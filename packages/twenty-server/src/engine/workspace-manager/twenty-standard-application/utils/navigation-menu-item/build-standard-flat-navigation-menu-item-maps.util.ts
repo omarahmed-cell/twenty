@@ -18,6 +18,7 @@ const FLAT_NAVIGATION_MENU_ITEM_NAMES = [
   'allNotes',
   'allOpportunities',
   'allPeople',
+  'allServices',
   'allTasks',
 ] as const;
 

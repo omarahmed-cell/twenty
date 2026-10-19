@@ -106,6 +106,7 @@ export const STANDARD_NAVIGATION_MENU_ITEM_DEFAULT_COLORS: Partial<
   allTasks: 'turquoise',
   allNotes: 'turquoise',
   allOpportunities: 'red',
+  allServices: 'purple',
   workflowsFolder: 'orange',
   allMessageCampaigns: 'gray',
   allDashboards: 'gray',
