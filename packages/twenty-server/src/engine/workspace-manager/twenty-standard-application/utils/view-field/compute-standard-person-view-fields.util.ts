@@ -386,5 +386,18 @@ export const computeStandardPersonViewFields = (
         size: 150,
       },
     }),
+    personRecordPageFieldsServices: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'person',
+      context: {
+        viewName: 'personRecordPageFields',
+        viewFieldName: 'services',
+        fieldName: 'services',
+        position: 11,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

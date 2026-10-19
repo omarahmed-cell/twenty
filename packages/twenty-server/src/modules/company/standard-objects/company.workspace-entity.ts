@@ -13,6 +13,7 @@ import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/co
 import { type MessageThreadTargetWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread-target.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
+import { type ServiceWorkspaceEntity } from 'src/modules/service/standard-objects/service.workspace-entity';
 import { type TaskTargetWorkspaceEntity } from 'src/modules/task/standard-objects/task-target.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
 import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
@@ -46,6 +47,10 @@ export class CompanyWorkspaceEntity {
   calendarEventTargets: EntityRelation<CalendarEventTargetWorkspaceEntity[]>;
   messageThreadTargets: EntityRelation<MessageThreadTargetWorkspaceEntity[]>;
   opportunities: EntityRelation<OpportunityWorkspaceEntity[]>;
+  services: EntityRelation<ServiceWorkspaceEntity[]>;
+  parentCompany: EntityRelation<CompanyWorkspaceEntity> | null;
+  parentCompanyId: string | null;
+  childCompanies: EntityRelation<CompanyWorkspaceEntity[]>;
   attachments: EntityRelation<AttachmentWorkspaceEntity[]>;
   timelineActivities: EntityRelation<TimelineActivityWorkspaceEntity[]>;
 }

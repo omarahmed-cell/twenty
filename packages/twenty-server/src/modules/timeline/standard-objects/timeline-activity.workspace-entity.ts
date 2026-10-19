@@ -10,6 +10,7 @@ import { type MessageListWorkspaceEntity } from 'src/modules/emailing/standard-o
 import { type NoteWorkspaceEntity } from 'src/modules/note/standard-objects/note.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
+import { type ServiceWorkspaceEntity } from 'src/modules/service/standard-objects/service.workspace-entity';
 import { type TaskWorkspaceEntity } from 'src/modules/task/standard-objects/task.workspace-entity';
 import { type WorkflowRunWorkspaceEntity } from 'src/modules/workflow/common/standard-objects/workflow-run.workspace-entity';
 import { type WorkflowVersionWorkspaceEntity } from 'src/modules/workflow/common/standard-objects/workflow-version.workspace-entity';
@@ -48,6 +49,8 @@ export class TimelineActivityWorkspaceEntity extends BaseWorkspaceEntity {
   targetMessageListId: string | null;
   targetMessageCampaign: EntityRelation<MessageCampaignWorkspaceEntity> | null;
   targetMessageCampaignId: string | null;
+  targetService: EntityRelation<ServiceWorkspaceEntity> | null;
+  targetServiceId: string | null;
   custom: EntityRelation<CustomWorkspaceEntity>;
   targetCustom: EntityRelation<CustomWorkspaceEntity>;
 }

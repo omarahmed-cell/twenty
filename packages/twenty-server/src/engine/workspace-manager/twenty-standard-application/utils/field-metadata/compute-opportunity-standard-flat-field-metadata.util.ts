@@ -443,6 +443,35 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  services: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'services',
+      label: i18nLabel(
+        msg({ message: `Services`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Services linked to the opportunity`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconBriefcase',
+      isNullable: true,
+      targetObjectName: 'service',
+      targetFieldName: 'opportunity',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   taskTargets: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

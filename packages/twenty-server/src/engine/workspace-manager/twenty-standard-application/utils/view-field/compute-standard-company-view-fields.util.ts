@@ -294,5 +294,44 @@ export const computeStandardCompanyViewFields = (
         viewFieldGroupName: 'system',
       },
     }),
+    companyRecordPageFieldsParentCompany: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'parentCompany',
+        fieldName: 'parentCompany',
+        position: 9,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    companyRecordPageFieldsServices: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'services',
+        fieldName: 'services',
+        position: 10,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    companyRecordPageFieldsChildCompanies: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'childCompanies',
+        fieldName: 'childCompanies',
+        position: 11,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

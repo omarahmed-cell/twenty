@@ -16,6 +16,7 @@ export { STANDARD_MESSAGE_LIST_PAGE_LAYOUT_CONFIG } from './standard-message-lis
 export { STANDARD_MESSAGE_THREAD_PAGE_LAYOUT_CONFIG } from './standard-message-thread-page-layout.config';
 export { STANDARD_NOTE_PAGE_LAYOUT_CONFIG } from './standard-note-page-layout.config';
 export { STANDARD_OPPORTUNITY_PAGE_LAYOUT_CONFIG } from './standard-opportunity-page-layout.config';
+export { STANDARD_SERVICE_PAGE_LAYOUT_CONFIG } from './standard-service-page-layout.config';
 export {
   type StandardPageLayoutConfig,
   type StandardPageLayoutTabConfig,

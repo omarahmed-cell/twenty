@@ -1,0 +1,189 @@
+import { type FlatViewField } from 'src/engine/metadata-modules/flat-view-field/types/flat-view-field.type';
+import {
+  createStandardViewFieldFlatMetadata,
+  type CreateStandardViewFieldArgs,
+} from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/create-standard-view-field-flat-metadata.util';
+
+export const computeStandardServiceViewFields = (
+  args: Omit<CreateStandardViewFieldArgs<'service'>, 'context'>,
+): Record<string, FlatViewField> => {
+  return {
+    allServicesName: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'allServices',
+        viewFieldName: 'name',
+        fieldName: 'name',
+        position: 0,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    allServicesCompany: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'allServices',
+        viewFieldName: 'company',
+        fieldName: 'company',
+        position: 1,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    allServicesPointOfContact: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'allServices',
+        viewFieldName: 'pointOfContact',
+        fieldName: 'pointOfContact',
+        position: 2,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    allServicesOpportunity: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'allServices',
+        viewFieldName: 'opportunity',
+        fieldName: 'opportunity',
+        position: 3,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    allServicesCreatedBy: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'allServices',
+        viewFieldName: 'createdBy',
+        fieldName: 'createdBy',
+        position: 4,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    allServicesCreatedAt: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'allServices',
+        viewFieldName: 'createdAt',
+        fieldName: 'createdAt',
+        position: 5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    serviceRecordPageFieldsCompany: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'company',
+        fieldName: 'company',
+        position: 0,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
+    serviceRecordPageFieldsPointOfContact: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'pointOfContact',
+        fieldName: 'pointOfContact',
+        position: 1,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
+    serviceRecordPageFieldsOpportunity: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'opportunity',
+        fieldName: 'opportunity',
+        position: 2,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
+    serviceRecordPageFieldsCreatedAt: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'createdAt',
+        fieldName: 'createdAt',
+        position: 0,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'system',
+      },
+    }),
+    serviceRecordPageFieldsCreatedBy: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'createdBy',
+        fieldName: 'createdBy',
+        position: 1,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'system',
+      },
+    }),
+    serviceRecordPageFieldsUpdatedAt: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'updatedAt',
+        fieldName: 'updatedAt',
+        position: 2,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'system',
+      },
+    }),
+    serviceRecordPageFieldsUpdatedBy: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'updatedBy',
+        fieldName: 'updatedBy',
+        position: 3,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'system',
+      },
+    }),
+    serviceRecordPageFieldsTimelineActivities:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'service',
+        context: {
+          viewName: 'serviceRecordPageFields',
+          viewFieldName: 'timelineActivities',
+          fieldName: 'timelineActivities',
+          position: 3,
+          isVisible: false,
+          size: 150,
+          viewFieldGroupName: 'relations',
+        },
+      }),
+  };
+};

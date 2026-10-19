@@ -55,6 +55,13 @@ export const STANDARD_NAVIGATION_MENU_ITEMS = {
         .universalIdentifier,
     position: 7,
   },
+  allServices: {
+    universalIdentifier: '3da6bee0-3d92-4f88-a2cd-9308c4186219',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.service.views.allServices.universalIdentifier,
+    position: 8,
+  },
   workflowsFolder: {
     universalIdentifier: '20202020-b007-4b07-8b07-c0aba11c0007',
     type: NavigationMenuItemType.FOLDER,

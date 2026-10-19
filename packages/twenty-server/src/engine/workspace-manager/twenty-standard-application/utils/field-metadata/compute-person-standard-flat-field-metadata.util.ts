@@ -453,6 +453,35 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  services: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'services',
+      label: i18nLabel(
+        msg({ message: `Services`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Services where the person is the point of contact`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconBriefcase',
+      isNullable: true,
+      targetObjectName: 'service',
+      targetFieldName: 'pointOfContact',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   taskTargets: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

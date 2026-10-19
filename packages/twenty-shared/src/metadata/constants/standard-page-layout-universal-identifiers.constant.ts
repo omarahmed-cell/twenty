@@ -61,6 +61,8 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           fields: 'Fields',
           people: 'People',
           opportunities: 'Opportunities',
+          services: 'Services',
+          childCompanies: 'Child Companies',
         },
       },
       timeline: {
@@ -117,6 +119,7 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           company: 'Company',
           pointOfContactForOpportunities: 'Opportunities',
           listMemberships: 'Lists',
+          services: 'Services',
         },
       },
       timeline: {
@@ -174,6 +177,7 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           pointOfContact: 'Point of Contact',
           company: 'Company',
           owner: 'Owner',
+          services: 'Services',
         },
       },
       timeline: {
@@ -216,6 +220,26 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
         title: 'Calendar',
         widgets: {
           calendar: 'Calendar',
+        },
+      },
+    },
+  }),
+  serviceRecordPage: buildStandardObjectRecordPageLayout({
+    objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+    tabs: {
+      home: {
+        title: 'Home',
+        widgets: {
+          fields: 'Fields',
+          company: 'Company',
+          pointOfContact: 'Point of Contact',
+          opportunity: 'Opportunity',
+        },
+      },
+      timeline: {
+        title: 'Timeline',
+        widgets: {
+          timeline: 'Timeline',
         },
       },
     },

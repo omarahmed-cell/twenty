@@ -331,6 +331,9 @@ export const STANDARD_OBJECTS = {
       domainNameUniqueIndex: {
         universalIdentifier: 'dd300c61-f422-467a-91f4-de4f83c4175b',
       },
+      parentCompanyIdIndex: {
+        universalIdentifier: '42690d5f-4acc-4ba0-887e-99cc21f72246',
+      },
       searchVectorGinIndex: {
         universalIdentifier: 'c3eb62df-2cc1-4cc3-b7aa-e96a4d65c633',
       },
@@ -360,6 +363,7 @@ export const STANDARD_OBJECTS = {
           'annualRevenue',
           'linkedinLink',
           'address',
+          'parentCompany',
           'createdAt',
           'createdBy',
           'updatedAt',
@@ -370,6 +374,8 @@ export const STANDARD_OBJECTS = {
           'opportunities',
           'attachments',
           'timelineActivities',
+          'services',
+          'childCompanies',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -942,6 +948,7 @@ export const STANDARD_OBJECTS = {
           'noteTargets',
           'attachments',
           'timelineActivities',
+          'services',
         ],
         viewFieldGroupNames: {
           deal: 'Deal',
@@ -1002,6 +1009,7 @@ export const STANDARD_OBJECTS = {
           'messageParticipants',
           'calendarEventParticipants',
           'timelineActivities',
+          'services',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -1029,6 +1037,58 @@ export const STANDARD_OBJECTS = {
           },
         },
       },
+    },
+  },
+  service: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+    fields: STANDARD_OBJECT_FIELDS.service,
+    indexes: {
+      companyIdIndex: {
+        universalIdentifier: '917d0dd4-c7e2-4cab-8fbb-73cd2b0b5335',
+      },
+      pointOfContactIdIndex: {
+        universalIdentifier: 'a323060e-3c73-4415-be78-fdef56247788',
+      },
+      opportunityIdIndex: {
+        universalIdentifier: '773c96f3-6540-4517-933b-9264dbd872ef',
+      },
+      searchVectorGinIndex: {
+        universalIdentifier: 'bde7f1c3-9e77-49bd-9fa4-58df4494668c',
+      },
+    },
+    views: {
+      allServices: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+        fields: STANDARD_OBJECT_FIELDS.service,
+        viewFieldNames: [
+          'name',
+          'company',
+          'pointOfContact',
+          'opportunity',
+          'createdBy',
+          'createdAt',
+        ],
+      }),
+      serviceRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+        fields: STANDARD_OBJECT_FIELDS.service,
+        viewFieldNames: [
+          'company',
+          'pointOfContact',
+          'opportunity',
+          'createdAt',
+          'createdBy',
+          'updatedAt',
+          'updatedBy',
+          'timelineActivities',
+        ],
+        viewFieldGroupNames: {
+          relations: 'Relations',
+          system: 'System',
+        },
+      }),
     },
   },
   recordShare: {
@@ -1267,6 +1327,9 @@ export const STANDARD_OBJECTS = {
       },
       messageCampaignIdIndex: {
         universalIdentifier: 'e808e721-91cc-4b9b-b24b-806d64b4d5e2',
+      },
+      serviceIdIndex: {
+        universalIdentifier: 'e9cd6149-5ea4-4c6b-95af-107f48cc8d8c',
       },
     },
     views: {

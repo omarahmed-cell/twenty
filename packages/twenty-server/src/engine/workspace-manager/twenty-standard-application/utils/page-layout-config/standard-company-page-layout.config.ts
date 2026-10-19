@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import {
   STANDARD_OBJECTS,
   STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS,
@@ -9,6 +10,7 @@ import {
   VERTICAL_LIST_LAYOUT_POSITIONS,
   WIDGET_PROPS,
 } from 'src/engine/workspace-manager/twenty-standard-application/constants/standard-page-layout-tabs.template';
+import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-application/utils/i18n-label.util';
 import {
   type StandardPageLayoutConfig,
   type StandardPageLayoutTabConfig,
@@ -46,6 +48,33 @@ const COMPANY_PAGE_TABS = {
         position: VERTICAL_LIST_LAYOUT_POSITIONS.THIRD,
         fieldUniversalIdentifier:
           STANDARD_OBJECTS.company.fields.opportunities.universalIdentifier,
+      },
+      services: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.home
+            .widgets.services.universalIdentifier,
+        title: i18nLabel(
+          msg({ message: 'Services', context: 'pageLayoutWidget.title' }),
+        ),
+        type: WidgetType.FIELD,
+        position: VERTICAL_LIST_LAYOUT_POSITIONS.FOURTH,
+        fieldUniversalIdentifier:
+          STANDARD_OBJECTS.company.fields.services.universalIdentifier,
+      },
+      childCompanies: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.home
+            .widgets.childCompanies.universalIdentifier,
+        title: i18nLabel(
+          msg({
+            message: 'Child Companies',
+            context: 'pageLayoutWidget.title',
+          }),
+        ),
+        type: WidgetType.FIELD,
+        position: VERTICAL_LIST_LAYOUT_POSITIONS.FIFTH,
+        fieldUniversalIdentifier:
+          STANDARD_OBJECTS.company.fields.childCompanies.universalIdentifier,
       },
     },
   },

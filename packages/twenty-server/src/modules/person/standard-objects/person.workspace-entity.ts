@@ -19,6 +19,7 @@ import { type NoteTargetWorkspaceEntity } from 'src/modules/note/standard-object
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
 import { type MessageThreadTargetWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread-target.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
+import { type ServiceWorkspaceEntity } from 'src/modules/service/standard-objects/service.workspace-entity';
 import { type TaskTargetWorkspaceEntity } from 'src/modules/task/standard-objects/task-target.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
 
@@ -39,6 +40,7 @@ export class PersonWorkspaceEntity extends BaseWorkspaceEntity {
   company: EntityRelation<CompanyWorkspaceEntity> | null;
   companyId: string | null;
   pointOfContactForOpportunities: EntityRelation<OpportunityWorkspaceEntity[]>;
+  services: EntityRelation<ServiceWorkspaceEntity[]>;
   taskTargets: EntityRelation<TaskTargetWorkspaceEntity[]>;
   noteTargets: EntityRelation<NoteTargetWorkspaceEntity[]>;
   agentChatThreadTargets: EntityRelation<

@@ -437,6 +437,16 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageCampaign,
       }),
     },
+    targetService: {
+      universalIdentifier: getSystemRelationFieldUniversalIdentifier({
+        applicationUniversalIdentifier:
+          TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.timelineActivity,
+        relationTargetObjectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+      }),
+    },
     linkedRecordCachedName: {
       universalIdentifier: '20202020-cfdb-4bef-bbce-a29f41230934',
     },
@@ -803,6 +813,15 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     opportunities: {
       universalIdentifier: '20202020-add3-4658-8e23-d70dccb6d0ec',
+    },
+    services: {
+      universalIdentifier: 'cf0f4f8a-b34f-435a-9adf-2c7c7c294e26',
+    },
+    parentCompany: {
+      universalIdentifier: 'f5089e4e-1902-43aa-b7c3-fa7d71d3484a',
+    },
+    childCompanies: {
+      universalIdentifier: '50530a01-3bdd-4d16-85ac-13feb02e37de',
     },
     attachments: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
@@ -1187,6 +1206,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     company: { universalIdentifier: '20202020-cbac-457e-b565-adece5fc815f' },
     owner: { universalIdentifier: '20202020-be7e-4d1e-8e19-3d5c7c4b9f2a' },
+    services: {
+      universalIdentifier: '6bdc4a51-1b5b-440a-b2ab-13e87a6ae902',
+    },
     taskTargets: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -1279,6 +1301,9 @@ export const STANDARD_OBJECT_FIELDS = {
     pointOfContactForOpportunities: {
       universalIdentifier: '20202020-911b-4a7d-b67b-918aa9a5b33a',
     },
+    services: {
+      universalIdentifier: '81b6c188-41f4-4ca0-8909-efc53069a144',
+    },
     taskTargets: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -1350,6 +1375,29 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     listMemberships: {
       universalIdentifier: '8b8d1be0-4c94-4413-a2c9-c7ede205a81d',
+    },
+  },
+  service: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+    ),
+    name: { universalIdentifier: '120f9f98-08d8-4ca3-8af3-5f8911565f64' },
+    company: { universalIdentifier: 'a10f3e30-45d3-4ae3-ad28-44d02b7b9bbb' },
+    pointOfContact: {
+      universalIdentifier: 'bf5cc87b-3e5d-45a0-8751-3000f305a791',
+    },
+    opportunity: {
+      universalIdentifier: '9be58245-dbf3-42cb-b871-714ff74515e9',
+    },
+    timelineActivities: {
+      universalIdentifier: getSystemRelationFieldUniversalIdentifier({
+        applicationUniversalIdentifier:
+          TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
+        relationTargetObjectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.timelineActivity,
+      }),
     },
   },
   recordShare: {
