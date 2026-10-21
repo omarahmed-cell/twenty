@@ -447,6 +447,16 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
       }),
     },
+    targetCall: {
+      universalIdentifier: getSystemRelationFieldUniversalIdentifier({
+        applicationUniversalIdentifier:
+          TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.timelineActivity,
+        relationTargetObjectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
+      }),
+    },
     linkedRecordCachedName: {
       universalIdentifier: '20202020-cfdb-4bef-bbce-a29f41230934',
     },
@@ -695,6 +705,25 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.calendarEventTarget,
         relationTargetObjectUniversalIdentifier:
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunity,
+      }),
+    },
+  },
+  call: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
+    ),
+    title: { universalIdentifier: 'eb2ab184-bfc6-44da-ba32-76d21ea5e29b' },
+    bodyV2: { universalIdentifier: 'a461c678-dac1-4914-8816-eb31ae67c1d3' },
+    direction: {
+      universalIdentifier: '7f9ca46f-95e3-455d-9514-d7478cac6353',
+    },
+    timelineActivities: {
+      universalIdentifier: getSystemRelationFieldUniversalIdentifier({
+        applicationUniversalIdentifier:
+          TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+        objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
+        relationTargetObjectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.timelineActivity,
       }),
     },
   },

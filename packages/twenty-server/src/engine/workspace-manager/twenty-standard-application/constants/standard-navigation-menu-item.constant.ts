@@ -62,6 +62,13 @@ export const STANDARD_NAVIGATION_MENU_ITEMS = {
       STANDARD_OBJECTS.service.views.allServices.universalIdentifier,
     position: 8,
   },
+  allCalls: {
+    universalIdentifier: 'a31943e5-eb36-46db-aa88-405e0d490840',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.call.views.allCalls.universalIdentifier,
+    position: 9,
+  },
   workflowsFolder: {
     universalIdentifier: '20202020-b007-4b07-8b07-c0aba11c0007',
     type: NavigationMenuItemType.FOLDER,
@@ -105,6 +112,7 @@ export const STANDARD_NAVIGATION_MENU_ITEM_DEFAULT_COLORS: Partial<
   allPeople: 'blue',
   allTasks: 'turquoise',
   allNotes: 'turquoise',
+  allCalls: 'turquoise',
   allOpportunities: 'red',
   allServices: 'purple',
   workflowsFolder: 'orange',

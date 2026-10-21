@@ -7,6 +7,7 @@ import { computeStandardBlocklistViewFieldGroups } from 'src/engine/workspace-ma
 import { computeStandardCalendarChannelEventAssociationViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-calendar-channel-event-association-view-field-groups.util';
 import { computeStandardCalendarEventViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-calendar-event-view-field-groups.util';
 import { computeStandardCalendarEventParticipantViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-calendar-event-participant-view-field-groups.util';
+import { computeStandardCallViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-call-view-field-groups.util';
 import { computeStandardCallRecordingViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-call-recording-view-field-groups.util';
 import { computeStandardCompanyViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-company-view-field-groups.util';
 import { computeStandardMessageCampaignViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-message-campaign-view-field-groups.util';
@@ -35,6 +36,7 @@ const STANDARD_FLAT_VIEW_FIELD_GROUP_METADATA_BUILDERS_BY_OBJECT_NAME = {
   calendarEvent: computeStandardCalendarEventViewFieldGroups,
   calendarEventParticipant:
     computeStandardCalendarEventParticipantViewFieldGroups,
+  call: computeStandardCallViewFieldGroups,
   callRecording: computeStandardCallRecordingViewFieldGroups,
   company: computeStandardCompanyViewFieldGroups,
   message: computeStandardMessageViewFieldGroups,

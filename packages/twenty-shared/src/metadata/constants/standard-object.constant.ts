@@ -280,6 +280,42 @@ export const STANDARD_OBJECTS = {
     },
     views: {},
   },
+  call: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
+    fields: STANDARD_OBJECT_FIELDS.call,
+    indexes: {
+      searchVectorGinIndex: {
+        universalIdentifier: 'e4f82180-f1d1-4813-b6f1-577350523d07',
+      },
+    },
+    views: {
+      allCalls: buildStandardObjectIndexView({
+        objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
+        fields: STANDARD_OBJECT_FIELDS.call,
+        viewFieldNames: [
+          'title',
+          'direction',
+          'bodyV2',
+          'createdBy',
+          'createdAt',
+        ],
+      }),
+      callRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
+        fields: STANDARD_OBJECT_FIELDS.call,
+        viewFieldNames: [
+          'direction',
+          'bodyV2',
+          'createdAt',
+          'createdBy',
+          'timelineActivities',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
+        },
+      }),
+    },
+  },
   callRecording: {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.callRecording,
     fields: STANDARD_OBJECT_FIELDS.callRecording,
@@ -1330,6 +1366,9 @@ export const STANDARD_OBJECTS = {
       },
       serviceIdIndex: {
         universalIdentifier: 'e9cd6149-5ea4-4c6b-95af-107f48cc8d8c',
+      },
+      callIdIndex: {
+        universalIdentifier: '4eefa3a6-f80c-4dda-a4dc-9c584de02e40',
       },
     },
     views: {

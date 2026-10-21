@@ -791,6 +791,36 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  targetCall: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.MORPH_RELATION,
+      morphId: STANDARD_OBJECTS.timelineActivity.morphIds.targetMorphId.morphId,
+      fieldName: 'targetCall',
+      label: i18nLabel(
+        msg({ message: `Call`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({ message: `Event target`, context: 'fieldMetadata.description' }),
+      ),
+      icon: 'IconTimelineEvent',
+      isNullable: true,
+      isUIEditable: false,
+      isSystemSideEffect: true,
+      targetObjectName: 'call',
+      targetFieldName: 'timelineActivities',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'targetCallId',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   searchVector: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,
