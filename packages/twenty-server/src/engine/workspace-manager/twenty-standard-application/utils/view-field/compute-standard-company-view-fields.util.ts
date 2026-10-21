@@ -302,7 +302,7 @@ export const computeStandardCompanyViewFields = (
         viewFieldName: 'parentCompany',
         fieldName: 'parentCompany',
         position: 9,
-        isVisible: true,
+        isVisible: false,
         size: 150,
         viewFieldGroupName: 'general',
       },

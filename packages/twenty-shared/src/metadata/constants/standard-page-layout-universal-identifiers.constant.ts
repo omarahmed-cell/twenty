@@ -62,7 +62,7 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           people: 'People',
           opportunities: 'Opportunities',
           services: 'Services',
-          childCompanies: 'Child Companies',
+          companies: 'Companies',
         },
       },
       timeline: {

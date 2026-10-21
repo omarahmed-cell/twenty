@@ -61,15 +61,12 @@ const COMPANY_PAGE_TABS = {
         fieldUniversalIdentifier:
           STANDARD_OBJECTS.company.fields.services.universalIdentifier,
       },
-      childCompanies: {
+      companies: {
         universalIdentifier:
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.home
-            .widgets.childCompanies.universalIdentifier,
+            .widgets.companies.universalIdentifier,
         title: i18nLabel(
-          msg({
-            message: 'Child Companies',
-            context: 'pageLayoutWidget.title',
-          }),
+          msg({ message: 'Companies', context: 'pageLayoutWidget.title' }),
         ),
         type: WidgetType.FIELD,
         position: VERTICAL_LIST_LAYOUT_POSITIONS.FIFTH,

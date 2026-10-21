@@ -215,7 +215,7 @@ exports[`getStandardPageLayoutMetadataRelatedEntityIds should return standard pa
       "home": {
         "id": "00000000-0000-0000-0000-000000000055",
         "widgets": {
-          "childCompanies": {
+          "companies": {
             "id": "00000000-0000-0000-0000-000000000060",
           },
           "fields": {
