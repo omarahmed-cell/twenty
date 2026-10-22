@@ -785,4 +785,34 @@ export const buildCompanyStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  communicationTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'communicationTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Communications`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Communications tied to the company`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMessageCircle',
+      isNullable: true,
+      targetObjectName: 'communicationTarget',
+      targetFieldName: 'targetCompany',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

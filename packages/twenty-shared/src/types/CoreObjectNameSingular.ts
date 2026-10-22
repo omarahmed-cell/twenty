@@ -13,6 +13,7 @@ export enum CoreObjectNameSingular {
   Call = 'call',
   CallRecording = 'callRecording',
   Comment = 'comment',
+  Communication = 'communication',
   Company = 'company',
   Dashboard = 'dashboard',
   TimelineActivity = 'timelineActivity',

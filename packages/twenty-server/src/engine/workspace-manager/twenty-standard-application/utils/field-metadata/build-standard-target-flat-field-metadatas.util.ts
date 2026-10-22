@@ -359,4 +359,33 @@ export const buildStandardTargetFlatFieldMetadatas = <
       },
     },
   }),
+  targetService: createStandardRelationFieldFlatMetadata({
+    ...args,
+    objectName,
+    context: {
+      type: FieldMetadataType.MORPH_RELATION,
+      morphId,
+      fieldName: 'targetService',
+      label: i18nLabel(
+        msg({ message: `Service`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Target record`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconBriefcase',
+      isNullable: true,
+      isUIEditable: false,
+      isSystemSideEffect: true,
+      targetObjectName: 'service',
+      targetFieldName: inverseTargetFieldName,
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.CASCADE,
+        joinColumnName: 'targetServiceId',
+      },
+    },
+  }),
 });

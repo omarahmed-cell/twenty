@@ -216,6 +216,69 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       },
     },
     {
+      name: 'communicationLinked',
+      universalIdentifier: '4e9ea106-e45d-43fc-92bd-b0445631f753',
+      label: msg({
+        message: `linked a related communication`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconLink',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'linked',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.communication.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.communication.fields.communicationTargets
+              .universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'communicationUnlinked',
+      universalIdentifier: '4a6774c3-500e-4b99-a8d3-996322b5db32',
+      label: msg({
+        message: `unlinked a related communication`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconUnlink',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'unlinked',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.communication.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.communication.fields.communicationTargets
+              .universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'communicationUpdated',
+      universalIdentifier: 'a39d537c-1f37-4624-bb5d-9506b83dc624',
+      label: msg({
+        message: `updated a related communication`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconEditCircle',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'updated',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.communication.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.communication.fields.communicationTargets
+              .universalIdentifier,
+          triggerFieldUniversalIdentifiers: [
+            STANDARD_OBJECTS.communication.fields.title.universalIdentifier,
+          ],
+        },
+      },
+    },
+    {
       name: 'taskLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0c',
       label: msg({

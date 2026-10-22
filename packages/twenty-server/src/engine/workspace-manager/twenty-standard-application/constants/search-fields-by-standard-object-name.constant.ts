@@ -47,6 +47,11 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
   ],
   noteTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
   callTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
+  communication: [
+    { name: 'title', type: FieldMetadataType.TEXT },
+    { name: 'bodyV2', type: FieldMetadataType.RICH_TEXT },
+  ],
+  communicationTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
   call: [
     { name: 'title', type: FieldMetadataType.TEXT },
     { name: 'bodyV2', type: FieldMetadataType.RICH_TEXT },

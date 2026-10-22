@@ -7,6 +7,7 @@ import { DashboardQueryHookModule } from 'src/modules/dashboard/query-hooks/dash
 import { BlocklistQueryHookModule } from 'src/modules/blocklist/query-hooks/blocklist-query-hook.module';
 import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/query-hooks/workspace-member-query-hook.module';
 import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hook.module';
+import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
 import { TaskQueryHookModule } from 'src/modules/task/query-hooks/task-query-hook.module';
 import { TimelineQueryHookModule } from 'src/modules/timeline/query-hooks/timeline-query-hook.module';
@@ -48,6 +49,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     BlocklistQueryHookModule,
     WorkspaceMemberQueryHookModule,
     CallQueryHookModule,
+    CommunicationQueryHookModule,
     NoteQueryHookModule,
     TaskQueryHookModule,
     TimelineQueryHookModule,

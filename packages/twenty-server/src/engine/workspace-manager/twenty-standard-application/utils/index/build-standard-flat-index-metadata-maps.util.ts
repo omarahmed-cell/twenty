@@ -1,3 +1,5 @@
+import { buildCommunicationStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-communication-standard-flat-index-metadata.util';
+import { buildCommunicationTargetStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-communication-target-standard-flat-index-metadata.util';
 import { buildCallTargetStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-call-target-standard-flat-index-metadata.util';
 import { buildCampaignDeliveryStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-campaign-delivery-standard-flat-index-metadata.util';
 import { buildMessageSuppressionStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-message-suppression-standard-flat-index-metadata.util';
@@ -73,6 +75,8 @@ const STANDARD_FLAT_INDEX_METADATA_BUILDERS_BY_OBJECT_NAME = {
   calendarEventTarget: buildCalendarEventTargetStandardFlatIndexMetadatas,
   call: buildCallStandardFlatIndexMetadatas,
   callTarget: buildCallTargetStandardFlatIndexMetadatas,
+  communication: buildCommunicationStandardFlatIndexMetadatas,
+  communicationTarget: buildCommunicationTargetStandardFlatIndexMetadatas,
   callRecording: buildCallRecordingStandardFlatIndexMetadatas,
   company: buildCompanyStandardFlatIndexMetadatas,
   dashboard: buildDashboardStandardFlatIndexMetadatas,

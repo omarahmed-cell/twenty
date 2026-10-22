@@ -11,6 +11,7 @@ type StandardObjectNameWithTargetMorphField =
   | 'agentChatThreadTarget'
   | 'attachment'
   | 'callTarget'
+  | 'communicationTarget'
   | 'calendarEventTarget'
   | 'messageThreadTarget'
   | 'noteTarget'

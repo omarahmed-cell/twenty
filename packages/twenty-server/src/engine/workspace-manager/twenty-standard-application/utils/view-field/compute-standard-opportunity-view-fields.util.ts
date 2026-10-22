@@ -376,5 +376,19 @@ export const computeStandardOpportunityViewFields = (
         },
       },
     ),
+    opportunityRecordPageFieldsCommunicationTargets:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'communicationTargets',
+          fieldName: 'communicationTargets',
+          position: 10,
+          isVisible: false,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
   };
 };

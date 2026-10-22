@@ -41,6 +41,9 @@ const MORPH_ID_BY_STANDARD_OBJECT_NAME_SINGULAR = {
   taskTarget: STANDARD_OBJECTS.taskTarget.morphIds.targetMorphId.morphId,
   agentChatThreadTarget:
     STANDARD_OBJECTS.agentChatThreadTarget.morphIds.targetMorphId.morphId,
+  callTarget: STANDARD_OBJECTS.callTarget.morphIds.targetMorphId.morphId,
+  communicationTarget:
+    STANDARD_OBJECTS.communicationTarget.morphIds.targetMorphId.morphId,
 } satisfies Record<
   | DefaultRelationStandardObjectNameSingular
   | OptionalDefaultRelationStandardObjectNameSingular,

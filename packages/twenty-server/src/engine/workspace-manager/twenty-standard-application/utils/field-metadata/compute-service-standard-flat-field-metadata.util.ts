@@ -479,4 +479,94 @@ export const buildServiceStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  communicationTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'communicationTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Communications`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Communications tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMessageCircle',
+      isNullable: true,
+      targetObjectName: 'communicationTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  messageThreadTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'messageThreadTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Emails`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Message threads tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMail',
+      isNullable: true,
+      targetObjectName: 'messageThreadTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  calendarEventTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'calendarEventTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Calendar events`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Calendar events tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendar',
+      isNullable: true,
+      targetObjectName: 'calendarEventTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

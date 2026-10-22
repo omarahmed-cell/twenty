@@ -42,6 +42,9 @@ export const STANDARD_OBJECTS = {
       callIdIndex: {
         universalIdentifier: '3bd8ed36-0e01-4508-8b48-62af38aa00de',
       },
+      communicationIdIndex: {
+        universalIdentifier: '3aec16b7-3d7b-4027-8756-3b189c8b2765',
+      },
     },
     views: {
       allAttachments: buildStandardObjectIndexView({
@@ -280,6 +283,12 @@ export const STANDARD_OBJECTS = {
       calendarEventOpportunityUniqueIndex: {
         universalIdentifier: 'c8183b17-5dfe-4e02-8d9d-aef8e54ef07d',
       },
+      serviceIdIndex: {
+        universalIdentifier: '887f5eb6-82ea-4cbb-bf51-ff6ad6bc7724',
+      },
+      calendarEventServiceUniqueIndex: {
+        universalIdentifier: '5e331298-9ac9-4170-8b8d-e27cf37ef1f4',
+      },
     },
     views: {},
   },
@@ -366,6 +375,103 @@ export const STANDARD_OBJECTS = {
         viewFieldNames: [
           'id',
           'call',
+          'targetPerson',
+          'targetCompany',
+          'targetOpportunity',
+          'targetService',
+        ],
+      }),
+    },
+  },
+  communication: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communication,
+    fields: STANDARD_OBJECT_FIELDS.communication,
+    indexes: {
+      searchVectorGinIndex: {
+        universalIdentifier: 'eadec858-6de0-4770-a9d1-11436bcb1f73',
+      },
+    },
+    views: {
+      allCommunications: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communication,
+        fields: STANDARD_OBJECT_FIELDS.communication,
+        viewFieldNames: [
+          'title',
+          'communicationTargets',
+          'channelType',
+          'direction',
+          'bodyV2',
+          'createdBy',
+          'createdAt',
+        ],
+      }),
+      communicationRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communication,
+        fields: STANDARD_OBJECT_FIELDS.communication,
+        viewFieldNames: [
+          'communicationTargets',
+          'channelType',
+          'direction',
+          'createdAt',
+          'createdBy',
+          'attachments',
+          'timelineActivities',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
+        },
+      }),
+    },
+  },
+  communicationTarget: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communicationTarget,
+    fields: STANDARD_OBJECT_FIELDS.communicationTarget,
+    morphIds: {
+      targetMorphId: {
+        morphId:
+          STANDARD_OBJECT_FIELDS.communicationTarget.target.universalIdentifier,
+      },
+    },
+    indexes: {
+      communicationIdIndex: {
+        universalIdentifier: '8b8357e7-374a-416e-a96c-6a7a0af9a299',
+      },
+      personIdIndex: {
+        universalIdentifier: '62878271-acf2-4428-8679-9a7641bd0fa8',
+      },
+      companyIdIndex: {
+        universalIdentifier: '2ccaefbe-1ce9-4f36-9c16-c155efb598f8',
+      },
+      opportunityIdIndex: {
+        universalIdentifier: '6700a2cc-105f-463c-8752-af1422d66d0b',
+      },
+      serviceIdIndex: {
+        universalIdentifier: '741dd1be-9ac2-478e-97bf-dfeb9e0717b4',
+      },
+      communicationPersonUniqueIndex: {
+        universalIdentifier: '615f6e3b-66b9-4855-bb56-8c919e42a229',
+      },
+      communicationCompanyUniqueIndex: {
+        universalIdentifier: '90fb3590-ee0d-4ce0-ac08-a9145160da30',
+      },
+      communicationOpportunityUniqueIndex: {
+        universalIdentifier: 'ea524389-12bf-4cf9-9bf3-e618a55eb991',
+      },
+      communicationServiceUniqueIndex: {
+        universalIdentifier: '7f7fc1ec-9461-475e-88a2-7d009b132002',
+      },
+    },
+    views: {
+      allCommunicationTargets: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communicationTarget,
+        fields: STANDARD_OBJECT_FIELDS.communicationTarget,
+        viewFieldNames: [
+          'id',
+          'communication',
           'targetPerson',
           'targetCompany',
           'targetOpportunity',
@@ -471,6 +577,7 @@ export const STANDARD_OBJECTS = {
           'services',
           'childCompanies',
           'callTargets',
+          'communicationTargets',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -825,6 +932,12 @@ export const STANDARD_OBJECTS = {
       messageThreadOpportunityUniqueIndex: {
         universalIdentifier: '1dc0e37e-afb1-4e90-90b4-052374126a6a',
       },
+      serviceIdIndex: {
+        universalIdentifier: 'a7ceabe5-ecb0-4508-932c-c51ac3d50382',
+      },
+      messageThreadServiceUniqueIndex: {
+        universalIdentifier: '808ee479-7cc6-449c-afd7-ea95da1ca467',
+      },
     },
     views: {},
   },
@@ -1052,6 +1165,7 @@ export const STANDARD_OBJECTS = {
           'timelineActivities',
           'services',
           'callTargets',
+          'communicationTargets',
         ],
         viewFieldGroupNames: {
           deal: 'Deal',
@@ -1114,6 +1228,7 @@ export const STANDARD_OBJECTS = {
           'timelineActivities',
           'services',
           'callTargets',
+          'communicationTargets',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -1190,6 +1305,9 @@ export const STANDARD_OBJECTS = {
           'noteTargets',
           'taskTargets',
           'callTargets',
+          'communicationTargets',
+          'messageThreadTargets',
+          'calendarEventTargets',
         ],
         viewFieldGroupNames: {
           relations: 'Relations',
@@ -1447,6 +1565,9 @@ export const STANDARD_OBJECTS = {
       },
       callIdIndex: {
         universalIdentifier: '4eefa3a6-f80c-4dda-a4dc-9c584de02e40',
+      },
+      communicationIdIndex: {
+        universalIdentifier: '755f8b6e-9b3a-4d73-8231-5bac3bd49786',
       },
     },
     views: {

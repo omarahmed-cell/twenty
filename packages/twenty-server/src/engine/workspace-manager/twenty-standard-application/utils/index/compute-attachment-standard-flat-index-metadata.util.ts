@@ -124,4 +124,16 @@ export const buildAttachmentStandardFlatIndexMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  communicationIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'communicationIdIndex',
+      relatedFieldNames: ['targetCommunication'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

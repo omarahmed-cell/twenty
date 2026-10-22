@@ -224,5 +224,47 @@ export const computeStandardServiceViewFields = (
         viewFieldGroupName: 'relations',
       },
     }),
+    serviceRecordPageFieldsCommunicationTargets:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'service',
+        context: {
+          viewName: 'serviceRecordPageFields',
+          viewFieldName: 'communicationTargets',
+          fieldName: 'communicationTargets',
+          position: 7,
+          isVisible: false,
+          size: 150,
+          viewFieldGroupName: 'relations',
+        },
+      }),
+    serviceRecordPageFieldsMessageThreadTargets:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'service',
+        context: {
+          viewName: 'serviceRecordPageFields',
+          viewFieldName: 'messageThreadTargets',
+          fieldName: 'messageThreadTargets',
+          position: 8,
+          isVisible: false,
+          size: 150,
+          viewFieldGroupName: 'relations',
+        },
+      }),
+    serviceRecordPageFieldsCalendarEventTargets:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'service',
+        context: {
+          viewName: 'serviceRecordPageFields',
+          viewFieldName: 'calendarEventTargets',
+          fieldName: 'calendarEventTargets',
+          position: 9,
+          isVisible: false,
+          size: 150,
+          viewFieldGroupName: 'relations',
+        },
+      }),
   };
 };

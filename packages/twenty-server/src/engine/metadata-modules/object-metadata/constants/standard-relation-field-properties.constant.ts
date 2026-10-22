@@ -29,6 +29,17 @@ export const STANDARD_RELATION_FIELD_PROPERTIES_BY_RELATION_OBJECT = {
     label: msg({ message: `Chats`, context: 'fieldMetadata.label' }),
     icon: 'IconMessage',
   },
+  callTarget: {
+    label: msg({ message: `Calls`, context: 'fieldMetadata.label' }),
+    icon: 'IconPhone',
+  },
+  communicationTarget: {
+    label: msg({
+      message: `Communications`,
+      context: 'fieldMetadata.label',
+    }),
+    icon: 'IconMessageCircle',
+  },
 } satisfies Record<
   | (typeof DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS)[number]
   | (typeof OPTIONAL_DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS)[number],

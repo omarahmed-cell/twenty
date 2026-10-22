@@ -10,6 +10,7 @@ type StandardTargetObjectName =
   | 'agentChatThreadTarget'
   | 'calendarEventTarget'
   | 'callTarget'
+  | 'communicationTarget'
   | 'messageThreadTarget'
   | 'noteTarget'
   | 'taskTarget';

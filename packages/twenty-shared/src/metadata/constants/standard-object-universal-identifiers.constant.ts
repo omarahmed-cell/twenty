@@ -18,6 +18,8 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   calendarEventParticipant: '20202020-a1c3-47a6-9732-27e5b1e8436d',
   call: 'b386ea21-37d2-4fbf-8b2b-8a769a673f32',
   callTarget: '31ca00b3-37b4-407e-913d-300668ae4aec',
+  communication: 'b7e14ee5-9693-4173-a585-359e761496cb',
+  communicationTarget: '3f7132f7-0ca2-4b17-a5e6-d4913d8a9d7e',
   callRecording: 'ce19efb9-710f-45b2-b141-473abbeea60b',
   noteTarget: '20202020-fff0-4b44-be82-bda313884400',
   taskTarget: '20202020-5a9a-44e8-95df-771cd06d0fb1',

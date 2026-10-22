@@ -38,6 +38,8 @@ describe('resolveSystemRelationTargetFlatObjectMetadatas', () => {
         'noteTarget',
         'taskTarget',
         'agentChatThreadTarget',
+        'callTarget',
+        'communicationTarget',
       ],
     );
     expect(missingDefaultRelationObjectNameSingulars).toEqual([]);
@@ -52,7 +54,47 @@ describe('resolveSystemRelationTargetFlatObjectMetadatas', () => {
     });
 
     expect(Object.keys(standardTargetFlatObjectMetadataByNameSingular)).toEqual(
-      ['timelineActivity', 'attachment', 'noteTarget', 'taskTarget'],
+      [
+        'timelineActivity',
+        'attachment',
+        'noteTarget',
+        'taskTarget',
+        'callTarget',
+        'communicationTarget',
+      ],
+    );
+    expect(missingDefaultRelationObjectNameSingulars).toEqual([]);
+  });
+
+  it('leaves out the call and communication targets without reporting them before their upgrade provisions them', () => {
+    const flatObjectMetadataMapsWithoutActivityTargets = {
+      ...flatObjectMetadataMaps,
+      byUniversalIdentifier: Object.fromEntries(
+        Object.entries(flatObjectMetadataMaps.byUniversalIdentifier).filter(
+          ([universalIdentifier]) =>
+            universalIdentifier !==
+              STANDARD_OBJECTS.callTarget.universalIdentifier &&
+            universalIdentifier !==
+              STANDARD_OBJECTS.communicationTarget.universalIdentifier,
+        ),
+      ),
+    };
+
+    const {
+      standardTargetFlatObjectMetadataByNameSingular,
+      missingDefaultRelationObjectNameSingulars,
+    } = resolveSystemRelationTargetFlatObjectMetadatas({
+      flatObjectMetadataMaps: flatObjectMetadataMapsWithoutActivityTargets,
+    });
+
+    expect(Object.keys(standardTargetFlatObjectMetadataByNameSingular)).toEqual(
+      [
+        'timelineActivity',
+        'attachment',
+        'noteTarget',
+        'taskTarget',
+        'agentChatThreadTarget',
+      ],
     );
     expect(missingDefaultRelationObjectNameSingulars).toEqual([]);
   });

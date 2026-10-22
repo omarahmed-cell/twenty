@@ -254,6 +254,18 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           notes: 'Notes',
         },
       },
+      emails: {
+        title: 'Emails',
+        widgets: {
+          emails: 'Emails',
+        },
+      },
+      calendar: {
+        title: 'Calendar',
+        widgets: {
+          calendar: 'Calendar',
+        },
+      },
     },
   }),
   callRecordPage: buildStandardObjectRecordPageLayout({
@@ -270,6 +282,37 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
         title: 'Call',
         widgets: {
           callRichText: 'Call',
+        },
+      },
+      timeline: {
+        title: 'Timeline',
+        widgets: {
+          timeline: 'Timeline',
+        },
+      },
+      files: {
+        title: 'Files',
+        widgets: {
+          files: 'Files',
+        },
+      },
+    },
+  }),
+  communicationRecordPage: buildStandardObjectRecordPageLayout({
+    objectUniversalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communication,
+    tabs: {
+      home: {
+        title: 'Home',
+        widgets: {
+          fields: 'Fields',
+          communicationRichText: 'Communication',
+        },
+      },
+      communication: {
+        title: 'Communication',
+        widgets: {
+          communicationRichText: 'Communication',
         },
       },
       timeline: {

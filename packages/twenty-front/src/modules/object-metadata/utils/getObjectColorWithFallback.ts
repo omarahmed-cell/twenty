@@ -17,6 +17,7 @@ const STANDARD_OBJECT_FALLBACK_COLOR: Partial<
   [CoreObjectNameSingular.Note]: 'turquoise',
   [CoreObjectNameSingular.NoteTarget]: 'turquoise',
   [CoreObjectNameSingular.Call]: 'turquoise',
+  [CoreObjectNameSingular.Communication]: 'turquoise',
   [CoreObjectNameSingular.Opportunity]: 'red',
   [CoreObjectNameSingular.Service]: 'purple',
   [CoreObjectNameSingular.Dashboard]: SYSTEM_OBJECT_COLOR,

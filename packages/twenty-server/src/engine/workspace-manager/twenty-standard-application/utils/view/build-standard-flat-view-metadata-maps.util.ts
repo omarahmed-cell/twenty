@@ -1,3 +1,5 @@
+import { computeStandardCommunicationViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-communication-views.util';
+import { computeStandardCommunicationTargetViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-communication-target-views.util';
 import { computeStandardCallTargetViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-call-target-views.util';
 import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/constant/create-empty-flat-entity-maps.constant';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
@@ -49,6 +51,8 @@ const STANDARD_FLAT_VIEW_METADATA_BUILDERS_BY_OBJECT_NAME = {
   calendarEventParticipant: computeStandardCalendarEventParticipantViews,
   call: computeStandardCallViews,
   callTarget: computeStandardCallTargetViews,
+  communication: computeStandardCommunicationViews,
+  communicationTarget: computeStandardCommunicationTargetViews,
   callRecording: computeStandardCallRecordingViews,
   company: computeStandardCompanyViews,
   dashboard: computeStandardDashboardViews,

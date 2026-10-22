@@ -3,7 +3,8 @@ import { CoreObjectNameSingular } from 'twenty-shared/types';
 export type TargetFieldName =
   | 'targetPersonId'
   | 'targetCompanyId'
-  | 'targetOpportunityId';
+  | 'targetOpportunityId'
+  | 'targetServiceId';
 
 export type TargetFilter = {
   fieldName: TargetFieldName;
@@ -20,6 +21,8 @@ export const getTargetFieldNameForObjectRecord = (
       return 'targetCompanyId';
     case CoreObjectNameSingular.Opportunity:
       return 'targetOpportunityId';
+    case CoreObjectNameSingular.Service:
+      return 'targetServiceId';
     default:
       return null;
   }

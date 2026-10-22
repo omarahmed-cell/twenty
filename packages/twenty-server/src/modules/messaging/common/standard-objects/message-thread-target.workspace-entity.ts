@@ -4,6 +4,7 @@ import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-object
 import { type MessageThreadWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
+import { type ServiceWorkspaceEntity } from 'src/modules/service/standard-objects/service.workspace-entity';
 
 export class MessageThreadTargetWorkspaceEntity extends BaseWorkspaceEntity {
   messageThread: EntityRelation<MessageThreadWorkspaceEntity>;
@@ -16,4 +17,6 @@ export class MessageThreadTargetWorkspaceEntity extends BaseWorkspaceEntity {
   targetCompanyId: string | null;
   targetOpportunity: EntityRelation<OpportunityWorkspaceEntity> | null;
   targetOpportunityId: string | null;
+  targetService: EntityRelation<ServiceWorkspaceEntity> | null;
+  targetServiceId: string | null;
 }

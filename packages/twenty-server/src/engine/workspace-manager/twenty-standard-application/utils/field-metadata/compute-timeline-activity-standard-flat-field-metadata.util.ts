@@ -821,6 +821,36 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  targetCommunication: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.MORPH_RELATION,
+      morphId: STANDARD_OBJECTS.timelineActivity.morphIds.targetMorphId.morphId,
+      fieldName: 'targetCommunication',
+      label: i18nLabel(
+        msg({ message: `Communication`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({ message: `Event target`, context: 'fieldMetadata.description' }),
+      ),
+      icon: 'IconTimelineEvent',
+      isNullable: true,
+      isUIEditable: false,
+      isSystemSideEffect: true,
+      targetObjectName: 'communication',
+      targetFieldName: 'timelineActivities',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'targetCommunicationId',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   searchVector: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

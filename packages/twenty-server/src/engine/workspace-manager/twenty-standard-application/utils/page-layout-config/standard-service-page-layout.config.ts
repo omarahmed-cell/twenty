@@ -112,6 +112,34 @@ const SERVICE_PAGE_TABS = {
       },
     },
   },
+  emails: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs.emails
+        .universalIdentifier,
+    ...TAB_PROPS.emails,
+    widgets: {
+      emails: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs
+            .emails.widgets.emails.universalIdentifier,
+        ...WIDGET_PROPS.emails,
+      },
+    },
+  },
+  calendar: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs.calendar
+        .universalIdentifier,
+    ...TAB_PROPS.calendar,
+    widgets: {
+      calendar: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs
+            .calendar.widgets.calendar.universalIdentifier,
+        ...WIDGET_PROPS.calendar,
+      },
+    },
+  },
 } as const satisfies Record<string, StandardPageLayoutTabConfig>;
 
 export const STANDARD_SERVICE_PAGE_LAYOUT_CONFIG = {

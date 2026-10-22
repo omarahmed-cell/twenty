@@ -753,6 +753,100 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  communication: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'communication'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'communication',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.communication.universalIdentifier,
+        nameSingular: 'communication',
+        namePlural: 'communications',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Communication`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Communications`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A logged message`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconMessageCircle',
+        isSearchable: true,
+        readability: MetadataReadability.INHERITED,
+        readabilityParentFieldMetadataNames: ['communicationTargets'],
+        labelIdentifierFieldMetadataName: 'title',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  communicationTarget: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'communicationTarget'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'communicationTarget',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.communicationTarget.universalIdentifier,
+        nameSingular: 'communicationTarget',
+        namePlural: 'communicationTargets',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Communication Target`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Communication Targets`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A communication target`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconCheckbox',
+        isSystem: true,
+        isUICreatable: false,
+        readability: MetadataReadability.INHERITED,
+        readabilityParentFieldMetadataNames: ['targetPerson'],
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   callRecording: ({
     now,
     workspaceId,

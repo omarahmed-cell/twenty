@@ -846,4 +846,34 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  communicationTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'communicationTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Communications`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Communications tied to the person`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMessageCircle',
+      isNullable: true,
+      targetObjectName: 'communicationTarget',
+      targetFieldName: 'targetPerson',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });
