@@ -25,6 +25,7 @@ export const STANDARD_OBJECT_ICONS = {
   message: 'IconMessage',
   note: 'IconNotes',
   call: 'IconPhone',
+  callTarget: 'IconCheckbox',
   noteTarget: 'IconCheckbox',
   opportunity: 'IconTargetArrow',
   person: 'IconUser',

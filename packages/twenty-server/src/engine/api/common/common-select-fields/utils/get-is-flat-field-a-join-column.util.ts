@@ -13,7 +13,9 @@ export const getIsFlatFieldAJoinColumn = ({
 
   // TODO: refactor this when we remove hard-coded activity relations
   const flatFieldIsActivityTarget =
-    flatField.name === 'noteTargets' || flatField.name === 'taskTargets';
+    flatField.name === 'noteTargets' ||
+    flatField.name === 'taskTargets' ||
+    flatField.name === 'callTargets';
 
   return flatFieldIsJoinColumn || flatFieldIsActivityTarget;
 };

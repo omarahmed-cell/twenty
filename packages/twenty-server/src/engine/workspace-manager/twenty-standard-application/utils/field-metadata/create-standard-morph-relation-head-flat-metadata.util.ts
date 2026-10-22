@@ -10,6 +10,7 @@ import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-applicat
 type StandardObjectNameWithTargetMorphField =
   | 'agentChatThreadTarget'
   | 'attachment'
+  | 'callTarget'
   | 'calendarEventTarget'
   | 'messageThreadTarget'
   | 'noteTarget'

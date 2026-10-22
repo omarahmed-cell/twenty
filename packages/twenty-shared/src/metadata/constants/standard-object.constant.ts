@@ -39,6 +39,9 @@ export const STANDARD_OBJECTS = {
       agentChatThreadIdIndex: {
         universalIdentifier: '69857371-6ff9-48fa-a9de-db4f71593431',
       },
+      callIdIndex: {
+        universalIdentifier: '3bd8ed36-0e01-4508-8b48-62af38aa00de',
+      },
     },
     views: {
       allAttachments: buildStandardObjectIndexView({
@@ -294,6 +297,7 @@ export const STANDARD_OBJECTS = {
         fields: STANDARD_OBJECT_FIELDS.call,
         viewFieldNames: [
           'title',
+          'callTargets',
           'direction',
           'bodyV2',
           'createdBy',
@@ -304,15 +308,69 @@ export const STANDARD_OBJECTS = {
         objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
         fields: STANDARD_OBJECT_FIELDS.call,
         viewFieldNames: [
+          'callTargets',
           'direction',
-          'bodyV2',
           'createdAt',
           'createdBy',
+          'attachments',
           'timelineActivities',
         ],
         viewFieldGroupNames: {
           general: 'General',
         },
+      }),
+    },
+  },
+  callTarget: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.callTarget,
+    fields: STANDARD_OBJECT_FIELDS.callTarget,
+    morphIds: {
+      targetMorphId: {
+        morphId: STANDARD_OBJECT_FIELDS.callTarget.target.universalIdentifier,
+      },
+    },
+    indexes: {
+      callIdIndex: {
+        universalIdentifier: '60e87ab0-ffff-43fc-9c0f-6cb740da6d3c',
+      },
+      personIdIndex: {
+        universalIdentifier: 'a8b58d15-a1bb-4c60-991e-673c4fdda5e2',
+      },
+      companyIdIndex: {
+        universalIdentifier: '99f304a7-ec05-4bc3-8c1f-379daee3fe7d',
+      },
+      opportunityIdIndex: {
+        universalIdentifier: 'ab3ee2f9-2d91-4936-9128-6aa89cb98ad4',
+      },
+      serviceIdIndex: {
+        universalIdentifier: '79b6bb77-e0b2-4606-b35e-522de4523a4b',
+      },
+      callPersonUniqueIndex: {
+        universalIdentifier: 'c94fdcea-f90e-4bda-aa46-0926b3b22d26',
+      },
+      callCompanyUniqueIndex: {
+        universalIdentifier: '0c383184-0d22-4cdd-935b-78f893e9a9fc',
+      },
+      callOpportunityUniqueIndex: {
+        universalIdentifier: 'acae3e53-8b56-4277-8fa1-9f722d22b70b',
+      },
+      callServiceUniqueIndex: {
+        universalIdentifier: '1951aad5-fb4a-4618-bdf7-338dbf2c8f12',
+      },
+    },
+    views: {
+      allCallTargets: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.callTarget,
+        fields: STANDARD_OBJECT_FIELDS.callTarget,
+        viewFieldNames: [
+          'id',
+          'call',
+          'targetPerson',
+          'targetCompany',
+          'targetOpportunity',
+          'targetService',
+        ],
       }),
     },
   },
@@ -412,6 +470,7 @@ export const STANDARD_OBJECTS = {
           'timelineActivities',
           'services',
           'childCompanies',
+          'callTargets',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -878,6 +937,12 @@ export const STANDARD_OBJECTS = {
       noteOpportunityUniqueIndex: {
         universalIdentifier: '58002741-8aa7-4812-b7af-f4cf98dd2433',
       },
+      serviceIdIndex: {
+        universalIdentifier: 'ba440ea3-4b1f-44e7-8cf8-0742f34b5f28',
+      },
+      noteServiceUniqueIndex: {
+        universalIdentifier: '67fbcd2c-eab4-405d-b26a-ea593e451450',
+      },
     },
     views: {
       allNoteTargets: buildStandardObjectIndexView({
@@ -890,6 +955,7 @@ export const STANDARD_OBJECTS = {
           'targetPerson',
           'targetCompany',
           'targetOpportunity',
+          'targetService',
         ],
       }),
     },
@@ -985,6 +1051,7 @@ export const STANDARD_OBJECTS = {
           'attachments',
           'timelineActivities',
           'services',
+          'callTargets',
         ],
         viewFieldGroupNames: {
           deal: 'Deal',
@@ -1046,6 +1113,7 @@ export const STANDARD_OBJECTS = {
           'calendarEventParticipants',
           'timelineActivities',
           'services',
+          'callTargets',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -1119,6 +1187,9 @@ export const STANDARD_OBJECTS = {
           'updatedAt',
           'updatedBy',
           'timelineActivities',
+          'noteTargets',
+          'taskTargets',
+          'callTargets',
         ],
         viewFieldGroupNames: {
           relations: 'Relations',
@@ -1302,6 +1373,12 @@ export const STANDARD_OBJECTS = {
       taskOpportunityUniqueIndex: {
         universalIdentifier: 'eb5422ff-7a41-48d2-a2df-3de1cbf7bced',
       },
+      serviceIdIndex: {
+        universalIdentifier: 'c70be6ea-67c3-4161-91b9-65f1aa1399de',
+      },
+      taskServiceUniqueIndex: {
+        universalIdentifier: '0d55346a-a531-413c-8ef0-89772b22ef56',
+      },
     },
     views: {
       allTaskTargets: buildStandardObjectIndexView({
@@ -1314,6 +1391,7 @@ export const STANDARD_OBJECTS = {
           'targetPerson',
           'targetCompany',
           'targetOpportunity',
+          'targetService',
         ],
       }),
     },

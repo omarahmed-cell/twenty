@@ -5,6 +5,7 @@ import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-object
 import { type NoteWorkspaceEntity } from 'src/modules/note/standard-objects/note.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
+import { type ServiceWorkspaceEntity } from 'src/modules/service/standard-objects/service.workspace-entity';
 
 export class NoteTargetWorkspaceEntity extends BaseWorkspaceEntity {
   note: EntityRelation<NoteWorkspaceEntity> | null;
@@ -15,5 +16,7 @@ export class NoteTargetWorkspaceEntity extends BaseWorkspaceEntity {
   targetCompanyId: string | null;
   targetOpportunity: EntityRelation<OpportunityWorkspaceEntity> | null;
   targetOpportunityId: string | null;
+  targetService: EntityRelation<ServiceWorkspaceEntity> | null;
+  targetServiceId: string | null;
   custom: EntityRelation<CustomWorkspaceEntity>;
 }

@@ -380,4 +380,37 @@ export const buildTaskTargetStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  targetService: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.MORPH_RELATION,
+      morphId: STANDARD_OBJECTS.taskTarget.morphIds.targetMorphId.morphId,
+      fieldName: 'targetService',
+      label: i18nLabel(
+        msg({ message: `Linked to`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `TaskTarget target`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCheckbox',
+      isNullable: true,
+      isUIEditable: false,
+      isSystemSideEffect: true,
+      targetObjectName: 'service',
+      targetFieldName: 'taskTargets',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.CASCADE,
+        joinColumnName: 'targetServiceId',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

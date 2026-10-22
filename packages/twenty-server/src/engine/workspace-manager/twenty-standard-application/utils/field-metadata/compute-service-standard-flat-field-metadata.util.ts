@@ -389,4 +389,94 @@ export const buildServiceStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  noteTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'noteTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Notes`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Notes tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconNotes',
+      isNullable: true,
+      targetObjectName: 'noteTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  taskTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'taskTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Tasks`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Tasks tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCheckbox',
+      isNullable: true,
+      targetObjectName: 'taskTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  callTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'callTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Calls`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Calls tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconPhone',
+      isNullable: true,
+      targetObjectName: 'callTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

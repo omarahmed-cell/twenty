@@ -69,5 +69,17 @@ export const computeStandardNoteTargetViewFields = (
         size: 150,
       },
     }),
+    allNoteTargetsTargetService: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'noteTarget',
+      context: {
+        viewName: 'allNoteTargets',
+        viewFieldName: 'targetService',
+        fieldName: 'targetService',
+        position: 5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
   };
 };

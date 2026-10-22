@@ -242,6 +242,18 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           timeline: 'Timeline',
         },
       },
+      tasks: {
+        title: 'Tasks',
+        widgets: {
+          tasks: 'Tasks',
+        },
+      },
+      notes: {
+        title: 'Notes',
+        widgets: {
+          notes: 'Notes',
+        },
+      },
     },
   }),
   callRecordPage: buildStandardObjectRecordPageLayout({
@@ -251,12 +263,25 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
         title: 'Home',
         widgets: {
           fields: 'Fields',
+          callRichText: 'Call',
+        },
+      },
+      call: {
+        title: 'Call',
+        widgets: {
+          callRichText: 'Call',
         },
       },
       timeline: {
         title: 'Timeline',
         widgets: {
           timeline: 'Timeline',
+        },
+      },
+      files: {
+        title: 'Files',
+        widgets: {
+          files: 'Files',
         },
       },
     },

@@ -185,5 +185,44 @@ export const computeStandardServiceViewFields = (
           viewFieldGroupName: 'relations',
         },
       }),
+    serviceRecordPageFieldsNoteTargets: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'noteTargets',
+        fieldName: 'noteTargets',
+        position: 4,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
+    serviceRecordPageFieldsTaskTargets: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'taskTargets',
+        fieldName: 'taskTargets',
+        position: 5,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
+    serviceRecordPageFieldsCallTargets: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'callTargets',
+        fieldName: 'callTargets',
+        position: 6,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
   };
 };

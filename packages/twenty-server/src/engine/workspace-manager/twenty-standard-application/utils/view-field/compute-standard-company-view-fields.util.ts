@@ -333,5 +333,18 @@ export const computeStandardCompanyViewFields = (
         viewFieldGroupName: 'general',
       },
     }),
+    companyRecordPageFieldsCallTargets: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'callTargets',
+        fieldName: 'callTargets',
+        position: 12,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

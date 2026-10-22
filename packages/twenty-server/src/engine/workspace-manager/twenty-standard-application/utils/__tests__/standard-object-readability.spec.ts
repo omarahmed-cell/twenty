@@ -20,6 +20,8 @@ const INHERITED_STANDARD_OBJECT_PARENT_FIELDS = {
   noteTarget: STANDARD_OBJECT_FIELDS.noteTarget.targetPerson,
   task: STANDARD_OBJECT_FIELDS.task.taskTargets,
   taskTarget: STANDARD_OBJECT_FIELDS.taskTarget.targetPerson,
+  call: STANDARD_OBJECT_FIELDS.call.callTargets,
+  callTarget: STANDARD_OBJECT_FIELDS.callTarget.targetPerson,
   messageThreadTarget: STANDARD_OBJECT_FIELDS.messageThreadTarget.messageThread,
   calendarEventTarget: STANDARD_OBJECT_FIELDS.calendarEventTarget.calendarEvent,
   agentChatThreadTarget: STANDARD_OBJECT_FIELDS.agentChatThreadTarget.thread,
@@ -164,6 +166,7 @@ describe('Standard object readability', () => {
     expect(parentJoinColumnNames).toEqual(
       [
         'targetAgentChatThreadId',
+        'targetCallId',
         'targetCompanyId',
         'targetDashboardId',
         'targetNoteId',
@@ -211,12 +214,55 @@ describe('Standard object readability', () => {
           joinColumnName: 'targetOpportunityId',
           parentNameSingular: 'opportunity',
         },
+        { joinColumnName: 'targetServiceId', parentNameSingular: 'service' },
       ]),
     );
     expect(parents).not.toContainEqual({
       joinColumnName: 'noteId',
       parentNameSingular: 'note',
     });
+  });
+
+  it('resolves every target of a callTarget as its parent, not the call', () => {
+    const parents = resolveParents('callTarget').map((parent) =>
+      parent.kind === 'column'
+        ? {
+            joinColumnName: parent.joinColumnName,
+            parentNameSingular: parent.parentFlatObjectMetadata.nameSingular,
+          }
+        : parent.kind,
+    );
+
+    expect(parents).toEqual(
+      expect.arrayContaining([
+        { joinColumnName: 'targetPersonId', parentNameSingular: 'person' },
+        { joinColumnName: 'targetCompanyId', parentNameSingular: 'company' },
+        {
+          joinColumnName: 'targetOpportunityId',
+          parentNameSingular: 'opportunity',
+        },
+        { joinColumnName: 'targetServiceId', parentNameSingular: 'service' },
+      ]),
+    );
+    expect(parents).not.toContainEqual({
+      joinColumnName: 'callId',
+      parentNameSingular: 'call',
+    });
+  });
+
+  it('resolves its call targets as the parents of a call, through the callId column', () => {
+    expect(
+      resolveParents('call').map((parent) =>
+        parent.kind === 'children'
+          ? {
+              childNameSingular: parent.childFlatObjectMetadata.nameSingular,
+              childJoinColumnName: parent.childJoinColumnName,
+            }
+          : parent.kind,
+      ),
+    ).toEqual([
+      { childNameSingular: 'callTarget', childJoinColumnName: 'callId' },
+    ]);
   });
 
   it('resolves its note targets as the parents of a note, through the noteId column', () => {

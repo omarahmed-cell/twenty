@@ -159,6 +159,63 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       },
     },
     {
+      name: 'callLinked',
+      universalIdentifier: 'd1f5aa35-b6ae-4105-a2b6-32ceab737a57',
+      label: msg({
+        message: `linked a related call`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconLink',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'linked',
+        objectUniversalIdentifier: STANDARD_OBJECTS.call.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.call.fields.callTargets.universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'callUnlinked',
+      universalIdentifier: 'e97cbbff-70f6-47bc-9589-239238256ca9',
+      label: msg({
+        message: `unlinked a related call`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconUnlink',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'unlinked',
+        objectUniversalIdentifier: STANDARD_OBJECTS.call.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.call.fields.callTargets.universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'callUpdated',
+      universalIdentifier: '13d57092-f6c4-42d8-8cf1-28b51a5ec224',
+      label: msg({
+        message: `updated a related call`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconEditCircle',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'updated',
+        objectUniversalIdentifier: STANDARD_OBJECTS.call.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.call.fields.callTargets.universalIdentifier,
+          triggerFieldUniversalIdentifiers: [
+            STANDARD_OBJECTS.call.fields.title.universalIdentifier,
+          ],
+        },
+      },
+    },
+    {
       name: 'taskLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0c',
       label: msg({

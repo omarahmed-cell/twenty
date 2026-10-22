@@ -69,5 +69,17 @@ export const computeStandardTaskTargetViewFields = (
         size: 150,
       },
     }),
+    allTaskTargetsTargetService: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'taskTarget',
+      context: {
+        viewName: 'allTaskTargets',
+        viewFieldName: 'targetService',
+        fieldName: 'targetService',
+        position: 5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
   };
 };
