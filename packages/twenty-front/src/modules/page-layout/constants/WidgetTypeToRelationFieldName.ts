@@ -5,6 +5,8 @@ export const WIDGET_TYPE_TO_RELATION_FIELD_NAME: Partial<
 > = {
   [WidgetType.TASKS]: 'taskTargets',
   [WidgetType.NOTES]: 'noteTargets',
+  [WidgetType.CALLS]: 'callTargets',
+  [WidgetType.COMMUNICATIONS]: 'communicationTargets',
   [WidgetType.FILES]: 'attachments',
   [WidgetType.TIMELINE]: 'timelineActivities',
   [WidgetType.CHAT_THREADS]: 'agentChatThreadTargets',

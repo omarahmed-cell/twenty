@@ -204,6 +204,12 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
       ... on NotesConfiguration {
         configurationType
       }
+      ... on CallsConfiguration {
+        configurationType
+      }
+      ... on CommunicationsConfiguration {
+        configurationType
+      }
       ... on TasksConfiguration {
         configurationType
       }

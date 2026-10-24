@@ -5,6 +5,8 @@ export type RelatedRecordAction = {
   id:
     | 'create-task'
     | 'create-note'
+    | 'create-call'
+    | 'create-communication'
     | 'attach-file'
     | 'compose-email'
     | 'create-calendar-event';

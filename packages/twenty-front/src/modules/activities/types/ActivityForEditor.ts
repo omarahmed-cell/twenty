@@ -1,4 +1,4 @@
-import { type Note } from '@/activities/types/Note';
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
 import { type Task } from '@/activities/types/Task';
 
-export type ActivityForEditor = Partial<Task | Note>;
+export type ActivityForEditor = Partial<Task | NoteLikeActivity>;

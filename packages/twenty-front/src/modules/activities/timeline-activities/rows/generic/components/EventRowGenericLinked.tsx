@@ -12,6 +12,7 @@ import {
   StyledEventRowContent,
   StyledEventRowLinkedRecord,
 } from '@/activities/timeline-activities/rows/components/EventRowStyles';
+import { useLinkedActivityEventLabel } from '@/activities/timeline-activities/rows/generic/hooks/useLinkedActivityEventLabel';
 import { getAuthorizedLinkedRecordName } from '@/activities/timeline-activities/rows/generic/utils/getAuthorizedLinkedRecordName';
 import { allowRequestsToTwentyIconsState } from '@/client-config/states/allowRequestsToTwentyIcons';
 import { recordStoreIdentifierFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreIdentifierFamilySelector';
@@ -48,6 +49,13 @@ export const EventRowGenericLinked = ({
 
   const objectLabel =
     linkedObjectMetadataItem?.labelSingular?.toLowerCase() ?? t`record`;
+
+  const actionLabel = useLinkedActivityEventLabel({
+    linkedObjectMetadataItem,
+    linkedRecordId: event.linkedRecordId,
+    eventTypeLabel,
+    isLinkedEvent: event.timelineActivityTypeSnapshot?.action === 'linked',
+  });
 
   const linkedRecordName = getAuthorizedLinkedRecordName(
     linkedRecordIdentifier?.name,
@@ -91,7 +99,7 @@ export const EventRowGenericLinked = ({
         <StyledEventRowContent>
           <EventRowItem>{authorFullName}</EventRowItem>
           <EventRowItem variant="action">
-            {eventTypeLabel ?? t`linked a ${objectLabel}`}
+            {actionLabel ?? t`linked a ${objectLabel}`}
           </EventRowItem>
           {canOpen && (
             <StyledEventRowLinkedRecord

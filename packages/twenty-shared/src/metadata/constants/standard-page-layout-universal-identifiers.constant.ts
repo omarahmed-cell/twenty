@@ -83,6 +83,18 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           notes: 'Notes',
         },
       },
+      calls: {
+        title: 'Calls',
+        widgets: {
+          calls: 'Calls',
+        },
+      },
+      communications: {
+        title: 'Communications',
+        widgets: {
+          communications: 'Communications',
+        },
+      },
       files: {
         title: 'Files',
         widgets: {
@@ -138,6 +150,18 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
         title: 'Notes',
         widgets: {
           notes: 'Notes',
+        },
+      },
+      calls: {
+        title: 'Calls',
+        widgets: {
+          calls: 'Calls',
+        },
+      },
+      communications: {
+        title: 'Communications',
+        widgets: {
+          communications: 'Communications',
         },
       },
       files: {
@@ -198,6 +222,18 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           notes: 'Notes',
         },
       },
+      calls: {
+        title: 'Calls',
+        widgets: {
+          calls: 'Calls',
+        },
+      },
+      communications: {
+        title: 'Communications',
+        widgets: {
+          communications: 'Communications',
+        },
+      },
       files: {
         title: 'Files',
         widgets: {
@@ -254,6 +290,18 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           notes: 'Notes',
         },
       },
+      calls: {
+        title: 'Calls',
+        widgets: {
+          calls: 'Calls',
+        },
+      },
+      communications: {
+        title: 'Communications',
+        widgets: {
+          communications: 'Communications',
+        },
+      },
       emails: {
         title: 'Emails',
         widgets: {
@@ -284,18 +332,6 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           callRichText: 'Call',
         },
       },
-      timeline: {
-        title: 'Timeline',
-        widgets: {
-          timeline: 'Timeline',
-        },
-      },
-      files: {
-        title: 'Files',
-        widgets: {
-          files: 'Files',
-        },
-      },
     },
   }),
   communicationRecordPage: buildStandardObjectRecordPageLayout({
@@ -313,18 +349,6 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
         title: 'Communication',
         widgets: {
           communicationRichText: 'Communication',
-        },
-      },
-      timeline: {
-        title: 'Timeline',
-        widgets: {
-          timeline: 'Timeline',
-        },
-      },
-      files: {
-        title: 'Files',
-        widgets: {
-          files: 'Files',
         },
       },
     },

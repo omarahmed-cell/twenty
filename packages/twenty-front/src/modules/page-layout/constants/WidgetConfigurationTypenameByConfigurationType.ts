@@ -28,6 +28,8 @@ export const WIDGET_CONFIGURATION_TYPENAME_BY_CONFIGURATION_TYPE = {
   [WidgetConfigurationType.MESSAGE_CAMPAIGN_DETAILS]:
     'MessageCampaignDetailsConfiguration',
   [WidgetConfigurationType.NOTES]: 'NotesConfiguration',
+  [WidgetConfigurationType.CALLS]: 'CallsConfiguration',
+  [WidgetConfigurationType.COMMUNICATIONS]: 'CommunicationsConfiguration',
   [WidgetConfigurationType.PIE_CHART]: 'PieChartConfiguration',
   [WidgetConfigurationType.RECORD_TABLE]: 'RecordTableConfiguration',
   [WidgetConfigurationType.STANDALONE_RICH_TEXT]:

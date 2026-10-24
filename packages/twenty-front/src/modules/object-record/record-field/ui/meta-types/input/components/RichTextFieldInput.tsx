@@ -1,3 +1,4 @@
+import { isActivityObjectNameSingular } from '@/activities/utils/isActivityObjectNameSingular';
 import { SkeletonLine } from '@/ui/feedback/skeleton/components/SkeletonLine';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { FieldInputEventContext } from '@/object-record/record-field/ui/contexts/FieldInputEventContext';
@@ -10,7 +11,6 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { Suspense, lazy, useContext, useRef } from 'react';
 import { SKELETON_HEIGHT_SIZES } from 'twenty-ui/primitives/feedback';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { IconButton } from 'twenty-ui/components/input';
 import { IconLayoutSidebarLeftCollapse } from 'twenty-ui/icon';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -66,14 +66,6 @@ const LoadingSkeleton = () => {
   );
 };
 
-const isActivityObject = (
-  objectNameSingular: string,
-): objectNameSingular is
-  | CoreObjectNameSingular.Note
-  | CoreObjectNameSingular.Task =>
-  objectNameSingular === CoreObjectNameSingular.Note ||
-  objectNameSingular === CoreObjectNameSingular.Task;
-
 export const RichTextFieldInput = () => {
   const { fieldDefinition, recordId } = useContext(FieldContext);
 
@@ -111,7 +103,7 @@ export const RichTextFieldInput = () => {
     <StyledContainer ref={containerRef}>
       <StyledEditorScroll>
         <Suspense fallback={<LoadingSkeleton />}>
-          {isActivityObject(objectNameSingular) ? (
+          {isActivityObjectNameSingular(objectNameSingular) ? (
             <ActivityRichTextEditor
               activityId={recordId}
               activityObjectNameSingular={objectNameSingular}

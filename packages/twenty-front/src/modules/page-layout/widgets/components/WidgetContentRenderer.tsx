@@ -14,6 +14,8 @@ import { GraphWidgetRenderer } from '@/page-layout/widgets/graph/components/Grap
 import { IframeWidget } from '@/page-layout/widgets/iframe/components/IframeWidget';
 import { MessageCampaignBodyWidget } from '@/page-layout/widgets/message-campaign/components/MessageCampaignBodyWidget';
 import { NoteWidget } from '@/page-layout/widgets/notes/components/NoteWidget';
+import { CallWidget } from '@/page-layout/widgets/calls/components/CallWidget';
+import { CommunicationWidget } from '@/page-layout/widgets/communications/components/CommunicationWidget';
 import { StandaloneRichTextWidgetRenderer } from '@/page-layout/widgets/standalone-rich-text/components/StandaloneRichTextWidgetRenderer';
 import { TaskWidget } from '@/page-layout/widgets/tasks/components/TaskWidget';
 import { TimelineWidget } from '@/page-layout/widgets/timeline/components/TimelineWidget';
@@ -51,6 +53,12 @@ export const WidgetContentRenderer = ({
 
     case WidgetType.NOTES:
       return <NoteWidget widget={widget} />;
+
+    case WidgetType.CALLS:
+      return <CallWidget widget={widget} />;
+
+    case WidgetType.COMMUNICATIONS:
+      return <CommunicationWidget widget={widget} />;
 
     case WidgetType.CHAT_THREADS:
       return <ChatThreadsWidget />;

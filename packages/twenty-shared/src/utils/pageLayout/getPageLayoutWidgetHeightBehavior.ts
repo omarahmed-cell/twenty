@@ -17,10 +17,12 @@ export const getPageLayoutWidgetHeightBehavior = ({
 
   switch (widgetType) {
     case WidgetType.CALENDAR:
+    case WidgetType.CALLS:
     case WidgetType.CALL_RECORDING_SUMMARY:
     case WidgetType.CALL_RECORDING_TRANSCRIPT:
     case WidgetType.CHAT:
     case WidgetType.CHAT_THREADS:
+    case WidgetType.COMMUNICATIONS:
     case WidgetType.EMAILS:
     case WidgetType.EMAIL_THREAD:
     case WidgetType.FILES:

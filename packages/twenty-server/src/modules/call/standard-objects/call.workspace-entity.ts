@@ -11,6 +11,7 @@ export class CallWorkspaceEntity extends BaseWorkspaceEntity {
   title: string | null;
   bodyV2: RichTextMetadata | null;
   direction: string | null;
+  outcome: string | null;
   createdBy: ActorMetadata;
   updatedBy: ActorMetadata;
   callTargets: EntityRelation<CallTargetWorkspaceEntity[]>;

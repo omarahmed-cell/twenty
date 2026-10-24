@@ -1,10 +1,10 @@
+import { isActivityObjectNameSingular } from '@/activities/utils/isActivityObjectNameSingular';
 import { SkeletonLine } from '@/ui/feedback/skeleton/components/SkeletonLine';
 import { viewableRichTextComponentState } from '@/side-panel/pages/rich-text-page/states/viewableRichTextComponentState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
 import { lazy, Suspense } from 'react';
 import { SKELETON_HEIGHT_SIZES } from 'twenty-ui/primitives/feedback';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 const ActivityRichTextEditor = lazy(() =>
@@ -37,14 +37,6 @@ const LoadingSkeleton = () => {
   );
 };
 
-const isActivityObject = (
-  objectNameSingular: string,
-): objectNameSingular is
-  | CoreObjectNameSingular.Note
-  | CoreObjectNameSingular.Task =>
-  objectNameSingular === CoreObjectNameSingular.Note ||
-  objectNameSingular === CoreObjectNameSingular.Task;
-
 export const SidePanelEditRichTextPage = () => {
   const { recordId, objectNameSingular, fieldName } = useAtomStateValue(
     viewableRichTextComponentState,
@@ -53,7 +45,7 @@ export const SidePanelEditRichTextPage = () => {
   return (
     <StyledContainer>
       <Suspense fallback={<LoadingSkeleton />}>
-        {isActivityObject(objectNameSingular) ? (
+        {isActivityObjectNameSingular(objectNameSingular) ? (
           <ActivityRichTextEditor
             activityId={recordId}
             activityObjectNameSingular={objectNameSingular}

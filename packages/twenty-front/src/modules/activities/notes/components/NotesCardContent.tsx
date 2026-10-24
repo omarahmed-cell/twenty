@@ -1,11 +1,13 @@
 import { CustomResolverFetchMoreLoader } from '@/activities/components/CustomResolverFetchMoreLoader';
 import { SkeletonLoader } from '@/activities/components/SkeletonLoader';
 import { NoteList } from '@/activities/notes/components/NoteList';
-import { type Note } from '@/activities/types/Note';
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type NoteLikeActivityObjectNameSingular } from '@/activities/types/NoteLikeActivityObjectNameSingular';
 import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/AnimatedPlaceholder/AnimatedPlaceholder';
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 import { IconPlus } from 'twenty-ui/icon';
@@ -21,14 +23,41 @@ const StyledNotesContainer = styled.div`
 
 type NotesCardContentProps = {
   loading: boolean;
-  notes: Note[];
+  notes: NoteLikeActivity[];
+  activityObjectNameSingular: NoteLikeActivityObjectNameSingular;
   onCreateNote: (() => void) | undefined;
   onLastRowVisible: () => Promise<void>;
+};
+
+const getEmptyStateCopy = (
+  activityObjectNameSingular: NoteLikeActivityObjectNameSingular,
+) => {
+  switch (activityObjectNameSingular) {
+    case CoreObjectNameSingular.Call:
+      return {
+        title: t`No calls`,
+        description: t`There are no calls logged on this record.`,
+        createLabel: t`Log call`,
+      };
+    case CoreObjectNameSingular.Communication:
+      return {
+        title: t`No communications`,
+        description: t`There are no communications logged on this record.`,
+        createLabel: t`Log communication`,
+      };
+    case CoreObjectNameSingular.Note:
+      return {
+        title: t`No notes`,
+        description: t`There are no associated notes with this record.`,
+        createLabel: t`New note`,
+      };
+  }
 };
 
 export const NotesCardContent = ({
   loading,
   notes,
+  activityObjectNameSingular,
   onCreateNote,
   onLastRowVisible,
 }: NotesCardContentProps) => {
@@ -39,13 +68,15 @@ export const NotesCardContent = ({
   }
 
   if (isNotesEmpty) {
+    const emptyStateCopy = getEmptyStateCopy(activityObjectNameSingular);
+
     return (
       <EmptyState.Root>
         <AnimatedPlaceholder type="noNote" />
         <EmptyState.Content>
-          <EmptyState.Title>{t`No notes`}</EmptyState.Title>
+          <EmptyState.Title>{emptyStateCopy.title}</EmptyState.Title>
           <EmptyState.Description>
-            {t`There are no associated notes with this record.`}
+            {emptyStateCopy.description}
           </EmptyState.Description>
         </EmptyState.Content>
         {isDefined(onCreateNote) && (
@@ -53,7 +84,9 @@ export const NotesCardContent = ({
             startIcon={<IconPlus />}
             onClick={onCreateNote}
             variant="outline"
-          >{t`New note`}</Button>
+          >
+            {emptyStateCopy.createLabel}
+          </Button>
         )}
       </EmptyState.Root>
     );
@@ -61,7 +94,10 @@ export const NotesCardContent = ({
 
   return (
     <StyledNotesContainer>
-      <NoteList notes={notes} />
+      <NoteList
+        notes={notes}
+        activityObjectNameSingular={activityObjectNameSingular}
+      />
       <CustomResolverFetchMoreLoader
         loading={loading}
         onLastRowVisible={onLastRowVisible}

@@ -308,6 +308,7 @@ export const STANDARD_OBJECTS = {
           'title',
           'callTargets',
           'direction',
+          'outcome',
           'bodyV2',
           'createdBy',
           'createdAt',
@@ -319,6 +320,7 @@ export const STANDARD_OBJECTS = {
         viewFieldNames: [
           'callTargets',
           'direction',
+          'outcome',
           'createdAt',
           'createdBy',
           'attachments',

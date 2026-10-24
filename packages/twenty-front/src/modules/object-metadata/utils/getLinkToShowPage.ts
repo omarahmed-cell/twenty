@@ -29,6 +29,22 @@ export const getLinkToShowPage = (
     return getAppPath(AppPath.AiChat, { threadId: record.id });
   }
 
+  if (objectNameSingular === CoreObjectNameSingular.CallTarget) {
+    return (
+      getBasePathToShowPage({
+        objectNameSingular: CoreObjectNameSingular.Call,
+      }) + record.call?.id
+    );
+  }
+
+  if (objectNameSingular === CoreObjectNameSingular.CommunicationTarget) {
+    return (
+      getBasePathToShowPage({
+        objectNameSingular: CoreObjectNameSingular.Communication,
+      }) + record.communication?.id
+    );
+  }
+
   if (objectNameSingular === CoreObjectNameSingular.TaskTarget) {
     return (
       getBasePathToShowPage({

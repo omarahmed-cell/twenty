@@ -1,5 +1,5 @@
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
-import { type Note } from '@/activities/types/Note';
 import { type Task } from '@/activities/types/Task';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
@@ -66,7 +66,9 @@ export const usePrepareFindManyActivitiesQuery = ({
   }: {
     additionalFilter?: Record<string, unknown>;
     targetableObject: ActivityTargetableObject;
-    shouldActivityBeExcluded?: (activityTarget: Task | Note) => boolean;
+    shouldActivityBeExcluded?: (
+      activityTarget: Task | NoteLikeActivity,
+    ) => boolean;
   }) => {
     const targetableObjectMetadataItem = objectMetadataItems.find(
       (objectMetadataItem) =>
@@ -120,8 +122,10 @@ export const usePrepareFindManyActivitiesQuery = ({
       ),
     ];
 
-    const activities: (Task | Note)[] = activityIds
-      .map((activityId) => getActivityFromCache<Task | Note>(activityId))
+    const activities: (Task | NoteLikeActivity)[] = activityIds
+      .map((activityId) =>
+        getActivityFromCache<Task | NoteLikeActivity>(activityId),
+      )
       .filter(isDefined);
 
     const nextFindManyActivitiesQueryFilter = {

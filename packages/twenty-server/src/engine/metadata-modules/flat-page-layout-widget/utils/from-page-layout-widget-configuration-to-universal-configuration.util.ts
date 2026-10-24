@@ -419,6 +419,8 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
     case WidgetConfigurationType.TIMELINE:
     case WidgetConfigurationType.TASKS:
     case WidgetConfigurationType.NOTES:
+    case WidgetConfigurationType.CALLS:
+    case WidgetConfigurationType.COMMUNICATIONS:
     case WidgetConfigurationType.FILES:
     case WidgetConfigurationType.EMAILS:
     case WidgetConfigurationType.CALENDAR:

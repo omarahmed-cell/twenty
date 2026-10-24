@@ -1,9 +1,10 @@
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
 import { useStore } from 'jotai';
 import { useCallback, useRef } from 'react';
 
 import { useUpsertActivity } from '@/activities/hooks/useUpsertActivity';
 import { canCreateActivityState } from '@/activities/states/canCreateActivityState';
-import { type Note } from '@/activities/types/Note';
 import { type Task } from '@/activities/types/Task';
 import { type BLOCK_SCHEMA } from '@/blocknote-editor/blocks/Schema';
 import { BLOCK_EDITOR_GLOBAL_HOTKEYS_CONFIG } from '@/blocknote-editor/constants/BlockEditorGlobalHotkeysConfig';
@@ -17,14 +18,11 @@ import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePush
 import { useRemoveFocusItemFromFocusStackById } from '@/ui/utilities/focus/hooks/useRemoveFocusItemFromFocusStackById';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
-import { type CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 type ActivityRichTextEditorProps = {
   activityId: string;
-  activityObjectNameSingular:
-    | CoreObjectNameSingular.Task
-    | CoreObjectNameSingular.Note;
+  activityObjectNameSingular: ActivityObjectNameSingular;
 };
 
 export const ActivityRichTextEditor = ({
@@ -67,7 +65,7 @@ export const ActivityRichTextEditor = ({
 
       const activity = store.get(
         recordStoreFamilyState.atomFamily(activityId),
-      ) as Task | Note | null;
+      ) as Task | NoteLikeActivity | null;
 
       if (isDefined(activity)) {
         upsertActivity({

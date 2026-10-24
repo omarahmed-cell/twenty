@@ -35,6 +35,8 @@ export const getWidgetTitle = (
     case WidgetConfigurationType.EMAILS:
     case WidgetConfigurationType.TASKS:
     case WidgetConfigurationType.NOTES:
+    case WidgetConfigurationType.CALLS:
+    case WidgetConfigurationType.COMMUNICATIONS:
     case WidgetConfigurationType.FILES:
     case WidgetConfigurationType.WORKFLOW:
     case WidgetConfigurationType.WORKFLOW_VERSION:

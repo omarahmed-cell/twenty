@@ -30,6 +30,10 @@ export const usePreviewRecord = ({
     recordGqlFields = { id: true, note: true };
   if (objectNameSingular === CoreObjectNameSingular.TaskTarget)
     recordGqlFields = { id: true, task: true };
+  if (objectNameSingular === CoreObjectNameSingular.CallTarget)
+    recordGqlFields = { id: true, call: true };
+  if (objectNameSingular === CoreObjectNameSingular.CommunicationTarget)
+    recordGqlFields = { id: true, communication: true };
 
   const { records } = useFindManyRecords({
     objectNameSingular,

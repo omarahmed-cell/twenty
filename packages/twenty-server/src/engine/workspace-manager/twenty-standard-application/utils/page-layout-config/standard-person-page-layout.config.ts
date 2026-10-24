@@ -116,6 +116,34 @@ const PERSON_PAGE_TABS = {
       },
     },
   },
+  calls: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.personRecordPage.tabs.calls
+        .universalIdentifier,
+    ...TAB_PROPS.calls,
+    widgets: {
+      calls: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.personRecordPage.tabs.calls
+            .widgets.calls.universalIdentifier,
+        ...WIDGET_PROPS.calls,
+      },
+    },
+  },
+  communications: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.personRecordPage.tabs
+        .communications.universalIdentifier,
+    ...TAB_PROPS.communications,
+    widgets: {
+      communications: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.personRecordPage.tabs
+            .communications.widgets.communications.universalIdentifier,
+        ...WIDGET_PROPS.communications,
+      },
+    },
+  },
   files: {
     universalIdentifier:
       STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.personRecordPage.tabs.files

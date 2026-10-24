@@ -1,3 +1,4 @@
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
 import { useCallback } from 'react';
 import { useStore } from 'jotai';
 import { isNonEmptyArray } from '@sniptt/guards';
@@ -6,7 +7,6 @@ import { type ActivityForEditor } from '@/activities/types/ActivityForEditor';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
-import { type CoreObjectNameSingular } from 'twenty-shared/types';
 import { getRecordConnectionFromRecords } from '@/object-record/cache/utils/getRecordConnectionFromRecords';
 import { modifyRecordFromCache } from '@/object-record/cache/utils/modifyRecordFromCache';
 import { useCreateManyRecords } from '@/object-record/hooks/useCreateManyRecords';
@@ -22,9 +22,7 @@ import { capitalize } from 'twenty-shared/utils';
 export const useCreateActivityInDB = ({
   activityObjectNameSingular,
 }: {
-  activityObjectNameSingular:
-    | CoreObjectNameSingular.Task
-    | CoreObjectNameSingular.Note;
+  activityObjectNameSingular: ActivityObjectNameSingular;
 }) => {
   const createOneActivityOperationSignature =
     createOneActivityOperationSignatureFactory({

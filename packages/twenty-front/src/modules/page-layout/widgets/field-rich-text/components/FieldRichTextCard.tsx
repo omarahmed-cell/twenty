@@ -1,5 +1,5 @@
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
 import { SkeletonLine } from '@/ui/feedback/skeleton/components/SkeletonLine';
-import { type CoreObjectNameSingular } from 'twenty-shared/types';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { ScrollWrapper } from '@/ui/utilities/scroll/components/ScrollWrapper';
@@ -49,9 +49,8 @@ export const FieldRichTextCard = () => {
     fieldName: 'bodyV2',
   });
 
-  const activityObjectNameSingular = targetRecord.targetObjectNameSingular as
-    | CoreObjectNameSingular.Note
-    | CoreObjectNameSingular.Task;
+  const activityObjectNameSingular =
+    targetRecord.targetObjectNameSingular as ActivityObjectNameSingular;
 
   if (!isDefined(activityBodyV2)) {
     return <LoadingSkeleton />;

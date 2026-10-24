@@ -117,6 +117,34 @@ const COMPANY_PAGE_TABS = {
       },
     },
   },
+  calls: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.calls
+        .universalIdentifier,
+    ...TAB_PROPS.calls,
+    widgets: {
+      calls: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs
+            .calls.widgets.calls.universalIdentifier,
+        ...WIDGET_PROPS.calls,
+      },
+    },
+  },
+  communications: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs
+        .communications.universalIdentifier,
+    ...TAB_PROPS.communications,
+    widgets: {
+      communications: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs
+            .communications.widgets.communications.universalIdentifier,
+        ...WIDGET_PROPS.communications,
+      },
+    },
+  },
   files: {
     universalIdentifier:
       STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.files

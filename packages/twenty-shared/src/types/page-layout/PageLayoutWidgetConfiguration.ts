@@ -154,6 +154,14 @@ export type NotesConfiguration = {
   configurationType: 'NOTES';
 };
 
+export type CallsConfiguration = {
+  configurationType: 'CALLS';
+};
+
+export type CommunicationsConfiguration = {
+  configurationType: 'COMMUNICATIONS';
+};
+
 export type FilesConfiguration = {
   configurationType: 'FILES';
 };
@@ -223,6 +231,8 @@ export type PageLayoutWidgetConfiguration =
   | TimelineConfiguration
   | TasksConfiguration
   | NotesConfiguration
+  | CallsConfiguration
+  | CommunicationsConfiguration
   | FilesConfiguration
   | EmailsConfiguration
   | CalendarConfiguration

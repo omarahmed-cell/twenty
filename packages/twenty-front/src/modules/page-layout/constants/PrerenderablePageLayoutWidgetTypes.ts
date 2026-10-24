@@ -7,6 +7,8 @@ export const PRERENDERABLE_PAGE_LAYOUT_WIDGET_TYPES: WidgetType[] = [
   WidgetType.TIMELINE,
   WidgetType.TASKS,
   WidgetType.NOTES,
+  WidgetType.CALLS,
+  WidgetType.COMMUNICATIONS,
   WidgetType.FILES,
   WidgetType.CHAT_THREADS,
   WidgetType.EMAILS,

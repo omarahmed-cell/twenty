@@ -73,34 +73,6 @@ const COMMUNICATION_PAGE_TABS = {
       },
     },
   },
-  timeline: {
-    universalIdentifier:
-      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.communicationRecordPage.tabs
-        .timeline.universalIdentifier,
-    ...TAB_PROPS.timeline,
-    widgets: {
-      timeline: {
-        universalIdentifier:
-          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.communicationRecordPage
-            .tabs.timeline.widgets.timeline.universalIdentifier,
-        ...WIDGET_PROPS.timeline,
-      },
-    },
-  },
-  files: {
-    universalIdentifier:
-      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.communicationRecordPage.tabs
-        .files.universalIdentifier,
-    ...TAB_PROPS.files,
-    widgets: {
-      files: {
-        universalIdentifier:
-          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.communicationRecordPage
-            .tabs.files.widgets.files.universalIdentifier,
-        ...WIDGET_PROPS.files,
-      },
-    },
-  },
 } as const satisfies Record<string, StandardPageLayoutTabConfig>;
 
 export const STANDARD_COMMUNICATION_PAGE_LAYOUT_CONFIG = {

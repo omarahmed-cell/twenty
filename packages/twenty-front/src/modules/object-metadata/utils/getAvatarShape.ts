@@ -33,7 +33,9 @@ export const getAvatarShape = (
 
   if (
     objectMetadataItem.nameSingular === CoreObjectNameSingular.Task ||
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.Note
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Note ||
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Call ||
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Communication
   ) {
     return 'rounded-square';
   }

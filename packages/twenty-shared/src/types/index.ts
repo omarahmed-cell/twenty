@@ -229,6 +229,8 @@ export type {
   TimelineConfiguration,
   TasksConfiguration,
   NotesConfiguration,
+  CallsConfiguration,
+  CommunicationsConfiguration,
   FilesConfiguration,
   EmailsConfiguration,
   EmailThreadConfiguration,

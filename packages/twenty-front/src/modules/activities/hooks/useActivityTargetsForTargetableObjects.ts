@@ -1,7 +1,5 @@
-import {
-  type CoreObjectNameSingular,
-  type RecordGqlOperationOrderBy,
-} from 'twenty-shared/types';
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
+import { type RecordGqlOperationOrderBy } from 'twenty-shared/types';
 
 import { findActivityTargetsOperationSignatureFactory } from '@/activities/graphql/operation-signatures/factories/findActivityTargetsOperationSignatureFactory';
 import { useObjectMorphJunctionConfigOrThrow } from '@/object-record/record-field/ui/hooks/useObjectMorphJunctionConfigOrThrow';
@@ -21,7 +19,7 @@ export const useActivityTargetsForTargetableObjects = ({
   activityTargetsOrderByVariables,
   limit,
 }: {
-  objectNameSingular: CoreObjectNameSingular.Note | CoreObjectNameSingular.Task;
+  objectNameSingular: ActivityObjectNameSingular;
   targetableObjects: Pick<
     ActivityTargetableObject,
     'id' | 'targetObjectNameSingular'

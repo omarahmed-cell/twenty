@@ -3,17 +3,24 @@ import { useEffect, useMemo } from 'react';
 import { useActivities } from '@/activities/hooks/useActivities';
 import { currentNotesQueryVariablesState } from '@/activities/notes/states/currentNotesQueryVariablesState';
 import { FIND_MANY_TIMELINE_ACTIVITIES_ORDER_BY } from '@/activities/timeline-activities/constants/FindManyTimelineActivitiesOrderBy';
-import { type Note } from '@/activities/types/Note';
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type NoteLikeActivityObjectNameSingular } from '@/activities/types/NoteLikeActivityObjectNameSingular';
 import {
   CoreObjectNameSingular,
   type RecordGqlOperationVariables,
 } from 'twenty-shared/types';
+import { capitalize } from 'twenty-shared/utils';
 import { isDeeplyEqual } from '~/utils/isDeeplyEqual';
 
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 
-export const useNotes = (targetableObject: ActivityTargetableObject) => {
+export const useNotes = (
+  targetableObject: ActivityTargetableObject,
+  activityObjectNameSingular: NoteLikeActivityObjectNameSingular = CoreObjectNameSingular.Note,
+) => {
+  const activityTypename = capitalize(activityObjectNameSingular);
+
   const notesQueryVariables = useMemo(
     () =>
       ({
@@ -29,19 +36,21 @@ export const useNotes = (targetableObject: ActivityTargetableObject) => {
     fetchMoreActivities,
     hasNextPage,
   } = useActivities({
-    objectNameSingular: CoreObjectNameSingular.Note,
+    objectNameSingular: activityObjectNameSingular,
     activityTargetsOrderByVariables: notesQueryVariables.orderBy ?? [{}],
     targetableObjects: [targetableObject],
     limit: 10,
   });
 
   const notes = activities.filter(
-    (activity): activity is Note => activity.__typename === 'Note',
+    (activity): activity is NoteLikeActivity =>
+      activity.__typename === activityTypename,
   );
 
   const fetchMoreNotes = async () =>
     (await fetchMoreActivities()).filter(
-      (activity): activity is Note => activity.__typename === 'Note',
+      (activity): activity is NoteLikeActivity =>
+        activity.__typename === activityTypename,
     );
 
   const [currentNotesQueryVariables, setCurrentNotesQueryVariables] =

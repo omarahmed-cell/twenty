@@ -39,14 +39,14 @@ const TASK_RECORD_GQL_FIELDS: RecordGqlFields = {
 export const createOneActivityOperationSignatureFactory: RecordGqlOperationSignatureFactory<
   CreateOneActivityOperationSignatureFactory
 > = ({ objectNameSingular }: CreateOneActivityOperationSignatureFactory) =>
-  objectNameSingular === CoreObjectNameSingular.Note
+  objectNameSingular === CoreObjectNameSingular.Task
     ? {
-        objectNameSingular: CoreObjectNameSingular.Note,
-        variables: {},
-        fields: NOTE_RECORD_GQL_FIELDS,
-      }
-    : {
         objectNameSingular: CoreObjectNameSingular.Task,
         variables: {},
         fields: TASK_RECORD_GQL_FIELDS,
+      }
+    : {
+        objectNameSingular,
+        variables: {},
+        fields: NOTE_RECORD_GQL_FIELDS,
       };

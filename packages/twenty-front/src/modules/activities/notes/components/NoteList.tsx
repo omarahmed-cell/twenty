@@ -1,13 +1,15 @@
 import { styled } from '@linaria/react';
 
-import { type Note } from '@/activities/types/Note';
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type NoteLikeActivityObjectNameSingular } from '@/activities/types/NoteLikeActivityObjectNameSingular';
 import { FieldDescriptionTooltipProvider } from '@/object-record/record-field/ui/components/FieldDescriptionTooltipProvider';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { NoteTile } from './NoteTile';
 
 type NoteListProps = {
-  notes: Note[];
+  notes: NoteLikeActivity[];
+  activityObjectNameSingular: NoteLikeActivityObjectNameSingular;
 };
 
 const StyledContainer = styled.div`
@@ -26,7 +28,10 @@ const StyledNoteContainer = styled.div`
   width: 100%;
 `;
 
-export const NoteList = ({ notes }: NoteListProps) => {
+export const NoteList = ({
+  notes,
+  activityObjectNameSingular,
+}: NoteListProps) => {
   return (
     <>
       {notes.length > 0 && (
@@ -38,6 +43,7 @@ export const NoteList = ({ notes }: NoteListProps) => {
                   key={note.id}
                   note={note}
                   isSingleNote={notes.length === 1}
+                  activityObjectNameSingular={activityObjectNameSingular}
                 />
               ))}
             </StyledNoteContainer>

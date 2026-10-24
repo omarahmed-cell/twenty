@@ -1,11 +1,11 @@
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
 import { useCreateActivityInDB } from '@/activities/hooks/useCreateActivityInDB';
 import { useRefreshShowPageFindManyActivitiesQueries } from '@/activities/hooks/useRefreshShowPageFindManyActivitiesQueries';
 import { isActivityInCreateModeState } from '@/activities/states/isActivityInCreateModeState';
 import { isUpsertingActivityInDBState } from '@/activities/states/isCreatingActivityInDBState';
 import { objectShowPageTargetableObjectState } from '@/activities/timeline-activities/states/objectShowPageTargetableObjectState';
-import { type Note } from '@/activities/types/Note';
 import { type Task } from '@/activities/types/Task';
-import { type CoreObjectNameSingular } from 'twenty-shared/types';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { isDefined } from 'twenty-shared/utils';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
@@ -14,9 +14,7 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 export const useUpsertActivity = ({
   activityObjectNameSingular,
 }: {
-  activityObjectNameSingular:
-    | CoreObjectNameSingular.Task
-    | CoreObjectNameSingular.Note;
+  activityObjectNameSingular: ActivityObjectNameSingular;
 }) => {
   const [isActivityInCreateMode] = useAtomState(isActivityInCreateModeState);
 
@@ -43,12 +41,12 @@ export const useUpsertActivity = ({
     activity,
     input,
   }: {
-    activity: Task | Note;
-    input: Partial<Task | Note>;
+    activity: Task | NoteLikeActivity;
+    input: Partial<Task | NoteLikeActivity>;
   }) => {
     setIsUpsertingActivityInDB(true);
     if (isActivityInCreateMode) {
-      const activityToCreate: Partial<Task | Note> = {
+      const activityToCreate: Partial<Task | NoteLikeActivity> = {
         ...activity,
         ...input,
       };

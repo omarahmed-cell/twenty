@@ -208,6 +208,16 @@ export const validateWidgetConfigurationInput = ({
         'Notes configuration is not supported yet',
         PageLayoutWidgetExceptionCode.INVALID_PAGE_LAYOUT_WIDGET_DATA,
       );
+    case WidgetConfigurationType.CALLS:
+      throw new PageLayoutWidgetException(
+        'Calls configuration is not supported yet',
+        PageLayoutWidgetExceptionCode.INVALID_PAGE_LAYOUT_WIDGET_DATA,
+      );
+    case WidgetConfigurationType.COMMUNICATIONS:
+      throw new PageLayoutWidgetException(
+        'Communications configuration is not supported yet',
+        PageLayoutWidgetExceptionCode.INVALID_PAGE_LAYOUT_WIDGET_DATA,
+      );
     case WidgetConfigurationType.FILES:
       throw new PageLayoutWidgetException(
         'Files configuration is not supported yet',

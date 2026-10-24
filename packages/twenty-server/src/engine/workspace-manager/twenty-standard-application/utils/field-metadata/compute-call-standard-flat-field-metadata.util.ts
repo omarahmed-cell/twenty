@@ -325,6 +325,76 @@ export const buildCallStandardFlatFieldMetadatas = ({
     now,
   }),
 
+  outcome: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'outcome',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Outcome`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `How the call ended`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconPhoneCheck',
+      isNullable: true,
+      options: [
+        {
+          id: 'c012083c-721a-4005-9012-5c93f7d9deae',
+          value: 'CONNECTED',
+          label: i18nLabel(
+            msg({ message: `Connected`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'green',
+        },
+        {
+          id: '6812ad11-3a56-4839-a99e-bbd5924d021f',
+          value: 'NO_ANSWER',
+          label: i18nLabel(
+            msg({ message: `No answer`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'orange',
+        },
+        {
+          id: '3849961c-4af9-4b6f-8abc-4f11e2d83137',
+          value: 'LEFT_VOICEMAIL',
+          label: i18nLabel(
+            msg({ message: `Left voicemail`, context: 'fieldMetadata.label' }),
+          ),
+          position: 2,
+          color: 'blue',
+        },
+        {
+          id: 'ccd24a81-f797-45c6-be3f-b63aa739576d',
+          value: 'BUSY',
+          label: i18nLabel(
+            msg({ message: `Busy`, context: 'fieldMetadata.label' }),
+          ),
+          position: 3,
+          color: 'yellow',
+        },
+        {
+          id: 'bd13d376-db87-4387-999f-1ee80e3d50ef',
+          value: 'WRONG_NUMBER',
+          label: i18nLabel(
+            msg({ message: `Wrong number`, context: 'fieldMetadata.label' }),
+          ),
+          position: 4,
+          color: 'red',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   timelineActivities: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

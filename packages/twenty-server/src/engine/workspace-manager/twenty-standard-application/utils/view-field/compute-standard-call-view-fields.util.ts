@@ -160,5 +160,30 @@ export const computeStandardCallViewFields = (
         viewFieldGroupName: 'general',
       },
     }),
+    allCallsOutcome: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'call',
+      context: {
+        viewName: 'allCalls',
+        viewFieldName: 'outcome',
+        fieldName: 'outcome',
+        position: 3,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    callRecordPageFieldsOutcome: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'call',
+      context: {
+        viewName: 'callRecordPageFields',
+        viewFieldName: 'outcome',
+        fieldName: 'outcome',
+        position: 2,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

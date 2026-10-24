@@ -757,6 +757,9 @@ export const STANDARD_OBJECT_FIELDS = {
     direction: {
       universalIdentifier: '7f9ca46f-95e3-455d-9514-d7478cac6353',
     },
+    outcome: {
+      universalIdentifier: '81e9bf18-915e-455e-87e9-d581015b714a',
+    },
     timelineActivities: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:

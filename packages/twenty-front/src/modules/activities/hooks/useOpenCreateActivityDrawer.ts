@@ -1,3 +1,5 @@
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
 import { activityTargetableEntityArrayState } from '@/activities/states/activityTargetableEntityArrayState';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { type WorkspaceMember } from '@/workspace-member/types/WorkspaceMember';
@@ -5,7 +7,6 @@ import { type WorkspaceMember } from '@/workspace-member/types/WorkspaceMember';
 import { isUpsertingActivityInDBState } from '@/activities/states/isCreatingActivityInDBState';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
-import { type Note } from '@/activities/types/Note';
 import { type Task } from '@/activities/types/Task';
 import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -18,12 +19,10 @@ import { isDefined } from 'twenty-shared/utils';
 export const useOpenCreateActivityDrawer = ({
   activityObjectNameSingular,
 }: {
-  activityObjectNameSingular:
-    | CoreObjectNameSingular.Note
-    | CoreObjectNameSingular.Task;
+  activityObjectNameSingular: ActivityObjectNameSingular;
 }) => {
   const { createOneRecord: createOneActivity } = useCreateOneRecord<
-    (Task | Note) & { position: 'first' | 'last' }
+    (Task | NoteLikeActivity) & { position: 'first' | 'last' }
   >({
     objectNameSingular: activityObjectNameSingular,
   });

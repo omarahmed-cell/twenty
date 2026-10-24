@@ -31,7 +31,10 @@ export const recordIdentifierToObjectRecordIdentifier = ({
 
   if (
     objectMetadataItem.nameSingular === CoreObjectNameSingular.NoteTarget ||
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.TaskTarget
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.TaskTarget ||
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.CallTarget ||
+    objectMetadataItem.nameSingular ===
+      CoreObjectNameSingular.CommunicationTarget
   ) {
     linkToShowPage = '';
   } else if (

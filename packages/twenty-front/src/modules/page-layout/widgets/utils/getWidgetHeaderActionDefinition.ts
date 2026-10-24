@@ -7,6 +7,8 @@ import { WidgetActionCalendarEventCreate } from '@/page-layout/widgets/calendar/
 import { WidgetActionEmailCompose } from '@/page-layout/widgets/emails/components/WidgetActionEmailCompose';
 import { WidgetActionFileAttach } from '@/page-layout/widgets/files/components/WidgetActionFileAttach';
 import { WidgetActionNoteCreate } from '@/page-layout/widgets/notes/components/WidgetActionNoteCreate';
+import { WidgetActionCallCreate } from '@/page-layout/widgets/calls/components/WidgetActionCallCreate';
+import { WidgetActionCommunicationCreate } from '@/page-layout/widgets/communications/components/WidgetActionCommunicationCreate';
 import { WidgetActionTaskCreate } from '@/page-layout/widgets/tasks/components/WidgetActionTaskCreate';
 import { WidgetActionTimeline } from '@/page-layout/widgets/timeline/components/WidgetActionTimeline';
 import { isWidgetConfigurationOfType } from '@/side-panel/pages/page-layout/utils/isWidgetConfigurationOfType';
@@ -36,6 +38,8 @@ const widgetHeaderActionComponentByWidgetType: Partial<
   [WidgetType.EMAILS]: WidgetActionEmailCompose,
   [WidgetType.TASKS]: WidgetActionTaskCreate,
   [WidgetType.NOTES]: WidgetActionNoteCreate,
+  [WidgetType.CALLS]: WidgetActionCallCreate,
+  [WidgetType.COMMUNICATIONS]: WidgetActionCommunicationCreate,
   [WidgetType.FILES]: WidgetActionFileAttach,
   [WidgetType.CHAT_THREADS]: WidgetActionChatThreadCreate,
   [WidgetType.TIMELINE]: WidgetActionTimeline,

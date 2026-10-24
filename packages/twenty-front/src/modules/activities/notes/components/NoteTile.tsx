@@ -2,11 +2,11 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 
 import { useActivityFieldComponentInstanceId } from '@/activities/hooks/useActivityFieldComponentInstanceId';
-import { type Note } from '@/activities/types/Note';
+import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
+import { type NoteLikeActivityObjectNameSingular } from '@/activities/types/NoteLikeActivityObjectNameSingular';
 import { getActivityPreview } from '@/activities/utils/getActivityPreview';
 import { useObjectMorphJunctionConfigOrThrow } from '@/object-record/record-field/ui/hooks/useObjectMorphJunctionConfigOrThrow';
 import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { FieldContextProvider } from '@/object-record/record-field/ui/components/FieldContextProvider';
 import { RecordFieldComponentInstanceContext } from '@/object-record/record-field/ui/states/contexts/RecordFieldComponentInstanceContext';
 import { RecordInlineCell } from '@/object-record/record-inline-cell/components/RecordInlineCell';
@@ -70,16 +70,18 @@ const StyledFooter = styled.div`
 export const NoteTile = ({
   note,
   isSingleNote,
+  activityObjectNameSingular,
 }: {
-  note: Note;
+  note: NoteLikeActivity;
   isSingleNote: boolean;
+  activityObjectNameSingular: NoteLikeActivityObjectNameSingular;
 }) => {
   const { openRecordInSidePanel } = useOpenRecordInSidePanel();
 
   const body = getActivityPreview(note?.bodyV2?.blocknote ?? null);
 
   const junctionFieldName = useObjectMorphJunctionConfigOrThrow({
-    objectNameSingular: CoreObjectNameSingular.Note,
+    objectNameSingular: activityObjectNameSingular,
   }).junctionField.name;
 
   const instanceIdPrefix =
@@ -96,16 +98,16 @@ export const NoteTile = ({
         onClick={() =>
           openRecordInSidePanel({
             recordId: note.id,
-            objectNameSingular: CoreObjectNameSingular.Note,
+            objectNameSingular: activityObjectNameSingular,
           })
         }
       >
-        <StyledNoteTitle>{note.title ?? t`Task Title`}</StyledNoteTitle>
+        <StyledNoteTitle>{note.title ?? t`Untitled`}</StyledNoteTitle>
         <StyledCardContent>{body}</StyledCardContent>
       </StyledCardDetailsContainer>
       <StyledFooter>
         <FieldContextProvider
-          objectNameSingular={CoreObjectNameSingular.Note}
+          objectNameSingular={activityObjectNameSingular}
           objectRecordId={note.id}
           fieldMetadataName={junctionFieldName}
           fieldPosition={0}

@@ -1,3 +1,4 @@
+import { type ActivityObjectNameSingular } from '@/activities/types/ActivityObjectNameSingular';
 import { useCallback } from 'react';
 import { useStore } from 'jotai';
 
@@ -5,10 +6,7 @@ import { useActivityTargetsForTargetableObjects } from '@/activities/hooks/useAc
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { type ActivityTarget } from '@/activities/types/ActivityTarget';
 import { getRelatedRecordFromJunction } from '@/object-record/record-field/ui/utils/junction/getRelatedRecordFromJunction';
-import {
-  type CoreObjectNameSingular,
-  type RecordGqlOperationOrderBy,
-} from 'twenty-shared/types';
+import { type RecordGqlOperationOrderBy } from 'twenty-shared/types';
 import { getRecordsFromRecordConnection } from '@/object-record/cache/utils/getRecordsFromRecordConnection';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { isDefined } from 'twenty-shared/utils';
@@ -20,7 +18,7 @@ export const useActivities = ({
   skip,
   limit,
 }: {
-  objectNameSingular: CoreObjectNameSingular.Note | CoreObjectNameSingular.Task;
+  objectNameSingular: ActivityObjectNameSingular;
   targetableObjects: ActivityTargetableObject[];
   activityTargetsOrderByVariables: RecordGqlOperationOrderBy;
   skip?: boolean;

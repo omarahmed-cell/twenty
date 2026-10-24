@@ -37,6 +37,16 @@ const DEFAULT_RECORD_PAGE_TAB_DEFINITIONS = [
     widgetConfigurationType: WidgetConfigurationType.NOTES,
   },
   {
+    key: 'calls',
+    widgetKey: 'calls',
+    widgetConfigurationType: WidgetConfigurationType.CALLS,
+  },
+  {
+    key: 'communications',
+    widgetKey: 'communications',
+    widgetConfigurationType: WidgetConfigurationType.COMMUNICATIONS,
+  },
+  {
     key: 'files',
     widgetKey: 'files',
     widgetConfigurationType: WidgetConfigurationType.FILES,

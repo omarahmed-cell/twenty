@@ -68,6 +68,12 @@ export class FlatPageLayoutWidgetTypeValidatorService {
       NOTES: validateSimpleRecordPageWidgetForCreation(
         WidgetConfigurationType.NOTES,
       ),
+      CALLS: validateSimpleRecordPageWidgetForCreation(
+        WidgetConfigurationType.CALLS,
+      ),
+      COMMUNICATIONS: validateSimpleRecordPageWidgetForCreation(
+        WidgetConfigurationType.COMMUNICATIONS,
+      ),
       FILES: validateSimpleRecordPageWidgetForCreation(
         WidgetConfigurationType.FILES,
       ),
@@ -142,6 +148,12 @@ export class FlatPageLayoutWidgetTypeValidatorService {
       ),
       NOTES: validateSimpleRecordPageWidgetForUpdate(
         WidgetConfigurationType.NOTES,
+      ),
+      CALLS: validateSimpleRecordPageWidgetForUpdate(
+        WidgetConfigurationType.CALLS,
+      ),
+      COMMUNICATIONS: validateSimpleRecordPageWidgetForUpdate(
+        WidgetConfigurationType.COMMUNICATIONS,
       ),
       FILES: validateSimpleRecordPageWidgetForUpdate(
         WidgetConfigurationType.FILES,

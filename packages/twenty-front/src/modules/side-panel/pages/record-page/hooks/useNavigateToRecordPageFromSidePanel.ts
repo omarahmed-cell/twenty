@@ -1,7 +1,8 @@
+import { isActivityObjectNameSingular } from '@/activities/utils/isActivityObjectNameSingular';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
 import { createPath, useNavigate } from 'react-router-dom';
-import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
+import { AppPath } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 
 import { getSidePanelCommandMenuDropdownIdFromCommandMenuId } from '@/command-menu-item/utils/getSidePanelCommandMenuDropdownIdFromCommandMenuId';
@@ -46,11 +47,9 @@ export const useNavigateToRecordPageFromSidePanel = () => {
       const isExpandingCurrentRoutedRecord =
         currentRoutedLocation?.pathname === recordPath;
 
-      const fallbackTabId =
-        objectNameSingular === CoreObjectNameSingular.Note ||
-        objectNameSingular === CoreObjectNameSingular.Task
-          ? 'richText'
-          : 'timeline';
+      const fallbackTabId = isActivityObjectNameSingular(objectNameSingular)
+        ? 'richText'
+        : 'timeline';
       const destinationPath =
         isExpandingCurrentRoutedRecord && isDefined(currentRoutedPath)
           ? currentRoutedPath

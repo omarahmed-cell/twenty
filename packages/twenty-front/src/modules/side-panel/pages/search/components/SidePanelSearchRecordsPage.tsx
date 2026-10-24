@@ -1,3 +1,4 @@
+import { isActivityObjectNameSingular } from '@/activities/utils/isActivityObjectNameSingular';
 import { ToastOnQueryErrorEffect } from '@/apollo/components/ToastOnQueryErrorEffect';
 import { useCloseCommandMenu } from '@/command-menu-item/hooks/useCloseCommandMenu';
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
@@ -14,7 +15,7 @@ import { css } from '@linaria/core';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
+import { AppPath, type CoreObjectNameSingular } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/primitives/data-display';
 import { Tooltip } from 'twenty-ui/primitives/surfaces';
@@ -61,10 +62,9 @@ export const SidePanelSearchRecordsPage = () => {
         {searchResultItems.length > 0 && (
           <SidePanelGroup heading={t`Results`}>
             {searchResultItems.map((item) => {
-              const isTaskOrNote = [
-                CoreObjectNameSingular.Task,
-                CoreObjectNameSingular.Note,
-              ].includes(item.objectNameSingular as CoreObjectNameSingular);
+              const isTaskOrNote = isActivityObjectNameSingular(
+                item.objectNameSingular,
+              );
 
               const handleClick = () => {
                 if (isTaskOrNote) {

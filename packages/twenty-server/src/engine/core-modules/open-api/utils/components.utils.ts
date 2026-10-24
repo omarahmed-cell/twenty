@@ -1303,6 +1303,8 @@ export const computeMetadataSchemaComponents = (
                   'TIMELINE',
                   'TASKS',
                   'NOTES',
+                  'CALLS',
+                  'COMMUNICATIONS',
                   'FILES',
                   'EMAILS',
                   'CALENDAR',

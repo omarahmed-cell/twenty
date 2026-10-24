@@ -112,6 +112,34 @@ const SERVICE_PAGE_TABS = {
       },
     },
   },
+  calls: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs.calls
+        .universalIdentifier,
+    ...TAB_PROPS.calls,
+    widgets: {
+      calls: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs
+            .calls.widgets.calls.universalIdentifier,
+        ...WIDGET_PROPS.calls,
+      },
+    },
+  },
+  communications: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs
+        .communications.universalIdentifier,
+    ...TAB_PROPS.communications,
+    widgets: {
+      communications: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs
+            .communications.widgets.communications.universalIdentifier,
+        ...WIDGET_PROPS.communications,
+      },
+    },
+  },
   emails: {
     universalIdentifier:
       STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs.emails

@@ -23,6 +23,14 @@ export const useRelatedRecordActions = ({
     targetRecord,
     activityObjectNameSingular: CoreObjectNameSingular.Note,
   });
+  const callAction = useCreateActivityRelatedRecordAction({
+    targetRecord,
+    activityObjectNameSingular: CoreObjectNameSingular.Call,
+  });
+  const communicationAction = useCreateActivityRelatedRecordAction({
+    targetRecord,
+    activityObjectNameSingular: CoreObjectNameSingular.Communication,
+  });
   const fileAction = useAttachFileRelatedRecordAction({
     targetRecord,
     onUploadComplete: onFileUploadComplete,
@@ -31,5 +39,13 @@ export const useRelatedRecordActions = ({
   const calendarEventAction =
     useComposeCalendarEventRelatedRecordAction(targetRecord);
 
-  return [taskAction, noteAction, fileAction, emailAction, calendarEventAction];
+  return [
+    taskAction,
+    noteAction,
+    callAction,
+    communicationAction,
+    fileAction,
+    emailAction,
+    calendarEventAction,
+  ];
 };

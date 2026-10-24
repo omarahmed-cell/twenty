@@ -97,6 +97,20 @@ export const TAB_PROPS = {
     icon: 'IconNotes',
     layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
   },
+  calls: {
+    title: i18nLabel(msg({ message: `Calls`, context: 'pageLayoutTab.title' })),
+    position: 44,
+    icon: 'IconPhone',
+    layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+  },
+  communications: {
+    title: i18nLabel(
+      msg({ message: `Communications`, context: 'pageLayoutTab.title' }),
+    ),
+    position: 47,
+    icon: 'IconMessageCircle',
+    layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+  },
   files: {
     title: i18nLabel(msg({ message: `Files`, context: 'pageLayoutTab.title' })),
     position: 50,
@@ -194,6 +208,20 @@ export const WIDGET_PROPS = {
       msg({ message: `Notes`, context: 'pageLayoutWidget.title' }),
     ),
     type: WidgetType.NOTES,
+    position: VERTICAL_LIST_LAYOUT_POSITIONS.FIRST,
+  },
+  calls: {
+    title: i18nLabel(
+      msg({ message: `Calls`, context: 'pageLayoutWidget.title' }),
+    ),
+    type: WidgetType.CALLS,
+    position: VERTICAL_LIST_LAYOUT_POSITIONS.FIRST,
+  },
+  communications: {
+    title: i18nLabel(
+      msg({ message: `Communications`, context: 'pageLayoutWidget.title' }),
+    ),
+    type: WidgetType.COMMUNICATIONS,
     position: VERTICAL_LIST_LAYOUT_POSITIONS.FIRST,
   },
   files: {

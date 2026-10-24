@@ -19,6 +19,8 @@ import {
   type MessageCampaignBodyConfiguration,
   type MessageCampaignDetailsConfiguration,
   type NotesConfiguration,
+  type CallsConfiguration,
+  type CommunicationsConfiguration,
   type PieChartConfiguration,
   type RecordTableConfiguration,
   type StandaloneRichTextConfiguration,
@@ -119,6 +121,15 @@ type WidgetConfigurationTypenameMap = {
   };
   NotesConfiguration: Omit<NotesConfiguration, 'configurationType'> & {
     configurationType: WidgetConfigurationType.NOTES;
+  };
+  CallsConfiguration: Omit<CallsConfiguration, 'configurationType'> & {
+    configurationType: WidgetConfigurationType.CALLS;
+  };
+  CommunicationsConfiguration: Omit<
+    CommunicationsConfiguration,
+    'configurationType'
+  > & {
+    configurationType: WidgetConfigurationType.COMMUNICATIONS;
   };
   PieChartConfiguration: Omit<PieChartConfiguration, 'configurationType'> & {
     configurationType: WidgetConfigurationType.PIE_CHART;

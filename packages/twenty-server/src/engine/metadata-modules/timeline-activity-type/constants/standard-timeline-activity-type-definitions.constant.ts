@@ -162,7 +162,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'callLinked',
       universalIdentifier: 'd1f5aa35-b6ae-4105-a2b6-32ceab737a57',
       label: msg({
-        message: `linked a related call`,
+        message: `logged a call`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconLink',
@@ -211,6 +211,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
             STANDARD_OBJECTS.call.fields.callTargets.universalIdentifier,
           triggerFieldUniversalIdentifiers: [
             STANDARD_OBJECTS.call.fields.title.universalIdentifier,
+            STANDARD_OBJECTS.call.fields.outcome.universalIdentifier,
           ],
         },
       },
@@ -219,7 +220,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'communicationLinked',
       universalIdentifier: '4e9ea106-e45d-43fc-92bd-b0445631f753',
       label: msg({
-        message: `linked a related communication`,
+        message: `logged a message`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconLink',
