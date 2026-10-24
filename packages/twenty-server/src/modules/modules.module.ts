@@ -6,6 +6,7 @@ import { CallRecordingQueryHookModule } from 'src/modules/call-recording/query-h
 import { DashboardQueryHookModule } from 'src/modules/dashboard/query-hooks/dashboard-query-hook.module';
 import { BlocklistQueryHookModule } from 'src/modules/blocklist/query-hooks/blocklist-query-hook.module';
 import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/query-hooks/workspace-member-query-hook.module';
+import { ActivityTargetQueryHookModule } from 'src/modules/activity-target/query-hooks/activity-target-query-hook.module';
 import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hook.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
@@ -48,6 +49,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     DashboardQueryHookModule,
     BlocklistQueryHookModule,
     WorkspaceMemberQueryHookModule,
+    ActivityTargetQueryHookModule,
     CallQueryHookModule,
     CommunicationQueryHookModule,
     NoteQueryHookModule,
