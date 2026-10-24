@@ -13,12 +13,13 @@ export const useResolveDefaultEmailRecipient = ({
 }: UseResolveDefaultEmailRecipientParams) => {
   const isPerson = objectNameSingular === CoreObjectNameSingular.Person;
   const isCompany = objectNameSingular === CoreObjectNameSingular.Company;
-  const isOpportunity =
-    objectNameSingular === CoreObjectNameSingular.Opportunity;
+  const isRecordWithPointOfContact =
+    objectNameSingular === CoreObjectNameSingular.Opportunity ||
+    objectNameSingular === CoreObjectNameSingular.Service;
 
   const skipPerson = !isPerson || !recordId;
   const skipCompanyPeople = !isCompany || !recordId;
-  const skipOpportunity = !isOpportunity || !recordId;
+  const skipPointOfContact = !isRecordWithPointOfContact || !recordId;
 
   const { record: personRecord, loading: personLoading } = useFindOneRecord({
     objectNameSingular: CoreObjectNameSingular.Person,
@@ -36,37 +37,41 @@ export const useResolveDefaultEmailRecipient = ({
       skip: skipCompanyPeople,
     });
 
-  const { record: opportunityRecord, loading: opportunityLoading } =
-    useFindOneRecord({
-      objectNameSingular: CoreObjectNameSingular.Opportunity,
-      objectRecordId: recordId ?? '',
-      recordGqlFields: {
-        id: true,
-        pointOfContact: { id: true, emails: { primaryEmail: true } },
-      },
-      skip: skipOpportunity,
-    });
+  const {
+    record: recordWithPointOfContact,
+    loading: recordWithPointOfContactLoading,
+  } = useFindOneRecord({
+    objectNameSingular: skipPointOfContact
+      ? CoreObjectNameSingular.Opportunity
+      : objectNameSingular,
+    objectRecordId: recordId ?? '',
+    recordGqlFields: {
+      id: true,
+      pointOfContact: { id: true, emails: { primaryEmail: true } },
+    },
+    skip: skipPointOfContact,
+  });
 
   const defaultTo = isPerson
     ? (personRecord?.emails?.primaryEmail ?? '')
     : isCompany
       ? (companyPeople[0]?.emails?.primaryEmail ?? '')
-      : isOpportunity
-        ? (opportunityRecord?.pointOfContact?.emails?.primaryEmail ?? '')
+      : isRecordWithPointOfContact
+        ? (recordWithPointOfContact?.pointOfContact?.emails?.primaryEmail ?? '')
         : '';
 
   const defaultRecipientPersonId = isPerson
     ? personRecord?.id
     : isCompany
       ? companyPeople[0]?.id
-      : isOpportunity
-        ? opportunityRecord?.pointOfContact?.id
+      : isRecordWithPointOfContact
+        ? recordWithPointOfContact?.pointOfContact?.id
         : undefined;
 
   const loading =
     (isPerson && personLoading) ||
     (isCompany && companyPeopleLoading) ||
-    (isOpportunity && opportunityLoading);
+    (isRecordWithPointOfContact && recordWithPointOfContactLoading);
 
   return { defaultRecipientPersonId, defaultTo, loading };
 };

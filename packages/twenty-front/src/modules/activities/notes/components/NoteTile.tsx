@@ -1,42 +1,54 @@
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
+import { isNonEmptyString } from '@sniptt/guards';
 
 import { useActivityFieldComponentInstanceId } from '@/activities/hooks/useActivityFieldComponentInstanceId';
 import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
 import { type NoteLikeActivityObjectNameSingular } from '@/activities/types/NoteLikeActivityObjectNameSingular';
 import { getActivityPreview } from '@/activities/utils/getActivityPreview';
-import { useObjectMorphJunctionConfigOrThrow } from '@/object-record/record-field/ui/hooks/useObjectMorphJunctionConfigOrThrow';
-import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
+import { dateLocaleState } from '@/localization/states/dateLocaleState';
 import { FieldContextProvider } from '@/object-record/record-field/ui/components/FieldContextProvider';
+import { useObjectMorphJunctionConfigOrThrow } from '@/object-record/record-field/ui/hooks/useObjectMorphJunctionConfigOrThrow';
 import { RecordFieldComponentInstanceContext } from '@/object-record/record-field/ui/states/contexts/RecordFieldComponentInstanceContext';
 import { RecordInlineCell } from '@/object-record/record-inline-cell/components/RecordInlineCell';
 import { getRecordFieldInputInstanceId } from '@/object-record/utils/getRecordFieldInputId';
+import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
+import { ActorDisplay } from '@/ui/field/display/components/ActorDisplay';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { isDefined } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
+import { beautifyPastDateRelativeToNow } from '~/utils/date-utils';
 
-const StyledCard = styled.div<{ isSingleNote: boolean }>`
-  align-items: flex-start;
+const StyledCard = styled.div`
   background: ${themeCssVariables.background.secondary};
   border: 1px solid ${themeCssVariables.border.color.medium};
   border-radius: ${themeCssVariables.border.radius.md};
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 300px;
-  justify-content: space-between;
   width: 100%;
 `;
 
 const StyledCardDetailsContainer = styled.div`
-  align-items: flex-start;
-  align-self: stretch;
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: ${themeCssVariables.spacing[2]};
-  height: calc(100% - 45px);
-  justify-content: start;
-  padding: ${themeCssVariables.spacing[4]};
-  width: calc(100% - ${themeCssVariables.spacing[8]});
+  padding: ${themeCssVariables.spacing[3]} ${themeCssVariables.spacing[4]};
+  width: 100%;
+`;
+
+const StyledCardHeader = styled.div`
+  align-items: center;
+  color: ${themeCssVariables.font.color.tertiary};
+  display: flex;
+  gap: ${themeCssVariables.spacing[1]};
+  min-width: 0;
+`;
+
+const StyledTimestamp = styled.span`
+  white-space: nowrap;
 `;
 
 const StyledNoteTitle = styled.div`
@@ -45,38 +57,32 @@ const StyledNoteTitle = styled.div`
 `;
 
 const StyledCardContent = styled.div`
-  align-self: stretch;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   color: ${themeCssVariables.font.color.secondary};
+  display: -webkit-box;
   line-break: anywhere;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: pre-line;
-  width: 100%;
 `;
 
 const StyledFooter = styled.div`
-  align-items: center;
-  align-self: stretch;
   border-top: 1px solid ${themeCssVariables.border.color.light};
+  box-sizing: border-box;
   color: ${themeCssVariables.font.color.primary};
-  display: flex;
-  flex-direction: row;
-  gap: ${themeCssVariables.spacing[1]};
-  justify-content: center;
-  padding: ${themeCssVariables.spacing[2]};
-  width: calc(100% - ${themeCssVariables.spacing[4]});
+  padding: ${themeCssVariables.spacing[1]} ${themeCssVariables.spacing[2]};
+  width: 100%;
 `;
 
 export const NoteTile = ({
   note,
-  isSingleNote,
   activityObjectNameSingular,
 }: {
   note: NoteLikeActivity;
-  isSingleNote: boolean;
   activityObjectNameSingular: NoteLikeActivityObjectNameSingular;
 }) => {
   const { openRecordInSidePanel } = useOpenRecordInSidePanel();
+  const { localeCatalog } = useAtomStateValue(dateLocaleState);
 
   const body = getActivityPreview(note?.bodyV2?.blocknote ?? null);
 
@@ -93,7 +99,7 @@ export const NoteTile = ({
   });
 
   return (
-    <StyledCard isSingleNote={isSingleNote}>
+    <StyledCard>
       <StyledCardDetailsContainer
         onClick={() =>
           openRecordInSidePanel({
@@ -102,8 +108,25 @@ export const NoteTile = ({
           })
         }
       >
-        <StyledNoteTitle>{note.title ?? t`Untitled`}</StyledNoteTitle>
-        <StyledCardContent>{body}</StyledCardContent>
+        <StyledCardHeader>
+          {isDefined(note.createdBy) && (
+            <ActorDisplay
+              name={note.createdBy.name}
+              source={note.createdBy.source}
+              workspaceMemberId={note.createdBy.workspaceMemberId}
+              context={note.createdBy.context}
+            />
+          )}
+          {isNonEmptyString(note.createdAt) && (
+            <StyledTimestamp>
+              {beautifyPastDateRelativeToNow(note.createdAt, localeCatalog)}
+            </StyledTimestamp>
+          )}
+        </StyledCardHeader>
+        <StyledNoteTitle>{note.title || t`Untitled`}</StyledNoteTitle>
+        {isNonEmptyString(body) && (
+          <StyledCardContent>{body}</StyledCardContent>
+        )}
       </StyledCardDetailsContainer>
       <StyledFooter>
         <FieldContextProvider

@@ -43,7 +43,9 @@ const PERSON_PAGE_TABS = {
         universalIdentifier:
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.personRecordPage.tabs.home
             .widgets.pointOfContactForOpportunities.universalIdentifier,
-        title: 'Opportunities',
+        title: i18nLabel(
+          msg({ message: 'Deals', context: 'pageLayoutWidget.title' }),
+        ),
         type: WidgetType.FIELD,
         position: VERTICAL_LIST_LAYOUT_POSITIONS.THIRD,
         fieldUniversalIdentifier:

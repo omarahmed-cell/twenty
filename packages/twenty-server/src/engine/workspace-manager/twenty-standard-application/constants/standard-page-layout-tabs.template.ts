@@ -141,7 +141,7 @@ export const TAB_PROPS = {
   },
   calendar: {
     title: i18nLabel(
-      msg({ message: `Calendar`, context: 'pageLayoutTab.title' }),
+      msg({ message: `Meetings`, context: 'pageLayoutTab.title' }),
     ),
     position: 70,
     icon: 'IconCalendarEvent',
@@ -248,7 +248,7 @@ export const WIDGET_PROPS = {
   },
   calendar: {
     title: i18nLabel(
-      msg({ message: `Calendar`, context: 'pageLayoutWidget.title' }),
+      msg({ message: `Meetings`, context: 'pageLayoutWidget.title' }),
     ),
     type: WidgetType.CALENDAR,
     position: VERTICAL_LIST_LAYOUT_POSITIONS.FIRST,

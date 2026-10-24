@@ -1769,6 +1769,26 @@ export const STANDARD_COMMAND_MENU_ITEMS = {
     engineComponentKey: EngineComponentKey.COMPOSE_EMAIL,
     hotKeys: null,
   },
+  composeEmailToService: {
+    universalIdentifier: '80c5c784-2854-4217-a089-750ddbd36b20',
+    label: i18nLabel(
+      msg({ message: `Send Email`, context: 'commandMenuItem.label' }),
+    ),
+    icon: 'IconMail',
+    isPinned: true,
+    position: 67,
+    shortLabel: i18nLabel(
+      msg({ message: `Send Email`, context: 'commandMenuItem.shortLabel' }),
+    ),
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      'numberOfSelectedRecords == 1 and permissionFlags.SEND_EMAIL_TOOL',
+    availabilityObjectMetadataUniversalIdentifier:
+      STANDARD_OBJECTS.service.universalIdentifier,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.COMPOSE_EMAIL,
+    hotKeys: null,
+  },
   duplicateMessageList: {
     universalIdentifier: '19b519d4-a871-4fc2-980c-f5d6c92c6962',
     label: i18nLabel(

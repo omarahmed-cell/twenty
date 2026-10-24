@@ -21,10 +21,9 @@ const StyledContainer = styled.div`
 `;
 
 const StyledNoteContainer = styled.div`
-  display: grid;
-  gap: ${themeCssVariables.spacing[4]};
-  grid-auto-rows: 1fr;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[2]};
   width: 100%;
 `;
 
@@ -42,7 +41,6 @@ export const NoteList = ({
                 <NoteTile
                   key={note.id}
                   note={note}
-                  isSingleNote={notes.length === 1}
                   activityObjectNameSingular={activityObjectNameSingular}
                 />
               ))}

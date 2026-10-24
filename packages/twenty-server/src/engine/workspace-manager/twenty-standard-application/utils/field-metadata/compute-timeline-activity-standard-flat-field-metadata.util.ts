@@ -439,7 +439,7 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
       morphId: STANDARD_OBJECTS.timelineActivity.morphIds.targetMorphId.morphId,
       fieldName: 'targetPerson',
       label: i18nLabel(
-        msg({ message: `Person`, context: 'fieldMetadata.label' }),
+        msg({ message: `Contact`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({ message: `Event target`, context: 'fieldMetadata.description' }),
@@ -499,7 +499,7 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
       morphId: STANDARD_OBJECTS.timelineActivity.morphIds.targetMorphId.morphId,
       fieldName: 'targetOpportunity',
       label: i18nLabel(
-        msg({ message: `Opportunity`, context: 'fieldMetadata.label' }),
+        msg({ message: `Deal`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({ message: `Event target`, context: 'fieldMetadata.description' }),

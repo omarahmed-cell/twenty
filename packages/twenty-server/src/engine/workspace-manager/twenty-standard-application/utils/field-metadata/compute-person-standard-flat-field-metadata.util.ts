@@ -432,7 +432,7 @@ export const buildPersonStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'pointOfContactForOpportunities',
       label: i18nLabel(
-        msg({ message: `Opportunities`, context: 'fieldMetadata.label' }),
+        msg({ message: `Deals`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({

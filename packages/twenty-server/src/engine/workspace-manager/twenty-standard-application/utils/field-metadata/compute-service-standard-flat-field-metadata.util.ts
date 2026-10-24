@@ -334,7 +334,7 @@ export const buildServiceStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'opportunity',
       label: i18nLabel(
-        msg({ message: `Opportunity`, context: 'fieldMetadata.label' }),
+        msg({ message: `Deal`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({

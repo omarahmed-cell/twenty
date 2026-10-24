@@ -61,7 +61,7 @@ const SERVICE_PAGE_TABS = {
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.serviceRecordPage.tabs.home
             .widgets.opportunity.universalIdentifier,
         title: i18nLabel(
-          msg({ message: 'Opportunity', context: 'pageLayoutWidget.title' }),
+          msg({ message: 'Deal', context: 'pageLayoutWidget.title' }),
         ),
         type: WidgetType.FIELD,
         position: VERTICAL_LIST_LAYOUT_POSITIONS.FOURTH,

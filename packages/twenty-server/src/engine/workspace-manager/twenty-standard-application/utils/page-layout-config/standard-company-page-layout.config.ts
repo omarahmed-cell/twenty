@@ -33,7 +33,9 @@ const COMPANY_PAGE_TABS = {
         universalIdentifier:
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.home
             .widgets.people.universalIdentifier,
-        title: 'People',
+        title: i18nLabel(
+          msg({ message: 'Contacts', context: 'pageLayoutWidget.title' }),
+        ),
         type: WidgetType.FIELD,
         position: VERTICAL_LIST_LAYOUT_POSITIONS.SECOND,
         fieldUniversalIdentifier:
@@ -43,7 +45,9 @@ const COMPANY_PAGE_TABS = {
         universalIdentifier:
           STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.companyRecordPage.tabs.home
             .widgets.opportunities.universalIdentifier,
-        title: 'Opportunities',
+        title: i18nLabel(
+          msg({ message: 'Deals', context: 'pageLayoutWidget.title' }),
+        ),
         type: WidgetType.FIELD,
         position: VERTICAL_LIST_LAYOUT_POSITIONS.THIRD,
         fieldUniversalIdentifier:

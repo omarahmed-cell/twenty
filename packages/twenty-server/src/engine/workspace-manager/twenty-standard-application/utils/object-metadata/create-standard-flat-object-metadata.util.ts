@@ -1460,13 +1460,13 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
         namePlural: 'opportunities',
         labelSingular: i18nLabel(
           msg({
-            message: `Opportunity`,
+            message: `Deal`,
             context: 'objectMetadata.labelSingular',
           }),
         ),
         labelPlural: i18nLabel(
           msg({
-            message: `Opportunities`,
+            message: `Deals`,
             context: 'objectMetadata.labelPlural',
           }),
         ),
@@ -1542,10 +1542,10 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
         nameSingular: 'person',
         namePlural: 'people',
         labelSingular: i18nLabel(
-          msg({ message: `Person`, context: 'objectMetadata.labelSingular' }),
+          msg({ message: `Contact`, context: 'objectMetadata.labelSingular' }),
         ),
         labelPlural: i18nLabel(
-          msg({ message: `People`, context: 'objectMetadata.labelPlural' }),
+          msg({ message: `Contacts`, context: 'objectMetadata.labelPlural' }),
         ),
         description: i18nLabel(
           msg({ message: `A person`, context: 'objectMetadata.description' }),

@@ -109,6 +109,36 @@ describe('useResolveDefaultEmailRecipient', () => {
     expect(result.current.defaultRecipientPersonId).toBe('contact-id');
   });
 
+  it('should return the service point of contact email', () => {
+    mockUseFindOneRecord.mockImplementation(
+      (args: { objectNameSingular: string }) => {
+        if (args.objectNameSingular === CoreObjectNameSingular.Service) {
+          return {
+            record: {
+              pointOfContact: {
+                id: 'service-contact-id',
+                emails: { primaryEmail: 'contact@service.com' },
+              },
+            },
+            loading: false,
+          };
+        }
+
+        return { record: null, loading: false };
+      },
+    );
+
+    const { result } = renderHook(() =>
+      useResolveDefaultEmailRecipient({
+        objectNameSingular: CoreObjectNameSingular.Service,
+        recordId: 'service-id',
+      }),
+    );
+
+    expect(result.current.defaultTo).toBe('contact@service.com');
+    expect(result.current.defaultRecipientPersonId).toBe('service-contact-id');
+  });
+
   it('should return empty string for unknown object types', () => {
     const { result } = renderHook(() =>
       useResolveDefaultEmailRecipient({
