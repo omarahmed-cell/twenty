@@ -47,6 +47,7 @@ export class ObjectRecordPageOnCreateSideEffectHandlerService extends MetadataSi
         applicationUniversalIdentifier,
         recordPageFieldsViewUniversalIdentifier:
           flatRecordPageViewToCreate.universalIdentifier,
+        includeActivityTabs: true,
       });
 
     return {

@@ -37,6 +37,20 @@ const DEFAULT_RECORD_PAGE_TAB_DEFINITIONS = [
     widgetConfigurationType: WidgetConfigurationType.NOTES,
   },
   {
+    key: 'files',
+    widgetKey: 'files',
+    widgetConfigurationType: WidgetConfigurationType.FILES,
+  },
+] as const satisfies readonly {
+  key: keyof typeof TAB_PROPS;
+  widgetKey: keyof typeof WIDGET_PROPS;
+  widgetConfigurationType: WidgetConfigurationType;
+}[];
+
+// Upgrade commands that backfill record pages run before the CALLS / COMMUNICATIONS
+// widget types exist, so only object creation asks for these tabs
+const ACTIVITY_RECORD_PAGE_TAB_DEFINITIONS = [
+  {
     key: 'calls',
     widgetKey: 'calls',
     widgetConfigurationType: WidgetConfigurationType.CALLS,
@@ -45,11 +59,6 @@ const DEFAULT_RECORD_PAGE_TAB_DEFINITIONS = [
     key: 'communications',
     widgetKey: 'communications',
     widgetConfigurationType: WidgetConfigurationType.COMMUNICATIONS,
-  },
-  {
-    key: 'files',
-    widgetKey: 'files',
-    widgetConfigurationType: WidgetConfigurationType.FILES,
   },
 ] as const satisfies readonly {
   key: keyof typeof TAB_PROPS;
@@ -61,8 +70,10 @@ export const computeSystemRecordPageLayoutToCreate = ({
   objectMetadata,
   applicationUniversalIdentifier,
   recordPageFieldsViewUniversalIdentifier,
+  includeActivityTabs = false,
 }: {
   applicationUniversalIdentifier: string;
+  includeActivityTabs?: boolean;
   objectMetadata: Pick<
     UniversalFlatObjectMetadata,
     'universalIdentifier' | 'labelSingular'
@@ -84,11 +95,12 @@ export const computeSystemRecordPageLayoutToCreate = ({
   const pageLayoutTabs: UniversalFlatPageLayoutTab[] = [];
   const pageLayoutWidgets: UniversalFlatPageLayoutWidget[] = [];
 
-  for (const {
-    key,
-    widgetKey,
-    widgetConfigurationType,
-  } of DEFAULT_RECORD_PAGE_TAB_DEFINITIONS) {
+  for (const { key, widgetKey, widgetConfigurationType } of includeActivityTabs
+    ? [
+        ...DEFAULT_RECORD_PAGE_TAB_DEFINITIONS,
+        ...ACTIVITY_RECORD_PAGE_TAB_DEFINITIONS,
+      ]
+    : DEFAULT_RECORD_PAGE_TAB_DEFINITIONS) {
     const tabProps = TAB_PROPS[key];
     const widgetProps = WIDGET_PROPS[widgetKey];
     const tabUniversalIdentifier = getSystemPageLayoutTabUniversalIdentifier({
