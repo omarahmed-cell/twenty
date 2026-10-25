@@ -26,12 +26,15 @@ export const StyledEventRowContent = styled.div`
   overflow: hidden;
 `;
 
-export const StyledEventRowLinkedRecord = styled.span`
+export const StyledEventRowLinkedRecord = styled.span<{
+  hasPreview?: boolean;
+}>`
   color: ${themeCssVariables.font.color.primary};
   cursor: pointer;
+  flex-shrink: ${({ hasPreview }) => (hasPreview ? '0' : '1')};
+  max-width: ${({ hasPreview }) => (hasPreview ? '40%' : '100%')};
   overflow: hidden;
   text-decoration: underline;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 100%;
 `;

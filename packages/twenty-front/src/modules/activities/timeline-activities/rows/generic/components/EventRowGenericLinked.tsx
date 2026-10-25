@@ -1,4 +1,5 @@
-import { t } from '@lingui/core/macro';
+import { styled } from '@linaria/react';
+import { isNonEmptyString } from '@sniptt/guards';
 import { type KeyboardEvent, useState } from 'react';
 
 import { EventCard } from '@/activities/timeline-activities/rows/components/EventCard';
@@ -12,7 +13,7 @@ import {
   StyledEventRowContent,
   StyledEventRowLinkedRecord,
 } from '@/activities/timeline-activities/rows/components/EventRowStyles';
-import { useLinkedActivityEventLabel } from '@/activities/timeline-activities/rows/generic/hooks/useLinkedActivityEventLabel';
+import { useLinkedActivityEventDescription } from '@/activities/timeline-activities/rows/generic/hooks/useLinkedActivityEventDescription';
 import { getAuthorizedLinkedRecordName } from '@/activities/timeline-activities/rows/generic/utils/getAuthorizedLinkedRecordName';
 import { allowRequestsToTwentyIconsState } from '@/client-config/states/allowRequestsToTwentyIcons';
 import { recordStoreIdentifierFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreIdentifierFamilySelector';
@@ -22,11 +23,24 @@ import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/use
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isDefined } from 'twenty-shared/utils';
 import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
+import { themeCssVariables } from 'twenty-ui/theme';
+
+const StyledSeparator = styled.span`
+  color: ${themeCssVariables.font.color.tertiary};
+`;
+
+const StyledPreview = styled.span`
+  color: ${themeCssVariables.font.color.tertiary};
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+`;
 
 type EventRowGenericLinkedProps = EventRowNativeComponentProps;
 
 export const EventRowGenericLinked = ({
   event,
+  eventAction,
   eventTypeLabel,
   authorFullName,
   linkedObjectMetadataItem,
@@ -47,14 +61,11 @@ export const EventRowGenericLinked = ({
     },
   );
 
-  const objectLabel =
-    linkedObjectMetadataItem?.labelSingular?.toLowerCase() ?? t`record`;
-
-  const actionLabel = useLinkedActivityEventLabel({
+  const { actionLabel, preview } = useLinkedActivityEventDescription({
     linkedObjectMetadataItem,
     linkedRecordId: event.linkedRecordId,
+    action: eventAction,
     eventTypeLabel,
-    isLinkedEvent: event.timelineActivityTypeSnapshot?.action === 'linked',
   });
 
   const linkedRecordName = getAuthorizedLinkedRecordName(
@@ -69,6 +80,8 @@ export const EventRowGenericLinked = ({
           objectNameSingular: linkedObjectMetadataItem.nameSingular,
         }
       : undefined;
+
+  const hasPreview = isNonEmptyString(preview) && preview !== linkedRecordName;
 
   const canOpen =
     hasRenderer !== true &&
@@ -98,11 +111,13 @@ export const EventRowGenericLinked = ({
       <StyledEventRowContainer>
         <StyledEventRowContent>
           <EventRowItem>{authorFullName}</EventRowItem>
-          <EventRowItem variant="action">
-            {actionLabel ?? t`linked a ${objectLabel}`}
-          </EventRowItem>
+          <EventRowItem variant="action">{actionLabel}</EventRowItem>
+          {(canOpen || isNonEmptyString(preview)) && (
+            <StyledSeparator>·</StyledSeparator>
+          )}
           {canOpen && (
             <StyledEventRowLinkedRecord
+              hasPreview={hasPreview}
               role="button"
               tabIndex={0}
               onClick={handleOpen}
@@ -110,6 +125,11 @@ export const EventRowGenericLinked = ({
             >
               <OverflowingTextWithTooltip text={linkedRecordName} />
             </StyledEventRowLinkedRecord>
+          )}
+          {hasPreview && (
+            <StyledPreview>
+              <OverflowingTextWithTooltip text={preview} />
+            </StyledPreview>
           )}
           {canOpen && (
             <EventCardToggleButton isOpen={isOpen} setIsOpen={setIsOpen} />

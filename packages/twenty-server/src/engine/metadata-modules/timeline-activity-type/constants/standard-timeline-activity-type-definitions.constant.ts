@@ -83,7 +83,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'recordLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c05',
       label: msg({
-        message: `was linked by`,
+        message: `linked`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconLink',
@@ -94,7 +94,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'recordUnlinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c06',
       label: msg({
-        message: `was unlinked by`,
+        message: `unlinked`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconUnlink',
@@ -105,7 +105,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'noteLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c09',
       label: msg({
-        message: `linked a related note`,
+        message: `added a note`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconLink',
@@ -123,7 +123,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'noteUnlinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0a',
       label: msg({
-        message: `unlinked a related note`,
+        message: `removed a note`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconUnlink',
@@ -141,7 +141,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'noteUpdated',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0b',
       label: msg({
-        message: `updated a related note`,
+        message: `updated a note`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconEditCircle',
@@ -180,7 +180,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'callUnlinked',
       universalIdentifier: 'e97cbbff-70f6-47bc-9589-239238256ca9',
       label: msg({
-        message: `unlinked a related call`,
+        message: `removed a call`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconUnlink',
@@ -198,7 +198,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'callUpdated',
       universalIdentifier: '13d57092-f6c4-42d8-8cf1-28b51a5ec224',
       label: msg({
-        message: `updated a related call`,
+        message: `updated a call`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconEditCircle',
@@ -240,7 +240,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'communicationUnlinked',
       universalIdentifier: '4a6774c3-500e-4b99-a8d3-996322b5db32',
       label: msg({
-        message: `unlinked a related communication`,
+        message: `removed a message`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconUnlink',
@@ -260,7 +260,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'communicationUpdated',
       universalIdentifier: 'a39d537c-1f37-4624-bb5d-9506b83dc624',
       label: msg({
-        message: `updated a related communication`,
+        message: `updated a message`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconEditCircle',
@@ -283,7 +283,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'taskLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0c',
       label: msg({
-        message: `linked a related task`,
+        message: `added a task`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconLink',
@@ -301,7 +301,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'taskUnlinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0d',
       label: msg({
-        message: `unlinked a related task`,
+        message: `removed a task`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconUnlink',
@@ -319,7 +319,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'taskUpdated',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0e',
       label: msg({
-        message: `updated a related task`,
+        message: `updated a task`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconEditCircle',
@@ -362,7 +362,7 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       name: 'calendarEventLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c10',
       label: msg({
-        message: `attended a calendar event`,
+        message: `attended a meeting`,
         context: 'timelineActivityType.label',
       }),
       icon: 'IconCalendar',
