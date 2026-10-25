@@ -3,6 +3,8 @@ export const STANDARD_OBJECT_RECORDS_UNDER_OBJECT_RECORDS_PERMISSIONS = [
   'company',
   'opportunity',
   'service',
+  'product',
+  'lineItem',
   'note',
   'task',
   'call',

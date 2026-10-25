@@ -37,6 +37,8 @@ import { buildNoteStandardFlatIndexMetadatas } from 'src/engine/workspace-manage
 import { buildNoteTargetStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-note-target-standard-flat-index-metadata.util';
 import { buildOpportunityStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-opportunity-standard-flat-index-metadata.util';
 import { buildServiceStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-service-standard-flat-index-metadata.util';
+import { buildProductStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-product-standard-flat-index-metadata.util';
+import { buildLineItemStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-line-item-standard-flat-index-metadata.util';
 import { buildPersonStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-person-standard-flat-index-metadata.util';
 import { buildRecordShareStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-record-share-standard-flat-index-metadata.util';
 import { buildShortLinkStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-short-link-standard-flat-index-metadata.util';
@@ -95,6 +97,8 @@ const STANDARD_FLAT_INDEX_METADATA_BUILDERS_BY_OBJECT_NAME = {
   opportunity: buildOpportunityStandardFlatIndexMetadatas,
   person: buildPersonStandardFlatIndexMetadatas,
   service: buildServiceStandardFlatIndexMetadatas,
+  product: buildProductStandardFlatIndexMetadatas,
+  lineItem: buildLineItemStandardFlatIndexMetadatas,
   recordShare: buildRecordShareStandardFlatIndexMetadatas,
   shortLink: buildShortLinkStandardFlatIndexMetadatas,
   task: buildTaskStandardFlatIndexMetadatas,

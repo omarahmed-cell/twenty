@@ -19,6 +19,8 @@ export { STANDARD_MESSAGE_THREAD_PAGE_LAYOUT_CONFIG } from './standard-message-t
 export { STANDARD_NOTE_PAGE_LAYOUT_CONFIG } from './standard-note-page-layout.config';
 export { STANDARD_OPPORTUNITY_PAGE_LAYOUT_CONFIG } from './standard-opportunity-page-layout.config';
 export { STANDARD_SERVICE_PAGE_LAYOUT_CONFIG } from './standard-service-page-layout.config';
+export { STANDARD_PRODUCT_PAGE_LAYOUT_CONFIG } from './standard-product-page-layout.config';
+export { STANDARD_LINE_ITEM_PAGE_LAYOUT_CONFIG } from './standard-line-item-page-layout.config';
 export {
   type StandardPageLayoutConfig,
   type StandardPageLayoutTabConfig,

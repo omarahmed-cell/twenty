@@ -28,6 +28,8 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   company: '20202020-b374-4779-a561-80086cb2e17f',
   opportunity: '20202020-9549-49dd-b2b2-883999db8938',
   service: '1dbdb4b9-dcca-440a-be2e-e6d5f57e27e5',
+  product: 'f099cee4-2fef-476b-ba00-41dc9ca7348c',
+  lineItem: '882dd640-72b3-4ef4-927a-c3a44f1131d7',
   note: '20202020-0b00-45cd-b6f6-6cd806fc6804',
   task: '20202020-1ba1-48ba-bc83-ef7e5990ed10',
   workflow: '20202020-62be-406c-b9ca-8caa50d51392',

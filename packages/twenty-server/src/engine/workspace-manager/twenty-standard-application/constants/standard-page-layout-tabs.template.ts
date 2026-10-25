@@ -153,6 +153,14 @@ export const TAB_PROPS = {
     icon: 'IconNotes',
     layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
   },
+  lineItems: {
+    title: i18nLabel(
+      msg({ message: `Line of Item`, context: 'pageLayoutTab.title' }),
+    ),
+    position: 15,
+    icon: 'IconListNumbers',
+    layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+  },
   members: {
     title: i18nLabel(
       msg({ message: `Members`, context: 'pageLayoutTab.title' }),

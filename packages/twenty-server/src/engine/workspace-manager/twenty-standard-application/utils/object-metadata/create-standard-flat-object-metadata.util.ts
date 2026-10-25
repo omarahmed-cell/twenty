@@ -1527,6 +1527,88 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  product: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<CreateStandardObjectArgs<'product'>, 'context' | 'objectName'>) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'product',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.product.universalIdentifier,
+        nameSingular: 'product',
+        namePlural: 'products',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Product`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Products`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A product or service in the catalog`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconPackage',
+        isSearchable: true,
+        labelIdentifierFieldMetadataName: 'name',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  lineItem: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<CreateStandardObjectArgs<'lineItem'>, 'context' | 'objectName'>) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'lineItem',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.lineItem.universalIdentifier,
+        nameSingular: 'lineItem',
+        namePlural: 'lineItems',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Line Item`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Line Items`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A product sold on a deal`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconListNumbers',
+        isSearchable: true,
+        labelIdentifierFieldMetadataName: 'name',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   person: ({
     now,
     workspaceId,

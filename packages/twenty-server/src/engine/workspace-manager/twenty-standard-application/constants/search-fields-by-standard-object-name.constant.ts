@@ -58,6 +58,11 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
   ],
   opportunity: [{ name: 'name', type: FieldMetadataType.TEXT }],
   service: [{ name: 'name', type: FieldMetadataType.TEXT }],
+  product: [
+    { name: 'name', type: FieldMetadataType.TEXT },
+    { name: 'sku', type: FieldMetadataType.TEXT },
+  ],
+  lineItem: [{ name: 'name', type: FieldMetadataType.TEXT }],
   person: [
     { name: 'name', type: FieldMetadataType.FULL_NAME },
     { name: 'emails', type: FieldMetadataType.EMAILS },

@@ -472,6 +472,35 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  lineItems: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'lineItems',
+      label: i18nLabel(
+        msg({ message: `Line of Item`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Products sold on the deal`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconListNumbers',
+      isNullable: true,
+      targetObjectName: 'lineItem',
+      targetFieldName: 'deal',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   taskTargets: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

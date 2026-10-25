@@ -33,6 +33,8 @@ export enum CoreObjectNameSingular {
   Opportunity = 'opportunity',
   Person = 'person',
   Service = 'service',
+  Product = 'product',
+  LineItem = 'lineItem',
   Task = 'task',
   TaskTarget = 'taskTarget',
   Webhook = 'webhook',

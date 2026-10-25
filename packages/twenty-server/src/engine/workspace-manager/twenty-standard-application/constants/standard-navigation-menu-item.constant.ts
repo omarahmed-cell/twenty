@@ -77,6 +77,20 @@ export const STANDARD_NAVIGATION_MENU_ITEMS = {
         .universalIdentifier,
     position: 10,
   },
+  allProducts: {
+    universalIdentifier: 'b1c345ca-eb41-45bf-bb0e-ca3b347ff7f7',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.product.views.allProducts.universalIdentifier,
+    position: 11,
+  },
+  allLineItems: {
+    universalIdentifier: '4b5ebb8f-3b28-4510-9ed5-c348d745489f',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.lineItem.views.allLineItems.universalIdentifier,
+    position: 12,
+  },
   workflowsFolder: {
     universalIdentifier: '20202020-b007-4b07-8b07-c0aba11c0007',
     type: NavigationMenuItemType.FOLDER,
@@ -124,6 +138,8 @@ export const STANDARD_NAVIGATION_MENU_ITEM_DEFAULT_COLORS: Partial<
   allCommunications: 'turquoise',
   allOpportunities: 'red',
   allServices: 'purple',
+  allProducts: 'orange',
+  allLineItems: 'orange',
   workflowsFolder: 'orange',
   allMessageCampaigns: 'gray',
   allDashboards: 'gray',

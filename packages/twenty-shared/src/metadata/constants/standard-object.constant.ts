@@ -1166,6 +1166,7 @@ export const STANDARD_OBJECTS = {
           'attachments',
           'timelineActivities',
           'services',
+          'lineItems',
           'callTargets',
           'communicationTargets',
         ],
@@ -1313,6 +1314,140 @@ export const STANDARD_OBJECTS = {
         ],
         viewFieldGroupNames: {
           relations: 'Relations',
+          system: 'System',
+        },
+      }),
+    },
+  },
+  product: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.product,
+    fields: STANDARD_OBJECT_FIELDS.product,
+    indexes: {
+      searchVectorGinIndex: {
+        universalIdentifier: '38628aca-524b-4abe-bad8-85657446ad88',
+      },
+    },
+    views: {
+      allProducts: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.product,
+        fields: STANDARD_OBJECT_FIELDS.product,
+        viewFieldNames: [
+          'name',
+          'sku',
+          'productType',
+          'billingFrequency',
+          'unitPrice',
+          'unitCost',
+          'createdAt',
+        ],
+      }),
+      productRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.product,
+        fields: STANDARD_OBJECT_FIELDS.product,
+        viewFieldNames: [
+          'sku',
+          'description',
+          'productType',
+          'billingFrequency',
+          'unitPrice',
+          'unitCost',
+          'createdAt',
+          'createdBy',
+          'updatedAt',
+          'updatedBy',
+          'lineItems',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
+          system: 'System',
+        },
+      }),
+    },
+  },
+  lineItem: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.lineItem,
+    fields: STANDARD_OBJECT_FIELDS.lineItem,
+    indexes: {
+      productIdIndex: {
+        universalIdentifier: '2e74ad7c-eb84-4c1d-94d4-63f6c5a0531e',
+      },
+      dealIdIndex: {
+        universalIdentifier: '455d4930-db47-4ecb-8098-059308f50eb5',
+      },
+      searchVectorGinIndex: {
+        universalIdentifier: '4143982d-a14a-4424-9b53-7e450a9cec9d',
+      },
+    },
+    views: {
+      allLineItems: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.lineItem,
+        fields: STANDARD_OBJECT_FIELDS.lineItem,
+        viewFieldNames: [
+          'name',
+          'deal',
+          'product',
+          'term',
+          'billingFrequency',
+          'quantity',
+          'unitPrice',
+          'unitDiscount',
+          'totalPrice',
+        ],
+      }),
+      dealRecordPageLineItems: {
+        universalIdentifier: 'fbee3008-ded1-4fda-9356-17f2ed2e5477',
+        viewFields: {
+          name: {
+            universalIdentifier: '0cd09a78-1f02-42d6-b4af-8ac66b7e131b',
+          },
+          term: {
+            universalIdentifier: 'bc2b740d-9b53-4670-80cb-1ff79cb09d31',
+          },
+          billingFrequency: {
+            universalIdentifier: '275702f1-92c3-49e3-b540-e8e06ceddb09',
+          },
+          quantity: {
+            universalIdentifier: 'c919e403-12df-4506-a627-52b4154b09ca',
+          },
+          unitPrice: {
+            universalIdentifier: '08b544de-8a0d-41fd-9012-41f83b4b8e62',
+          },
+          unitDiscount: {
+            universalIdentifier: 'c2f2af17-edb2-45cc-a6c9-540f994e387e',
+          },
+          totalPrice: {
+            universalIdentifier: '4398d6e8-6d02-45d2-ba19-27a40aa471fb',
+          },
+        },
+        viewFilters: {
+          dealIsCurrentRecord: {
+            universalIdentifier: 'ee801174-f93a-445d-bf72-227ea96eeffb',
+          },
+        },
+      },
+      lineItemRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.lineItem,
+        fields: STANDARD_OBJECT_FIELDS.lineItem,
+        viewFieldNames: [
+          'product',
+          'deal',
+          'term',
+          'billingFrequency',
+          'quantity',
+          'unitPrice',
+          'unitDiscount',
+          'totalPrice',
+          'createdAt',
+          'createdBy',
+          'updatedAt',
+          'updatedBy',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
           system: 'System',
         },
       }),

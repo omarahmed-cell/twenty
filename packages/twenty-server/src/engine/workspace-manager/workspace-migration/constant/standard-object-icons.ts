@@ -32,6 +32,8 @@ export const STANDARD_OBJECT_ICONS = {
   opportunity: 'IconTargetArrow',
   person: 'IconUser',
   service: 'IconBriefcase',
+  product: 'IconPackage',
+  lineItem: 'IconListNumbers',
   task: 'IconCheckbox',
   taskTarget: 'IconCheckbox',
   timelineActivity: 'IconTimelineEvent',

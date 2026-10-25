@@ -204,6 +204,12 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           services: 'Services',
         },
       },
+      lineItems: {
+        title: 'Line of Item',
+        widgets: {
+          lineItems: 'Line of Item',
+        },
+      },
       timeline: {
         title: 'Timeline',
         widgets: {
@@ -256,6 +262,31 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
         title: 'Calendar',
         widgets: {
           calendar: 'Calendar',
+        },
+      },
+    },
+  }),
+  productRecordPage: buildStandardObjectRecordPageLayout({
+    objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.product,
+    tabs: {
+      home: {
+        title: 'Home',
+        widgets: {
+          fields: 'Fields',
+          lineItems: 'Line Items',
+        },
+      },
+    },
+  }),
+  lineItemRecordPage: buildStandardObjectRecordPageLayout({
+    objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.lineItem,
+    tabs: {
+      home: {
+        title: 'Home',
+        widgets: {
+          fields: 'Fields',
+          product: 'Product',
+          deal: 'Deal',
         },
       },
     },

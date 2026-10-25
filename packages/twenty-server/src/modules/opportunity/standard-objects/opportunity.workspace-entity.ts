@@ -7,6 +7,7 @@ import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-
 import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-objects/call-target.workspace-entity';
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
+import { type LineItemWorkspaceEntity } from 'src/modules/line-item/standard-objects/line-item.workspace-entity';
 import { type NoteTargetWorkspaceEntity } from 'src/modules/note/standard-objects/note-target.workspace-entity';
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
 import { type MessageThreadTargetWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread-target.workspace-entity';
@@ -42,6 +43,7 @@ export class OpportunityWorkspaceEntity extends BaseWorkspaceEntity {
   owner: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
   ownerId: string | null;
   services: EntityRelation<ServiceWorkspaceEntity[]>;
+  lineItems: EntityRelation<LineItemWorkspaceEntity[]>;
   /** @deprecated */
   probability: string;
   searchVector: string;

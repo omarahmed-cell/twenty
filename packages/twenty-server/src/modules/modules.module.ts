@@ -8,6 +8,7 @@ import { BlocklistQueryHookModule } from 'src/modules/blocklist/query-hooks/bloc
 import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/query-hooks/workspace-member-query-hook.module';
 import { ActivityTargetQueryHookModule } from 'src/modules/activity-target/query-hooks/activity-target-query-hook.module';
 import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hook.module';
+import { LineItemQueryHookModule } from 'src/modules/line-item/query-hooks/line-item-query-hook.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
 import { TaskQueryHookModule } from 'src/modules/task/query-hooks/task-query-hook.module';
@@ -51,6 +52,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     WorkspaceMemberQueryHookModule,
     ActivityTargetQueryHookModule,
     CallQueryHookModule,
+    LineItemQueryHookModule,
     CommunicationQueryHookModule,
     NoteQueryHookModule,
     TaskQueryHookModule,

@@ -20,6 +20,8 @@ const STANDARD_OBJECT_FALLBACK_COLOR: Partial<
   [CoreObjectNameSingular.Communication]: 'turquoise',
   [CoreObjectNameSingular.Opportunity]: 'red',
   [CoreObjectNameSingular.Service]: 'purple',
+  [CoreObjectNameSingular.Product]: 'orange',
+  [CoreObjectNameSingular.LineItem]: 'orange',
   [CoreObjectNameSingular.Dashboard]: SYSTEM_OBJECT_COLOR,
   [CoreObjectNameSingular.Workflow]: SYSTEM_OBJECT_COLOR,
   [CoreObjectNameSingular.WorkflowRun]: SYSTEM_OBJECT_COLOR,

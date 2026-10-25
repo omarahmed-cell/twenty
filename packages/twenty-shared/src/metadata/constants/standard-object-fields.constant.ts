@@ -1465,6 +1465,9 @@ export const STANDARD_OBJECT_FIELDS = {
     services: {
       universalIdentifier: '6bdc4a51-1b5b-440a-b2ab-13e87a6ae902',
     },
+    lineItems: {
+      universalIdentifier: '5cc0767e-d40e-4ae8-a6e5-a5ec5551cb85',
+    },
     taskTargets: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -1752,6 +1755,57 @@ export const STANDARD_OBJECT_FIELDS = {
         relationTargetObjectUniversalIdentifier:
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.calendarEventTarget,
       }),
+    },
+  },
+  product: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.product,
+    ),
+    name: { universalIdentifier: '3f4f9cb2-0d0b-4c14-bbc5-e11600749ffa' },
+    sku: { universalIdentifier: '4355bbe5-d65b-4186-8657-98df98eb71fc' },
+    description: {
+      universalIdentifier: '05c02c42-edcf-4c3d-82b7-fcaa962357ec',
+    },
+    productType: {
+      universalIdentifier: '06b65afb-bab3-4a16-b245-80d14d7ef403',
+    },
+    billingFrequency: {
+      universalIdentifier: '18d221b3-cb4d-4448-9703-d8c7c5b4e71e',
+    },
+    unitPrice: {
+      universalIdentifier: 'c4ce9e7d-4422-4e9a-bbc9-8855549ebe2e',
+    },
+    unitCost: {
+      universalIdentifier: 'c97d4717-7433-4ec0-9252-daca2ec92500',
+    },
+    lineItems: {
+      universalIdentifier: 'a62c7d5c-e621-4e04-9bcf-06520ff49d17',
+    },
+  },
+  lineItem: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.lineItem,
+    ),
+    product: {
+      universalIdentifier: 'a5a2b43e-6a42-4815-94f1-b16b8917349b',
+    },
+    deal: { universalIdentifier: '6f30aad5-4a94-41f2-865c-4547c7cbb4ec' },
+    name: { universalIdentifier: '216d3447-af05-453c-8bf9-01bf2a315b49' },
+    term: { universalIdentifier: '6eb98a80-89d9-46b0-a228-044be9c024df' },
+    billingFrequency: {
+      universalIdentifier: '04177cf1-7061-48ef-a424-de7efd2ba164',
+    },
+    quantity: {
+      universalIdentifier: 'fa07f116-c10e-4621-aef1-c2c8d9d7c2ba',
+    },
+    unitPrice: {
+      universalIdentifier: '8a3b1e64-8b6f-42b7-8b33-37ae609f2b85',
+    },
+    unitDiscount: {
+      universalIdentifier: '9cfaf65c-afc4-4a7f-bc1b-4da33bc74a36',
+    },
+    totalPrice: {
+      universalIdentifier: '7ec17a65-4715-451e-bbbb-fa91b41652e5',
     },
   },
   recordShare: {

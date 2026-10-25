@@ -5,6 +5,7 @@ import {
 } from 'twenty-shared/metadata';
 
 import { PageLayoutType, WidgetType } from 'twenty-shared/types';
+import { FieldDisplayMode } from 'src/engine/metadata-modules/page-layout-widget/enums/field-display-mode.enum';
 import {
   TAB_PROPS,
   VERTICAL_LIST_LAYOUT_POSITIONS,
@@ -71,6 +72,30 @@ const OPPORTUNITY_PAGE_TABS = {
         position: VERTICAL_LIST_LAYOUT_POSITIONS.FIFTH,
         fieldUniversalIdentifier:
           STANDARD_OBJECTS.opportunity.fields.services.universalIdentifier,
+      },
+    },
+  },
+  lineItems: {
+    universalIdentifier:
+      STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
+        .lineItems.universalIdentifier,
+    ...TAB_PROPS.lineItems,
+    widgets: {
+      lineItems: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
+            .lineItems.widgets.lineItems.universalIdentifier,
+        title: i18nLabel(
+          msg({ message: 'Line of Item', context: 'pageLayoutWidget.title' }),
+        ),
+        type: WidgetType.FIELD,
+        position: VERTICAL_LIST_LAYOUT_POSITIONS.FIRST,
+        fieldUniversalIdentifier:
+          STANDARD_OBJECTS.opportunity.fields.lineItems.universalIdentifier,
+        fieldDisplayMode: FieldDisplayMode.TABLE,
+        embeddedViewUniversalIdentifier:
+          STANDARD_OBJECTS.lineItem.views.dealRecordPageLineItems
+            .universalIdentifier,
       },
     },
   },
