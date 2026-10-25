@@ -60,13 +60,13 @@ const StyledFieldList = styled.div`
   padding: ${themeCssVariables.spacing[3]};
 `;
 
-// Rows keep a fixed height so the card does not resize as values arrive
+// A minimum height keeps the card from resizing as values arrive; multi-line values grow the row
 const StyledFieldRow = styled.div`
-  align-items: center;
+  align-items: flex-start;
   box-sizing: border-box;
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
-  height: 24px;
+  min-height: 24px;
 `;
 
 const StyledFieldLabel = styled.div`
@@ -76,6 +76,7 @@ const StyledFieldLabel = styled.div`
   flex-shrink: 0;
   font-size: ${themeCssVariables.font.size.md};
   gap: ${themeCssVariables.spacing[2]};
+  height: 24px;
   width: 104px;
 `;
 
@@ -97,9 +98,15 @@ const StyledShowMoreContainer = styled.div`
   display: flex;
 `;
 
+// Safe centering top-aligns a value too tall for the row so its start stays visible
 const StyledFieldValue = styled.div`
+  align-items: safe center;
   color: ${themeCssVariables.font.color.primary};
+  display: flex;
+  flex: 1;
   font-size: ${themeCssVariables.font.size.md};
+  max-height: 64px;
+  min-height: 24px;
   min-width: 0;
   overflow: hidden;
 `;

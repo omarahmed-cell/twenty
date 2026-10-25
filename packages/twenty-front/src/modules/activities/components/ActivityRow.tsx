@@ -13,12 +13,17 @@ const StyledRowContentContainer = styled.div`
 `;
 
 const StyledRowContent = styled(Card.Content)`
+  padding: ${themeCssVariables.spacing[0]} ${themeCssVariables.spacing[4]};
+  position: relative;
+`;
+
+// Card.Content's own class wins over a styled override, so the row layout lives on an inner element
+const StyledRowLayout = styled.div`
   align-items: center;
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
-  height: ${themeCssVariables.spacing[12]};
-  padding: ${themeCssVariables.spacing[0]} ${themeCssVariables.spacing[4]};
-  position: relative;
+  min-height: ${themeCssVariables.spacing[6]};
+  width: 100%;
 `;
 
 const StyledRowAction = styled.button`
@@ -82,7 +87,7 @@ export const ActivityRow = ({
             disabled={disabled}
           />
         )}
-        {children}
+        <StyledRowLayout>{children}</StyledRowLayout>
       </StyledRowContent>
     </StyledRowContentContainer>
   );
