@@ -11,7 +11,12 @@ export const timelineCalendarEventFragment = gql`
     startsAt
     endsAt
     isFullDay
+    isCanceled
     visibility
+    locationType
+    meetingType
+    meetingOutcome
+    assignedToId
     participants {
       ...TimelineCalendarEventParticipantFragment
     }

@@ -40,6 +40,7 @@ const buildWorkspaceMember = ({
   agentMessageReactions: [],
   assignedAgentChatThreads: [],
   ownedOpportunities: [],
+  assignedCalendarEvents: [],
 });
 
 describe('buildFlatWorkspaceMemberMaps', () => {

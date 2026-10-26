@@ -28,4 +28,16 @@ export const buildCalendarEventStandardFlatIndexMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  assignedToIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'assignedToIdIndex',
+      relatedFieldNames: ['assignedTo'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

@@ -208,6 +208,9 @@ export const STANDARD_OBJECTS = {
       iCalUidIndex: {
         universalIdentifier: 'e38d1418-f994-4f0d-b0cd-41d4da240ea0',
       },
+      assignedToIdIndex: {
+        universalIdentifier: '432b9702-97f7-449c-a8db-a0916170cd83',
+      },
     },
     views: {
       allCalendarEvents: buildStandardObjectIndexView({
@@ -222,6 +225,8 @@ export const STANDARD_OBJECTS = {
           'location',
           'conferenceLink',
           'isCanceled',
+          'meetingOutcome',
+          'assignedTo',
           'createdAt',
         ],
       }),
@@ -239,6 +244,10 @@ export const STANDARD_OBJECTS = {
           'location',
           'description',
           'calendarEventTargets',
+          'locationType',
+          'meetingType',
+          'meetingOutcome',
+          'assignedTo',
           'externalCreatedAt',
           'externalUpdatedAt',
           'iCalUid',

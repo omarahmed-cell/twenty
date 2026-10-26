@@ -4,6 +4,7 @@ import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
 
@@ -421,7 +422,7 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
       description: i18nLabel(
         msg({ message: `Location`, context: 'fieldMetadata.description' }),
       ),
-      icon: 'IconMapPin',
+      icon: 'IconMap',
       isNullable: true,
       isUIEditable: false,
     },
@@ -490,6 +491,203 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
       icon: 'IconLink',
       isNullable: true,
       isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  locationType: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'locationType',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Location type`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `How the meeting takes place`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMap',
+      isNullable: true,
+      options: [
+        {
+          id: '3d055c1e-258b-439a-be84-81adeec58364',
+          value: 'PHONE_CALL',
+          label: i18nLabel(
+            msg({ message: `Phone-Call`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'blue',
+        },
+        {
+          id: 'fc75e91f-3b32-4a16-8412-d4308e7d81f7',
+          value: 'IN_PERSON',
+          label: i18nLabel(
+            msg({ message: `In-Person`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'green',
+        },
+        {
+          id: '6e65760e-1600-424e-b6f4-aa4fe0e8a755',
+          value: 'GOOGLE_MEET',
+          label: i18nLabel(
+            msg({ message: `Google Meet`, context: 'fieldMetadata.label' }),
+          ),
+          position: 2,
+          color: 'turquoise',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  meetingType: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'meetingType',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Meeting type`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Whether the meeting is physical or virtual`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsersGroup',
+      isNullable: true,
+      options: [
+        {
+          id: '26b1138a-964c-422c-933a-a9e836bd7aed',
+          value: 'PHYSICAL',
+          label: i18nLabel(
+            msg({ message: `Physical`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'orange',
+        },
+        {
+          id: '7b13c727-b32d-4a85-b705-6a9238407972',
+          value: 'VIRTUAL',
+          label: i18nLabel(
+            msg({ message: `Virtual`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'purple',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  meetingOutcome: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'meetingOutcome',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Meeting outcome`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `What happened with the meeting, set by the rep`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconProgressCheck',
+      isNullable: false,
+      defaultValue: "'SCHEDULED'",
+      options: [
+        {
+          id: 'a7c07cc5-5714-4350-a808-eeda2b205fe5',
+          value: 'SCHEDULED',
+          label: i18nLabel(
+            msg({ message: `Scheduled`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'sky',
+        },
+        {
+          id: '8170bbae-3d2f-47e5-ae73-3cba85e1962d',
+          value: 'RESCHEDULED',
+          label: i18nLabel(
+            msg({ message: `Rescheduled`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'yellow',
+        },
+        {
+          id: 'badc54af-4634-43ee-a17d-bf9da62b4d82',
+          value: 'COMPLETED',
+          label: i18nLabel(
+            msg({ message: `Completed`, context: 'fieldMetadata.label' }),
+          ),
+          position: 2,
+          color: 'green',
+        },
+        {
+          id: 'd0229669-3566-490c-80f0-e1dec35b8ba6',
+          value: 'NO_SHOW',
+          label: i18nLabel(
+            msg({ message: `No Show`, context: 'fieldMetadata.label' }),
+          ),
+          position: 3,
+          color: 'red',
+        },
+        {
+          id: 'd8f97818-39cc-4c49-ba87-f055fdff91e8',
+          value: 'CANCELED',
+          label: i18nLabel(
+            msg({ message: `Canceled`, context: 'fieldMetadata.label' }),
+          ),
+          position: 4,
+          color: 'gray',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assignedTo: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedTo',
+      label: i18nLabel(
+        msg({ message: `Assigned to`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Account executive responsible for the meeting`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUserCircle',
+      isNullable: true,
+      targetObjectName: 'workspaceMember',
+      targetFieldName: 'assignedCalendarEvents',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'assignedToId',
+      },
     },
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,

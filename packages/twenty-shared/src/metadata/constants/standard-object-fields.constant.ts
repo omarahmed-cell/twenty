@@ -680,6 +680,18 @@ export const STANDARD_OBJECT_FIELDS = {
     conferenceLink: {
       universalIdentifier: '20202020-35da-43ef-9ca0-e936e9dc237b',
     },
+    locationType: {
+      universalIdentifier: 'c193fff6-70c9-48fe-8376-e1b7c7c9e883',
+    },
+    meetingType: {
+      universalIdentifier: '1a6e76f5-923f-42f1-9740-1404c7c1ff45',
+    },
+    meetingOutcome: {
+      universalIdentifier: '60b96e80-49a2-484f-b92b-6db0759e4538',
+    },
+    assignedTo: {
+      universalIdentifier: 'd95a25ce-08f6-471a-b0ff-028cdb8cb682',
+    },
     calendarChannelEventAssociations: {
       universalIdentifier: '20202020-bdf8-4572-a2cc-ecbb6bcc3a02',
     },
@@ -2082,6 +2094,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     ownedOpportunities: {
       universalIdentifier: '20202020-9e4d-4b3a-8c1f-6d7e8f9a0b1c',
+    },
+    assignedCalendarEvents: {
+      universalIdentifier: 'ba4eca98-bb20-48d1-a108-98653cd20d33',
     },
     accountOwnerForCompanies: {
       universalIdentifier: '20202020-dc29-4bd4-a3c1-29eafa324bee',

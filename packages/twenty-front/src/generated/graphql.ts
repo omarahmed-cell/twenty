@@ -780,6 +780,7 @@ export type TestHttpRequestInput = {
 
 export type TimelineCalendarEvent = {
   __typename?: 'TimelineCalendarEvent';
+  assignedToId?: Maybe<Scalars['UUID']['output']>;
   callRecordings: Array<TimelineCalendarEventCallRecording>;
   conferenceLink: LinksMetadata;
   conferenceSolution: Scalars['String']['output'];
@@ -789,6 +790,9 @@ export type TimelineCalendarEvent = {
   isCanceled: Scalars['Boolean']['output'];
   isFullDay: Scalars['Boolean']['output'];
   location: Scalars['String']['output'];
+  locationType?: Maybe<Scalars['String']['output']>;
+  meetingOutcome?: Maybe<Scalars['String']['output']>;
+  meetingType?: Maybe<Scalars['String']['output']>;
   participants: Array<TimelineCalendarEventParticipant>;
   startsAt: Scalars['DateTime']['output'];
   title: Scalars['String']['output'];

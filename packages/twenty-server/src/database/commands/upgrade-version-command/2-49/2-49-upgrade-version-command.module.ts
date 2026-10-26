@@ -7,6 +7,7 @@ import { StripDerivedRecordFilterPropertiesCommand } from 'src/database/commands
 import { ProvisionActivityObjectsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792864328886-provision-activity-objects.command';
 import { ProvisionCatalogObjectsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792956108196-provision-catalog-objects.command';
 import { MoveLineOfItemTabCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792968069375-move-line-of-item-tab.command';
+import { ProvisionMeetingFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793022325268-provision-meeting-fields.command';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { WorkspaceSchemaManagerModule } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.module';
@@ -29,6 +30,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionActivityObjectsCommand,
     ProvisionCatalogObjectsCommand,
     MoveLineOfItemTabCommand,
+    ProvisionMeetingFieldsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

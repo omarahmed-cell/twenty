@@ -45,7 +45,7 @@ describe('CalendarEvent standard metadata build', () => {
       (viewField) => viewField.fieldMetadataUniversalIdentifier,
     );
 
-    expect(viewFieldFieldUniversalIdentifiers).toHaveLength(13);
+    expect(viewFieldFieldUniversalIdentifiers).toHaveLength(17);
     expect(viewFieldFieldUniversalIdentifiers).toEqual(
       expect.arrayContaining([
         STANDARD_OBJECTS.calendarEvent.fields.title.universalIdentifier,
@@ -66,6 +66,11 @@ describe('CalendarEvent standard metadata build', () => {
         STANDARD_OBJECTS.calendarEvent.fields.iCalUid.universalIdentifier,
         STANDARD_OBJECTS.calendarEvent.fields.conferenceSolution
           .universalIdentifier,
+        STANDARD_OBJECTS.calendarEvent.fields.locationType.universalIdentifier,
+        STANDARD_OBJECTS.calendarEvent.fields.meetingType.universalIdentifier,
+        STANDARD_OBJECTS.calendarEvent.fields.meetingOutcome
+          .universalIdentifier,
+        STANDARD_OBJECTS.calendarEvent.fields.assignedTo.universalIdentifier,
       ]),
     );
     expect(viewFieldFieldUniversalIdentifiers).not.toContain(
@@ -91,6 +96,10 @@ describe('CalendarEvent standard metadata build', () => {
       STANDARD_OBJECTS.calendarEvent.fields.description.universalIdentifier,
       STANDARD_OBJECTS.calendarEvent.fields.calendarEventTargets
         .universalIdentifier,
+      STANDARD_OBJECTS.calendarEvent.fields.locationType.universalIdentifier,
+      STANDARD_OBJECTS.calendarEvent.fields.meetingType.universalIdentifier,
+      STANDARD_OBJECTS.calendarEvent.fields.meetingOutcome.universalIdentifier,
+      STANDARD_OBJECTS.calendarEvent.fields.assignedTo.universalIdentifier,
     ]);
 
     expect(

@@ -15,6 +15,7 @@ import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calend
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
+import { type CalendarEventWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event.workspace-entity';
 import { type TaskWorkspaceEntity } from 'src/modules/task/standard-objects/task.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
 
@@ -88,6 +89,7 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   >;
   agentMessageReactions: Relation<AgentMessageReactionWorkspaceEntity[]>;
   ownedOpportunities: Relation<OpportunityWorkspaceEntity[]>;
+  assignedCalendarEvents: Relation<CalendarEventWorkspaceEntity[]>;
   searchVector: string;
   numberFormat: string;
 }

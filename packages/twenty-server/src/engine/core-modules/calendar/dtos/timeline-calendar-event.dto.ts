@@ -58,6 +58,18 @@ export class TimelineCalendarEventDTO {
   @Field(() => LinksMetadataDTO)
   conferenceLink: LinksMetadataDTO;
 
+  @Field(() => String, { nullable: true })
+  locationType: string | null;
+
+  @Field(() => String, { nullable: true })
+  meetingType: string | null;
+
+  @Field(() => String, { nullable: true })
+  meetingOutcome: string | null;
+
+  @Field(() => UUIDScalarType, { nullable: true })
+  assignedToId: string | null;
+
   @Field(() => [TimelineCalendarEventParticipantDTO])
   participants: TimelineCalendarEventParticipantDTO[];
 

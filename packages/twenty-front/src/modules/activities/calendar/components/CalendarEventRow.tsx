@@ -9,6 +9,7 @@ import {
 
 import { CalendarEventNotSharedContent } from '@/activities/calendar/components/CalendarEventNotSharedContent';
 import { CalendarEventParticipantsAvatarGroup } from '@/activities/calendar/components/CalendarEventParticipantsAvatarGroup';
+import { CalendarEventRowDetails } from '@/activities/calendar/components/CalendarEventRowDetails';
 import { getCalendarEventEndDate } from '@/activities/calendar/utils/getCalendarEventEndDate';
 import { getCalendarEventStartDate } from '@/activities/calendar/utils/getCalendarEventStartDate';
 import { hasCalendarEventEnded } from '@/activities/calendar/utils/hasCalendarEventEnded';
@@ -24,12 +25,27 @@ type CalendarEventRowProps = {
 };
 
 const StyledContainer = styled.div<{ showTitle?: boolean }>`
-  align-items: center;
+  align-items: stretch;
   cursor: ${({ showTitle }) => (showTitle ? 'pointer' : 'not-allowed')};
   display: flex;
   gap: ${themeCssVariables.spacing[3]};
-  height: ${themeCssVariables.spacing[6]};
+  min-height: ${themeCssVariables.spacing[6]};
   position: relative;
+`;
+
+const StyledContent = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: ${themeCssVariables.spacing[1]};
+  min-width: 0;
+`;
+
+const StyledMainLine = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${themeCssVariables.spacing[3]};
+  height: ${themeCssVariables.spacing[6]};
 `;
 
 const StyledAttendanceIndicator = styled.div<{ active?: boolean }>`
@@ -109,31 +125,39 @@ export const CalendarEventRow = ({
       }
     >
       <StyledAttendanceIndicator active={isCurrentWorkspaceMemberAttending} />
-      <StyledLabels>
-        <StyledTime>
-          {startTimeLabel}
-          {endTimeLabel && (
-            <>
-              <IconArrowRight size={theme.icon.size.sm} />
-              {endTimeLabel}
-            </>
+      <StyledContent>
+        <StyledMainLine>
+          <StyledLabels>
+            <StyledTime>
+              {startTimeLabel}
+              {endTimeLabel && (
+                <>
+                  <IconArrowRight size={theme.icon.size.sm} />
+                  {endTimeLabel}
+                </>
+              )}
+            </StyledTime>
+            {showTitle ? (
+              <StyledTitle
+                active={!hasEnded}
+                canceled={!!calendarEvent.isCanceled}
+              >
+                {calendarEvent.title}
+              </StyledTitle>
+            ) : (
+              <CalendarEventNotSharedContent />
+            )}
+          </StyledLabels>
+          {(!!calendarEvent.participants?.length ||
+            !!calendarEvent.callRecordings?.length) && (
+            <CalendarEventParticipantsAvatarGroup
+              participants={calendarEvent.participants ?? []}
+              callRecordings={calendarEvent.callRecordings}
+            />
           )}
-        </StyledTime>
-        {showTitle ? (
-          <StyledTitle active={!hasEnded} canceled={!!calendarEvent.isCanceled}>
-            {calendarEvent.title}
-          </StyledTitle>
-        ) : (
-          <CalendarEventNotSharedContent />
-        )}
-      </StyledLabels>
-      {(!!calendarEvent.participants?.length ||
-        !!calendarEvent.callRecordings?.length) && (
-        <CalendarEventParticipantsAvatarGroup
-          participants={calendarEvent.participants ?? []}
-          callRecordings={calendarEvent.callRecordings}
-        />
-      )}
+        </StyledMainLine>
+        {showTitle && <CalendarEventRowDetails calendarEvent={calendarEvent} />}
+      </StyledContent>
     </StyledContainer>
   );
 };

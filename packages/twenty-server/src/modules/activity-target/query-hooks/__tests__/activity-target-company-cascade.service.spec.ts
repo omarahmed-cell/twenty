@@ -158,11 +158,19 @@ const matchesCondition = (
 
 const createFakeRepository = (records: FakeRecord[]) => ({
   find: jest.fn(
-    async ({ where }: { where: Record<string, FindOperator<unknown>> }) =>
-      records.filter((record) =>
-        Object.entries(where).every(([fieldName, condition]) =>
-          matchesCondition(record[fieldName] ?? null, condition),
-        ),
+    async ({
+      where,
+      withDeleted,
+    }: {
+      where: Record<string, FindOperator<unknown>>;
+      withDeleted?: boolean;
+    }) =>
+      records.filter(
+        (record) =>
+          (withDeleted === true || !record.deletedAt) &&
+          Object.entries(where).every(([fieldName, condition]) =>
+            matchesCondition(record[fieldName] ?? null, condition),
+          ),
       ),
   ),
   insert: jest.fn(async (newRecords: FakeRecord[]) => {
@@ -191,7 +199,10 @@ describe('ActivityTargetCompanyCascadeService', () => {
       );
   });
 
-  const setup = (callTargets: FakeRecord[]) => {
+  const setup = (
+    callTargets: FakeRecord[],
+    createdTargetDefaults?: Record<string, boolean>,
+  ) => {
     const repositories: Record<
       string,
       ReturnType<typeof createFakeRepository>
@@ -228,7 +239,11 @@ describe('ActivityTargetCompanyCascadeService', () => {
     const addParentCompanyTargets = (targetIds: string[]) =>
       service.addParentCompanyTargets(
         authContext,
-        { junctionObjectName: 'callTarget', activityIdFieldName: 'callId' },
+        {
+          junctionObjectName: 'callTarget',
+          activityIdFieldName: 'callId',
+          createdTargetDefaults,
+        },
         targetIds.map((id) => ({ id })),
       );
 
@@ -244,11 +259,14 @@ describe('ActivityTargetCompanyCascadeService', () => {
 
     await addParentCompanyTargets(['t1', 't2', 't3']);
 
-    expect(repositories.callTarget.insert).toHaveBeenCalledWith([
-      { callId: 'call-1', targetCompanyId: 'company-1' },
-      { callId: 'call-2', targetCompanyId: 'company-2' },
-      { callId: 'call-3', targetCompanyId: 'company-1' },
-    ]);
+    expect(repositories.callTarget.insert).toHaveBeenCalledWith(
+      [
+        { callId: 'call-1', targetCompanyId: 'company-1' },
+        { callId: 'call-2', targetCompanyId: 'company-2' },
+        { callId: 'call-3', targetCompanyId: 'company-1' },
+      ],
+      { onConflictDoNothing: true },
+    );
   });
 
   it('links the company of a custom object through its company relation', async () => {
@@ -258,9 +276,10 @@ describe('ActivityTargetCompanyCascadeService', () => {
 
     await addParentCompanyTargets(['t1']);
 
-    expect(repositories.callTarget.insert).toHaveBeenCalledWith([
-      { callId: 'call-1', targetCompanyId: 'company-3' },
-    ]);
+    expect(repositories.callTarget.insert).toHaveBeenCalledWith(
+      [{ callId: 'call-1', targetCompanyId: 'company-3' }],
+      { onConflictDoNothing: true },
+    );
   });
 
   it('adds nothing for a custom object without a company relation', async () => {
@@ -304,8 +323,46 @@ describe('ActivityTargetCompanyCascadeService', () => {
 
     await addParentCompanyTargets(['t1', 't2']);
 
-    expect(repositories.callTarget.insert).toHaveBeenCalledWith([
-      { callId: 'call-1', targetCompanyId: 'company-1' },
+    expect(repositories.callTarget.insert).toHaveBeenCalledWith(
+      [{ callId: 'call-1', targetCompanyId: 'company-1' }],
+      { onConflictDoNothing: true },
+    );
+  });
+
+  it('does not bring back a company link that was removed', async () => {
+    const { repositories, addParentCompanyTargets } = setup([
+      callTarget('t1', 'call-1', { targetPersonId: 'person-1' }),
+      {
+        id: 't2',
+        callId: 'call-1',
+        targetCompanyId: 'company-1',
+        deletedAt: '2026-10-01T00:00:00.000Z',
+      },
     ]);
+
+    await addParentCompanyTargets(['t1']);
+
+    expect(repositories.callTarget.insert).not.toHaveBeenCalled();
+  });
+
+  it('marks the created company links with the junction defaults', async () => {
+    const { repositories, addParentCompanyTargets } = setup(
+      [callTarget('t1', 'call-1', { targetPersonId: 'person-1' })],
+      { isManuallyAssigned: true, isAutomaticallyAssigned: false },
+    );
+
+    await addParentCompanyTargets(['t1']);
+
+    expect(repositories.callTarget.insert).toHaveBeenCalledWith(
+      [
+        {
+          callId: 'call-1',
+          targetCompanyId: 'company-1',
+          isManuallyAssigned: true,
+          isAutomaticallyAssigned: false,
+        },
+      ],
+      { onConflictDoNothing: true },
+    );
   });
 });

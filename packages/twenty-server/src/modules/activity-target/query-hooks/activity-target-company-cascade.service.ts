@@ -22,8 +22,15 @@ export type ActivityTargetJunction = {
     | 'noteTarget'
     | 'taskTarget'
     | 'callTarget'
-    | 'communicationTarget';
-  activityIdFieldName: 'noteId' | 'taskId' | 'callId' | 'communicationId';
+    | 'communicationTarget'
+    | 'calendarEventTarget';
+  activityIdFieldName:
+    | 'noteId'
+    | 'taskId'
+    | 'callId'
+    | 'communicationId'
+    | 'calendarEventId';
+  createdTargetDefaults?: Record<string, boolean>;
 };
 
 type ActivityTargetRecord = Record<string, string | null> & { id: string };
@@ -55,7 +62,11 @@ export class ActivityTargetCompanyCascadeService {
 
   async addParentCompanyTargets(
     authContext: WorkspaceAuthContext,
-    { junctionObjectName, activityIdFieldName }: ActivityTargetJunction,
+    {
+      junctionObjectName,
+      activityIdFieldName,
+      createdTargetDefaults,
+    }: ActivityTargetJunction,
     payload: { id: string }[],
   ): Promise<void> {
     if (!payload || payload.length === 0) {
@@ -141,7 +152,9 @@ export class ActivityTargetCompanyCascadeService {
         return;
       }
 
+      // Soft-deleted links count too, so a company link the user removed is not brought back
       const existingCompanyTargets = await activityTargetRepository.find({
+        withDeleted: true,
         where: {
           [activityIdFieldName]: In(
             parentCompanyLinks.map((link) => link.activityId),
@@ -168,13 +181,20 @@ export class ActivityTargetCompanyCascadeService {
           linkedKeys.add(linkKey);
 
           return [
-            { [activityIdFieldName]: activityId, targetCompanyId: companyId },
+            {
+              [activityIdFieldName]: activityId,
+              targetCompanyId: companyId,
+              ...createdTargetDefaults,
+            },
           ];
         },
       );
 
       if (targetsToCreate.length > 0) {
-        await activityTargetRepository.insert(targetsToCreate);
+        // Participant sync can insert the same company link concurrently
+        await activityTargetRepository.insert(targetsToCreate, {
+          onConflictDoNothing: true,
+        });
       }
     }, authContext);
   }
