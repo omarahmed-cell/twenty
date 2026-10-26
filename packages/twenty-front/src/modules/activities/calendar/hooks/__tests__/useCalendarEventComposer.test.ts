@@ -7,6 +7,7 @@ import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 const mockCreateCalendarEvent = jest.fn();
 const mockCreateCalendarEventTargets = jest.fn();
 const mockRefetchTimelineCalendarEvents = jest.fn();
+const mockUpdateOneRecord = jest.fn();
 const mockContextRecord: { current: ObjectRecord | undefined } = {
   current: undefined,
 };
@@ -43,6 +44,10 @@ jest.mock(
       mockTargetObjectMetadataItems.current,
   }),
 );
+
+jest.mock('@/object-record/hooks/useUpdateOneRecord', () => ({
+  useUpdateOneRecord: () => ({ updateOneRecord: mockUpdateOneRecord }),
+}));
 
 jest.mock('@/object-record/hooks/useFindOneRecord', () => ({
   useFindOneRecord: () => ({ record: mockContextRecord.current }),
@@ -322,5 +327,52 @@ describe('useCalendarEventComposer', () => {
       Temporal.PlainDate.from(startsAt).add({ days: 1 }).toString(),
     );
     expect(result.current.hasValidDateRange).toBe(true);
+  });
+
+  it('saves the meeting details on the created event without sending them to the provider', async () => {
+    mockCreateCalendarEvent.mockResolvedValue({
+      success: true,
+      calendarEventId: 'calendar-event-id',
+    });
+
+    const { result } = renderHook(() =>
+      useCalendarEventComposer({
+        initialValues: {
+          connectedAccountId: 'account-id',
+          contextRecord: {
+            objectNameSingular: 'person',
+            recordId: 'person-id',
+          },
+          defaultAttendees: '',
+          timeZone: 'UTC',
+        },
+        onCreated: jest.fn(),
+      }),
+    );
+
+    act(() => {
+      result.current.setTitle('Discovery call');
+      result.current.setCrmField('locationType', 'GOOGLE_MEET');
+      result.current.setCrmField('meetingType', 'VIRTUAL');
+      result.current.setCrmField('assignedToId', 'workspace-member-id');
+    });
+
+    await act(async () => {
+      await result.current.handleCreate();
+    });
+
+    expect(mockCreateCalendarEvent).toHaveBeenCalledWith(
+      expect.not.objectContaining({ meetingOutcome: expect.anything() }),
+    );
+    expect(mockUpdateOneRecord).toHaveBeenCalledWith({
+      objectNameSingular: 'calendarEvent',
+      idToUpdate: 'calendar-event-id',
+      updateOneRecordInput: {
+        locationType: 'GOOGLE_MEET',
+        meetingType: 'VIRTUAL',
+        meetingOutcome: 'SCHEDULED',
+        assignedToId: 'workspace-member-id',
+      },
+    });
   });
 });
