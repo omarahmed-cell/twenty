@@ -7,6 +7,7 @@ import { DashboardQueryHookModule } from 'src/modules/dashboard/query-hooks/dash
 import { BlocklistQueryHookModule } from 'src/modules/blocklist/query-hooks/blocklist-query-hook.module';
 import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/query-hooks/workspace-member-query-hook.module';
 import { ActivityTargetQueryHookModule } from 'src/modules/activity-target/query-hooks/activity-target-query-hook.module';
+import { CalendarEventAssignedToModule } from 'src/modules/calendar/calendar-event-assigned-to/calendar-event-assigned-to.module';
 import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hook.module';
 import { LineItemQueryHookModule } from 'src/modules/line-item/query-hooks/line-item-query-hook.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
@@ -51,6 +52,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     BlocklistQueryHookModule,
     WorkspaceMemberQueryHookModule,
     ActivityTargetQueryHookModule,
+    CalendarEventAssignedToModule,
     CallQueryHookModule,
     LineItemQueryHookModule,
     CommunicationQueryHookModule,
