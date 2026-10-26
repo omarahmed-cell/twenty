@@ -157,7 +157,7 @@ export const TAB_PROPS = {
     title: i18nLabel(
       msg({ message: `Line of Item`, context: 'pageLayoutTab.title' }),
     ),
-    position: 15,
+    position: 55,
     icon: 'IconListNumbers',
     layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
   },
