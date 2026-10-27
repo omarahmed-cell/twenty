@@ -1,10 +1,13 @@
+import { styled } from '@linaria/react';
 import { type ReactNode } from 'react';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { ObjectSortDropdownButton } from '@/object-record/object-sort-dropdown/components/ObjectSortDropdownButton';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { TopBar } from '@/ui/layout/top-bar/components/TopBar';
 import { QueryParamsFiltersEffect } from '@/views/components/QueryParamsFiltersEffect';
 import { QueryParamsSortsEffect } from '@/views/components/QueryParamsSortsEffect';
+import { RecordIndexSearchInput } from '@/views/components/RecordIndexSearchInput';
 import { ViewBarPageTitle } from '@/views/components/ViewBarPageTitle';
 import { ViewPickerDropdown } from '@/views/view-picker/components/ViewPickerDropdown';
 
@@ -21,6 +24,12 @@ import { ViewBarRecordSortEffect } from '@/views/components/ViewBarRecordSortEff
 import { getViewBarFilterDropdownId } from '@/views/utils/getViewBarFilterDropdownId';
 import { UpdateViewButtonGroup } from './UpdateViewButtonGroup';
 import { ViewBarDetails } from './ViewBarDetails';
+
+const StyledLeftComponent = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${themeCssVariables.spacing[2]};
+`;
 
 type ViewBarProps = {
   viewBarId: string;
@@ -62,7 +71,12 @@ export const ViewBar = ({
       <ViewBarPageTitle />
       <TopBar
         className={className}
-        leftComponent={<ViewPickerDropdown />}
+        leftComponent={
+          <StyledLeftComponent>
+            <ViewPickerDropdown />
+            <RecordIndexSearchInput />
+          </StyledLeftComponent>
+        }
         rightComponent={
           <>
             <ObjectFilterDropdownComponentInstanceContext.Provider
