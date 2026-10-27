@@ -3,11 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FileUrlModule } from 'src/engine/core-modules/file/file-url/file-url.module';
 import { GetMessagesService } from 'src/engine/core-modules/messaging/services/get-messages.service';
+import { TimelineChannelOwnersService } from 'src/engine/core-modules/messaging/services/timeline-channel-owners.service';
 import { TimelineMessagingService } from 'src/engine/core-modules/messaging/services/timeline-messaging.service';
 import { TimelineMessagingResolver } from 'src/engine/core-modules/messaging/timeline-messaging.resolver';
 import { RelatedPersonIdsModule } from 'src/engine/core-modules/related-person-ids/related-person-ids.module';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserModule } from 'src/engine/core-modules/user/user.module';
+import { CalendarChannelEntity } from 'src/engine/metadata-modules/calendar-channel/entities/calendar-channel.entity';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
@@ -24,6 +26,7 @@ import { TargetModule } from 'src/engine/core-modules/target/target.module';
     TargetModule,
     TypeOrmModule.forFeature([
       MessageChannelEntity,
+      CalendarChannelEntity,
       ConnectedAccountEntity,
       UserWorkspaceEntity,
     ]),
@@ -33,6 +36,7 @@ import { TargetModule } from 'src/engine/core-modules/target/target.module';
     TimelineMessagingResolver,
     TimelineMessagingService,
     GetMessagesService,
+    TimelineChannelOwnersService,
   ],
 })
 export class TimelineMessagingModule {}

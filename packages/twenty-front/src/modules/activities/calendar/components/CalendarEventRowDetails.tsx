@@ -42,7 +42,17 @@ const StyledOutcome = styled.div`
 `;
 
 type CalendarEventRowDetailsProps = {
-  calendarEvent: TimelineCalendarEvent;
+  calendarEvent: Pick<
+    TimelineCalendarEvent,
+    | 'id'
+    | 'isFullDay'
+    | 'startsAt'
+    | 'meetingType'
+    | 'locationType'
+    | 'location'
+    | 'assignedToId'
+    | 'meetingOutcome'
+  > & { endsAt?: string };
 };
 
 export const CalendarEventRowDetails = ({

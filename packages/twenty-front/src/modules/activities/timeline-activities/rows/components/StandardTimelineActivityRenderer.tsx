@@ -9,15 +9,15 @@ import { isDefined } from 'twenty-shared/utils';
 import { type StandardTimelineActivityRendererProps } from '@/activities/timeline-activities/rows/components/TimelineActivityRenderer';
 import { isTimelineActivityWithLinkedRecord } from '@/activities/timeline-activities/types/TimelineActivity';
 
-const EventCardCalendarEvent = lazy(() =>
-  import('@/activities/timeline-activities/rows/calendar/components/EventCardCalendarEvent').then(
-    (module) => ({ default: module.EventCardCalendarEvent }),
+const EventRowCalendarEvent = lazy(() =>
+  import('@/activities/timeline-activities/rows/calendar/components/EventRowCalendarEvent').then(
+    (module) => ({ default: module.EventRowCalendarEvent }),
   ),
 );
 
-const EventCardMessage = lazy(() =>
-  import('@/activities/timeline-activities/rows/message/components/EventCardMessage').then(
-    (module) => ({ default: module.EventCardMessage }),
+const EventRowMessage = lazy(() =>
+  import('@/activities/timeline-activities/rows/message/components/EventRowMessage').then(
+    (module) => ({ default: module.EventRowMessage }),
   ),
 );
 
@@ -29,9 +29,10 @@ const MessageTimelineActivityRenderer = ({
   authorFullName,
 }: MessageTimelineActivityRendererProps) =>
   isTimelineActivityWithLinkedRecord(event) ? (
-    <EventCardMessage
+    <EventRowMessage
       messageId={event.linkedRecordId}
       authorFullName={authorFullName}
+      happensAt={event.happensAt}
     />
   ) : null;
 
@@ -40,9 +41,14 @@ type CalendarEventTimelineActivityRendererProps =
 
 const CalendarEventTimelineActivityRenderer = ({
   event,
+  authorFullName,
 }: CalendarEventTimelineActivityRendererProps) =>
   isTimelineActivityWithLinkedRecord(event) ? (
-    <EventCardCalendarEvent calendarEventId={event.linkedRecordId} />
+    <EventRowCalendarEvent
+      calendarEventId={event.linkedRecordId}
+      authorFullName={authorFullName}
+      happensAt={event.happensAt}
+    />
   ) : null;
 
 const STANDARD_TIMELINE_ACTIVITY_RENDERERS: Record<

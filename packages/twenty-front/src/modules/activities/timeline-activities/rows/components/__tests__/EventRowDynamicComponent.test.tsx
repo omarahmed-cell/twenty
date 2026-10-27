@@ -57,9 +57,12 @@ describe('EventRowDynamicComponent', () => {
     ).toBeInTheDocument();
   });
 
-  it('mounts a standard renderer only after the row is expanded', async () => {
-    const user = userEvent.setup();
-    const StandardRenderer = () => <div>Standard timeline component</div>;
+  it('lets a standard renderer own the whole row', async () => {
+    const StandardRenderer = ({
+      authorFullName,
+    }: {
+      authorFullName: string;
+    }) => <div>Standard timeline row by {authorFullName}</div>;
 
     render(
       <I18nProvider i18n={i18n}>
@@ -77,11 +80,8 @@ describe('EventRowDynamicComponent', () => {
     );
 
     expect(
-      screen.queryByText('Standard timeline component'),
-    ).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Expand details' }));
-
-    expect(screen.getByText('Standard timeline component')).toBeInTheDocument();
+      await screen.findByText('Standard timeline row by Ada Lovelace'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Native timeline row')).not.toBeInTheDocument();
   });
 });

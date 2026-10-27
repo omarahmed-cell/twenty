@@ -14,7 +14,6 @@ import { getTimelineActivityAction } from '@/activities/timeline-activities/util
 import { getTimelineActivityType } from '@/activities/timeline-activities/utils/getTimelineActivityType';
 import { getTimelineActivityLinkedObjectMetadataItem } from '@/activities/timeline-activities/utils/getTimelineActivityLinkedObjectMetadataItem';
 import { getTimelineActivityAuthorFullName } from '@/activities/timeline-activities/utils/getTimelineActivityAuthorFullName';
-import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { getObjectRecordIdentifier } from '@/object-metadata/utils/getObjectRecordIdentifier';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
@@ -103,8 +102,6 @@ export const EventRow = ({
   event,
   mainObjectMetadataItem,
 }: EventRowProps) => {
-  const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
-
   const allowRequestsToTwentyIcons = useAtomStateValue(
     allowRequestsToTwentyIconsState,
   );
@@ -151,10 +148,6 @@ export const EventRow = ({
       objectMetadataItems,
     }) ?? null;
 
-  if (!isDefined(currentWorkspaceMember)) {
-    return null;
-  }
-
   if (!isDefined(recordStore)) {
     return null;
   }
@@ -168,10 +161,7 @@ export const EventRow = ({
     allowRequestsToTwentyIcons,
   });
 
-  const authorFullName = getTimelineActivityAuthorFullName(
-    event,
-    currentWorkspaceMember,
-  );
+  const authorFullName = getTimelineActivityAuthorFullName(event);
 
   return (
     <>

@@ -1,9 +1,8 @@
 import { type TimelineActivity } from '@/activities/timeline-activities/types/TimelineActivity';
 import { getTimelineActivityAuthorFullName } from '@/activities/timeline-activities/utils/getTimelineActivityAuthorFullName';
-import { type CurrentWorkspaceMember } from '@/auth/states/currentWorkspaceMemberState';
 
 describe('getTimelineActivityAuthorFullName', () => {
-  it('should return "You" if the current workspace member is the author', () => {
+  it('should return the full name of the workspace member who authored the event', () => {
     const event = {
       workspaceMember: {
         id: '123',
@@ -13,51 +12,31 @@ describe('getTimelineActivityAuthorFullName', () => {
         },
       },
     };
-    const currentWorkspaceMember = {
-      id: '123',
-    };
 
-    const result = getTimelineActivityAuthorFullName(
-      event as TimelineActivity,
-      currentWorkspaceMember as CurrentWorkspaceMember,
+    expect(getTimelineActivityAuthorFullName(event as TimelineActivity)).toBe(
+      'John Doe',
     );
-
-    expect(result).toBe('You');
   });
 
-  it('should return the full name of the workspace member if they are not the current workspace member', () => {
+  it('should skip an empty last name', () => {
     const event = {
       workspaceMember: {
         id: '456',
         name: {
           firstName: 'Jane',
-          lastName: 'Smith',
+          lastName: '',
         },
       },
     };
-    const currentWorkspaceMember = {
-      id: '123',
-    };
 
-    const result = getTimelineActivityAuthorFullName(
-      event as TimelineActivity,
-      currentWorkspaceMember as CurrentWorkspaceMember,
+    expect(getTimelineActivityAuthorFullName(event as TimelineActivity)).toBe(
+      'Jane',
     );
-
-    expect(result).toBe('Jane Smith');
   });
 
   it('should return "Twenty" if the workspace member is not defined', () => {
-    const event = {};
-    const currentWorkspaceMember = {
-      id: '123',
-    };
-
-    const result = getTimelineActivityAuthorFullName(
-      event as TimelineActivity,
-      currentWorkspaceMember as CurrentWorkspaceMember,
+    expect(getTimelineActivityAuthorFullName({} as TimelineActivity)).toBe(
+      'Twenty',
     );
-
-    expect(result).toBe('Twenty');
   });
 });

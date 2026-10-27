@@ -67,6 +67,14 @@ export const EventRowDynamicComponent = ({
     return nativeRenderer;
   }
 
+  if (renderer.type === 'standard') {
+    return (
+      <Suspense fallback={nativeRenderer}>
+        <renderer.Component event={event} authorFullName={authorFullName} />
+      </Suspense>
+    );
+  }
+
   return (
     <StyledContainer>
       <StyledNativeRowContainer>
@@ -79,18 +87,11 @@ export const EventRowDynamicComponent = ({
       {isRendererOpen && (
         <EventCard isOpen>
           <Suspense fallback={null}>
-            {renderer.type === 'standard' ? (
-              <renderer.Component
-                event={event}
-                authorFullName={authorFullName}
-              />
-            ) : (
-              <FrontComponentRenderer
-                frontComponentId={renderer.frontComponentId}
-                timelineActivityId={event.id}
-                objectNameSingular={mainObjectMetadataItem.nameSingular}
-              />
-            )}
+            <FrontComponentRenderer
+              frontComponentId={renderer.frontComponentId}
+              timelineActivityId={event.id}
+              objectNameSingular={mainObjectMetadataItem.nameSingular}
+            />
           </Suspense>
         </EventCard>
       )}

@@ -9,8 +9,10 @@ import { CoreResolver } from 'src/engine/api/graphql/graphql-config/decorators/c
 import { UUIDScalarType } from 'src/engine/api/graphql/workspace-schema-builder/graphql-types/scalars';
 import { TIMELINE_THREADS_MAX_PAGE_SIZE } from 'src/engine/core-modules/messaging/constants/messaging.constants';
 import { DismissReconnectAccountBannerInput } from 'src/engine/core-modules/messaging/dtos/dismiss-reconnect-account-banner.input';
+import { TimelineChannelOwnerDTO } from 'src/engine/core-modules/messaging/dtos/timeline-channel-owner.dto';
 import { TimelineThreadsWithTotalDTO } from 'src/engine/core-modules/messaging/dtos/timeline-threads-with-total.dto';
 import { GetMessagesService } from 'src/engine/core-modules/messaging/services/get-messages.service';
+import { TimelineChannelOwnersService } from 'src/engine/core-modules/messaging/services/timeline-channel-owners.service';
 import { UserService } from 'src/engine/core-modules/user/services/user.service';
 import { type AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
@@ -98,7 +100,15 @@ export class TimelineMessagingResolver {
     private readonly getMessagesFromPersonIdsService: GetMessagesService,
     private readonly userService: UserService,
     private readonly accountsToReconnectService: AccountsToReconnectService,
+    private readonly timelineChannelOwnersService: TimelineChannelOwnersService,
   ) {}
+
+  @Query(() => [TimelineChannelOwnerDTO])
+  async getTimelineChannelOwners(
+    @AuthWorkspace() workspace: WorkspaceEntity,
+  ): Promise<TimelineChannelOwnerDTO[]> {
+    return this.timelineChannelOwnersService.getChannelOwners(workspace.id);
+  }
 
   @Query(() => TimelineThreadsWithTotalDTO)
   async getTimelineThreadsFromObjectRecord(
