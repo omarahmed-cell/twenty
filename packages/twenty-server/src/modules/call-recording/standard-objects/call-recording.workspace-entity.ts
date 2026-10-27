@@ -1,4 +1,4 @@
-import { type RichTextMetadata } from 'twenty-shared/types';
+import { type LinksMetadata, type RichTextMetadata } from 'twenty-shared/types';
 
 import { type FileOutput } from 'src/engine/api/common/common-args-processors/data-arg-processor/types/file-item.type';
 import { BaseWorkspaceEntity } from 'src/engine/twenty-orm/base.workspace-entity';
@@ -17,6 +17,7 @@ export class CallRecordingWorkspaceEntity extends BaseWorkspaceEntity {
   startedAt: string | null;
   endedAt: string | null;
   video: FileOutput[] | null;
+  recordingUrl: LinksMetadata | null;
   audio: FileOutput[] | null;
   transcript: Record<string, unknown> | null;
   summary: RichTextMetadata | null;

@@ -57,6 +57,7 @@ import { WorkspaceMigrationRunnerModule } from 'src/engine/workspace-manager/wor
 import { WorkspaceVersionModule } from 'src/engine/workspace-manager/workspace-version/workspace-version.module';
 import { WebhookSubscriptionModule } from 'src/modules/connected-account/webhook-subscription-manager/webhook-subscription.module';
 import { CalendarEventImportManagerModule } from 'src/modules/calendar/calendar-event-import-manager/calendar-event-import-manager.module';
+import { GoogleMeetRecordingModule } from 'src/modules/call-recording/google-meet/google-meet-recording.module';
 import { EmailingModule } from 'src/modules/emailing/emailing.module';
 import { MessagingImportManagerModule } from 'src/modules/messaging/message-import-manager/messaging-import-manager.module';
 import { WorkflowRunQueueModule } from 'src/modules/workflow/workflow-runner/workflow-run-queue/workflow-run-queue.module';
@@ -71,6 +72,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     WorkspaceExportModule,
     MessagingImportManagerModule,
     CalendarEventImportManagerModule,
+    GoogleMeetRecordingModule,
     WebhookSubscriptionModule,
     EmailingModule,
     AutomatedTriggerModule,

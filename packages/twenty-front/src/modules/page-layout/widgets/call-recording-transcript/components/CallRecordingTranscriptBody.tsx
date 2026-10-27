@@ -1,3 +1,5 @@
+import { CallRecordingExternalRecordingLink } from '@/page-layout/widgets/call-recording/components/CallRecordingExternalRecordingLink';
+import { GoogleMeetRecordingsReconnectCallout } from '@/page-layout/widgets/call-recording/components/GoogleMeetRecordingsReconnectCallout';
 import { CallRecordingAudioPlayer } from '@/page-layout/widgets/call-recording-transcript/components/CallRecordingAudioPlayer';
 import { type CallRecordingPlaybackMedia } from '@/page-layout/widgets/call-recording/types/CallRecordingPlaybackMedia';
 import { CallRecordingWidgetEmptyStateDisplay } from '@/page-layout/widgets/call-recording/components/CallRecordingWidgetEmptyStateDisplay';
@@ -66,20 +68,26 @@ export const CallRecordingTranscriptBody = ({
 
   if (!isDefined(callRecording)) {
     return (
-      <CallRecordingWidgetEmptyStateDisplay
-        animatedPlaceholderType="noCallRecording"
-        title={t`No Transcript`}
-        subTitle={t`No transcript is available for this calendar event yet.`}
-      />
+      <>
+        <GoogleMeetRecordingsReconnectCallout />
+        <CallRecordingWidgetEmptyStateDisplay
+          animatedPlaceholderType="noCallRecording"
+          title={t`No Transcript`}
+          subTitle={t`No transcript is available for this calendar event yet.`}
+        />
+      </>
     );
   }
 
   if (!isDefined(playbackMedia)) {
     return (
-      <CallRecordingTranscriptContent
-        callRecording={callRecording}
-        transcriptEntries={transcriptEntries}
-      />
+      <>
+        <CallRecordingExternalRecordingLink callRecording={callRecording} />
+        <CallRecordingTranscriptContent
+          callRecording={callRecording}
+          transcriptEntries={transcriptEntries}
+        />
+      </>
     );
   }
 

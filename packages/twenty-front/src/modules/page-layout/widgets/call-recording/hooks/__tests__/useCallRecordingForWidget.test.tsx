@@ -3,6 +3,15 @@ import { useCallRecordingForWidget } from '@/page-layout/widgets/call-recording/
 import { renderHook } from '@testing-library/react';
 
 let restrictedFields = new Set<string>();
+let callRecordingFieldNames: string[] = [];
+
+jest.mock('@/object-metadata/hooks/useObjectMetadataItem', () => ({
+  useObjectMetadataItem: () => ({
+    objectMetadataItem: {
+      fields: callRecordingFieldNames.map((name) => ({ name })),
+    },
+  }),
+}));
 
 jest.mock('@/object-record/hooks/useFindOneRecord', () => ({
   useFindOneRecord: jest.fn(() => ({ loading: false, refetch: jest.fn() })),
@@ -37,6 +46,7 @@ describe('useCallRecordingForWidget', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     restrictedFields = new Set();
+    callRecordingFieldNames = [];
   });
 
   it.each([
@@ -102,5 +112,28 @@ describe('useCallRecordingForWidget', () => {
       transcript: true,
       audio: true,
     });
+  });
+
+  it('requests the recording link on both widgets once the workspace has the field', () => {
+    callRecordingFieldNames = ['recordingUrl'];
+
+    renderHook(() => useCallRecordingForWidget({ kind: 'transcript' }));
+    expect(getRequestedFields()).toEqual(
+      expect.objectContaining({ recordingUrl: true }),
+    );
+
+    renderHook(() => useCallRecordingForWidget({ kind: 'summary' }));
+    expect(getRequestedFields()).toEqual(
+      expect.objectContaining({ recordingUrl: true }),
+    );
+  });
+
+  it('omits the recording link when the role cannot read it', () => {
+    callRecordingFieldNames = ['recordingUrl'];
+    restrictedFields = new Set(['recordingUrl']);
+
+    renderHook(() => useCallRecordingForWidget({ kind: 'transcript' }));
+
+    expect(getRequestedFields()).not.toHaveProperty('recordingUrl');
   });
 });

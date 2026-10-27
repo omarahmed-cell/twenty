@@ -27,6 +27,7 @@ import { DeferredWorkspaceMigrationActionRecoveryCronCommand } from 'src/engine/
 import { CleanOnboardingWorkspacesCronCommand } from 'src/engine/workspace-manager/workspace-cleaner/commands/clean-onboarding-workspaces.cron.command';
 import { CleanSuspendedWorkspacesCronCommand } from 'src/engine/workspace-manager/workspace-cleaner/commands/clean-suspended-workspaces.cron.command';
 import { CalendarEventListFetchCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-event-list-fetch.cron.command';
+import { GoogleMeetRecordingsImportCronCommand } from 'src/modules/call-recording/google-meet/crons/commands/google-meet-recordings-import.cron.command';
 import { CalendarEventsImportCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-import.cron.command';
 import { CalendarOngoingStaleCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-ongoing-stale.cron.command';
 import { CalendarRelaunchFailedCalendarChannelsCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-relaunch-failed-calendar-channels.cron.command';
@@ -53,6 +54,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly messagingRelaunchFailedMessageChannelsCronCommand: MessagingRelaunchFailedMessageChannelsCronCommand,
 
     private readonly calendarEventListFetchCronCommand: CalendarEventListFetchCronCommand,
+    private readonly googleMeetRecordingsImportCronCommand: GoogleMeetRecordingsImportCronCommand,
     private readonly calendarEventsImportCronCommand: CalendarEventsImportCronCommand,
     private readonly calendarOngoingStaleCronCommand: CalendarOngoingStaleCronCommand,
     private readonly calendarRelaunchFailedCalendarChannelsCronCommand: CalendarRelaunchFailedCalendarChannelsCronCommand,
@@ -128,6 +130,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'CalendarEventsImport',
         command: this.calendarEventsImportCronCommand,
+      },
+      {
+        name: 'GoogleMeetRecordingsImport',
+        command: this.googleMeetRecordingsImportCronCommand,
       },
       {
         name: 'CalendarOngoingStale',

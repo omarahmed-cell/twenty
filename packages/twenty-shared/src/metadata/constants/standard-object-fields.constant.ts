@@ -957,6 +957,9 @@ export const STANDARD_OBJECT_FIELDS = {
     video: {
       universalIdentifier: 'bb9523d3-457e-4f4b-8c79-27a77afb87da',
     },
+    recordingUrl: {
+      universalIdentifier: 'dc3e4543-88a2-492d-8aac-5ce403d61f69',
+    },
     audio: {
       universalIdentifier: '2eafc2d0-8fec-430c-a939-65ca5fbc0f08',
     },

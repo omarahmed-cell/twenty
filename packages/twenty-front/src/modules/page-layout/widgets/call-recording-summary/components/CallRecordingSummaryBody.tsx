@@ -1,5 +1,7 @@
 import { LazyMarkdownRenderer } from '@/ai/components/LazyMarkdownRenderer';
+import { CallRecordingExternalRecordingLink } from '@/page-layout/widgets/call-recording/components/CallRecordingExternalRecordingLink';
 import { CallRecordingStatusDisplay } from '@/page-layout/widgets/call-recording/components/CallRecordingStatusDisplay';
+import { GoogleMeetRecordingsReconnectCallout } from '@/page-layout/widgets/call-recording/components/GoogleMeetRecordingsReconnectCallout';
 import { CallRecordingWidgetEmptyStateDisplay } from '@/page-layout/widgets/call-recording/components/CallRecordingWidgetEmptyStateDisplay';
 import { CallRecordingWidgetForbiddenDisplay } from '@/page-layout/widgets/call-recording/components/CallRecordingWidgetForbiddenDisplay';
 import { type WidgetCallRecordingCandidate } from '@/page-layout/widgets/call-recording/types/WidgetCallRecordingCandidate';
@@ -52,11 +54,14 @@ export const CallRecordingSummaryBody = ({
 
   if (!isDefined(callRecording)) {
     return (
-      <CallRecordingWidgetEmptyStateDisplay
-        animatedPlaceholderType="noCallRecording"
-        title={t`No Call Recording`}
-        subTitle={t`No call recording exists for this calendar event yet.`}
-      />
+      <>
+        <GoogleMeetRecordingsReconnectCallout />
+        <CallRecordingWidgetEmptyStateDisplay
+          animatedPlaceholderType="noCallRecording"
+          title={t`No Call Recording`}
+          subTitle={t`No call recording exists for this calendar event yet.`}
+        />
+      </>
     );
   }
 
@@ -65,15 +70,19 @@ export const CallRecordingSummaryBody = ({
   if (isDefined(summaryMarkdown)) {
     return (
       <StyledSummaryContainer>
+        <CallRecordingExternalRecordingLink callRecording={callRecording} />
         <LazyMarkdownRenderer text={summaryMarkdown} />
       </StyledSummaryContainer>
     );
   }
 
   return (
-    <CallRecordingStatusDisplay
-      callRecording={callRecording}
-      artifactType="summary"
-    />
+    <>
+      <CallRecordingExternalRecordingLink callRecording={callRecording} />
+      <CallRecordingStatusDisplay
+        callRecording={callRecording}
+        artifactType="summary"
+      />
+    </>
   );
 };

@@ -8,5 +8,8 @@ export const getGoogleApisOauthScopes = () => {
     'https://www.googleapis.com/auth/profile.emails.read',
     'https://www.googleapis.com/auth/gmail.send',
     'https://www.googleapis.com/auth/gmail.compose',
+    // Meet-created files only (recordings, transcripts, Gemini notes), never the rest of Drive
+    'https://www.googleapis.com/auth/drive.meet.readonly',
+    'https://www.googleapis.com/auth/meetings.space.readonly',
   ];
 };
