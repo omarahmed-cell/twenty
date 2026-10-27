@@ -91,6 +91,22 @@ export const STANDARD_NAVIGATION_MENU_ITEMS = {
       STANDARD_OBJECTS.lineItem.views.allLineItems.universalIdentifier,
     position: 12,
   },
+  allCalendarEvents: {
+    universalIdentifier: '0d880c8c-2cf3-4d56-9d9d-7ed3b2c74bec',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.calendarEvent.views.allCalendarEvents
+        .universalIdentifier,
+    position: 13,
+  },
+  allCallRecordings: {
+    universalIdentifier: '3e9beadf-db4a-4e23-81e5-56690661732a',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.callRecording.views.allCallRecordings
+        .universalIdentifier,
+    position: 14,
+  },
   workflowsFolder: {
     universalIdentifier: '20202020-b007-4b07-8b07-c0aba11c0007',
     type: NavigationMenuItemType.FOLDER,
@@ -136,6 +152,8 @@ export const STANDARD_NAVIGATION_MENU_ITEM_DEFAULT_COLORS: Partial<
   allNotes: 'turquoise',
   allCalls: 'turquoise',
   allCommunications: 'turquoise',
+  allCalendarEvents: 'turquoise',
+  allCallRecordings: 'turquoise',
   allOpportunities: 'red',
   allServices: 'purple',
   allProducts: 'orange',

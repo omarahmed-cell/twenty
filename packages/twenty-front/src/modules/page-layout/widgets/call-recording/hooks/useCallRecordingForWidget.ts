@@ -49,11 +49,13 @@ export const useCallRecordingForWidget = ({
     useObjectMetadataItem({
       objectNameSingular: CoreObjectNameSingular.CallRecording,
     });
-  // Workspaces upgraded before the field existed do not have it yet
-  const canReadRecordingUrl =
+  // Workspaces upgraded before these fields existed do not have them yet
+  const canReadField = (fieldName: string) =>
     callRecordingObjectMetadataItem.fields.some(
-      (field) => field.name === 'recordingUrl',
-    ) && !isFieldRestricted('recordingUrl');
+      (field) => field.name === fieldName,
+    ) && !isFieldRestricted(fieldName);
+  const canReadRecordingUrl = canReadField('recordingUrl');
+  const canReadNotesUrl = canReadField('notesUrl');
 
   // Requesting a field the role cannot read fails the whole query.
   const recordGqlFields = useMemo<RecordGqlFields>(
@@ -68,7 +70,7 @@ export const useCallRecordingForWidget = ({
         : {
             ...CALL_RECORDING_RECORD_FIELDS_BY_WIDGET_KIND.summary,
             ...(!isTranscriptRestricted && { transcript: true }),
-            ...(canReadRecordingUrl && { recordingUrl: true }),
+            ...(canReadNotesUrl && { notesUrl: true }),
           },
     [
       kind,
@@ -76,6 +78,7 @@ export const useCallRecordingForWidget = ({
       isAudioRestricted,
       isTranscriptRestricted,
       canReadRecordingUrl,
+      canReadNotesUrl,
     ],
   );
 

@@ -1,10 +1,7 @@
 import { styled } from '@linaria/react';
-import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
-import { IconExternalLink, IconVideo } from 'twenty-ui/icon';
+import { type IconComponent, IconExternalLink } from 'twenty-ui/icon';
 import { themeCssVariables, useTheme } from 'twenty-ui/theme';
-
-import { type WidgetCallRecordingCandidate } from '@/page-layout/widgets/call-recording/types/WidgetCallRecordingCandidate';
 
 const StyledLink = styled.a`
   align-items: center;
@@ -35,16 +32,21 @@ const StyledHint = styled.span`
   white-space: nowrap;
 `;
 
-type CallRecordingExternalRecordingLinkProps = {
-  callRecording: Pick<WidgetCallRecordingCandidate, 'recordingUrl'>;
+type CallRecordingExternalLinkProps = {
+  url: string | null | undefined;
+  label: string;
+  hint?: string;
+  Icon: IconComponent;
 };
 
-// Recordings that stay with the meeting provider open there instead of playing inline
-export const CallRecordingExternalRecordingLink = ({
-  callRecording,
-}: CallRecordingExternalRecordingLinkProps) => {
+// Files that stay with the meeting provider open there instead of rendering inline
+export const CallRecordingExternalLink = ({
+  url,
+  label,
+  hint,
+  Icon,
+}: CallRecordingExternalLinkProps) => {
   const theme = useTheme();
-  const url = callRecording.recordingUrl?.primaryLinkUrl;
 
   if (!isNonEmptyString(url)) {
     return null;
@@ -52,11 +54,9 @@ export const CallRecordingExternalRecordingLink = ({
 
   return (
     <StyledLink href={url} target="_blank" rel="noopener noreferrer">
-      <IconVideo size={theme.icon.size.md} />
-      <StyledLabel>
-        {callRecording.recordingUrl?.primaryLinkLabel || t`Recording`}
-      </StyledLabel>
-      <StyledHint>{t`Open in Google Drive`}</StyledHint>
+      <Icon size={theme.icon.size.md} />
+      <StyledLabel>{label}</StyledLabel>
+      {isNonEmptyString(hint) && <StyledHint>{hint}</StyledHint>}
       <IconExternalLink size={theme.icon.size.sm} />
     </StyledLink>
   );

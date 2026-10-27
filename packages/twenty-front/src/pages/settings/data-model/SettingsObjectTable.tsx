@@ -13,6 +13,7 @@ import {
   SETTINGS_OBJECT_TABLE_ROW_MOBILE_MIN_WIDTH,
   StyledStickyFirstCell,
 } from '@/settings/data-model/object-details/components/SettingsObjectItemTableRowStyledComponents';
+import { SYSTEM_OBJECTS_LISTED_IN_DATA_MODEL } from '@/settings/data-model/constants/SystemObjectsListedInDataModel';
 import { SettingsObjectInactiveMenuDropDown } from '@/settings/data-model/objects/components/SettingsObjectInactiveMenuDropDown';
 import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
 import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent';
@@ -139,8 +140,12 @@ export const SettingsObjectTable = ({
           return false;
         }
 
-        const isSystem = item.objectMetadataItem.isSystem;
-        if (isSystem && !showSystemObjects) {
+        const isHiddenSystemObject =
+          item.objectMetadataItem.isSystem &&
+          !SYSTEM_OBJECTS_LISTED_IN_DATA_MODEL.includes(
+            item.objectMetadataItem.nameSingular,
+          );
+        if (isHiddenSystemObject && !showSystemObjects) {
           return false;
         }
 

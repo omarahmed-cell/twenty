@@ -21,7 +21,7 @@ const getEntities = (flatEntityMaps: {
   ) as LooseFlatEntity[];
 
 // Everything in the standard definitions that points, directly or transitively, at the seed
-// objects or fields; a new tab on an existing layout comes in through its widget
+// entities; a new tab on an existing layout comes in through its widget
 export const selectStandardAdditionsFromSeeds = ({
   existing,
   standard,
@@ -67,12 +67,9 @@ export const selectStandardAdditionsFromSeeds = ({
   };
 
   for (const universalIdentifier of seedUniversalIdentifiers) {
-    const seedEntity = (standard.flatObjectMetadataMaps.byUniversalIdentifier[
-      universalIdentifier
-    ] ??
-      standard.flatFieldMetadataMaps.byUniversalIdentifier[
-        universalIdentifier
-      ]) as LooseFlatEntity | undefined;
+    const seedEntity = ACTIVITY_OBJECTS_FLAT_ENTITY_MAPS_KEYS.map(
+      (mapsKey) => standard[mapsKey].byUniversalIdentifier[universalIdentifier],
+    ).find(isDefined) as LooseFlatEntity | undefined;
 
     if (isDefined(seedEntity)) {
       select(seedEntity);

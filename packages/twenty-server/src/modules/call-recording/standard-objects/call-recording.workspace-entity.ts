@@ -18,6 +18,7 @@ export class CallRecordingWorkspaceEntity extends BaseWorkspaceEntity {
   endedAt: string | null;
   video: FileOutput[] | null;
   recordingUrl: LinksMetadata | null;
+  notesUrl: LinksMetadata | null;
   audio: FileOutput[] | null;
   transcript: Record<string, unknown> | null;
   summary: RichTextMetadata | null;

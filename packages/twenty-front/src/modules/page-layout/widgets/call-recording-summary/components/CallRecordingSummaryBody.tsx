@@ -1,5 +1,5 @@
 import { LazyMarkdownRenderer } from '@/ai/components/LazyMarkdownRenderer';
-import { CallRecordingExternalRecordingLink } from '@/page-layout/widgets/call-recording/components/CallRecordingExternalRecordingLink';
+import { CallRecordingExternalLink } from '@/page-layout/widgets/call-recording/components/CallRecordingExternalLink';
 import { CallRecordingStatusDisplay } from '@/page-layout/widgets/call-recording/components/CallRecordingStatusDisplay';
 import { GoogleMeetRecordingsReconnectCallout } from '@/page-layout/widgets/call-recording/components/GoogleMeetRecordingsReconnectCallout';
 import { CallRecordingWidgetEmptyStateDisplay } from '@/page-layout/widgets/call-recording/components/CallRecordingWidgetEmptyStateDisplay';
@@ -13,6 +13,7 @@ import { type WidgetAccessDenialInfo } from '@/page-layout/widgets/types/WidgetA
 import { t } from '@lingui/core/macro';
 import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
+import { IconNotes } from 'twenty-ui/icon';
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -70,7 +71,6 @@ export const CallRecordingSummaryBody = ({
   if (isDefined(summaryMarkdown)) {
     return (
       <StyledSummaryContainer>
-        <CallRecordingExternalRecordingLink callRecording={callRecording} />
         <LazyMarkdownRenderer text={summaryMarkdown} />
       </StyledSummaryContainer>
     );
@@ -78,7 +78,11 @@ export const CallRecordingSummaryBody = ({
 
   return (
     <>
-      <CallRecordingExternalRecordingLink callRecording={callRecording} />
+      <CallRecordingExternalLink
+        url={callRecording.notesUrl?.primaryLinkUrl}
+        label={t`Open Gemini notes in Google Docs`}
+        Icon={IconNotes}
+      />
       <CallRecordingStatusDisplay
         callRecording={callRecording}
         artifactType="summary"

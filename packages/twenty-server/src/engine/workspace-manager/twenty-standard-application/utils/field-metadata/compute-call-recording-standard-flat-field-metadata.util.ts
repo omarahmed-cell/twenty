@@ -459,6 +459,30 @@ export const buildCallRecordingStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  notesUrl: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'notesUrl',
+      type: FieldMetadataType.LINKS,
+      label: i18nLabel(
+        msg({ message: `Notes link`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Where the meeting notes are stored, when they stay with the meeting provider`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconNotes',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   audio: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

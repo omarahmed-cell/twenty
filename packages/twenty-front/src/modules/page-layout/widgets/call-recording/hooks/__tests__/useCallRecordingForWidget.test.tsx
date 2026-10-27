@@ -114,18 +114,28 @@ describe('useCallRecordingForWidget', () => {
     });
   });
 
-  it('requests the recording link on both widgets once the workspace has the field', () => {
-    callRecordingFieldNames = ['recordingUrl'];
+  it('requests the recording link on the transcript and the notes link on the summary', () => {
+    callRecordingFieldNames = ['recordingUrl', 'notesUrl'];
 
     renderHook(() => useCallRecordingForWidget({ kind: 'transcript' }));
     expect(getRequestedFields()).toEqual(
       expect.objectContaining({ recordingUrl: true }),
     );
+    expect(getRequestedFields()).not.toHaveProperty('notesUrl');
 
     renderHook(() => useCallRecordingForWidget({ kind: 'summary' }));
     expect(getRequestedFields()).toEqual(
-      expect.objectContaining({ recordingUrl: true }),
+      expect.objectContaining({ notesUrl: true }),
     );
+    expect(getRequestedFields()).not.toHaveProperty('recordingUrl');
+  });
+
+  it('omits the notes link while the workspace lacks the field', () => {
+    callRecordingFieldNames = ['recordingUrl'];
+
+    renderHook(() => useCallRecordingForWidget({ kind: 'summary' }));
+
+    expect(getRequestedFields()).not.toHaveProperty('notesUrl');
   });
 
   it('omits the recording link when the role cannot read it', () => {

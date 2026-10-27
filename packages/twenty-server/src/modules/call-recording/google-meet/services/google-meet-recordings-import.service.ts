@@ -222,7 +222,7 @@ export class GoogleMeetRecordingsImportService {
     return events;
   }
 
-  // Returns false when none of the meeting's Meet files could be read
+  // Returns false when the meeting has no Meet file link and none of its files could be read
   private async upsertCallRecording({
     auth,
     calendarEventId,
@@ -251,9 +251,11 @@ export class GoogleMeetRecordingsImportService {
     });
 
     const recordingUrl = recording?.fileUrl ?? undefined;
+    const geminiNotesUrl = geminiNotes?.fileUrl ?? undefined;
 
     if (
       !isDefined(recordingUrl) &&
+      !isDefined(geminiNotesUrl) &&
       !isDefined(geminiNotesMarkdown) &&
       !isDefined(transcriptEntries)
     ) {
@@ -279,6 +281,13 @@ export class GoogleMeetRecordingsImportService {
         recordingUrl: {
           primaryLinkUrl: recordingUrl,
           primaryLinkLabel: recording?.title ?? 'Google Meet recording',
+          secondaryLinks: [],
+        },
+      }),
+      ...(isDefined(geminiNotesUrl) && {
+        notesUrl: {
+          primaryLinkUrl: geminiNotesUrl,
+          primaryLinkLabel: geminiNotes?.title ?? 'Gemini notes',
           secondaryLinks: [],
         },
       }),

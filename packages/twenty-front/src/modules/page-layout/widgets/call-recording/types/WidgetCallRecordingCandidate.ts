@@ -12,5 +12,8 @@ export type WidgetCallRecordingCandidate = {
     primaryLinkUrl: string | null;
     primaryLinkLabel: string | null;
   } | null;
+  notesUrl?: {
+    primaryLinkUrl: string | null;
+  } | null;
   audio?: FieldFilesValue[] | null;
 };

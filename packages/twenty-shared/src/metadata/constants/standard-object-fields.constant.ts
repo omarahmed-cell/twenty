@@ -960,6 +960,9 @@ export const STANDARD_OBJECT_FIELDS = {
     recordingUrl: {
       universalIdentifier: 'dc3e4543-88a2-492d-8aac-5ce403d61f69',
     },
+    notesUrl: {
+      universalIdentifier: 'b3cfcab1-7467-4080-8845-d37c67a20cb1',
+    },
     audio: {
       universalIdentifier: '2eafc2d0-8fec-430c-a939-65ca5fbc0f08',
     },

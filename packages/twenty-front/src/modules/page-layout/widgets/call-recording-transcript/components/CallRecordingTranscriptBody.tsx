@@ -1,4 +1,4 @@
-import { CallRecordingExternalRecordingLink } from '@/page-layout/widgets/call-recording/components/CallRecordingExternalRecordingLink';
+import { CallRecordingExternalLink } from '@/page-layout/widgets/call-recording/components/CallRecordingExternalLink';
 import { GoogleMeetRecordingsReconnectCallout } from '@/page-layout/widgets/call-recording/components/GoogleMeetRecordingsReconnectCallout';
 import { CallRecordingAudioPlayer } from '@/page-layout/widgets/call-recording-transcript/components/CallRecordingAudioPlayer';
 import { type CallRecordingPlaybackMedia } from '@/page-layout/widgets/call-recording/types/CallRecordingPlaybackMedia';
@@ -18,6 +18,7 @@ import { t } from '@lingui/core/macro';
 import { useState } from 'react';
 import { type CallRecordingParsedTranscriptEntry } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
+import { IconVideo } from 'twenty-ui/icon';
 
 const StyledRecordingLayout = styled.div`
   display: grid;
@@ -82,7 +83,12 @@ export const CallRecordingTranscriptBody = ({
   if (!isDefined(playbackMedia)) {
     return (
       <>
-        <CallRecordingExternalRecordingLink callRecording={callRecording} />
+        <CallRecordingExternalLink
+          url={callRecording.recordingUrl?.primaryLinkUrl}
+          label={callRecording.recordingUrl?.primaryLinkLabel || t`Recording`}
+          hint={t`Open in Google Drive`}
+          Icon={IconVideo}
+        />
         <CallRecordingTranscriptContent
           callRecording={callRecording}
           transcriptEntries={transcriptEntries}
