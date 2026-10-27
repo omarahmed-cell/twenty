@@ -106,12 +106,14 @@ type EmailComposerFieldsProps = {
   contextRecord?: EmailComposerContextRecord | null;
   // For surfaces without a composer footer of their own.
   onAttachFiles?: () => void;
+  onOpenAttachmentPicker?: () => void;
 };
 
 export const EmailComposerFields = ({
   composerState,
   contextRecord,
   onAttachFiles,
+  onOpenAttachmentPicker,
 }: EmailComposerFieldsProps) => {
   const theme = useTheme();
   const { uploadEmailImage } = useUploadEmailImage();
@@ -294,6 +296,7 @@ export const EmailComposerFields = ({
           onChange={composerState.setBody}
           profile={INLINE_EMAIL_BODY_EDITOR_PROFILE}
           onImageUpload={uploadEmailImage}
+          onAttachFiles={onOpenAttachmentPicker}
         />
       </StyledBody>
       {(composerState.files.length > 0 || isDefined(onAttachFiles)) && (

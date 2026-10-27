@@ -1,4 +1,5 @@
 import { AdvancedTextEditor } from '@/advanced-text-editor/components/AdvancedTextEditor';
+import { AdvancedTextEditorFixedToolbar } from '@/advanced-text-editor/components/AdvancedTextEditorFixedToolbar';
 import { useAdvancedTextEditor } from '@/advanced-text-editor/hooks/useAdvancedTextEditor';
 import { type AdvancedTextEditorComponentProps } from '@/advanced-text-editor/types/AdvancedTextEditorComponentProps';
 import { type AdvancedTextEditorProfile } from '@/advanced-text-editor/types/AdvancedTextEditorProfile';
@@ -106,6 +107,7 @@ type FormAdvancedTextFieldInputProps = {
   enableFullScreen?: boolean;
   fullScreenBreadcrumbs?: BreadcrumbProps['links'];
   onEditorReady?: (editor: Editor | null) => void;
+  onAttachFiles?: () => void;
 };
 
 export const FormAdvancedTextFieldInput = ({
@@ -125,6 +127,7 @@ export const FormAdvancedTextFieldInput = ({
   enableFullScreen,
   fullScreenBreadcrumbs,
   onEditorReady,
+  onAttachFiles,
 }: FormAdvancedTextFieldInputProps) => {
   const { chrome, variant, minHeight: profileMinHeight } = profile;
 
@@ -255,6 +258,16 @@ export const FormAdvancedTextFieldInput = ({
           {label ? <Field.Label>{label}</Field.Label> : null}
 
           <StyledAdvancedTextFieldFieldContainer>
+            {profile.showFixedToolbar === true &&
+              !readonly &&
+              !isFullScreen && (
+                <AdvancedTextEditorFixedToolbar
+                  editor={editor}
+                  onImageUpload={onImageUpload}
+                  onImageUploadError={onImageUploadError}
+                  onAttachFiles={onAttachFiles}
+                />
+              )}
             <StyledAdvancedTextFieldInnerContainer
               hasFieldChrome={chrome === 'field'}
             >

@@ -89,6 +89,7 @@ export const SidePanelComposeEmailPage = () => {
         <EmailComposerFields
           composerState={composerState}
           contextRecord={composeEmailContextRecord}
+          onOpenAttachmentPicker={openAttachmentPicker}
         />
       </StyledContent>
       <SidePanelFooter

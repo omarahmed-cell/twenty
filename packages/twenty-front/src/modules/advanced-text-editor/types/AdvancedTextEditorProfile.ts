@@ -11,6 +11,7 @@ export type AdvancedTextEditorProfile = {
   variant: AdvancedTextEditorVariant;
   minHeight: number;
   enableFullScreen: boolean;
+  showFixedToolbar?: boolean;
   buildExtensions: (
     context: AdvancedTextEditorExtensionContext,
   ) => AnyExtension[];

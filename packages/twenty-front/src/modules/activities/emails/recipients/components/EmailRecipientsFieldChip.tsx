@@ -14,7 +14,7 @@ import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent
 import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
-const CHIP_MAX_WIDTH = 240;
+const CHIP_MAX_WIDTH = 360;
 
 type EmailRecipientsFieldChipProps = {
   chipId: string;
@@ -60,6 +60,11 @@ export const EmailRecipientsFieldChip = ({
     handle: recipient.address,
   });
 
+  const chipLabel =
+    resolvedLabel === recipient.address
+      ? recipient.address
+      : `${resolvedLabel} <${recipient.address}>`;
+
   const avatar =
     isDefined(workspaceMember) || isDefined(person) ? (
       <Avatar
@@ -78,7 +83,7 @@ export const EmailRecipientsFieldChip = ({
       <Dropdown.Trigger render={<div />} nativeButton={false} tabIndex={-1}>
         <BaseChip
           chipId={chipId}
-          label={resolvedLabel}
+          label={chipLabel}
           title={
             isInvalid
               ? t`Invalid email address`

@@ -7,6 +7,7 @@ export const INLINE_EMAIL_BODY_EDITOR_PROFILE = {
   variant: 'email',
   minHeight: 120,
   enableFullScreen: true,
+  showFixedToolbar: true,
   parseLegacyDocument: parseLegacyHtmlDocument,
   buildExtensions: buildFullRichTextWithVariableTagExtensions,
 } satisfies AdvancedTextEditorProfile;

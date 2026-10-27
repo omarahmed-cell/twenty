@@ -3,5 +3,5 @@ export const getEditLinkDropdownId = ({
   bubbleMenuType,
 }: {
   editorInstanceId: string;
-  bubbleMenuType: 'text' | 'link';
+  bubbleMenuType: 'text' | 'link' | 'toolbar';
 }) => `edit-link-dropdown-${bubbleMenuType}-${editorInstanceId}`;

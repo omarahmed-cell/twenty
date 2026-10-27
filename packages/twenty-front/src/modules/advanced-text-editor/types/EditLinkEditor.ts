@@ -1,6 +1,6 @@
 import { type ChainedCommands, type Editor } from '@tiptap/core';
 
-type EditLinkCommandChain = {
+export type EditLinkCommandChain = {
   [CommandName in 'focus' | 'extendMarkRange' | 'setLink' | 'unsetLink']: (
     ...args: Parameters<ChainedCommands[CommandName]>
   ) => EditLinkCommandChain;

@@ -157,6 +157,7 @@ export const EmailThreadComposer = ({
         <EmailComposerFields
           composerState={composerState}
           onAttachFiles={isInSidePanel ? undefined : openAttachmentPicker}
+          onOpenAttachmentPicker={openAttachmentPicker}
         />
       ) : (
         !isInSidePanel && (
