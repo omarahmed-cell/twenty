@@ -205,6 +205,15 @@ const validateFieldMetadataInputOptions = (
 ): FlatFieldMetadataValidationError[] => {
   const { options } = universalFlatFieldMetadata;
 
+  // System multi-selects (segment membership) get their options at runtime and start empty
+  const canHaveNoOptions =
+    universalFlatFieldMetadata.isSystem === true &&
+    universalFlatFieldMetadata.type === FieldMetadataType.MULTI_SELECT;
+
+  if (canHaveNoOptions && isDefined(options) && options.length === 0) {
+    return [];
+  }
+
   if (!isDefined(options) || options.length === 0) {
     return [
       {

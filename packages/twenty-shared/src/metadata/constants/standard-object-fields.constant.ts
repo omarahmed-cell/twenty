@@ -980,6 +980,12 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company,
     ),
+    segmentMembers: {
+      universalIdentifier: 'd4ec2d5b-1bf7-4041-809c-53e87fe1cbaf',
+    },
+    segmentMembership: {
+      universalIdentifier: '0254606c-eef8-4ce3-9fc6-04d959f3f343',
+    },
     name: { universalIdentifier: '20202020-4d99-4e2e-a84c-4a27837b1ece' },
     domainName: {
       universalIdentifier: '20202020-0c28-43d8-8ba5-3659924d3489',
@@ -1469,6 +1475,12 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunity,
     ),
+    segmentMembers: {
+      universalIdentifier: '80a590cf-546f-4ab5-adee-18f2d4da57ee',
+    },
+    segmentMembership: {
+      universalIdentifier: 'f4baad0c-10e1-41cd-be36-9413419456e7',
+    },
     name: { universalIdentifier: '20202020-8609-4f65-a2d9-44009eb422b5' },
     amount: { universalIdentifier: '20202020-583e-4642-8533-db761d5fa82f' },
     closeDate: {
@@ -1581,6 +1593,12 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person,
     ),
+    segmentMembers: {
+      universalIdentifier: '1c757569-68e9-4ca4-98ec-5b86ffd615fd',
+    },
+    segmentMembership: {
+      universalIdentifier: 'b85f8293-a358-45a9-bc7d-a18eb35ed3e0',
+    },
     name: { universalIdentifier: '20202020-3875-44d5-8c33-a6239011cab8' },
     emails: { universalIdentifier: '20202020-3c51-43fa-8b6e-af39e29368ab' },
     linkedinLink: {
@@ -1824,6 +1842,37 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     totalPrice: {
       universalIdentifier: '7ec17a65-4715-451e-bbbb-fa91b41652e5',
+    },
+  },
+  segment: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segment,
+    ),
+    name: { universalIdentifier: '453c4101-a03d-4743-b282-dc60ea8c0f47' },
+    targetObject: {
+      universalIdentifier: '5a1c9077-d655-4f0c-a4a6-854fd4d00672',
+    },
+    memberCount: {
+      universalIdentifier: '4042b1c8-43bb-42f5-97c9-db1159b51aad',
+    },
+    segmentMembers: {
+      universalIdentifier: 'bbe6c5fd-2271-4acb-8781-176763d082f8',
+    },
+  },
+  segmentMember: {
+    target: { universalIdentifier: 'e6fbeeb0-b479-4b01-9ca2-176a83651a3e' },
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segmentMember,
+    ),
+    segment: { universalIdentifier: 'b3b9cacf-816d-40a1-a4c2-d32f048f5926' },
+    targetCompany: {
+      universalIdentifier: 'e3a6652d-ffb1-40e5-943f-e4f1fac31423',
+    },
+    targetPerson: {
+      universalIdentifier: 'b3e5028e-02d4-4e80-aaab-5e133eadd160',
+    },
+    targetOpportunity: {
+      universalIdentifier: '8a2e5e73-14e6-4f5b-aed2-60888772b6e8',
     },
   },
   recordShare: {

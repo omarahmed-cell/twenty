@@ -15,6 +15,7 @@ type StandardObjectNameWithTargetMorphField =
   | 'calendarEventTarget'
   | 'messageThreadTarget'
   | 'noteTarget'
+  | 'segmentMember'
   | 'taskTarget'
   | 'timelineActivity';
 

@@ -1849,4 +1849,65 @@ export const STANDARD_COMMAND_MENU_ITEMS = {
     engineComponentKey: EngineComponentKey.ADD_VIEW_TO_MESSAGE_LIST,
     hotKeys: null,
   },
+  addToSegment: {
+    universalIdentifier: '187a609e-ae03-4b45-90b2-2ee80461aa7b',
+    label: i18nLabel(
+      msg({ message: `Add to segment`, context: 'commandMenuItem.label' }),
+    ),
+    icon: 'IconPlaylistAdd',
+    isPinned: false,
+    position: 81,
+    shortLabel: i18nLabel(
+      msg({ message: `Add to segment`, context: 'commandMenuItem.shortLabel' }),
+    ),
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      '(objectMetadataItem.nameSingular == "company" or objectMetadataItem.nameSingular == "person" or objectMetadataItem.nameSingular == "opportunity") and targetObjectWritePermissions.segmentMember and numberOfSelectedRecords >= 1 and not hasAnySoftDeleteFilterOnView and (isSelectAll or noneDefined(selectedRecords, "deletedAt"))',
+    availabilityObjectMetadataUniversalIdentifier: null,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.ADD_TO_SEGMENT,
+    hotKeys: null,
+  },
+  removeFromSegment: {
+    universalIdentifier: '9d1ab39a-b15a-4130-a730-5952646337f2',
+    label: i18nLabel(
+      msg({ message: `Remove from segment`, context: 'commandMenuItem.label' }),
+    ),
+    icon: 'IconMinus',
+    isPinned: false,
+    position: 82,
+    shortLabel: i18nLabel(
+      msg({
+        message: `Remove from segment`,
+        context: 'commandMenuItem.shortLabel',
+      }),
+    ),
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      '(objectMetadataItem.nameSingular == "company" or objectMetadataItem.nameSingular == "person" or objectMetadataItem.nameSingular == "opportunity") and targetObjectWritePermissions.segmentMember and numberOfSelectedRecords >= 1 and not hasAnySoftDeleteFilterOnView and (isSelectAll or noneDefined(selectedRecords, "deletedAt"))',
+    availabilityObjectMetadataUniversalIdentifier: null,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.REMOVE_FROM_SEGMENT,
+    hotKeys: null,
+  },
+  openSegmentRecords: {
+    universalIdentifier: '07f2ba0b-f1b2-4613-ae33-cd7efb706e0f',
+    label: i18nLabel(
+      msg({ message: `Open records`, context: 'commandMenuItem.label' }),
+    ),
+    icon: 'IconArrowUpRight',
+    isPinned: true,
+    position: 83,
+    shortLabel: i18nLabel(
+      msg({ message: `Open records`, context: 'commandMenuItem.shortLabel' }),
+    ),
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      'numberOfSelectedRecords == 1 and noneDefined(selectedRecords, "deletedAt")',
+    availabilityObjectMetadataUniversalIdentifier:
+      STANDARD_OBJECTS.segment.universalIdentifier,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.OPEN_SEGMENT_RECORDS,
+    hotKeys: null,
+  },
 } as const;

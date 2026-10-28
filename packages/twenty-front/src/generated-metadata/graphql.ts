@@ -2017,6 +2017,7 @@ export enum EngineComponentKey {
   ADD_NODE_WORKFLOW = 'ADD_NODE_WORKFLOW',
   ADD_TO_FAVORITES = 'ADD_TO_FAVORITES',
   ADD_TO_MESSAGE_LIST = 'ADD_TO_MESSAGE_LIST',
+  ADD_TO_SEGMENT = 'ADD_TO_SEGMENT',
   ADD_VIEW_TO_MESSAGE_LIST = 'ADD_VIEW_TO_MESSAGE_LIST',
   ASK_AI = 'ASK_AI',
   ASSIGN_AI_CHAT = 'ASSIGN_AI_CHAT',
@@ -2068,7 +2069,9 @@ export enum EngineComponentKey {
   NAVIGATE_TO_PREVIOUS_RECORD = 'NAVIGATE_TO_PREVIOUS_RECORD',
   NAVIGATION = 'NAVIGATION',
   NEW_AI_CHAT = 'NEW_AI_CHAT',
+  OPEN_SEGMENT_RECORDS = 'OPEN_SEGMENT_RECORDS',
   REMOVE_FROM_FAVORITES = 'REMOVE_FROM_FAVORITES',
+  REMOVE_FROM_SEGMENT = 'REMOVE_FROM_SEGMENT',
   REOPEN_AI_CHAT = 'REOPEN_AI_CHAT',
   REPLY_TO_EMAIL_THREAD = 'REPLY_TO_EMAIL_THREAD',
   RESTORE_MULTIPLE_RECORDS = 'RESTORE_MULTIPLE_RECORDS',
@@ -3182,6 +3185,7 @@ export type Mutation = {
   activateWorkspace: Workspace;
   addAgentChatMessageReaction: Array<AgentMessageReactionSummary>;
   addQueryToEventStream: Scalars['Boolean']['output'];
+  addRecordsToSegment: UpdateSegmentMembershipResult;
   assignAgentChatThread: Scalars['Boolean']['output'];
   assignRoleToAgent: Scalars['Boolean']['output'];
   assignRoleToApiKey: Scalars['Boolean']['output'];
@@ -3333,6 +3337,7 @@ export type Mutation = {
   removeAgentChatMessageReaction: Array<AgentMessageReactionSummary>;
   removeQueryFromEventStream: Scalars['Boolean']['output'];
   removeRecordShare: RecordSharingDto;
+  removeRecordsFromSegment: UpdateSegmentMembershipResult;
   removeRoleFromAgent: Scalars['Boolean']['output'];
   renewApplicationToken: ApplicationTokenPair;
   renewToken: AuthTokens;
@@ -3484,6 +3489,11 @@ export type MutationAddAgentChatMessageReactionArgs = {
 
 export type MutationAddQueryToEventStreamArgs = {
   input: AddQuerySubscriptionInput;
+};
+
+
+export type MutationAddRecordsToSegmentArgs = {
+  input: UpdateSegmentMembershipInput;
 };
 
 
@@ -4202,6 +4212,11 @@ export type MutationRemoveQueryFromEventStreamArgs = {
 export type MutationRemoveRecordShareArgs = {
   principal: RecordSharePrincipalInput;
   target: RecordTargetInput;
+};
+
+
+export type MutationRemoveRecordsFromSegmentArgs = {
+  input: UpdateSegmentMembershipInput;
 };
 
 
@@ -7120,6 +7135,18 @@ export type UpdateRolePayload = {
   label?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateSegmentMembershipInput = {
+  objectNameSingular: Scalars['String']['input'];
+  recordFilter: Scalars['JSON']['input'];
+  segmentId: Scalars['UUID']['input'];
+};
+
+export type UpdateSegmentMembershipResult = {
+  __typename?: 'UpdateSegmentMembershipResult';
+  affectedRecordCount: Scalars['Int']['output'];
+  memberCount: Scalars['Int']['output'];
+};
+
 export type UpdateSkillInput = {
   content?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -8861,12 +8888,26 @@ export type CommandMenuItemFieldsFragment = { __typename?: 'CommandMenuItem', id
     | { __typename?: 'PathCommandMenuItemPayload', path: string }
    | null };
 
+export type AddRecordsToSegmentMutationVariables = Exact<{
+  input: UpdateSegmentMembershipInput;
+}>;
+
+
+export type AddRecordsToSegmentMutation = { __typename?: 'Mutation', addRecordsToSegment: { __typename?: 'UpdateSegmentMembershipResult', affectedRecordCount: number, memberCount: number } };
+
 export type DuplicateMessageListMutationVariables = Exact<{
   id: Scalars['UUID']['input'];
 }>;
 
 
 export type DuplicateMessageListMutation = { __typename?: 'Mutation', duplicateMessageList: { __typename?: 'DuplicatedMessageList', id: string, name?: string | null, description?: string | null, position: number, memberCount: number, createdAt: string, updatedAt: string } };
+
+export type RemoveRecordsFromSegmentMutationVariables = Exact<{
+  input: UpdateSegmentMembershipInput;
+}>;
+
+
+export type RemoveRecordsFromSegmentMutation = { __typename?: 'Mutation', removeRecordsFromSegment: { __typename?: 'UpdateSegmentMembershipResult', affectedRecordCount: number, memberCount: number } };
 
 export type ResetCommandMenuItemMutationVariables = Exact<{
   id: Scalars['UUID']['input'];
@@ -11107,7 +11148,9 @@ export const FindApplicationRegistrationByClientIdDocument = {"kind":"Document",
 export const GetPublicWorkspaceDataByDomainDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicWorkspaceDataByDomain"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"origin"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPublicWorkspaceDataByDomain"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"origin"},"value":{"kind":"Variable","name":{"kind":"Name","value":"origin"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"logo"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"workspaceUrls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"WorkspaceUrlsFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authProviders"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sso"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"issuer"}}]}},{"kind":"Field","name":{"kind":"Name","value":"google"}},{"kind":"Field","name":{"kind":"Name","value":"magicLink"}},{"kind":"Field","name":{"kind":"Name","value":"password"}},{"kind":"Field","name":{"kind":"Name","value":"microsoft"}}]}},{"kind":"Field","name":{"kind":"Name","value":"authBypassProviders"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"google"}},{"kind":"Field","name":{"kind":"Name","value":"password"}},{"kind":"Field","name":{"kind":"Name","value":"microsoft"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WorkspaceUrlsFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"WorkspaceUrls"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subdomainUrl"}},{"kind":"Field","name":{"kind":"Name","value":"customUrl"}}]}}]} as unknown as DocumentNode<GetPublicWorkspaceDataByDomainQuery, GetPublicWorkspaceDataByDomainQueryVariables>;
 export const GetWorkspaceCreationDefaultsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetWorkspaceCreationDefaults"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getWorkspaceCreationDefaults"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"subdomain"}}]}}]}}]} as unknown as DocumentNode<GetWorkspaceCreationDefaultsQuery, GetWorkspaceCreationDefaultsQueryVariables>;
 export const ValidatePasswordResetTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidatePasswordResetToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validatePasswordResetToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"passwordResetToken"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassword"}}]}}]}}]} as unknown as DocumentNode<ValidatePasswordResetTokenQuery, ValidatePasswordResetTokenQueryVariables>;
+export const AddRecordsToSegmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddRecordsToSegment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSegmentMembershipInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addRecordsToSegment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"affectedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}}]}}]}}]} as unknown as DocumentNode<AddRecordsToSegmentMutation, AddRecordsToSegmentMutationVariables>;
 export const DuplicateMessageListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DuplicateMessageList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"duplicateMessageList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<DuplicateMessageListMutation, DuplicateMessageListMutationVariables>;
+export const RemoveRecordsFromSegmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveRecordsFromSegment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSegmentMembershipInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeRecordsFromSegment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"affectedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}}]}}]}}]} as unknown as DocumentNode<RemoveRecordsFromSegmentMutation, RemoveRecordsFromSegmentMutationVariables>;
 export const ResetCommandMenuItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetCommandMenuItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetCommandMenuItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommandMenuItemFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommandMenuItemFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CommandMenuItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"universalIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"coreWorkflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"workflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponentId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isHeadless"}}]}},{"kind":"Field","name":{"kind":"Name","value":"engineComponentKey"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"icon"}},{"kind":"Field","name":{"kind":"Name","value":"shortLabel"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"payload"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"PathCommandMenuItemPayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"hotKeys"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalAvailabilityExpression"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalPinnedExpression"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityType"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityObjectMetadataId"}},{"kind":"Field","name":{"kind":"Name","value":"navigationTargetObjectMetadataId"}},{"kind":"Field","name":{"kind":"Name","value":"pageLayoutId"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}}]}}]} as unknown as DocumentNode<ResetCommandMenuItemMutation, ResetCommandMenuItemMutationVariables>;
 export const TriggerAddPeopleToMessageListJobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TriggerAddPeopleToMessageListJob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TriggerAddPeopleToMessageListJobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggerAddPeopleToMessageListJob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"jobId"}}]}}]}}]} as unknown as DocumentNode<TriggerAddPeopleToMessageListJobMutation, TriggerAddPeopleToMessageListJobMutationVariables>;
 export const UpdateCommandMenuItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCommandMenuItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCommandMenuItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCommandMenuItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommandMenuItemFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommandMenuItemFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CommandMenuItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"universalIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"coreWorkflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"workflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponentId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isHeadless"}}]}},{"kind":"Field","name":{"kind":"Name","value":"engineComponentKey"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"icon"}},{"kind":"Field","name":{"kind":"Name","value":"shortLabel"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"payload"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"PathCommandMenuItemPayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"hotKeys"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalAvailabilityExpression"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalPinnedExpression"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityType"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityObjectMetadataId"}},{"kind":"Field","name":{"kind":"Name","value":"navigationTargetObjectMetadataId"}},{"kind":"Field","name":{"kind":"Name","value":"pageLayoutId"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}}]}}]} as unknown as DocumentNode<UpdateCommandMenuItemMutation, UpdateCommandMenuItemMutationVariables>;

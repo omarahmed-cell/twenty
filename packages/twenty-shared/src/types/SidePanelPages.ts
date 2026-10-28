@@ -37,6 +37,7 @@ export enum SidePanelPages {
   SendCampaign = 'send-campaign',
   SendCampaignTest = 'send-campaign-test',
   AddToMessageList = 'add-to-message-list',
+  SegmentMembership = 'segment-membership',
   WorkflowVersions = 'workflow-versions',
   WorkflowVersion = 'workflow-version',
   EmailBlockSettings = 'email-block-settings',

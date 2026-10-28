@@ -1462,6 +1462,95 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  segment: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segment,
+    fields: STANDARD_OBJECT_FIELDS.segment,
+    indexes: {
+      searchVectorGinIndex: {
+        universalIdentifier: 'eeff4f45-4230-41a5-bb8f-a27e26177f4f',
+      },
+    },
+    views: {
+      allSegments: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segment,
+        fields: STANDARD_OBJECT_FIELDS.segment,
+        viewFieldNames: [
+          'name',
+          'targetObject',
+          'memberCount',
+          'createdBy',
+          'createdAt',
+        ],
+      }),
+      segmentRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segment,
+        fields: STANDARD_OBJECT_FIELDS.segment,
+        viewFieldNames: [
+          'targetObject',
+          'memberCount',
+          'createdAt',
+          'createdBy',
+          'updatedAt',
+          'updatedBy',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
+          system: 'System',
+        },
+      }),
+    },
+  },
+  segmentMember: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segmentMember,
+    fields: STANDARD_OBJECT_FIELDS.segmentMember,
+    morphIds: {
+      targetMorphId: {
+        morphId:
+          STANDARD_OBJECT_FIELDS.segmentMember.target.universalIdentifier,
+      },
+    },
+    indexes: {
+      segmentIdIndex: {
+        universalIdentifier: 'ee673e17-7fea-4c3b-83a7-9c4f19fe806d',
+      },
+      companyIdIndex: {
+        universalIdentifier: 'bcec488d-b1e0-4cdb-9a63-9ae8643eedda',
+      },
+      personIdIndex: {
+        universalIdentifier: '7691990b-f014-447b-83cf-cd2abe605430',
+      },
+      opportunityIdIndex: {
+        universalIdentifier: 'c9e80ce3-9067-45e7-9dcc-90c943bc91c4',
+      },
+      segmentCompanyUniqueIndex: {
+        universalIdentifier: '7d559224-ebe3-4ed7-b1ed-5caf82440310',
+      },
+      segmentPersonUniqueIndex: {
+        universalIdentifier: '466fe804-5cd3-4bbc-b494-8c084067634d',
+      },
+      segmentOpportunityUniqueIndex: {
+        universalIdentifier: 'c0fc1d2a-1ea8-4db0-9180-c56c16278ccd',
+      },
+    },
+    views: {
+      allSegmentMembers: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segmentMember,
+        fields: STANDARD_OBJECT_FIELDS.segmentMember,
+        viewFieldNames: [
+          'id',
+          'segment',
+          'targetCompany',
+          'targetPerson',
+          'targetOpportunity',
+          'createdBy',
+          'createdAt',
+        ],
+      }),
+    },
+  },
   recordShare: {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.recordShare,
     fields: STANDARD_OBJECT_FIELDS.recordShare,

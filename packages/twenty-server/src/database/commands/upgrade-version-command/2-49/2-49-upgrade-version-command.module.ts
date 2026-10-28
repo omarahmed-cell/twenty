@@ -11,6 +11,7 @@ import { ProvisionMeetingFieldsCommand } from 'src/database/commands/upgrade-ver
 import { ProvisionCallRecordingLinkCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793050711844-provision-call-recording-link.command';
 import { ProvisionCallRecordingNotesLinkCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793095789249-provision-call-recording-notes-link.command';
 import { ProvisionMeetingNavigationCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793095921551-provision-meeting-navigation.command';
+import { ProvisionSegmentsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793188101860-provision-segments.command';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { WorkspaceSchemaManagerModule } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.module';
@@ -37,6 +38,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionCallRecordingLinkCommand,
     ProvisionCallRecordingNotesLinkCommand,
     ProvisionMeetingNavigationCommand,
+    ProvisionSegmentsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

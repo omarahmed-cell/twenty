@@ -1609,6 +1609,94 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  segment: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<CreateStandardObjectArgs<'segment'>, 'context' | 'objectName'>) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'segment',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.segment.universalIdentifier,
+        nameSingular: 'segment',
+        namePlural: 'segments',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Segment`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Segments`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A static list of companies, contacts or deals`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconChartPie',
+        isSearchable: true,
+        isAuditLogged: false,
+        labelIdentifierFieldMetadataName: 'name',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  segmentMember: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'segmentMember'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'segmentMember',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.segmentMember.universalIdentifier,
+        nameSingular: 'segmentMember',
+        namePlural: 'segmentMembers',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Segment Member`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Segment Members`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A record that belongs to a segment`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconUsersGroup',
+        isSystem: true,
+        isAuditLogged: false,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   person: ({
     now,
     workspaceId,

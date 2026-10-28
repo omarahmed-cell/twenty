@@ -876,4 +876,61 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  segmentMembers: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'segmentMembers',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Segment members`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Segment memberships of the record`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconChartPie',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'segmentMember',
+      targetFieldName: 'targetPerson',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  segmentMembership: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'segmentMembership',
+      type: FieldMetadataType.MULTI_SELECT,
+      label: i18nLabel(
+        msg({ message: `Segment Membership`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Segments the record belongs to, kept in sync from segment members`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconChartPie',
+      isSystem: true,
+      isNullable: true,
+      isUIEditable: false,
+      options: [],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

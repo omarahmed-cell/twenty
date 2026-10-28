@@ -13,6 +13,7 @@ import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migr
 import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-objects/attachment.workspace-entity';
 import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-participant.workspace-entity';
 import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-objects/call-target.workspace-entity';
+import { type SegmentMemberWorkspaceEntity } from 'src/modules/segment/standard-objects/segment-member.workspace-entity';
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type MessageListMemberWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-list-member.workspace-entity';
@@ -46,6 +47,8 @@ export class PersonWorkspaceEntity extends BaseWorkspaceEntity {
   taskTargets: EntityRelation<TaskTargetWorkspaceEntity[]>;
   noteTargets: EntityRelation<NoteTargetWorkspaceEntity[]>;
   callTargets: EntityRelation<CallTargetWorkspaceEntity[]>;
+  segmentMembers: EntityRelation<SegmentMemberWorkspaceEntity[]>;
+  segmentMembership: string[] | null;
   communicationTargets: EntityRelation<CommunicationTargetWorkspaceEntity[]>;
   agentChatThreadTargets: EntityRelation<
     AgentChatThreadTargetWorkspaceEntity[]

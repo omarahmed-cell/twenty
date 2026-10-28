@@ -11,6 +11,7 @@ import { CalendarEventAssignedToModule } from 'src/modules/calendar/calendar-eve
 import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hook.module';
 import { GoogleMeetRecordingModule } from 'src/modules/call-recording/google-meet/google-meet-recording.module';
 import { LineItemQueryHookModule } from 'src/modules/line-item/query-hooks/line-item-query-hook.module';
+import { SegmentModule } from 'src/modules/segment/segment.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
 import { TaskQueryHookModule } from 'src/modules/task/query-hooks/task-query-hook.module';
@@ -57,6 +58,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     CallQueryHookModule,
     GoogleMeetRecordingModule,
     LineItemQueryHookModule,
+    SegmentModule,
     CommunicationQueryHookModule,
     NoteQueryHookModule,
     TaskQueryHookModule,

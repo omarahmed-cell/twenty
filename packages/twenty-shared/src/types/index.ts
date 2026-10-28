@@ -318,6 +318,7 @@ export type {
   RelationPredicateValue,
   RowLevelPermissionPredicateValue,
 } from './RowLevelPermissionPredicateValue';
+export type { SegmentTargetObject } from './SegmentTargetObject';
 export type { SerializedRelation } from './SerializedRelation';
 export { SERIALIZED_RELATION_BRAND } from './SerializedRelation';
 export { ServerFileFolder } from './ServerFileFolder';

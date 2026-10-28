@@ -42,6 +42,8 @@ import { buildOpportunityStandardFlatFieldMetadatas } from 'src/engine/workspace
 import { buildServiceStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-service-standard-flat-field-metadata.util';
 import { buildProductStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-product-standard-flat-field-metadata.util';
 import { buildLineItemStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-line-item-standard-flat-field-metadata.util';
+import { buildSegmentStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-segment-standard-flat-field-metadata.util';
+import { buildSegmentMemberStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-segment-member-standard-flat-field-metadata.util';
 import { buildPersonStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util';
 import { buildRecordShareStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-record-share-standard-flat-field-metadata.util';
 import { buildShortLinkStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-short-link-standard-flat-field-metadata.util';
@@ -103,6 +105,8 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   service: buildServiceStandardFlatFieldMetadatas,
   product: buildProductStandardFlatFieldMetadatas,
   lineItem: buildLineItemStandardFlatFieldMetadatas,
+  segment: buildSegmentStandardFlatFieldMetadatas,
+  segmentMember: buildSegmentMemberStandardFlatFieldMetadatas,
   recordShare: buildRecordShareStandardFlatFieldMetadatas,
   shortLink: buildShortLinkStandardFlatFieldMetadatas,
   task: buildTaskStandardFlatFieldMetadatas,

@@ -107,6 +107,13 @@ export const STANDARD_NAVIGATION_MENU_ITEMS = {
         .universalIdentifier,
     position: 14,
   },
+  allSegments: {
+    universalIdentifier: '197505c7-823d-49d4-a589-7f1c86872015',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.segment.views.allSegments.universalIdentifier,
+    position: 15,
+  },
   workflowsFolder: {
     universalIdentifier: '20202020-b007-4b07-8b07-c0aba11c0007',
     type: NavigationMenuItemType.FOLDER,
@@ -158,6 +165,7 @@ export const STANDARD_NAVIGATION_MENU_ITEM_DEFAULT_COLORS: Partial<
   allServices: 'purple',
   allProducts: 'orange',
   allLineItems: 'orange',
+  allSegments: 'pink',
   workflowsFolder: 'orange',
   allMessageCampaigns: 'gray',
   allDashboards: 'gray',

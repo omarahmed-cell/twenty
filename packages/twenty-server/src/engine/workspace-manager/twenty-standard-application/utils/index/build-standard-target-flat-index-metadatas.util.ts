@@ -13,6 +13,7 @@ type StandardTargetObjectName =
   | 'communicationTarget'
   | 'messageThreadTarget'
   | 'noteTarget'
+  | 'segmentMember'
   | 'taskTarget';
 
 type TargetIndexNames<T extends StandardTargetObjectName> = {

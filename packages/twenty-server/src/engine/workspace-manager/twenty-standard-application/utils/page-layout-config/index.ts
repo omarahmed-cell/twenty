@@ -21,6 +21,7 @@ export { STANDARD_OPPORTUNITY_PAGE_LAYOUT_CONFIG } from './standard-opportunity-
 export { STANDARD_SERVICE_PAGE_LAYOUT_CONFIG } from './standard-service-page-layout.config';
 export { STANDARD_PRODUCT_PAGE_LAYOUT_CONFIG } from './standard-product-page-layout.config';
 export { STANDARD_LINE_ITEM_PAGE_LAYOUT_CONFIG } from './standard-line-item-page-layout.config';
+export { STANDARD_SEGMENT_PAGE_LAYOUT_CONFIG } from './standard-segment-page-layout.config';
 export {
   type StandardPageLayoutConfig,
   type StandardPageLayoutTabConfig,

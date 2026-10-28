@@ -30,6 +30,8 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   service: '1dbdb4b9-dcca-440a-be2e-e6d5f57e27e5',
   product: 'f099cee4-2fef-476b-ba00-41dc9ca7348c',
   lineItem: '882dd640-72b3-4ef4-927a-c3a44f1131d7',
+  segment: '78b3ad8c-d477-48ae-8a86-4f913d5d0075',
+  segmentMember: 'c3da76c5-4657-40bf-b0da-06a17fc1b923',
   note: '20202020-0b00-45cd-b6f6-6cd806fc6804',
   task: '20202020-1ba1-48ba-bc83-ef7e5990ed10',
   workflow: '20202020-62be-406c-b9ca-8caa50d51392',

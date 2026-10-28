@@ -109,6 +109,7 @@ const RECORD_PAGE_FIELDS_VIEW_NAME_BY_OBJECT: Partial<
   person: 'personRecordPageFields',
   service: 'serviceRecordPageFields',
   product: 'productRecordPageFields',
+  segment: 'segmentRecordPageFields',
   lineItem: 'lineItemRecordPageFields',
   task: 'taskRecordPageFields',
   workflowAutomatedTrigger: 'workflowAutomatedTriggerRecordPageFields',

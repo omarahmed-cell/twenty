@@ -1,0 +1,1 @@
+export const SEGMENT_MEMBERSHIP_PAGE_SIZE = 200;

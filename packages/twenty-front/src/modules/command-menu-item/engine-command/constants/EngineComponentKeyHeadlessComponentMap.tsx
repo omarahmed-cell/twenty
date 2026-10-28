@@ -16,6 +16,8 @@ import { DeleteRecordsCommand } from '@/command-menu-item/engine-command/record/
 import { DestroyRecordsCommand } from '@/command-menu-item/engine-command/record/components/DestroyRecordsCommand';
 import { ExportRecordsCommand } from '@/command-menu-item/engine-command/record/components/ExportRecordsCommand';
 import { AddRecordsToMessageListCommand } from '@/command-menu-item/engine-command/record/components/AddRecordsToMessageListCommand';
+import { SegmentMembershipRecordsCommand } from '@/command-menu-item/engine-command/record/components/SegmentMembershipRecordsCommand';
+import { OpenSegmentRecordsSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/segment/components/OpenSegmentRecordsSingleRecordCommand';
 import { AddViewToMessageListNoSelectionRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/AddViewToMessageListNoSelectionRecordCommand';
 import { RestoreRecordsCommand } from '@/command-menu-item/engine-command/record/components/RestoreRecordsCommand';
 import { TriggerWorkflowVersionEngineCommand } from '@/command-menu-item/engine-command/record/components/TriggerWorkflowVersionEngineCommand';
@@ -86,6 +88,15 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
     <DuplicateMessageListSingleRecordCommand />
   ),
   [EngineComponentKey.ADD_TO_MESSAGE_LIST]: <AddRecordsToMessageListCommand />,
+  [EngineComponentKey.ADD_TO_SEGMENT]: (
+    <SegmentMembershipRecordsCommand operation="ADD" />
+  ),
+  [EngineComponentKey.REMOVE_FROM_SEGMENT]: (
+    <SegmentMembershipRecordsCommand operation="REMOVE" />
+  ),
+  [EngineComponentKey.OPEN_SEGMENT_RECORDS]: (
+    <OpenSegmentRecordsSingleRecordCommand />
+  ),
   [EngineComponentKey.ADD_VIEW_TO_MESSAGE_LIST]: (
     <AddViewToMessageListNoSelectionRecordCommand />
   ),

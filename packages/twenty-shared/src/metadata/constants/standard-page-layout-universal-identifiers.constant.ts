@@ -291,6 +291,17 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
       },
     },
   }),
+  segmentRecordPage: buildStandardObjectRecordPageLayout({
+    objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segment,
+    tabs: {
+      home: {
+        title: 'Home',
+        widgets: {
+          fields: 'Fields',
+        },
+      },
+    },
+  }),
   serviceRecordPage: buildStandardObjectRecordPageLayout({
     objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
     tabs: {

@@ -34,6 +34,8 @@ export const STANDARD_OBJECT_ICONS = {
   service: 'IconBriefcase',
   product: 'IconPackage',
   lineItem: 'IconListNumbers',
+  segment: 'IconChartPie',
+  segmentMember: 'IconUsersGroup',
   task: 'IconCheckbox',
   taskTarget: 'IconCheckbox',
   timelineActivity: 'IconTimelineEvent',

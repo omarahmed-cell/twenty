@@ -22,6 +22,7 @@ const STANDARD_OBJECT_FALLBACK_COLOR: Partial<
   [CoreObjectNameSingular.Service]: 'purple',
   [CoreObjectNameSingular.Product]: 'orange',
   [CoreObjectNameSingular.LineItem]: 'orange',
+  [CoreObjectNameSingular.Segment]: 'pink',
   [CoreObjectNameSingular.Dashboard]: SYSTEM_OBJECT_COLOR,
   [CoreObjectNameSingular.Workflow]: SYSTEM_OBJECT_COLOR,
   [CoreObjectNameSingular.WorkflowRun]: SYSTEM_OBJECT_COLOR,

@@ -5,6 +5,8 @@ export const STANDARD_OBJECT_RECORDS_UNDER_OBJECT_RECORDS_PERMISSIONS = [
   'service',
   'product',
   'lineItem',
+  'segment',
+  'segmentMember',
   'note',
   'task',
   'call',

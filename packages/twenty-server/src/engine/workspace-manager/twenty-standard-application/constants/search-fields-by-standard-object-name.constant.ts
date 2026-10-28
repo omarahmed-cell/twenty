@@ -63,6 +63,8 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
     { name: 'sku', type: FieldMetadataType.TEXT },
   ],
   lineItem: [{ name: 'name', type: FieldMetadataType.TEXT }],
+  segment: [{ name: 'name', type: FieldMetadataType.TEXT }],
+  segmentMember: [{ name: 'id', type: FieldMetadataType.UUID }],
   person: [
     { name: 'name', type: FieldMetadataType.FULL_NAME },
     { name: 'emails', type: FieldMetadataType.EMAILS },

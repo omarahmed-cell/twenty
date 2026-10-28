@@ -76,6 +76,7 @@ export { QUOTED_STRING_REGEX } from './QuotedStringRegex';
 export { RATING_VALUES } from './RatingValues';
 export { RELATION_NESTED_QUERY_KEYWORDS } from './RelationNestedQueriesKeyword';
 export { RESERVED_SUBDOMAINS } from './ReservedSubdomains';
+export { SEGMENT_TARGET_OBJECT_NAME_SINGULARS } from './SegmentTargetObjectNameSingulars';
 export { STANDARD_OBJECT_RECORDS_UNDER_OBJECT_RECORDS_PERMISSIONS } from './StandardObjectRecordsUnderObjectRecordsPermissions';
 export { SUBDOMAIN_PATTERN } from './SubdomainPattern';
 export { SystemPermissionFlag } from './SystemPermissionFlag';

@@ -35,6 +35,8 @@ export enum CoreObjectNameSingular {
   Service = 'service',
   Product = 'product',
   LineItem = 'lineItem',
+  Segment = 'segment',
+  SegmentMember = 'segmentMember',
   Task = 'task',
   TaskTarget = 'taskTarget',
   Webhook = 'webhook',
