@@ -20,8 +20,19 @@ import { ScrollWrapper } from '@/ui/utilities/scroll/components/ScrollWrapper';
 import { VIEW_BAR_FILTER_BOTTOM_MENU_ITEM_IDS } from '@/views/constants/ViewBarFilterBottomMenuItemIds';
 import { DropdownComponentInstanceContext } from '@/ui/layout/dropdown/contexts/DropdownComponentInstanceContext';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
+import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { IconX } from 'twenty-ui/icon';
+
+// Scrolls from its own styles instead of the toggled scroll-wrapper class, so the bottom
+// menu stays reachable however the class toggle and dropdown sizing race
+const StyledFieldListScrollWrapper = styled(ScrollWrapper)`
+  && {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+`;
 
 export const ViewBarFilterDropdownFieldSelectMenu = () => {
   const [objectFilterDropdownSearchInput, setObjectFilterDropdownSearchInput] =
@@ -76,7 +87,7 @@ export const ViewBarFilterDropdownFieldSelectMenu = () => {
       >
         {t`Filter`}
       </DropdownMenuHeader>
-      <ScrollWrapper componentInstanceId="view-bar-dropdown-filter-field-select-menu">
+      <StyledFieldListScrollWrapper componentInstanceId="view-bar-dropdown-filter-field-select-menu">
         <DropdownMenuSearchInput
           value={objectFilterDropdownSearchInput}
           placeholder={t`Search fields`}
@@ -124,7 +135,7 @@ export const ViewBarFilterDropdownFieldSelectMenu = () => {
           {hasSelectableItems && <DropdownMenuSeparator />}
           <ViewBarFilterDropdownBottomMenu />
         </SelectableList>
-      </ScrollWrapper>
+      </StyledFieldListScrollWrapper>
     </LegacyDropdownContent>
   );
 };
