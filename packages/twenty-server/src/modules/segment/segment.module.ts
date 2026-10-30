@@ -15,6 +15,7 @@ import { SegmentMembershipResolver } from 'src/modules/segment/resolvers/segment
 import { SegmentMembershipOptionsService } from 'src/modules/segment/services/segment-membership-options.service';
 import { SegmentMembershipSyncService } from 'src/modules/segment/services/segment-membership-sync.service';
 import { SegmentMembershipService } from 'src/modules/segment/services/segment-membership.service';
+import { SegmentPullService } from 'src/modules/segment/services/segment-pull.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SegmentMembershipService } from 'src/modules/segment/services/segment-m
     SegmentMembershipOptionsService,
     SegmentMembershipSyncService,
     SegmentMembershipService,
+    SegmentPullService,
     SegmentMembershipResolver,
     SegmentSyncJob,
     SegmentSyncListener,

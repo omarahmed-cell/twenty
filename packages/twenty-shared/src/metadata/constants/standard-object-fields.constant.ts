@@ -1858,6 +1858,15 @@ export const STANDARD_OBJECT_FIELDS = {
     segmentMembers: {
       universalIdentifier: 'bbe6c5fd-2271-4acb-8781-176763d082f8',
     },
+    pulledFrom: {
+      universalIdentifier: 'a7d6d259-01fe-4278-bbab-dfe7b19e5a7d',
+    },
+    pulledSegments: {
+      universalIdentifier: '1946868d-5c4f-4572-96c5-d4f93f302d5e',
+    },
+    pullRelationFieldMetadataId: {
+      universalIdentifier: 'f42738de-166d-4a32-90b4-30a459fbae32',
+    },
   },
   segmentMember: {
     target: { universalIdentifier: 'e6fbeeb0-b479-4b01-9ca2-176a83651a3e' },

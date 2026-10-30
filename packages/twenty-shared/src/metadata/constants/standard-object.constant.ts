@@ -1469,6 +1469,9 @@ export const STANDARD_OBJECTS = {
       searchVectorGinIndex: {
         universalIdentifier: 'eeff4f45-4230-41a5-bb8f-a27e26177f4f',
       },
+      pulledFromIdIndex: {
+        universalIdentifier: '7feecaa1-c24b-4fcc-8f40-1cda2fc02ca3',
+      },
     },
     views: {
       allSegments: buildStandardObjectIndexView({
@@ -1490,6 +1493,7 @@ export const STANDARD_OBJECTS = {
         viewFieldNames: [
           'targetObject',
           'memberCount',
+          'pulledFrom',
           'createdAt',
           'createdBy',
           'updatedAt',

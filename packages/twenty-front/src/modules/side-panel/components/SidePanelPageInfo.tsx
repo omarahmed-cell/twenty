@@ -84,6 +84,7 @@ export const SidePanelPageInfo = ({ pageChip }: SidePanelPageInfoProps) => {
         SidePanelPages.EmailBlockStyle,
         SidePanelPages.AddToMessageList,
         SidePanelPages.SegmentMembership,
+        SidePanelPages.SegmentPull,
       ].includes(pageChip.page.page)
     : false;
 

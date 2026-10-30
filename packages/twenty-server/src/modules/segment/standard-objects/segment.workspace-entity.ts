@@ -15,5 +15,9 @@ export class SegmentWorkspaceEntity extends BaseWorkspaceEntity {
   createdBy: ActorMetadata;
   updatedBy: ActorMetadata;
   segmentMembers: EntityRelation<SegmentMemberWorkspaceEntity[]>;
+  pulledFrom: EntityRelation<SegmentWorkspaceEntity> | null;
+  pulledFromId: string | null;
+  pulledSegments: EntityRelation<SegmentWorkspaceEntity[]>;
+  pullRelationFieldMetadataId: string | null;
   searchVector: string;
 }

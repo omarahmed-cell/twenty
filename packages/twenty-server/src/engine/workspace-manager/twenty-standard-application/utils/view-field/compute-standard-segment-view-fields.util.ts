@@ -94,6 +94,19 @@ export const computeStandardSegmentViewFields = (
         viewFieldGroupName: 'general',
       },
     }),
+    segmentRecordPageFieldsPulledFrom: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'segment',
+      context: {
+        viewName: 'segmentRecordPageFields',
+        viewFieldName: 'pulledFrom',
+        fieldName: 'pulledFrom',
+        position: 2,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
     segmentRecordPageFieldsCreatedAt: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'segment',

@@ -18,6 +18,8 @@ import { ExportRecordsCommand } from '@/command-menu-item/engine-command/record/
 import { AddRecordsToMessageListCommand } from '@/command-menu-item/engine-command/record/components/AddRecordsToMessageListCommand';
 import { SegmentMembershipRecordsCommand } from '@/command-menu-item/engine-command/record/components/SegmentMembershipRecordsCommand';
 import { OpenSegmentRecordsSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/segment/components/OpenSegmentRecordsSingleRecordCommand';
+import { PullAssociatedRecordsIntoSegmentSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/segment/components/PullAssociatedRecordsIntoSegmentSingleRecordCommand';
+import { RefreshSegmentPullSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/segment/components/RefreshSegmentPullSingleRecordCommand';
 import { AddViewToMessageListNoSelectionRecordCommand } from '@/command-menu-item/engine-command/record/no-selection/components/AddViewToMessageListNoSelectionRecordCommand';
 import { RestoreRecordsCommand } from '@/command-menu-item/engine-command/record/components/RestoreRecordsCommand';
 import { TriggerWorkflowVersionEngineCommand } from '@/command-menu-item/engine-command/record/components/TriggerWorkflowVersionEngineCommand';
@@ -96,6 +98,12 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
   ),
   [EngineComponentKey.OPEN_SEGMENT_RECORDS]: (
     <OpenSegmentRecordsSingleRecordCommand />
+  ),
+  [EngineComponentKey.PULL_ASSOCIATED_RECORDS_INTO_SEGMENT]: (
+    <PullAssociatedRecordsIntoSegmentSingleRecordCommand />
+  ),
+  [EngineComponentKey.REFRESH_SEGMENT_PULL]: (
+    <RefreshSegmentPullSingleRecordCommand />
   ),
   [EngineComponentKey.ADD_VIEW_TO_MESSAGE_LIST]: (
     <AddViewToMessageListNoSelectionRecordCommand />

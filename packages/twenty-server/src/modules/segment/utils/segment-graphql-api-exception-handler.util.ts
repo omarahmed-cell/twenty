@@ -18,6 +18,9 @@ export const segmentGraphqlApiExceptionHandler = (error: Error) => {
       case SegmentExceptionCode.SEGMENT_TARGET_OBJECT_MISSING:
       case SegmentExceptionCode.SEGMENT_TARGET_OBJECT_MISMATCH:
       case SegmentExceptionCode.SEGMENT_TOO_MANY_RECORDS:
+      case SegmentExceptionCode.SEGMENT_PULL_RELATION_INVALID:
+      case SegmentExceptionCode.SEGMENT_PULL_TARGET_INVALID:
+      case SegmentExceptionCode.SEGMENT_PULL_NOT_CONFIGURED:
         throw new UserInputError(error);
       case SegmentExceptionCode.SEGMENT_MEMBERSHIP_UPDATE_FAILED:
         throw new InternalServerError(error);

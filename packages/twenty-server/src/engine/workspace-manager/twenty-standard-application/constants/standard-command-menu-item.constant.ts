@@ -1910,4 +1910,50 @@ export const STANDARD_COMMAND_MENU_ITEMS = {
     engineComponentKey: EngineComponentKey.OPEN_SEGMENT_RECORDS,
     hotKeys: null,
   },
+  pullAssociatedRecordsIntoSegment: {
+    universalIdentifier: '86f2b83a-f970-4627-a0b8-81fcde4be482',
+    label: i18nLabel(
+      msg({
+        message: `Pull associated records into a segment`,
+        context: 'commandMenuItem.label',
+      }),
+    ),
+    icon: 'IconArrowMerge',
+    isPinned: false,
+    position: 84,
+    shortLabel: i18nLabel(
+      msg({
+        message: `Pull associated records`,
+        context: 'commandMenuItem.shortLabel',
+      }),
+    ),
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      'targetObjectWritePermissions.segmentMember and numberOfSelectedRecords == 1 and noneDefined(selectedRecords, "deletedAt")',
+    availabilityObjectMetadataUniversalIdentifier:
+      STANDARD_OBJECTS.segment.universalIdentifier,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.PULL_ASSOCIATED_RECORDS_INTO_SEGMENT,
+    hotKeys: null,
+  },
+  refreshSegmentPull: {
+    universalIdentifier: 'a1d032b1-653c-48c9-8abf-6c36ae98dfc0',
+    label: i18nLabel(
+      msg({ message: `Refresh pull`, context: 'commandMenuItem.label' }),
+    ),
+    icon: 'IconRefresh',
+    isPinned: true,
+    position: 85,
+    shortLabel: i18nLabel(
+      msg({ message: `Refresh`, context: 'commandMenuItem.shortLabel' }),
+    ),
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      'targetObjectWritePermissions.segmentMember and numberOfSelectedRecords == 1 and noneDefined(selectedRecords, "deletedAt") and everyDefined(selectedRecords, "pulledFromId")',
+    availabilityObjectMetadataUniversalIdentifier:
+      STANDARD_OBJECTS.segment.universalIdentifier,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.REFRESH_SEGMENT_PULL,
+    hotKeys: null,
+  },
 } as const;

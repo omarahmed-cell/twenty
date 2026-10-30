@@ -4,6 +4,7 @@ import {
   DateDisplayFormat,
   FieldMetadataType,
   NumberDataType,
+  RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
 
@@ -369,6 +370,93 @@ export const buildSegmentStandardFlatFieldMetadatas = ({
       settings: {
         relationType: RelationType.ONE_TO_MANY,
       },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  pulledFrom: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'pulledFrom',
+      label: i18nLabel(
+        msg({ message: `Pulled from`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Segment whose associated records fill this segment`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconArrowMerge',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'segment',
+      targetFieldName: 'pulledSegments',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'pulledFromId',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  pulledSegments: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'pulledSegments',
+      label: i18nLabel(
+        msg({ message: `Pulled segments`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Segments filled from this segment's associated records`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconArrowMerge',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'segment',
+      targetFieldName: 'pulledFrom',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  pullRelationFieldMetadataId: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'pullRelationFieldMetadataId',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Pull relation`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Relation followed from the source segment's records`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconArrowMerge',
+      isSystem: true,
+      isNullable: true,
+      isUIEditable: false,
     },
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,

@@ -137,7 +137,7 @@ export class SegmentMembershipService {
     return { affectedRecordCount: affectedRecordIds.length, memberCount };
   }
 
-  private async addMembers({
+  async addMembers({
     authContext,
     segmentId,
     targetObject,
@@ -206,7 +206,7 @@ export class SegmentMembershipService {
     }, authContext);
   }
 
-  private async removeMembers({
+  async removeMembers({
     authContext,
     segmentId,
     targetObject,

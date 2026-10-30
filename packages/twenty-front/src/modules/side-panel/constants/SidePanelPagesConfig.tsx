@@ -9,6 +9,7 @@ import { SidePanelEmailDesignPage } from '@/side-panel/pages/email-block-setting
 import { SidePanelEmailPageStylePage } from '@/side-panel/pages/email-block-settings/components/SidePanelEmailPageStylePage';
 import { SidePanelAddToMessageListPage } from '@/side-panel/pages/add-to-message-list/components/SidePanelAddToMessageListPage';
 import { SidePanelSegmentMembershipPage } from '@/side-panel/pages/segment-membership/components/SidePanelSegmentMembershipPage';
+import { SidePanelSegmentPullPage } from '@/side-panel/pages/segment-pull/components/SidePanelSegmentPullPage';
 import { SidePanelAskAiPage } from '@/side-panel/pages/ask-ai/components/SidePanelAskAiPage';
 import { SidePanelComposeEmailPage } from '@/side-panel/pages/compose-email/components/SidePanelComposeEmailPage';
 import { SidePanelComposeCalendarEventPage } from '@/side-panel/pages/compose-calendar-event/components/SidePanelComposeCalendarEventPage';
@@ -108,6 +109,7 @@ export const SIDE_PANEL_PAGES_CONFIG = new Map<
   [SidePanelPages.SendCampaignTest, <SidePanelSendCampaignTestPage />],
   [SidePanelPages.AddToMessageList, <SidePanelAddToMessageListPage />],
   [SidePanelPages.SegmentMembership, <SidePanelSegmentMembershipPage />],
+  [SidePanelPages.SegmentPull, <SidePanelSegmentPullPage />],
   [SidePanelPages.EmailBlockSettings, <SidePanelEmailDesignPage />],
   [SidePanelPages.EmailBlockStyle, <SidePanelEmailBlockSettingsPage />],
   [SidePanelPages.EmailPageStyle, <SidePanelEmailPageStylePage />],

@@ -2070,6 +2070,8 @@ export enum EngineComponentKey {
   NAVIGATION = 'NAVIGATION',
   NEW_AI_CHAT = 'NEW_AI_CHAT',
   OPEN_SEGMENT_RECORDS = 'OPEN_SEGMENT_RECORDS',
+  PULL_ASSOCIATED_RECORDS_INTO_SEGMENT = 'PULL_ASSOCIATED_RECORDS_INTO_SEGMENT',
+  REFRESH_SEGMENT_PULL = 'REFRESH_SEGMENT_PULL',
   REMOVE_FROM_FAVORITES = 'REMOVE_FROM_FAVORITES',
   REMOVE_FROM_SEGMENT = 'REMOVE_FROM_SEGMENT',
   REOPEN_AI_CHAT = 'REOPEN_AI_CHAT',
@@ -3332,7 +3334,9 @@ export type Mutation = {
   installApplication: Application;
   /** @deprecated Use installApplication instead */
   installMarketplaceApp: Scalars['Boolean']['output'];
+  pullAssociatedRecordsIntoSegment: SegmentPullResult;
   refreshEnterpriseValidityToken: Scalars['Boolean']['output'];
+  refreshSegmentPull: SegmentPullResult;
   releaseEnterpriseServerBinding: EnterpriseLicenseInfoDto;
   removeAgentChatMessageReaction: Array<AgentMessageReactionSummary>;
   removeQueryFromEventStream: Scalars['Boolean']['output'];
@@ -4195,6 +4199,16 @@ export type MutationInstallApplicationArgs = {
 export type MutationInstallMarketplaceAppArgs = {
   universalIdentifier: Scalars['String']['input'];
   version?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationPullAssociatedRecordsIntoSegmentArgs = {
+  input: PullAssociatedRecordsIntoSegmentInput;
+};
+
+
+export type MutationRefreshSegmentPullArgs = {
+  input: RefreshSegmentPullInput;
 };
 
 
@@ -5408,6 +5422,13 @@ export type PublicWorkspaceDataSummary = {
   logo?: Maybe<Scalars['String']['output']>;
 };
 
+export type PullAssociatedRecordsIntoSegmentInput = {
+  newTargetSegmentName?: InputMaybe<Scalars['String']['input']>;
+  relationFieldMetadataId: Scalars['UUID']['input'];
+  sourceSegmentId: Scalars['UUID']['input'];
+  targetSegmentId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   agentChatOpenThreadsSummary: AgentChatOpenThreadsSummary;
@@ -6171,6 +6192,10 @@ export type RecordTargetInput = {
   recordId: Scalars['UUID']['input'];
 };
 
+export type RefreshSegmentPullInput = {
+  segmentId: Scalars['UUID']['input'];
+};
+
 export type Relation = {
   __typename?: 'Relation';
   sourceFieldMetadata: Field;
@@ -6398,6 +6423,14 @@ export type SearchField = {
   position: Scalars['Float']['output'];
   tsVectorFieldMetadataId: Scalars['UUID']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type SegmentPullResult = {
+  __typename?: 'SegmentPullResult';
+  addedRecordCount: Scalars['Int']['output'];
+  memberCount: Scalars['Int']['output'];
+  removedRecordCount: Scalars['Int']['output'];
+  targetSegmentId: Scalars['UUID']['output'];
 };
 
 export type SendChatMessageResult = {
@@ -8902,6 +8935,20 @@ export type DuplicateMessageListMutationVariables = Exact<{
 
 export type DuplicateMessageListMutation = { __typename?: 'Mutation', duplicateMessageList: { __typename?: 'DuplicatedMessageList', id: string, name?: string | null, description?: string | null, position: number, memberCount: number, createdAt: string, updatedAt: string } };
 
+export type PullAssociatedRecordsIntoSegmentMutationVariables = Exact<{
+  input: PullAssociatedRecordsIntoSegmentInput;
+}>;
+
+
+export type PullAssociatedRecordsIntoSegmentMutation = { __typename?: 'Mutation', pullAssociatedRecordsIntoSegment: { __typename?: 'SegmentPullResult', targetSegmentId: string, addedRecordCount: number, removedRecordCount: number, memberCount: number } };
+
+export type RefreshSegmentPullMutationVariables = Exact<{
+  input: RefreshSegmentPullInput;
+}>;
+
+
+export type RefreshSegmentPullMutation = { __typename?: 'Mutation', refreshSegmentPull: { __typename?: 'SegmentPullResult', targetSegmentId: string, addedRecordCount: number, removedRecordCount: number, memberCount: number } };
+
 export type RemoveRecordsFromSegmentMutationVariables = Exact<{
   input: UpdateSegmentMembershipInput;
 }>;
@@ -11150,6 +11197,8 @@ export const GetWorkspaceCreationDefaultsDocument = {"kind":"Document","definiti
 export const ValidatePasswordResetTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidatePasswordResetToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validatePasswordResetToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"passwordResetToken"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassword"}}]}}]}}]} as unknown as DocumentNode<ValidatePasswordResetTokenQuery, ValidatePasswordResetTokenQueryVariables>;
 export const AddRecordsToSegmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddRecordsToSegment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSegmentMembershipInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addRecordsToSegment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"affectedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}}]}}]}}]} as unknown as DocumentNode<AddRecordsToSegmentMutation, AddRecordsToSegmentMutationVariables>;
 export const DuplicateMessageListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DuplicateMessageList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"duplicateMessageList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<DuplicateMessageListMutation, DuplicateMessageListMutationVariables>;
+export const PullAssociatedRecordsIntoSegmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PullAssociatedRecordsIntoSegment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PullAssociatedRecordsIntoSegmentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pullAssociatedRecordsIntoSegment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"targetSegmentId"}},{"kind":"Field","name":{"kind":"Name","value":"addedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"removedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}}]}}]}}]} as unknown as DocumentNode<PullAssociatedRecordsIntoSegmentMutation, PullAssociatedRecordsIntoSegmentMutationVariables>;
+export const RefreshSegmentPullDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RefreshSegmentPull"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RefreshSegmentPullInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refreshSegmentPull"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"targetSegmentId"}},{"kind":"Field","name":{"kind":"Name","value":"addedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"removedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}}]}}]}}]} as unknown as DocumentNode<RefreshSegmentPullMutation, RefreshSegmentPullMutationVariables>;
 export const RemoveRecordsFromSegmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveRecordsFromSegment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSegmentMembershipInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeRecordsFromSegment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"affectedRecordCount"}},{"kind":"Field","name":{"kind":"Name","value":"memberCount"}}]}}]}}]} as unknown as DocumentNode<RemoveRecordsFromSegmentMutation, RemoveRecordsFromSegmentMutationVariables>;
 export const ResetCommandMenuItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetCommandMenuItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetCommandMenuItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommandMenuItemFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommandMenuItemFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CommandMenuItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"universalIdentifier"}},{"kind":"Field","name":{"kind":"Name","value":"applicationId"}},{"kind":"Field","name":{"kind":"Name","value":"coreWorkflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"workflowVersionId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponentId"}},{"kind":"Field","name":{"kind":"Name","value":"frontComponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isHeadless"}}]}},{"kind":"Field","name":{"kind":"Name","value":"engineComponentKey"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"icon"}},{"kind":"Field","name":{"kind":"Name","value":"shortLabel"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"isPinned"}},{"kind":"Field","name":{"kind":"Name","value":"payload"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"PathCommandMenuItemPayload"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"hotKeys"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalAvailabilityExpression"}},{"kind":"Field","name":{"kind":"Name","value":"conditionalPinnedExpression"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityType"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityObjectMetadataId"}},{"kind":"Field","name":{"kind":"Name","value":"navigationTargetObjectMetadataId"}},{"kind":"Field","name":{"kind":"Name","value":"pageLayoutId"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}}]}}]} as unknown as DocumentNode<ResetCommandMenuItemMutation, ResetCommandMenuItemMutationVariables>;
 export const TriggerAddPeopleToMessageListJobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TriggerAddPeopleToMessageListJob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TriggerAddPeopleToMessageListJobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggerAddPeopleToMessageListJob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"jobId"}}]}}]}}]} as unknown as DocumentNode<TriggerAddPeopleToMessageListJobMutation, TriggerAddPeopleToMessageListJobMutationVariables>;

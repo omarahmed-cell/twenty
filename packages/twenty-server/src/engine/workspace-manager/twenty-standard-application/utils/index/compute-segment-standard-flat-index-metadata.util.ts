@@ -31,4 +31,16 @@ export const buildSegmentStandardFlatIndexMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  pulledFromIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'pulledFromIdIndex',
+      relatedFieldNames: ['pulledFrom'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });
