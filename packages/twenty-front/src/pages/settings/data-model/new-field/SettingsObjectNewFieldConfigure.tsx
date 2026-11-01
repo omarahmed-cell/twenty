@@ -9,6 +9,10 @@ import { FIELD_NAME_MAXIMUM_LENGTH } from '@/settings/data-model/constants/Field
 import { SettingsObjectNewFieldHeaderIcon } from '@/settings/data-model/fields/components/SettingsObjectNewFieldHeaderIcon';
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
+import {
+  SettingsDataModelFieldSyncForm,
+  type SettingsDataModelFieldSyncFormValue,
+} from '@/settings/data-model/fields/forms/sync/components/SettingsDataModelFieldSyncForm';
 import { settingsFieldFormSchema } from '@/settings/data-model/fields/forms/validation-schemas/settingsFieldFormSchema';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -22,7 +26,12 @@ import {
   type RelationCreationPayload,
   SettingsPath,
 } from 'twenty-shared/types';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import {
+  getFieldSyncTargetFieldType,
+  getSettingsPath,
+  isDefined,
+} from 'twenty-shared/utils';
+import { v4 } from 'uuid';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
 import { Button } from 'twenty-ui/primitives/input';
@@ -52,6 +61,7 @@ export const SettingsObjectNewFieldConfigure = () => {
   const fieldType =
     (searchParams.get('fieldType') as FieldMetadataType) ||
     FieldMetadataType.TEXT;
+  const isSyncMode = searchParams.get('sync') === 'true';
   const { enqueueToast } = useToast();
 
   const { findObjectMetadataItemByNamePlural } =
@@ -76,6 +86,8 @@ export const SettingsObjectNewFieldConfigure = () => {
         DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ?? DEFAULT_ICON_FOR_NEW_FIELD,
       label: '',
       name: '',
+      // The text settings card that normally fills this is not rendered for synced fields.
+      ...(isSyncMode ? { settings: { displayedMaxRows: null } } : {}),
     },
   });
 
@@ -87,6 +99,9 @@ export const SettingsObjectNewFieldConfigure = () => {
   }, [fieldType, formConfig]);
 
   const [isSaving, setIsSaving] = useState(false);
+
+  const [syncFormValue, setSyncFormValue] =
+    useState<SettingsDataModelFieldSyncFormValue>({});
 
   useEffect(() => {
     if (
@@ -107,7 +122,11 @@ export const SettingsObjectNewFieldConfigure = () => {
 
   const { isValid, isSubmitting } = formConfig.formState;
 
-  const canSave = isValid && !isSubmitting && !isDDLLocked;
+  const canSave =
+    isValid &&
+    !isSubmitting &&
+    !isDDLLocked &&
+    (!isSyncMode || isDefined(syncFormValue.sourceField));
 
   const handleSave = async (
     formValues: SettingsDataModelNewFieldFormValues,
@@ -124,6 +143,47 @@ export const SettingsObjectNewFieldConfigure = () => {
       }
       setIsSaving(false);
     };
+
+    const syncSourceField = syncFormValue.sourceField;
+    const syncTargetFieldType = isDefined(syncSourceField)
+      ? getFieldSyncTargetFieldType(syncSourceField.type)
+      : undefined;
+
+    if (
+      isSyncMode &&
+      isDefined(syncSourceField) &&
+      isDefined(syncTargetFieldType) &&
+      isDefined(syncFormValue.relationFieldMetadataId)
+    ) {
+      const creationResult = await createMetadataField({
+        ...formValues,
+        type: syncTargetFieldType,
+        defaultValue: null,
+        isUnique: false,
+        isUIEditable: false,
+        options:
+          syncTargetFieldType === FieldMetadataType.TEXT
+            ? undefined
+            : (syncSourceField.options ?? []).map(
+                ({ label, value, color, position }) => ({
+                  id: v4(),
+                  label,
+                  value,
+                  color,
+                  position,
+                }),
+              ),
+        settings: {
+          sync: {
+            relationFieldMetadataId: syncFormValue.relationFieldMetadataId,
+            sourceFieldMetadataId: syncSourceField.id,
+          },
+        },
+        objectMetadataId: activeObjectMetadataItem.id,
+      });
+
+      return createCleanUp(creationResult);
+    }
 
     if (formValues.type !== FieldMetadataType.MORPH_RELATION) {
       const creationResult = await createMetadataField({
@@ -248,17 +308,31 @@ export const SettingsObjectNewFieldConfigure = () => {
               isCreationMode={true}
             />
           </Section.Root>
-          <Section.Root>
-            <Section.Header
-              title={t`Customization`}
-              description={t`Customize field settings`}
-            />
-            <SettingsDataModelFieldSettingsFormCard
-              fieldType={fieldType}
-              existingFieldMetadataId=""
-              objectNameSingular={activeObjectMetadataItem.nameSingular}
-            />
-          </Section.Root>
+          {isSyncMode ? (
+            <Section.Root>
+              <Section.Header
+                title={t`Sync`}
+                description={t`Mirror a property of an associated record`}
+              />
+              <SettingsDataModelFieldSyncForm
+                objectMetadataItem={activeObjectMetadataItem}
+                value={syncFormValue}
+                onChange={setSyncFormValue}
+              />
+            </Section.Root>
+          ) : (
+            <Section.Root>
+              <Section.Header
+                title={t`Customization`}
+                description={t`Customize field settings`}
+              />
+              <SettingsDataModelFieldSettingsFormCard
+                fieldType={fieldType}
+                existingFieldMetadataId=""
+                objectNameSingular={activeObjectMetadataItem.nameSingular}
+              />
+            </Section.Root>
+          )}
         </SettingsPageContainer>
       </SettingsPageLayout>
     </FormProvider>

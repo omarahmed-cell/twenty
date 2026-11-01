@@ -1,5 +1,6 @@
 import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
+import { type FieldMetadataSyncSettings } from '@/types/FieldMetadataSyncSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
 import { type IsExactly } from '@/types/IsExactly';
 import { type RelationOnDeleteAction } from '@/types/RelationOnDeleteAction';
@@ -39,6 +40,11 @@ type FieldMetadataCurrencySettings = {
 
 type FieldMetadataTextSettings = {
   displayedMaxRows?: number;
+  sync?: FieldMetadataSyncSettings;
+};
+
+type FieldMetadataSelectSettings = {
+  sync?: FieldMetadataSyncSettings;
 };
 
 type FieldMetadataDateSettings = {
@@ -76,6 +82,8 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.DATE]: FieldMetadataDateSettings | null;
   [FieldMetadataType.DATE_TIME]: FieldMetadataDateTimeSettings | null;
   [FieldMetadataType.TEXT]: FieldMetadataTextSettings | null;
+  [FieldMetadataType.SELECT]: FieldMetadataSelectSettings | null;
+  [FieldMetadataType.MULTI_SELECT]: FieldMetadataSelectSettings | null;
   [FieldMetadataType.RELATION]: FieldMetadataRelationSettings;
   [FieldMetadataType.ADDRESS]: FieldMetadataAddressSettings | null;
   [FieldMetadataType.MORPH_RELATION]: FieldMetadataRelationSettings;

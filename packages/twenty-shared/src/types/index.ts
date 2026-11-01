@@ -134,6 +134,11 @@ export {
   DateDisplayFormat,
   FIELD_LINKS_VARIANTS,
 } from './FieldMetadataSettings';
+export type {
+  FieldSyncPolicy,
+  FieldMetadataSyncSettings,
+} from './FieldMetadataSyncSettings';
+export { FIELD_SYNC_POLICIES } from './FieldMetadataSyncSettings';
 export { FieldMetadataType } from './FieldMetadataType';
 export type { FieldMetadataUniversalSettings } from './FieldMetadataUniversalSettings';
 export type { FieldRatingValue } from './FieldRatingValue';

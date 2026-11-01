@@ -4,6 +4,7 @@ import {
   type HasAllProperties,
 } from 'twenty-shared/testing';
 import {
+  type FieldMetadataSyncSettings,
   type FieldMetadataType,
   type FieldNumberVariant,
   type NullablePartial,
@@ -120,6 +121,7 @@ type SettingsExpectedResult =
     }
   | {
       displayedMaxRows?: number | undefined;
+      sync?: FieldMetadataSyncSettings | undefined;
       __JsonbPropertyBrand__?: undefined;
     }
   | null;

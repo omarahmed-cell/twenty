@@ -114,8 +114,6 @@ type NotDefinedSettings = {
 type SettingsAssertions = [
   Expect<HasAllProperties<FullNameFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<RatingFieldMetadata, NotDefinedSettings>>,
-  Expect<HasAllProperties<SelectFieldMetadata, NotDefinedSettings>>,
-  Expect<HasAllProperties<MultiSelectFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<PositionFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<RawJsonFieldMetadata, NotDefinedSettings>>,
   Expect<HasAllProperties<ActorFieldMetadata, NotDefinedSettings>>,

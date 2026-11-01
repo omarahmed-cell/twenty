@@ -27,6 +27,7 @@ export const useFieldMetadataItem = () => {
       | 'isUnique'
     > & {
       objectMetadataId: string;
+      isUIEditable?: boolean;
       relationCreationPayload?: RelationCreationPayload;
       morphRelationsCreationPayload?: RelationCreationPayload[];
     },
@@ -42,6 +43,7 @@ export const useFieldMetadataItem = () => {
       isLabelSyncedWithName: formattedInput.isLabelSyncedWithName ?? true,
       relationCreationPayload: input.relationCreationPayload,
       morphRelationsCreationPayload: input.morphRelationsCreationPayload,
+      isUIEditable: input.isUIEditable,
     });
   };
 

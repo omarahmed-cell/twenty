@@ -64,6 +64,8 @@ export { CustomError } from './errors/CustomError';
 export { evalFromContext } from './evalFromContext';
 export { getEventLogRetentionInHours } from './event-logs/getEventLogRetentionInHours';
 export { extractAndSanitizeObjectStringFields } from './extractAndSanitizeObjectStringFields';
+export type { FieldSyncTargetFieldType } from './field-sync/getFieldSyncTargetFieldType';
+export { getFieldSyncTargetFieldType } from './field-sync/getFieldSyncTargetFieldType';
 export { computeMorphRelationGqlFieldName } from './fieldMetadata/compute-morph-relation-gql-field-name';
 export {
   computeRelationGqlFieldJoinColumnName,
