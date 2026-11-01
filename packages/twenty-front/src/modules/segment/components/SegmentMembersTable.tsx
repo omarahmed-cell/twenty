@@ -4,6 +4,7 @@ import { RecordIndexTableContainerEffect } from '@/object-record/record-index/co
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { scopeRecordFiltersComponentState } from '@/object-record/record-filter/states/scopeRecordFiltersComponentState';
 import { RecordTableWithWrappers } from '@/object-record/record-table/components/RecordTableWithWrappers';
+import { SegmentMembersTableStatesEffect } from '@/segment/components/SegmentMembersTableStatesEffect';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { styled } from '@linaria/react';
 import { isNonEmptyArray } from 'twenty-shared/utils';
@@ -28,6 +29,7 @@ export const SegmentMembersTable = () => {
 
   return (
     <>
+      <SegmentMembersTableStatesEffect />
       <RecordIndexTableContainerEffect />
       <RecordIndexFiltersToContextStoreEffect />
       <RecordIndexContainerContextStoreNumberOfSelectedRecordsEffect />

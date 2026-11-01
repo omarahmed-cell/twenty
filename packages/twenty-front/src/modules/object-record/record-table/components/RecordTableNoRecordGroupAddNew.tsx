@@ -3,6 +3,7 @@ import { hasAnySoftDeleteFilterOnViewComponentSelector } from '@/object-record/r
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { useCreateNewIndexRecord } from '@/object-record/record-table/hooks/useCreateNewIndexRecord';
+import { isRecordTableAddNewRowHiddenComponentState } from '@/object-record/record-table/states/isRecordTableAddNewRowHiddenComponentState';
 import { isRecordTableCellsNonEditableComponentState } from '@/object-record/record-table/states/isRecordTableCellsNonEditableComponentState';
 import { RecordTableActionRow } from '@/object-record/record-table/record-table-row/components/RecordTableActionRow';
 import { RecordTableWidgetJunctionAddNewRow } from '@/object-record/record-table-widget/components/RecordTableWidgetJunctionAddNewRow';
@@ -29,6 +30,10 @@ export const RecordTableNoRecordGroupAddNew = () => {
 
   const isRecordTableCellsNonEditable = useAtomComponentStateValue(
     isRecordTableCellsNonEditableComponentState,
+  );
+
+  const isRecordTableAddNewRowHidden = useAtomComponentStateValue(
+    isRecordTableAddNewRowHiddenComponentState,
   );
 
   const { createNewIndexRecord } = useCreateNewIndexRecord({
@@ -78,7 +83,7 @@ export const RecordTableNoRecordGroupAddNew = () => {
     ],
   );
 
-  if (isRecordTableCellsNonEditable) {
+  if (isRecordTableCellsNonEditable || isRecordTableAddNewRowHidden) {
     return null;
   }
 
