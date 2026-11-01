@@ -1,6 +1,7 @@
 import { FormFieldInputContainer } from '@/ui/input/components/FormFieldInputContainer';
 import { FormFieldInputInnerContainer } from '@/object-record/record-field/ui/form-types/components/FormFieldInputInnerContainer';
 import { FormFieldInputRowContainer } from '@/object-record/record-field/ui/form-types/components/FormFieldInputRowContainer';
+import { ActionExecutionDateChip } from '@/object-record/record-field/ui/form-types/components/ActionExecutionDateChip';
 import { VariableChipStandalone } from '@/object-record/record-field/ui/form-types/components/VariableChipStandalone';
 import { type VariablePickerComponent } from '@/ui/input/types/VariablePickerComponent';
 import { Field } from 'twenty-ui/primitives/input';
@@ -15,7 +16,12 @@ import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotke
 import { ParentClickOutsideIdContext } from '@/ui/utilities/pointer-event/contexts/ParentClickOutsideIdContext';
 import { useListenClickOutside } from '@/ui/utilities/pointer-event/hooks/useListenClickOutside';
 
-import { isStandaloneVariableString } from 'twenty-shared/workflow';
+import {
+  isStandaloneVariableString,
+  WORKFLOW_ACTION_EXECUTION_DATE_TOKEN,
+} from 'twenty-shared/workflow';
+import { IconClockPlay } from 'twenty-ui/icon';
+import { useLingui } from '@lingui/react/macro';
 import {
   FloatingPortal,
   autoUpdate,
@@ -57,7 +63,7 @@ type DraftValue =
       mode: 'view' | 'edit';
     }
   | {
-      type: 'variable';
+      type: 'variable' | 'actionExecutionDate';
       value: string;
     };
 
@@ -70,6 +76,7 @@ type FormDateTimeFieldInputProps = {
   readonly?: boolean;
   timeZone?: string;
   variant?: FormFieldInputVariant;
+  canUseActionExecutionDate?: boolean;
 };
 
 export const FormDateTimeFieldInput = ({
@@ -80,20 +87,24 @@ export const FormDateTimeFieldInput = ({
   readonly,
   timeZone,
   variant = 'default',
+  canUseActionExecutionDate = false,
 }: FormDateTimeFieldInputProps) => {
+  const { t } = useLingui();
   const instanceId = useId();
 
   const [draftValue, setDraftValue] = useState<DraftValue>(
-    isStandaloneVariableString(defaultValue)
-      ? {
-          type: 'variable',
-          value: defaultValue,
-        }
-      : {
-          type: 'static',
-          value: defaultValue !== 'null' ? (defaultValue ?? null) : null,
-          mode: 'view',
-        },
+    defaultValue === WORKFLOW_ACTION_EXECUTION_DATE_TOKEN
+      ? { type: 'actionExecutionDate', value: defaultValue }
+      : isStandaloneVariableString(defaultValue)
+        ? {
+            type: 'variable',
+            value: defaultValue,
+          }
+        : {
+            type: 'static',
+            value: defaultValue !== 'null' ? (defaultValue ?? null) : null,
+            mode: 'view',
+          },
   );
 
   const datePickerWrapperRef = useRef<HTMLDivElement>(null);
@@ -218,6 +229,15 @@ export const FormDateTimeFieldInput = ({
     onChange(variableName);
   };
 
+  const handleActionExecutionDateSelect = () => {
+    setDraftValue({
+      type: 'actionExecutionDate',
+      value: WORKFLOW_ACTION_EXECUTION_DATE_TOKEN,
+    });
+
+    onChange(WORKFLOW_ACTION_EXECUTION_DATE_TOKEN);
+  };
+
   const handleUnlinkVariable = () => {
     setDraftValue({
       type: 'static',
@@ -237,7 +257,9 @@ export const FormDateTimeFieldInput = ({
 
   const { userTimezone } = useUserTimezone();
 
-  const isVariable = Boolean(isStandaloneVariableString(defaultValue));
+  const isVariable =
+    Boolean(isStandaloneVariableString(defaultValue)) ||
+    defaultValue === WORKFLOW_ACTION_EXECUTION_DATE_TOKEN;
 
   const dateValue =
     isVariable ||
@@ -281,6 +303,10 @@ export const FormDateTimeFieldInput = ({
                   variant={variant}
                 />
               </StyledDateInputTextContainer>
+            ) : draftValue.type === 'actionExecutionDate' ? (
+              <ActionExecutionDateChip
+                onRemove={readonly ? undefined : handleUnlinkVariable}
+              />
             ) : (
               <VariableChipStandalone
                 rawVariableName={draftValue.value}
@@ -311,6 +337,15 @@ export const FormDateTimeFieldInput = ({
                     onEnter={handlePickerEnter}
                     onEscape={handlePickerEscape}
                     onClear={handlePickerClear}
+                    footerAction={
+                      canUseActionExecutionDate
+                        ? {
+                            label: t`Date the action was executed`,
+                            Icon: IconClockPlay,
+                            onClick: handleActionExecutionDateSelect,
+                          }
+                        : undefined
+                    }
                     hideHeaderInput
                     timeZone={timeZone}
                   />

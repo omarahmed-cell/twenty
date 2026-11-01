@@ -301,6 +301,7 @@ export const WorkflowEditActionUpsertRecord = ({
               }}
               VariablePicker={WorkflowVariablePicker}
               readonly={isFormDisabled}
+              canUseActionExecutionDate
             />
           );
         })}

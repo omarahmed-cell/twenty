@@ -14,6 +14,7 @@ import { filterValidFieldsInRecord } from 'src/modules/workflow/workflow-executo
 import { formatWorkflowRecordRelationFields } from 'src/modules/workflow/workflow-executor/utils/format-workflow-record-relation-fields.util';
 import { findStepOrThrow } from 'src/modules/workflow/workflow-executor/utils/find-step-or-throw.util';
 import { convertStepObjectRecordTipTapToMarkdown } from 'src/modules/workflow/workflow-executor/utils/convert-step-object-record-tiptap-to-markdown.util';
+import { resolveActionExecutionDateFields } from 'src/modules/workflow/workflow-executor/utils/resolve-action-execution-date-fields.util';
 import { resolveRichTextMarkdownVariables } from 'src/modules/workflow/workflow-executor/utils/resolve-rich-text-markdown-variables.util';
 import { type WorkflowCreateRecordActionInput } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/types/workflow-record-crud-action-input.type';
 
@@ -48,13 +49,17 @@ export class CreateRecordWorkflowAction implements WorkflowAction {
 
     const inputWithRichText = {
       ...rawInput,
-      objectRecord: resolveRichTextMarkdownVariables(
-        convertStepObjectRecordTipTapToMarkdown(
-          rawInput.objectRecord,
+      objectRecord: resolveActionExecutionDateFields(
+        resolveRichTextMarkdownVariables(
+          convertStepObjectRecordTipTapToMarkdown(
+            rawInput.objectRecord,
+            objectMetadataInfo,
+          ),
           objectMetadataInfo,
+          context,
         ),
         objectMetadataInfo,
-        context,
+        new Date(),
       ),
     };
 

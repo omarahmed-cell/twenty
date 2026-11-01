@@ -241,6 +241,7 @@ export const WorkflowEditActionCreateRecord = ({
               }}
               VariablePicker={WorkflowVariablePicker}
               readonly={isFormDisabled}
+              canUseActionExecutionDate
             />
           );
         })}

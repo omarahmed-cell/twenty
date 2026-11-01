@@ -77,6 +77,7 @@ type FormFieldInputProps = {
   onError?: (error: string | undefined) => void;
   timeZone?: string;
   settings?: FormFieldInputSettings;
+  canUseActionExecutionDate?: boolean;
 };
 
 export const FormFieldInput = ({
@@ -92,6 +93,7 @@ export const FormFieldInput = ({
   onError,
   timeZone,
   settings,
+  canUseActionExecutionDate,
 }: FormFieldInputProps) => {
   return isFieldNumber(field) || field.type === FieldMetadataType.NUMERIC ? (
     <FormNumberFieldInput
@@ -194,6 +196,7 @@ export const FormFieldInput = ({
       VariablePicker={VariablePicker}
       readonly={readonly}
       placeholder={placeholder}
+      canUseActionExecutionDate={canUseActionExecutionDate}
     />
   ) : isFieldDateTime(field) ? (
     <FormDateTimeFieldInput
@@ -203,6 +206,7 @@ export const FormFieldInput = ({
       VariablePicker={VariablePicker}
       readonly={readonly}
       timeZone={timeZone}
+      canUseActionExecutionDate={canUseActionExecutionDate}
     />
   ) : isFieldMultiSelect(field) ? (
     <FormMultiSelectFieldInput

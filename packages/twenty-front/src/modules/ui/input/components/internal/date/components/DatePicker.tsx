@@ -28,6 +28,7 @@ import {
   type RelativeDateFilter,
 } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
+import { type DatePickerFooterAction } from '@/ui/input/components/internal/date/types/DatePickerFooterAction';
 import { IconCalendarX } from 'twenty-ui/icon';
 import { Text } from 'twenty-ui/primitives/typography';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
@@ -91,6 +92,7 @@ type DatePickerProps = {
   keyboardEventsDisabled?: boolean;
   onClear?: () => void;
   hideCalendar?: boolean;
+  footerAction?: DatePickerFooterAction;
 };
 
 // react-datepicker v9 types its props as a discriminated union keyed on
@@ -126,6 +128,7 @@ export const DatePicker = ({
   relativeDate,
   onRelativeDateChange,
   hideHeaderInput,
+  footerAction,
 }: DatePickerProps) => {
   const theme = useTheme();
   const plainDate = isDefined(plainDateString)
@@ -285,6 +288,14 @@ export const DatePicker = ({
           />
         </Suspense>
       </div>
+      {isDefined(footerAction) && (
+        <StyledButtonContainer onClick={footerAction.onClick}>
+          <StyledButtonContent>
+            <footerAction.Icon size={theme.icon.size.md} />
+            <Text>{footerAction.label}</Text>
+          </StyledButtonContent>
+        </StyledButtonContainer>
+      )}
       {clearable && (
         <StyledButtonContainer onClick={() => onClear?.()}>
           <StyledButtonContent>

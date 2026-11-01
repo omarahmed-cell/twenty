@@ -20,6 +20,7 @@ import { SKELETON_HEIGHT_SIZES } from 'twenty-ui/primitives/feedback';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
+import { type DatePickerFooterAction } from '@/ui/input/components/internal/date/types/DatePickerFooterAction';
 import { IconCalendarX } from 'twenty-ui/icon';
 import { Text } from 'twenty-ui/primitives/typography';
 
@@ -102,6 +103,7 @@ type DateTimePickerProps = {
   keyboardEventsDisabled?: boolean;
   onClear?: () => void;
   timeZone?: string;
+  footerAction?: DatePickerFooterAction;
 };
 
 // react-datepicker v9 types its props as a discriminated union keyed on
@@ -138,6 +140,7 @@ export const DateTimePicker = ({
   onRelativeDateChange,
   hideHeaderInput,
   timeZone,
+  footerAction,
 }: DateTimePickerProps) => {
   const theme = useTheme();
   const { userFirstDayOfTheWeek } = useUserFirstDayOfTheWeek();
@@ -334,6 +337,17 @@ export const DateTimePicker = ({
               }
             />
           </Suspense>
+        )}
+        {isDefined(footerAction) && (
+          <>
+            <StyledSeparator />
+            <StyledButtonContainer onClick={footerAction.onClick}>
+              <StyledButtonContent>
+                <footerAction.Icon size={theme.icon.size.md} />
+                <Text>{footerAction.label}</Text>
+              </StyledButtonContent>
+            </StyledButtonContainer>
+          </>
         )}
         {clearable && (
           <>
