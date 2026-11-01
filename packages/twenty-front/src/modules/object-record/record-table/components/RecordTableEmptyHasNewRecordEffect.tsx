@@ -5,6 +5,7 @@ import { turnSortsIntoOrderBy } from '@/object-record/object-sort-dropdown/utils
 import { currentRecordFilterGroupsComponentState } from '@/object-record/record-filter-group/states/currentRecordFilterGroupsComponentState';
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { scopeRecordFiltersComponentState } from '@/object-record/record-filter/states/scopeRecordFiltersComponentState';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { recordIndexHasRecordsComponentSelector } from '@/object-record/record-index/states/selectors/recordIndexHasRecordsComponentSelector';
 import { currentRecordSortsComponentState } from '@/object-record/record-sort/states/currentRecordSortsComponentState';
@@ -48,6 +49,10 @@ export const RecordTableEmptyHasNewRecordEffect = () => {
     currentRecordFiltersComponentState,
   );
 
+  const scopeRecordFilters = useAtomComponentStateValue(
+    scopeRecordFiltersComponentState,
+  );
+
   const currentRecordSorts = useAtomComponentStateValue(
     currentRecordSortsComponentState,
   );
@@ -64,7 +69,7 @@ export const RecordTableEmptyHasNewRecordEffect = () => {
       variables: {
         filter: computeRecordGqlOperationFilter({
           fieldMetadataItems: flattenedFieldMetadataItems,
-          recordFilters: currentRecordFilters,
+          recordFilters: [...currentRecordFilters, ...scopeRecordFilters],
           recordFilterGroups: currentRecordFilterGroups,
           filterValueDependencies,
         }),
@@ -74,6 +79,7 @@ export const RecordTableEmptyHasNewRecordEffect = () => {
     [
       objectMetadataItem,
       currentRecordFilters,
+      scopeRecordFilters,
       currentRecordFilterGroups,
       filterValueDependencies,
       currentRecordSorts,

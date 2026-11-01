@@ -8,6 +8,7 @@ import { currentRecordFilterGroupsComponentState } from '@/object-record/record-
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
 import { anyFieldFilterValueComponentState } from '@/object-record/record-filter/states/anyFieldFilterValueComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { scopeRecordFiltersComponentState } from '@/object-record/record-filter/states/scopeRecordFiltersComponentState';
 import { useRecordGroupFilter } from '@/object-record/record-group/hooks/useRecordGroupFilter';
 import { getRecordAggregateDisplayLabel } from '@/object-record/record-index/utils/getRecordndexAggregateDisplayLabel';
 import { useListenToJunctionRecordOperation } from '@/object-record/record-table-widget/hooks/useListenToJunctionRecordOperation';
@@ -48,6 +49,10 @@ export const useAggregateRecordsForRecordTableColumnFooter = (
     currentRecordFiltersComponentState,
   );
 
+  const scopeRecordFilters = useAtomComponentStateValue(
+    scopeRecordFiltersComponentState,
+  );
+
   const dateLocale = useAtomStateValue(dateLocaleState);
 
   const flattenedFieldMetadataItems = useAtomStateValue(
@@ -60,7 +65,7 @@ export const useAggregateRecordsForRecordTableColumnFooter = (
     fieldMetadataItems: flattenedFieldMetadataItems,
     filterValueDependencies,
     recordFilterGroups: currentRecordFilterGroups,
-    recordFilters: currentRecordFilters,
+    recordFilters: [...currentRecordFilters, ...scopeRecordFilters],
   });
 
   const { viewFieldId } = useContext(

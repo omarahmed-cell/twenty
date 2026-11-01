@@ -12,7 +12,12 @@ import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/h
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useStore } from 'jotai';
 import { useCallback } from 'react';
-import { AppPath, OpenRecordIn, SidePanelPages } from 'twenty-shared/types';
+import {
+  AppPath,
+  CoreObjectNameSingular,
+  OpenRecordIn,
+  SidePanelPages,
+} from 'twenty-shared/types';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 
 export const useOpenRecordFromIndexView = () => {
@@ -44,7 +49,13 @@ export const useOpenRecordFromIndexView = () => {
   const store = useStore();
 
   const openRecordFromIndexView = useCallback(
-    ({ recordId }: { recordId: string }) => {
+    ({
+      recordId,
+      isOpenRecordButtonClick = false,
+    }: {
+      recordId: string;
+      isOpenRecordButtonClick?: boolean;
+    }) => {
       const parentViewFilters = store.get(currentRecordFilters);
 
       const parentViewSorts = store.get(currentRecordSorts);
@@ -82,7 +93,13 @@ export const useOpenRecordFromIndexView = () => {
         return;
       }
 
-      if (openRecordIn === OpenRecordIn.SIDE_PANEL) {
+      // A segment's page is its members list, so only the open button shows its details panel.
+      const shouldOpenInSidePanel =
+        objectNameSingular === CoreObjectNameSingular.Segment
+          ? isOpenRecordButtonClick
+          : openRecordIn === OpenRecordIn.SIDE_PANEL;
+
+      if (shouldOpenInSidePanel) {
         const sidePanelPageInstanceId = openRecordInSidePanel({
           recordId,
           objectNameSingular,

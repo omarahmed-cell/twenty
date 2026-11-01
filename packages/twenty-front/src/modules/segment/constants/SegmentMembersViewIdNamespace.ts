@@ -1,0 +1,2 @@
+export const SEGMENT_MEMBERS_VIEW_ID_NAMESPACE =
+  '2096fafb-eea6-4a00-8e64-33915642e85f';

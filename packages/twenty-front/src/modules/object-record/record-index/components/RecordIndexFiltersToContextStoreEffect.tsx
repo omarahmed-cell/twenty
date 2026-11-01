@@ -10,6 +10,7 @@ import { orderRecordIdsBySelection } from '@/context-store/utils/orderRecordIdsB
 import { currentRecordFilterGroupsComponentState } from '@/object-record/record-filter-group/states/currentRecordFilterGroupsComponentState';
 import { anyFieldFilterValueComponentState } from '@/object-record/record-filter/states/anyFieldFilterValueComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { scopeRecordFiltersComponentState } from '@/object-record/record-filter/states/scopeRecordFiltersComponentState';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { recordIndexAllRecordIdsComponentSelector } from '@/object-record/record-index/states/selectors/recordIndexAllRecordIdsComponentSelector';
 import { hasUserSelectedAllRecordsComponentState } from '@/object-record/record-selection/states/hasUserSelectedAllRecordsComponentState';
@@ -26,6 +27,11 @@ export const RecordIndexFiltersToContextStoreEffect = () => {
 
   const currentRecordFilters = useAtomComponentStateValue(
     currentRecordFiltersComponentState,
+    recordIndexId,
+  );
+
+  const scopeRecordFilters = useAtomComponentStateValue(
+    scopeRecordFiltersComponentState,
     recordIndexId,
   );
 
@@ -111,7 +117,10 @@ export const RecordIndexFiltersToContextStoreEffect = () => {
       }),
     );
 
-    setIfChanged(contextStoreFiltersAtom, currentRecordFilters);
+    setIfChanged(contextStoreFiltersAtom, [
+      ...currentRecordFilters,
+      ...scopeRecordFilters,
+    ]);
     setIfChanged(contextStoreFilterGroupsAtom, currentRecordFilterGroups);
     setIfChanged(contextStoreAnyFieldFilterValueAtom, anyFieldFilterValue);
 
@@ -132,6 +141,7 @@ export const RecordIndexFiltersToContextStoreEffect = () => {
     contextStoreTargetedRecordsRuleAtom,
     currentRecordFilterGroups,
     currentRecordFilters,
+    scopeRecordFilters,
     hasUserSelectedAllRecords,
     recordIndexAllRecordIds,
     selectedRecordIds,

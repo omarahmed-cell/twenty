@@ -12,14 +12,10 @@ import {
 import { getErrorMessageFromApolloError } from '~/utils/get-error-message-from-apollo-error.util';
 
 type UseUpdateSegmentMembershipArgs = {
-  segmentId: string | null;
-  request: SegmentMembershipRequest;
   onCompleted: () => void;
 };
 
 export const useUpdateSegmentMembership = ({
-  segmentId,
-  request,
   onCompleted,
 }: UseUpdateSegmentMembershipArgs) => {
   const { enqueueToast } = useToast();
@@ -31,7 +27,13 @@ export const useUpdateSegmentMembership = ({
     RemoveRecordsFromSegmentDocument,
   );
 
-  const updateSegmentMembership = async (): Promise<void> => {
+  const updateSegmentMembership = async ({
+    segmentId,
+    request,
+  }: {
+    segmentId: string | null;
+    request: SegmentMembershipRequest;
+  }): Promise<void> => {
     if (!isDefined(segmentId)) {
       return;
     }

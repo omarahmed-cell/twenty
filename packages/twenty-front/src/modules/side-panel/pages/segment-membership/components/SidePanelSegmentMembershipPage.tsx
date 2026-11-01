@@ -52,7 +52,9 @@ export const SidePanelSegmentMembershipPage = () => {
   const { t } = useLingui();
   const { closeSidePanelMenu } = useSidePanelMenu();
 
-  const targetObject = getSegmentTargetObject(segmentMembershipRequest.objectNameSingular);
+  const targetObject = getSegmentTargetObject(
+    segmentMembershipRequest.objectNameSingular,
+  );
 
   const { records: segments, loading } =
     useFindManyRecords<SegmentOptionRecord>({
@@ -64,8 +66,6 @@ export const SidePanelSegmentMembershipPage = () => {
     });
 
   const { updateSegmentMembership, isUpdating } = useUpdateSegmentMembership({
-    segmentId,
-    request: segmentMembershipRequest,
     onCompleted: closeSidePanelMenu,
   });
 
@@ -112,7 +112,12 @@ export const SidePanelSegmentMembershipPage = () => {
             startIcon={isAdd ? <IconPlaylistAdd /> : <IconMinus />}
             loading={isUpdating}
             disabled={isUpdating || !isDefined(segmentId)}
-            onClick={updateSegmentMembership}
+            onClick={() =>
+              updateSegmentMembership({
+                segmentId,
+                request: segmentMembershipRequest,
+              })
+            }
             variant="solid"
             color={isAdd ? 'accent' : 'danger'}
           >

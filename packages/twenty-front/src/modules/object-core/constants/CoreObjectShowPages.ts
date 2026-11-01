@@ -21,4 +21,14 @@ export const CORE_OBJECT_SHOW_PAGES: ReadonlyMap<
       ),
     ),
   ],
+  [
+    CoreObjectNameSingular.Segment,
+    lazy(() =>
+      import('~/pages/object-core/SegmentCoreObjectShowPage').then(
+        (module) => ({
+          default: module.SegmentCoreObjectShowPage,
+        }),
+      ),
+    ),
+  ],
 ]);

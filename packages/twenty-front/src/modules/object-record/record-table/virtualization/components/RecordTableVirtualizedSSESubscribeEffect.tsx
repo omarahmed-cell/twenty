@@ -5,6 +5,7 @@ import { turnSortsIntoOrderBy } from '@/object-record/object-sort-dropdown/utils
 import { currentRecordFilterGroupsComponentState } from '@/object-record/record-filter-group/states/currentRecordFilterGroupsComponentState';
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { scopeRecordFiltersComponentState } from '@/object-record/record-filter/states/scopeRecordFiltersComponentState';
 import { useRefetchAggregateQueriesForObjectMetadataItem } from '@/object-record/hooks/useRefetchAggregateQueriesForObjectMetadataItem';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { currentRecordSortsComponentState } from '@/object-record/record-sort/states/currentRecordSortsComponentState';
@@ -45,6 +46,10 @@ export const RecordTableVirtualizedSSESubscribeEffect = () => {
     currentRecordFiltersComponentState,
   );
 
+  const scopeRecordFilters = useAtomComponentStateValue(
+    scopeRecordFiltersComponentState,
+  );
+
   const currentRecordSorts = useAtomComponentStateValue(
     currentRecordSortsComponentState,
   );
@@ -61,7 +66,7 @@ export const RecordTableVirtualizedSSESubscribeEffect = () => {
       variables: {
         filter: computeRecordGqlOperationFilter({
           fieldMetadataItems: flattenedFieldMetadataItems,
-          recordFilters: currentRecordFilters,
+          recordFilters: [...currentRecordFilters, ...scopeRecordFilters],
           recordFilterGroups: currentRecordFilterGroups,
           filterValueDependencies,
         }),
@@ -71,6 +76,7 @@ export const RecordTableVirtualizedSSESubscribeEffect = () => {
     [
       objectMetadataItem,
       currentRecordFilters,
+      scopeRecordFilters,
       currentRecordFilterGroups,
       filterValueDependencies,
       currentRecordSorts,

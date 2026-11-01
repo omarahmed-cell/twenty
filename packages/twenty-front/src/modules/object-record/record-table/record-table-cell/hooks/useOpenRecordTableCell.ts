@@ -105,7 +105,10 @@ export const useOpenRecordTableCell = (recordTableId: string) => {
           unfocusRecordTableRow();
         }
 
-        openRecordFromIndexView({ recordId });
+        openRecordFromIndexView({
+          recordId,
+          isOpenRecordButtonClick: isNavigating,
+        });
 
         return;
       }

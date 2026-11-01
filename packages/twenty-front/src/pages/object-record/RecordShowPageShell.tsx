@@ -33,6 +33,7 @@ type RecordShowPageShellProps = {
   headerTitleAccessory?: ReactNode;
   headerTitleMode?: RecordShowPageHeaderTitleMode;
   isRecordIdentifierBarHidden?: boolean;
+  body?: ReactNode;
 };
 
 export const RecordShowPageShell = ({
@@ -46,6 +47,7 @@ export const RecordShowPageShell = ({
   headerTitleAccessory,
   headerTitleMode,
   isRecordIdentifierBarHidden = false,
+  body,
 }: RecordShowPageShellProps) => {
   const isInSidePanel = useWorkspaceSurface().type === 'side-panel';
   const isLayoutCustomizationModeEnabled = useAtomStateValue(
@@ -112,13 +114,15 @@ export const RecordShowPageShell = ({
               recordId: objectRecordId,
             }}
           >
-            <PageLayoutRecordPageRenderer
-              targetRecordIdentifier={{
-                id: objectRecordId,
-                targetObjectNameSingular: objectNameSingular,
-              }}
-              isRecordIdentifierBarHidden={isRecordIdentifierBarHidden}
-            />
+            {body ?? (
+              <PageLayoutRecordPageRenderer
+                targetRecordIdentifier={{
+                  id: objectRecordId,
+                  targetObjectNameSingular: objectNameSingular,
+                }}
+                isRecordIdentifierBarHidden={isRecordIdentifierBarHidden}
+              />
+            )}
             <RecordShowPageSSESubscribeEffect
               objectNameSingular={objectNameSingular}
               recordId={objectRecordId}

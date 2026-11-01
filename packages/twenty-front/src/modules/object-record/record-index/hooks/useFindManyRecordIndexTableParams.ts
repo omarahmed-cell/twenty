@@ -6,6 +6,7 @@ import { currentRecordFilterGroupsComponentState } from '@/object-record/record-
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
 import { anyFieldFilterValueComponentState } from '@/object-record/record-filter/states/anyFieldFilterValueComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { scopeRecordFiltersComponentState } from '@/object-record/record-filter/states/scopeRecordFiltersComponentState';
 import { useCurrentRecordGroupDefinition } from '@/object-record/record-group/hooks/useCurrentRecordGroupDefinition';
 import { useRecordGroupFilter } from '@/object-record/record-group/hooks/useRecordGroupFilter';
 import { recordIndexGroupLoadLimitComponentState } from '@/object-record/record-index/states/recordIndexGroupLoadLimitComponentState';
@@ -49,6 +50,11 @@ export const useFindManyRecordIndexTableParams = (
     instanceId,
   );
 
+  const scopeRecordFilters = useAtomComponentStateValue(
+    scopeRecordFiltersComponentState,
+    instanceId,
+  );
+
   const recordIndexGroupLoadLimit = useAtomComponentStateValue(
     recordIndexGroupLoadLimitComponentState,
     instanceId,
@@ -63,7 +69,7 @@ export const useFindManyRecordIndexTableParams = (
   const currentFilters = computeRecordGqlOperationFilter({
     fieldMetadataItems: flattenedFieldMetadataItems,
     recordFilterGroups: currentRecordFilterGroups,
-    recordFilters: currentRecordFilters,
+    recordFilters: [...currentRecordFilters, ...scopeRecordFilters],
     filterValueDependencies,
   });
 

@@ -2,6 +2,7 @@ import { HeadlessEngineCommandWrapperEffect } from '@/command-menu-item/engine-c
 import { useHeadlessCommandContextApi } from '@/command-menu-item/engine-command/hooks/useHeadlessCommandContextApi';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
+import { getSegmentRecordsInViewQueryParams } from '@/segment/utils/getSegmentRecordsInViewQueryParams';
 import { t } from '@lingui/core/macro';
 import { SEGMENT_TARGET_OBJECT_NAME_SINGULARS } from 'twenty-shared/constants';
 import { doNotTranslate } from 'twenty-shared/i18n';
@@ -9,12 +10,8 @@ import {
   AppPath,
   CoreObjectNameSingular,
   type SegmentTargetObject,
-  ViewFilterOperand,
 } from 'twenty-shared/types';
-import {
-  getSegmentMembershipOptionValue,
-  isDefined,
-} from 'twenty-shared/utils';
+import { isDefined } from 'twenty-shared/utils';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 
 type SegmentRecord = {
@@ -62,20 +59,10 @@ export const OpenSegmentRecordsSingleRecordCommand = () => {
     navigate(
       AppPath.RecordIndexPage,
       { objectNamePlural },
-      {
-        filter: {
-          segmentMembership: {
-            [ViewFilterOperand.CONTAINS]: [
-              getSegmentMembershipOptionValue(segment.id),
-            ],
-          },
-        },
-        filterDisplayValue: {
-          segmentMembership: {
-            [ViewFilterOperand.CONTAINS]: segment.name ?? '',
-          },
-        },
-      },
+      getSegmentRecordsInViewQueryParams({
+        segmentId: segment.id,
+        segmentName: segment.name ?? '',
+      }),
     );
   };
 
