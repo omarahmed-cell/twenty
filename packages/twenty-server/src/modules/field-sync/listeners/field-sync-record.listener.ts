@@ -62,13 +62,8 @@ export class FieldSyncRecordListener {
     );
   }
 
-  @OnDatabaseBatchEvent('*', DatabaseEventAction.UPSERTED)
-  async handleUpserted(payload: RecordEventBatch) {
-    await this.dispatch(payload, (_config, role) =>
-      this.recomputeBothSides(payload, role),
-    );
-  }
-
+  // UPSERTED is not handled: the ORM emits it on every create and update, even without a diff,
+  // so a sync's own write would re-enqueue itself. CREATED and UPDATED already cover those writes.
   @OnDatabaseBatchEvent('*', DatabaseEventAction.UPDATED)
   async handleUpdated(payload: RecordEventBatch) {
     await this.dispatch(payload, (config, { isTarget, isSource }) => [

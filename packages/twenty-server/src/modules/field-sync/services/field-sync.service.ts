@@ -209,7 +209,13 @@ export class FieldSyncService {
 
       const valueKey = JSON.stringify(value);
 
-      if (JSON.stringify(target[config.targetFieldName] ?? null) === valueKey) {
+      // The ORM reads empty text and multi-select as '' and [], while the formatter's empty is null.
+      const currentValue = formatSyncedValue({
+        sourceFieldType: config.sourceFieldType,
+        value: target[config.targetFieldName],
+      });
+
+      if (JSON.stringify(currentValue) === valueKey) {
         continue;
       }
 
