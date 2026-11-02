@@ -9,6 +9,12 @@ import { FIELD_NAME_MAXIMUM_LENGTH } from '@/settings/data-model/constants/Field
 import { SettingsObjectNewFieldHeaderIcon } from '@/settings/data-model/fields/components/SettingsObjectNewFieldHeaderIcon';
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
+import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
+import { SettingsDataModelFieldFormulaForm } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
+import {
+  getFormulaReferenceableFields,
+  validateFormula,
+} from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
 import {
   SettingsDataModelFieldSyncForm,
   type SettingsDataModelFieldSyncFormValue,
@@ -27,6 +33,7 @@ import {
   SettingsPath,
 } from 'twenty-shared/types';
 import {
+  type FormulaOutputFieldType,
   getFieldSyncTargetFieldType,
   getSettingsPath,
   isDefined,
@@ -50,6 +57,7 @@ type SettingsDataModelNewFieldFormValues = z.infer<
 const DEFAULT_ICON_FOR_NEW_FIELD = 'IconUsers';
 
 const SYNC_FIELD_DEFAULT_ICON = 'IconRefresh';
+const FORMULA_FIELD_DEFAULT_ICON = 'IconCalculator';
 
 export const SettingsObjectNewFieldConfigure = () => {
   const { t } = useLingui();
@@ -64,6 +72,7 @@ export const SettingsObjectNewFieldConfigure = () => {
     (searchParams.get('fieldType') as FieldMetadataType) ||
     FieldMetadataType.TEXT;
   const isSyncMode = searchParams.get('sync') === 'true';
+  const isFormulaMode = searchParams.get('formula') === 'true';
   const { enqueueToast } = useToast();
 
   const { findObjectMetadataItemByNamePlural } =
@@ -84,31 +93,66 @@ export const SettingsObjectNewFieldConfigure = () => {
     ),
     defaultValues: {
       type: fieldType,
-      icon: isSyncMode
-        ? SYNC_FIELD_DEFAULT_ICON
-        : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
-          DEFAULT_ICON_FOR_NEW_FIELD),
+      icon: isFormulaMode
+        ? FORMULA_FIELD_DEFAULT_ICON
+        : isSyncMode
+          ? SYNC_FIELD_DEFAULT_ICON
+          : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
+            DEFAULT_ICON_FOR_NEW_FIELD),
       label: '',
       name: '',
       // The text settings card that normally fills this is not rendered for synced fields.
       ...(isSyncMode ? { settings: { displayedMaxRows: null } } : {}),
+      ...(isFormulaMode
+        ? {
+            type: FieldMetadataType.NUMBER,
+            defaultValue: null,
+            settings: { type: 'number', decimals: DEFAULT_DECIMAL_VALUE },
+          }
+        : {}),
     },
   });
 
   useEffect(() => {
     formConfig.setValue(
       'icon',
-      isSyncMode
-        ? SYNC_FIELD_DEFAULT_ICON
-        : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
+      isFormulaMode
+        ? FORMULA_FIELD_DEFAULT_ICON
+        : isSyncMode
+          ? SYNC_FIELD_DEFAULT_ICON
+          : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
             DEFAULT_ICON_FOR_NEW_FIELD),
     );
-  }, [fieldType, formConfig, isSyncMode]);
+  }, [fieldType, formConfig, isFormulaMode, isSyncMode]);
 
   const [isSaving, setIsSaving] = useState(false);
 
   const [syncFormValue, setSyncFormValue] =
     useState<SettingsDataModelFieldSyncFormValue>({});
+
+  const [formulaExpression, setFormulaExpression] = useState('');
+  const [formulaOutputType, setFormulaOutputType] =
+    useState<FormulaOutputFieldType>(FieldMetadataType.NUMBER);
+
+  // These cards are not rendered for calculated fields, so the form defaults stand in for them.
+  const handleFormulaOutputTypeChange = (
+    outputType: FormulaOutputFieldType,
+  ) => {
+    setFormulaOutputType(outputType);
+    formConfig.setValue('type', outputType as never, { shouldValidate: true });
+    formConfig.setValue(
+      'defaultValue',
+      (outputType === FieldMetadataType.BOOLEAN ? false : null) as never,
+      { shouldValidate: true },
+    );
+    formConfig.setValue(
+      'settings',
+      (outputType === FieldMetadataType.NUMBER
+        ? { type: 'number', decimals: DEFAULT_DECIMAL_VALUE }
+        : { displayedMaxRows: null }) as never,
+      { shouldValidate: true },
+    );
+  };
 
   useEffect(() => {
     if (
@@ -133,7 +177,12 @@ export const SettingsObjectNewFieldConfigure = () => {
     isValid &&
     !isSubmitting &&
     !isDDLLocked &&
-    (!isSyncMode || isDefined(syncFormValue.sourceField));
+    (!isSyncMode || isDefined(syncFormValue.sourceField)) &&
+    (!isFormulaMode ||
+      validateFormula(
+        formulaExpression,
+        getFormulaReferenceableFields(activeObjectMetadataItem),
+      ).status === 'valid');
 
   const handleSave = async (
     formValues: SettingsDataModelNewFieldFormValues,
@@ -191,6 +240,25 @@ export const SettingsObjectNewFieldConfigure = () => {
               ? { policy: syncFormValue.policy ?? 'MOST_RECENTLY_CREATED' }
               : {}),
           },
+        },
+        objectMetadataId: activeObjectMetadataItem.id,
+      });
+
+      return createCleanUp(creationResult);
+    }
+
+    if (isFormulaMode) {
+      const creationResult = await createMetadataField({
+        ...formValues,
+        type: formulaOutputType,
+        defaultValue: null,
+        isUnique: false,
+        isUIEditable: false,
+        settings: {
+          ...(formulaOutputType === FieldMetadataType.NUMBER
+            ? formValues.settings
+            : {}),
+          formula: { expression: formulaExpression },
         },
         objectMetadataId: activeObjectMetadataItem.id,
       });
@@ -321,7 +389,21 @@ export const SettingsObjectNewFieldConfigure = () => {
               isCreationMode={true}
             />
           </Section.Root>
-          {isSyncMode ? (
+          {isFormulaMode ? (
+            <Section.Root>
+              <Section.Header
+                title={t`Calculation`}
+                description={t`Compute this field from the record's other fields`}
+              />
+              <SettingsDataModelFieldFormulaForm
+                objectMetadataItem={activeObjectMetadataItem}
+                expression={formulaExpression}
+                onExpressionChange={setFormulaExpression}
+                outputType={formulaOutputType}
+                onOutputTypeChange={handleFormulaOutputTypeChange}
+              />
+            </Section.Root>
+          ) : isSyncMode ? (
             <Section.Root>
               <Section.Header
                 title={t`Sync`}

@@ -19,7 +19,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
-import { IconRefresh, IconSearch } from 'twenty-ui/icon';
+import { IconRefresh, IconSearch, IconVariable } from 'twenty-ui/icon';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { type SettingsDataModelFieldTypeFormValues } from '@/settings/data-model/fields/forms/validation-schemas/settingsDataModelFieldTypeFormSchema';
@@ -83,6 +83,10 @@ export const SettingsObjectNewFieldSelector = ({
       i18n._(config.label).toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const formulaCardLabel = t`Calculation`;
+  const isFormulaCardVisible = formulaCardLabel
+    .toLowerCase()
+    .includes(searchQuery.toLowerCase());
   const syncCardLabel = t`Sync`;
   const isSyncCardVisible = syncCardLabel
     .toLowerCase()
@@ -205,6 +209,32 @@ export const SettingsObjectNewFieldSelector = ({
                           </StyledFieldTypeIconContainer>
                         }
                         title={syncCardLabel}
+                      />
+                    </StyledCardContainer>
+                  )}
+                  {category === 'Advanced' && isFormulaCardVisible && (
+                    <StyledCardContainer>
+                      <SettingsCard
+                        to={getSettingsPath(
+                          SettingsPath.ObjectNewFieldConfigure,
+                          { objectNamePlural },
+                          {
+                            fieldType: FieldMetadataType.NUMBER,
+                            formula: 'true',
+                          },
+                        )}
+                        onClick={() =>
+                          setValue('type', FieldMetadataType.NUMBER)
+                        }
+                        Icon={
+                          <StyledFieldTypeIconContainer>
+                            <IconVariable
+                              size={theme.icon.size.xl}
+                              stroke={theme.icon.stroke.sm}
+                            />
+                          </StyledFieldTypeIconContainer>
+                        }
+                        title={formulaCardLabel}
                       />
                     </StyledCardContainer>
                   )}

@@ -8,6 +8,7 @@ import { useGetRelationMetadata } from '@/object-metadata/hooks/useGetRelationMe
 import { useUpdateOneFieldMetadataItem } from '@/object-metadata/hooks/useUpdateOneFieldMetadataItem';
 import { formatFieldMetadataItemInput } from '@/object-metadata/utils/formatFieldMetadataItemInput';
 import { isLabelIdentifierField } from '@/object-metadata/utils/isLabelIdentifierField';
+import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
 import { isObjectMetadataReadOnly } from '@/object-record/read-only/utils/isObjectMetadataReadOnly';
 import { resolveJunctionConfig } from '@/object-record/record-field/ui/utils/junction/resolveJunctionConfig';
 import { SaveAndCancelButtons } from '@/settings/components/SaveAndCancelButtons/SaveAndCancelButtons';
@@ -17,6 +18,12 @@ import { FIELD_NAME_MAXIMUM_LENGTH } from '@/settings/data-model/constants/Field
 import { SettingsDataModelFieldDescriptionForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldDescriptionForm';
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
+import { SettingsDataModelFieldFormulaForm } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
+import {
+  getFieldFormulaSettings,
+  getFormulaReferenceableFields,
+  validateFormula,
+} from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
 import {
   SettingsDataModelFieldSyncForm,
   type SettingsDataModelFieldSyncFormValue,
@@ -43,7 +50,13 @@ import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppPath, SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath, isDefined, isEmptyObject } from 'twenty-shared/utils';
+import {
+  FORMULA_OUTPUT_FIELD_TYPES,
+  type FormulaOutputFieldType,
+  getSettingsPath,
+  isDefined,
+  isEmptyObject,
+} from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
 import { IconArchive, IconArchiveOff, IconTrash } from 'twenty-ui/icon';
@@ -116,6 +129,7 @@ export const SettingsObjectFieldEdit = () => {
     null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  const [formulaDraft, setFormulaDraft] = useState<string | null>(null);
   const [syncFormDraft, setSyncFormDraft] =
     useState<SettingsDataModelFieldSyncFormValue | null>(null);
 
@@ -144,6 +158,8 @@ export const SettingsObjectFieldEdit = () => {
     getFieldMetadataItemInitialValues(fieldMetadataItem);
 
   const isSyncField = isDefined(getFieldSyncSettings(fieldMetadataItem));
+  const savedFormula = getFieldFormulaSettings(fieldMetadataItem);
+  const isFormulaField = isDefined(savedFormula);
 
   const formConfig = useForm<SettingsDataModelFieldEditFormValues>({
     mode: 'onTouched',
@@ -157,6 +173,20 @@ export const SettingsObjectFieldEdit = () => {
       settings,
       defaultValue,
       // The cards that normally fill these are not rendered for synced fields.
+      ...(isFormulaField
+        ? {
+            settings: {
+              displayedMaxRows: null,
+              type: 'number',
+              decimals: DEFAULT_DECIMAL_VALUE,
+              ...settings,
+            },
+            defaultValue:
+              fieldMetadataItem?.type === FieldMetadataType.BOOLEAN
+                ? false
+                : null,
+          }
+        : {}),
       ...(isSyncField
         ? {
             settings: { displayedMaxRows: null, ...settings },
@@ -187,8 +217,20 @@ export const SettingsObjectFieldEdit = () => {
 
   const isDirty = !isEmptyObject(dirtyFields);
 
+  const isFormulaDraftValid =
+    !isDefined(formulaDraft) ||
+    (isDefined(objectMetadataItem) &&
+      validateFormula(
+        formulaDraft,
+        getFormulaReferenceableFields(
+          objectMetadataItem,
+          fieldMetadataItem?.id,
+        ),
+      ).status === 'valid');
+
   const canSave =
-    (isDirty || isDefined(syncFormDraft)) &&
+    (isDirty || isDefined(syncFormDraft) || isDefined(formulaDraft)) &&
+    isFormulaDraftValid &&
     (!isDefined(syncFormDraft) || isDefined(syncFormDraft.sourceField)) &&
     isValid &&
     !isSubmitting;
@@ -225,6 +267,17 @@ export const SettingsObjectFieldEdit = () => {
     objectMetadataItem,
     objectMetadataItems,
   );
+
+  const isFormulaOutputField = (
+    FORMULA_OUTPUT_FIELD_TYPES as readonly FieldMetadataType[]
+  ).includes(fieldMetadataItem.type);
+
+  const isFormulaPaused =
+    isFormulaField &&
+    validateFormula(
+      savedFormula.expression,
+      getFormulaReferenceableFields(objectMetadataItem, fieldMetadataItem.id),
+    ).status === 'invalid';
 
   const isSyncPaused =
     isSyncField && !isDefined(savedSyncFormValue.sourceField);
@@ -264,7 +317,11 @@ export const SettingsObjectFieldEdit = () => {
 
     const otherDirtyFields = omit(dirtyFields, 'relation');
 
-    if (Object.keys(otherDirtyFields).length > 0 || isDefined(syncFormDraft)) {
+    if (
+      Object.keys(otherDirtyFields).length > 0 ||
+      isDefined(syncFormDraft) ||
+      isDefined(formulaDraft)
+    ) {
       const formattedInput = Object.fromEntries(
         Object.entries(formatFieldMetadataItemInput(formValues)).filter(
           ([key]) => Object.keys(otherDirtyFields).includes(key),
@@ -276,6 +333,19 @@ export const SettingsObjectFieldEdit = () => {
         fieldMetadataIdToUpdate: fieldMetadataItem.id,
         updatePayload: {
           ...formattedInput,
+          ...(isFormulaField
+            ? {
+                settings: {
+                  ...fieldMetadataItem.settings,
+                  ...(fieldMetadataItem.type === FieldMetadataType.NUMBER
+                    ? formattedInput.settings
+                    : {}),
+                  formula: {
+                    expression: formulaDraft ?? savedFormula.expression,
+                  },
+                },
+              }
+            : {}),
           ...(isDefined(syncFormDraft?.sourceField) &&
           isDefined(syncFormDraft.relationFieldMetadataId)
             ? {
@@ -434,6 +504,23 @@ export const SettingsObjectFieldEdit = () => {
                 readonly={readonly}
               />
             </Section.Root>
+            {isFormulaField && isFormulaOutputField && (
+              <Section.Root>
+                <Section.Header
+                  title={t`Calculation`}
+                  description={t`Compute this field from the record's other fields`}
+                />
+                <SettingsDataModelFieldFormulaForm
+                  objectMetadataItem={objectMetadataItem}
+                  expression={formulaDraft ?? savedFormula.expression}
+                  onExpressionChange={setFormulaDraft}
+                  outputType={fieldMetadataItem.type as FormulaOutputFieldType}
+                  targetFieldId={fieldMetadataItem.id}
+                  isPaused={isFormulaPaused}
+                  disabled={readonly}
+                />
+              </Section.Root>
+            )}
             {isSyncField && (
               <Section.Root>
                 <Section.Header
@@ -458,7 +545,7 @@ export const SettingsObjectFieldEdit = () => {
                 </StyledSyncActions>
               </Section.Root>
             )}
-            {!isReverseJunctionRelation && !isSyncField && (
+            {!isReverseJunctionRelation && !isSyncField && !isFormulaField && (
               <Section.Root>
                 {fieldMetadataItem.isUnique ? (
                   <Section.Header

@@ -4418,6 +4418,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.10.2":
+  version: 7.29.10
+  resolution: "@babel/runtime@npm:7.29.10"
+  checksum: 10c0/32f975da8e9c2cae6b33e1a477f8fe8bbff6722c982b5ce35f99affaf3a7a1b612c8272b43afa0e51d3000928d6f3ba38f9296301115db5640264907c027b0cd
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.13, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.8.4":
   version: 7.28.4
   resolution: "@babel/runtime@npm:7.28.4"
@@ -21440,6 +21447,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/jexl@npm:2.3.4":
+  version: 2.3.4
+  resolution: "@types/jexl@npm:2.3.4"
+  checksum: 10c0/9c86a11adc62bbbca834f0a9aa4699deaaf5a735992edf9cc3cf305ec09447e3aaed131832e2c95619e6ac6143f2862165fa39205fdb5104fde809831200fa5c
+  languageName: node
+  linkType: hard
+
 "@types/js-cookie@npm:^3.0.3":
   version: 3.0.6
   resolution: "@types/js-cookie@npm:3.0.6"
@@ -37408,6 +37422,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jexl@npm:2.3.0":
+  version: 2.3.0
+  resolution: "jexl@npm:2.3.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.10.2"
+  checksum: 10c0/068f2d1f56e94265f871452eac1769612547fde90bd8ba0da8c9aefb7db09e7ef4afaa5eb7fa1db94a4e5b06f702b1b487b7c797cef86cc684e2da12a0dd797f
+  languageName: node
+  linkType: hard
+
 "jiti@npm:2.4.2":
   version: 2.4.2
   resolution: "jiti@npm:2.4.2"
@@ -51325,6 +51348,7 @@ __metadata:
     "@types/addressparser": "npm:^1.0.3"
     "@types/babel__preset-env": "npm:^7"
     "@types/jest": "npm:^30.0.0"
+    "@types/jexl": "npm:2.3.4"
     "@types/lodash.camelcase": "npm:^4.3.7"
     "@types/lodash.escaperegexp": "npm:^4.1.9"
     "@types/qs": "npm:6.9.16"
@@ -51340,6 +51364,7 @@ __metadata:
     glob: "npm:^11.1.0"
     jest: "npm:29.7.0"
     jest-environment-jsdom: "npm:30.0.0-beta.3"
+    jexl: "npm:2.3.0"
     libphonenumber-js: "npm:^1.10.26"
     lodash.camelcase: "npm:^4.3.0"
     lodash.escaperegexp: "npm:^4.1.2"

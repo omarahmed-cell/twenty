@@ -1,4 +1,5 @@
 import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
+import { type FieldMetadataFormulaSettings } from '@/types/FieldMetadataFormulaSettings';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataSyncSettings } from '@/types/FieldMetadataSyncSettings';
 import { type FieldMetadataType } from '@/types/FieldMetadataType';
@@ -31,6 +32,7 @@ type FieldMetadataNumberSettings = {
   dataType?: NumberDataType;
   decimals?: number;
   type?: FieldNumberVariant;
+  formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataCurrencySettings = {
@@ -41,6 +43,11 @@ type FieldMetadataCurrencySettings = {
 type FieldMetadataTextSettings = {
   displayedMaxRows?: number;
   sync?: FieldMetadataSyncSettings;
+  formula?: FieldMetadataFormulaSettings;
+};
+
+type FieldMetadataBooleanSettings = {
+  formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataSelectSettings = {
@@ -93,6 +100,7 @@ export type FieldMetadataSettingsMapping = {
   [FieldMetadataType.LINKS]: FieldMetadataLinksSettings | null;
   [FieldMetadataType.ARRAY]: FieldMetadataMultiItemSettings | null;
   [FieldMetadataType.FILES]: FieldMetadataFilesSettings;
+  [FieldMetadataType.BOOLEAN]: FieldMetadataBooleanSettings;
 };
 
 export type AllFieldMetadataSettings =

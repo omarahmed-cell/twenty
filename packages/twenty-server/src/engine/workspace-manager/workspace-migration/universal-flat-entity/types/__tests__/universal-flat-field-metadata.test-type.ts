@@ -4,6 +4,7 @@ import {
   type HasAllProperties,
 } from 'twenty-shared/testing';
 import {
+  type FieldMetadataFormulaSettings,
   type FieldMetadataSyncSettings,
   type FieldMetadataType,
   type FieldNumberVariant,
@@ -117,11 +118,13 @@ type SettingsExpectedResult =
       dataType?: NumberDataType | undefined;
       decimals?: number | undefined;
       type?: FieldNumberVariant | undefined;
+      formula?: FieldMetadataFormulaSettings | undefined;
       __JsonbPropertyBrand__?: undefined;
     }
   | {
       displayedMaxRows?: number | undefined;
       sync?: FieldMetadataSyncSettings | undefined;
+      formula?: FieldMetadataFormulaSettings | undefined;
       __JsonbPropertyBrand__?: undefined;
     }
   | null;

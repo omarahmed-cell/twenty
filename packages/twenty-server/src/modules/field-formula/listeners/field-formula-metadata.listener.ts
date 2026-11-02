@@ -1,0 +1,106 @@
+import { Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+
+import { isDefined } from 'twenty-shared/utils';
+
+import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
+import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
+import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
+import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { type MetadataEventBatch } from 'src/engine/subscriptions/metadata-event/types/metadata-event-batch.type';
+import {
+  FieldFormulaJob,
+  type FieldFormulaJobData,
+} from 'src/modules/field-formula/jobs/field-formula.job';
+import { FieldFormulaService } from 'src/modules/field-formula/services/field-formula.service';
+import { getFieldFormulaSettings } from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
+
+type FieldMetadataEventBatch = MetadataEventBatch<
+  'fieldMetadata',
+  'created' | 'updated'
+>;
+
+const isSameJson = (left: unknown, right: unknown) =>
+  JSON.stringify(left ?? null) === JSON.stringify(right ?? null);
+
+@Injectable()
+export class FieldFormulaMetadataListener {
+  constructor(
+    private readonly fieldFormulaService: FieldFormulaService,
+    @InjectMessageQueue(MessageQueue.workspaceQueue)
+    private readonly messageQueueService: MessageQueueService,
+  ) {}
+
+  @OnEvent('metadata.fieldMetadata.created')
+  async handleFieldCreated(payload: FieldMetadataEventBatch) {
+    for (const event of payload.events) {
+      if (!('after' in event.properties)) {
+        continue;
+      }
+
+      const field = event.properties.after as FlatFieldMetadata;
+
+      if (isDefined(getFieldFormulaSettings(field))) {
+        await this.enqueueBackfill(payload.workspaceId, field.id);
+      }
+    }
+  }
+
+  // Label and icon edits are ignored; only changes that can alter computed values re-run.
+  @OnEvent('metadata.fieldMetadata.updated')
+  async handleFieldUpdated(payload: FieldMetadataEventBatch) {
+    const configs = await this.fieldFormulaService.getConfigs(
+      payload.workspaceId,
+    );
+
+    const targetFieldIds = new Set<string>();
+
+    for (const event of payload.events) {
+      if (event.type !== 'updated') {
+        continue;
+      }
+
+      const before = event.properties.before as FlatFieldMetadata;
+      const after = event.properties.after as FlatFieldMetadata;
+
+      const needsCatchUp =
+        (!before.isActive && after.isActive) || before.name !== after.name;
+
+      if (
+        isDefined(getFieldFormulaSettings(after)) &&
+        (needsCatchUp ||
+          !isSameJson(
+            getFieldFormulaSettings(before),
+            getFieldFormulaSettings(after),
+          ))
+      ) {
+        targetFieldIds.add(after.id);
+      }
+
+      // Renaming a select option migrates stored values in SQL, without any record event.
+      const dependencyValuesMayHaveChanged =
+        needsCatchUp || !isSameJson(before.options, after.options);
+
+      if (!dependencyValuesMayHaveChanged) {
+        continue;
+      }
+
+      for (const config of configs) {
+        if (config.dependencies.some(({ fieldId }) => fieldId === after.id)) {
+          targetFieldIds.add(config.targetFieldId);
+        }
+      }
+    }
+
+    for (const targetFieldId of targetFieldIds) {
+      await this.enqueueBackfill(payload.workspaceId, targetFieldId);
+    }
+  }
+
+  private async enqueueBackfill(workspaceId: string, targetFieldId: string) {
+    await this.messageQueueService.add<FieldFormulaJobData>(
+      FieldFormulaJob.name,
+      { type: 'BACKFILL', workspaceId, targetFieldId },
+    );
+  }
+}

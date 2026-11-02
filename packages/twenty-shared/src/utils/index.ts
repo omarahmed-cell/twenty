@@ -199,6 +199,21 @@ export {
 } from './filter/utils/validation-schemas/jsonRelationFilterValueSchema';
 export { formatBytes } from './format/formatBytes';
 export { formatToShortNumber } from './format/formatToShortNumber';
+export { buildFormulaVariables } from './formula/buildFormulaVariables';
+export type {
+  FormulaOutputFieldType,
+  CoercedFormulaResult,
+} from './formula/coerceFormulaResult';
+export {
+  FORMULA_OUTPUT_FIELD_TYPES,
+  coerceFormulaResult,
+} from './formula/coerceFormulaResult';
+export type { FormulaEvaluation } from './formula/evaluateFormula';
+export { evaluateFormula } from './formula/evaluateFormula';
+export { FORMULA_FUNCTIONS, FORMULA_ENGINE } from './formula/formulaEngine';
+export { isFormulaValueUnchanged } from './formula/isFormulaValueUnchanged';
+export type { ParsedFormula } from './formula/parseFormula';
+export { parseFormula } from './formula/parseFormula';
 export { fromArrayToUniqueKeyRecord } from './from-array-to-unique-key-record.util';
 export { fromArrayToValuesByKeyRecord } from './fromArrayToValuesByKeyRecord.util';
 export { getUrlSafely } from './getUrlSafely';
