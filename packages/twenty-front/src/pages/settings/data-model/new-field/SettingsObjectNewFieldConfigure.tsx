@@ -37,7 +37,7 @@ import { Section } from 'twenty-ui/components/layout';
 import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { type z } from 'zod';
-import { FieldMetadataType } from '~/generated-metadata/graphql';
+import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 import { DEFAULT_ICONS_BY_FIELD_TYPE } from '~/pages/settings/data-model/constants/DefaultIconsByFieldType';
@@ -145,6 +145,9 @@ export const SettingsObjectNewFieldConfigure = () => {
     };
 
     const syncSourceField = syncFormValue.sourceField;
+    const syncRelationField = activeObjectMetadataItem.fields.find(
+      (field) => field.id === syncFormValue.relationFieldMetadataId,
+    );
     const syncTargetFieldType = isDefined(syncSourceField)
       ? getFieldSyncTargetFieldType(syncSourceField.type)
       : undefined;
@@ -177,6 +180,9 @@ export const SettingsObjectNewFieldConfigure = () => {
           sync: {
             relationFieldMetadataId: syncFormValue.relationFieldMetadataId,
             sourceFieldMetadataId: syncSourceField.id,
+            ...(syncRelationField?.relation?.type === RelationType.ONE_TO_MANY
+              ? { policy: syncFormValue.policy ?? 'MOST_RECENTLY_CREATED' }
+              : {}),
           },
         },
         objectMetadataId: activeObjectMetadataItem.id,

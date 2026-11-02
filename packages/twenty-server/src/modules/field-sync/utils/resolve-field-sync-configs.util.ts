@@ -1,5 +1,6 @@
 import { isNonEmptyString } from '@sniptt/guards';
 import {
+  FIELD_SYNC_POLICIES,
   type FieldMetadataSyncSettings,
   FieldMetadataType,
   RelationType,
@@ -14,7 +15,10 @@ import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/typ
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object-metadata/types/flat-object-metadata.type';
-import { type ResolvedFieldSyncConfig } from 'src/modules/field-sync/types/resolved-field-sync-config.type';
+import {
+  type FieldSyncCardinality,
+  type ResolvedFieldSyncConfig,
+} from 'src/modules/field-sync/types/resolved-field-sync-config.type';
 
 const SYNC_TARGET_FIELD_TYPES = new Set<FieldMetadataType>([
   FieldMetadataType.TEXT,
@@ -45,6 +49,62 @@ export const getFieldSyncSettings = (
   return sync as FieldMetadataSyncSettings;
 };
 
+type RelationSettings =
+  | { relationType?: RelationType; joinColumnName?: string | null }
+  | null
+  | undefined;
+
+const getRelationSettings = (field: FlatFieldMetadata | undefined) =>
+  field?.type === FieldMetadataType.RELATION
+    ? (field.settings as RelationSettings)
+    : undefined;
+
+const resolveCardinality = (
+  relationField: FlatFieldMetadata,
+  sync: FieldMetadataSyncSettings,
+  flatFieldMetadataMaps: FlatEntityMaps<FlatFieldMetadata>,
+): FieldSyncCardinality | undefined => {
+  const relationSettings = getRelationSettings(relationField);
+
+  if (relationSettings?.relationType === RelationType.MANY_TO_ONE) {
+    return isNonEmptyString(relationSettings.joinColumnName)
+      ? {
+          cardinality: 'TO_ONE',
+          joinColumnName: relationSettings.joinColumnName,
+        }
+      : undefined;
+  }
+
+  if (relationSettings?.relationType !== RelationType.ONE_TO_MANY) {
+    return undefined;
+  }
+
+  const inverseField = isDefined(relationField.relationTargetFieldMetadataId)
+    ? findFlatEntityByIdInFlatEntityMaps({
+        flatEntityId: relationField.relationTargetFieldMetadataId,
+        flatEntityMaps: flatFieldMetadataMaps,
+      })
+    : undefined;
+
+  const inverseSettings = getRelationSettings(inverseField);
+
+  if (
+    inverseSettings?.relationType !== RelationType.MANY_TO_ONE ||
+    !isNonEmptyString(inverseSettings.joinColumnName)
+  ) {
+    return undefined;
+  }
+
+  return {
+    cardinality: 'TO_MANY',
+    sourceJoinColumnName: inverseSettings.joinColumnName,
+    policy:
+      isDefined(sync.policy) && FIELD_SYNC_POLICIES.includes(sync.policy)
+        ? sync.policy
+        : 'MOST_RECENTLY_CREATED',
+  };
+};
+
 const resolveFieldSyncConfig = (
   targetField: FlatFieldMetadata,
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>,
@@ -61,19 +121,22 @@ const resolveFieldSyncConfig = (
     flatEntityMaps: flatFieldMetadataMaps,
   });
 
-  const relationSettings = relationField?.settings as
-    | { relationType?: RelationType; joinColumnName?: string | null }
-    | null
-    | undefined;
-
   if (
     !isDefined(relationField) ||
+    !relationField.isActive ||
     relationField.objectMetadataId !== targetField.objectMetadataId ||
-    relationField.type !== FieldMetadataType.RELATION ||
-    relationSettings?.relationType !== RelationType.MANY_TO_ONE ||
-    !isNonEmptyString(relationSettings.joinColumnName) ||
     !isDefined(relationField.relationTargetObjectMetadataId)
   ) {
+    return undefined;
+  }
+
+  const cardinality = resolveCardinality(
+    relationField,
+    sync,
+    flatFieldMetadataMaps,
+  );
+
+  if (!isDefined(cardinality)) {
     return undefined;
   }
 
@@ -111,10 +174,10 @@ const resolveFieldSyncConfig = (
     targetFieldId: targetField.id,
     targetFieldName: targetField.name,
     targetObjectNameSingular: targetObject.nameSingular,
-    joinColumnName: relationSettings.joinColumnName,
     sourceObjectNameSingular: sourceObject.nameSingular,
     sourceFieldName: sourceField.name,
     sourceFieldType: sourceField.type,
+    ...cardinality,
   };
 };
 

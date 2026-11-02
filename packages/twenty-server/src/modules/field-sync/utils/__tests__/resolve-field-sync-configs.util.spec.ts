@@ -43,6 +43,7 @@ const dealsRelationField = getFlatFieldMetadataMock({
   name: 'opportunities',
   type: FieldMetadataType.RELATION,
   relationTargetObjectMetadataId: 'opportunity',
+  relationTargetFieldMetadataId: 'deal-company',
   settings: { relationType: RelationType.ONE_TO_MANY },
 } as Partial<FlatFieldMetadata> as FlatFieldMetadata);
 
@@ -79,24 +80,37 @@ const mismatchedTypeSyncField = buildSyncField(
   },
 );
 
-const toManySyncField = buildSyncField(
-  'companyDealName',
-  FieldMetadataType.TEXT,
-  {
-    relationFieldMetadataId: dealsRelationField.id,
-    sourceFieldMetadataId: companyNameField.id,
-  },
-  'company',
-);
+const dealStageField = getFlatFieldMetadataMock({
+  id: 'deal-stage',
+  universalIdentifier: 'deal-stage-uid',
+  objectMetadataId: 'opportunity',
+  name: 'stage',
+  type: FieldMetadataType.SELECT,
+});
+
+const buildToManySyncField = (id: string, policy?: string) =>
+  buildSyncField(
+    id,
+    FieldMetadataType.SELECT,
+    {
+      relationFieldMetadataId: dealsRelationField.id,
+      sourceFieldMetadataId: dealStageField.id,
+      ...(policy === undefined ? {} : { policy }),
+    },
+    'company',
+  );
 
 const fields = [
   operatesInField,
   companyNameField,
   companyRelationField,
   dealsRelationField,
+  dealStageField,
   validSyncField,
   mismatchedTypeSyncField,
-  toManySyncField,
+  buildToManySyncField('firstDealStage', 'FIRST_CREATED'),
+  buildToManySyncField('anyDealStage'),
+  buildToManySyncField('unknownPolicyDealStage', 'BIGGEST'),
 ];
 
 const toMaps = <T extends FlatFieldMetadata | FlatObjectMetadata>(
@@ -127,12 +141,25 @@ const flatObjectMetadataMaps = toMaps<FlatObjectMetadata>([
   }),
 ]);
 
+const buildToManyConfig = (targetField: string, policy: string) => ({
+  cardinality: 'TO_MANY',
+  targetFieldId: targetField,
+  targetFieldName: targetField,
+  targetObjectNameSingular: 'company',
+  sourceJoinColumnName: 'companyId',
+  policy,
+  sourceObjectNameSingular: 'opportunity',
+  sourceFieldName: 'stage',
+  sourceFieldType: FieldMetadataType.SELECT,
+});
+
 describe('resolveFieldSyncConfigs', () => {
-  it('resolves a to-one sync and skips invalid or unsupported configs', () => {
+  it('resolves to-one and to-many syncs and skips invalid configs', () => {
     expect(
       resolveFieldSyncConfigs(flatObjectMetadataMaps, toMaps(fields)),
     ).toEqual([
       {
+        cardinality: 'TO_ONE',
         targetFieldId: 'dealOperatesIn',
         targetFieldName: 'dealOperatesIn',
         targetObjectNameSingular: 'opportunity',
@@ -141,6 +168,9 @@ describe('resolveFieldSyncConfigs', () => {
         sourceFieldName: 'operatesIn',
         sourceFieldType: FieldMetadataType.MULTI_SELECT,
       },
+      buildToManyConfig('firstDealStage', 'FIRST_CREATED'),
+      buildToManyConfig('anyDealStage', 'MOST_RECENTLY_CREATED'),
+      buildToManyConfig('unknownPolicyDealStage', 'MOST_RECENTLY_CREATED'),
     ]);
   });
 });

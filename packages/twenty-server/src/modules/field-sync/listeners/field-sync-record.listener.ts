@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { isNonEmptyString } from '@sniptt/guards';
 import { type ObjectRecordUpdateEvent } from 'twenty-shared/database-events';
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
 
@@ -26,6 +27,8 @@ type RecordEventBatch = WorkspaceEventBatch<RecordEvent>;
 
 type ConfigRole = { isTarget: boolean; isSource: boolean };
 
+type EventSide = 'before' | 'after';
+
 const getRecordIds = (events: RecordEvent[]) => [
   ...new Set(events.map(({ recordId }) => recordId).filter(isDefined)),
 ];
@@ -47,6 +50,32 @@ const sourcesTask = (sourceRecordIds: string[]): FieldSyncJobTask[] =>
     ? [{ type: 'SOURCES', sourceRecordIds }]
     : [];
 
+// To-many sources hold the join column, so the affected targets come from the event itself.
+const linkedTargetsTask = (
+  config: ResolvedFieldSyncConfig,
+  events: RecordEvent[],
+  sides: EventSide[],
+): FieldSyncJobTask[] => {
+  if (config.cardinality !== 'TO_MANY') {
+    return [];
+  }
+
+  return targetsTask([
+    ...new Set(
+      events
+        .flatMap(({ properties }) =>
+          sides.map(
+            (side) =>
+              (properties[side] as Record<string, unknown> | undefined)?.[
+                config.sourceJoinColumnName
+              ],
+          ),
+        )
+        .filter(isNonEmptyString),
+    ),
+  ]);
+};
+
 @Injectable()
 export class FieldSyncRecordListener {
   constructor(
@@ -57,61 +86,89 @@ export class FieldSyncRecordListener {
 
   @OnDatabaseBatchEvent('*', DatabaseEventAction.CREATED)
   async handleCreated(payload: RecordEventBatch) {
-    await this.dispatch(payload, (_config, { isTarget }) =>
-      isTarget ? targetsTask(getRecordIds(payload.events)) : [],
-    );
+    await this.dispatch(payload, (config, { isTarget, isSource }) => [
+      ...(isTarget ? targetsTask(getRecordIds(payload.events)) : []),
+      ...(isSource ? linkedTargetsTask(config, payload.events, ['after']) : []),
+    ]);
   }
 
   // UPSERTED is not handled: the ORM emits it on every create and update, even without a diff,
   // so a sync's own write would re-enqueue itself. CREATED and UPDATED already cover those writes.
   @OnDatabaseBatchEvent('*', DatabaseEventAction.UPDATED)
   async handleUpdated(payload: RecordEventBatch) {
-    await this.dispatch(payload, (config, { isTarget, isSource }) => [
-      ...(isTarget
-        ? targetsTask(
-            getRecordIdsUpdating(payload.events, config.joinColumnName),
-          )
-        : []),
-      ...(isSource
-        ? sourcesTask(
-            getRecordIdsUpdating(payload.events, config.sourceFieldName),
-          )
-        : []),
-    ]);
+    await this.dispatch(payload, (config, { isTarget, isSource }) => {
+      if (config.cardinality === 'TO_MANY') {
+        return isSource
+          ? linkedTargetsTask(
+              config,
+              payload.events.filter(({ properties }) =>
+                (properties.updatedFields ?? []).some(
+                  (fieldName) =>
+                    fieldName === config.sourceFieldName ||
+                    fieldName === config.sourceJoinColumnName,
+                ),
+              ),
+              ['before', 'after'],
+            )
+          : [];
+      }
+
+      return [
+        ...(isTarget
+          ? targetsTask(
+              getRecordIdsUpdating(payload.events, config.joinColumnName),
+            )
+          : []),
+        ...(isSource
+          ? sourcesTask(
+              getRecordIdsUpdating(payload.events, config.sourceFieldName),
+            )
+          : []),
+      ];
+    });
   }
 
   // A soft-deleted source counts as no association.
   @OnDatabaseBatchEvent('*', DatabaseEventAction.DELETED)
   async handleDeleted(payload: RecordEventBatch) {
-    await this.dispatch(payload, (_config, { isSource }) =>
-      isSource ? sourcesTask(getRecordIds(payload.events)) : [],
-    );
+    await this.dispatch(payload, (config, { isSource }) => {
+      if (!isSource) {
+        return [];
+      }
+
+      return config.cardinality === 'TO_MANY'
+        ? linkedTargetsTask(config, payload.events, ['before'])
+        : sourcesTask(getRecordIds(payload.events));
+    });
   }
 
   @OnDatabaseBatchEvent('*', DatabaseEventAction.RESTORED)
   async handleRestored(payload: RecordEventBatch) {
-    await this.dispatch(payload, (_config, role) =>
-      this.recomputeBothSides(payload, role),
-    );
+    await this.dispatch(payload, (config, { isTarget, isSource }) => {
+      const recordIds = getRecordIds(payload.events);
+
+      return [
+        ...(isTarget ? targetsTask(recordIds) : []),
+        ...(isSource
+          ? config.cardinality === 'TO_MANY'
+            ? linkedTargetsTask(config, payload.events, ['after'])
+            : sourcesTask(recordIds)
+          : []),
+      ];
+    });
   }
 
   @OnDatabaseBatchEvent('*', DatabaseEventAction.DESTROYED)
   async handleDestroyed(payload: RecordEventBatch) {
-    await this.dispatch(payload, (_config, { isSource }) =>
-      isSource ? [{ type: 'ORPHANS' }] : [],
-    );
-  }
+    await this.dispatch(payload, (config, { isSource }) => {
+      if (!isSource) {
+        return [];
+      }
 
-  private recomputeBothSides(
-    payload: RecordEventBatch,
-    { isTarget, isSource }: ConfigRole,
-  ): FieldSyncJobTask[] {
-    const recordIds = getRecordIds(payload.events);
-
-    return [
-      ...(isTarget ? targetsTask(recordIds) : []),
-      ...(isSource ? sourcesTask(recordIds) : []),
-    ];
+      return config.cardinality === 'TO_MANY'
+        ? linkedTargetsTask(config, payload.events, ['before'])
+        : [{ type: 'ORPHANS' }];
+    });
   }
 
   private async dispatch(

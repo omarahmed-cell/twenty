@@ -5,6 +5,7 @@ import { Select } from '@/ui/input/components/Select';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
+import { type FieldSyncPolicy } from 'twenty-shared/types';
 import { getFieldSyncTargetFieldType, isDefined } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { RelationType } from '~/generated-metadata/graphql';
@@ -22,6 +23,7 @@ const StyledHint = styled.div`
 export type SettingsDataModelFieldSyncFormValue = {
   relationFieldMetadataId?: string;
   sourceField?: FieldMetadataItem;
+  policy?: FieldSyncPolicy;
 };
 
 type SettingsDataModelFieldSyncFormProps = {
@@ -44,12 +46,16 @@ export const SettingsDataModelFieldSyncForm = ({
   const relationFields = objectMetadataItem.fields.filter(
     (field) =>
       field.isActive === true &&
-      field.relation?.type === RelationType.MANY_TO_ONE,
+      (field.relation?.type === RelationType.MANY_TO_ONE ||
+        field.relation?.type === RelationType.ONE_TO_MANY),
   );
 
   const selectedRelationField = relationFields.find(
     (field) => field.id === value.relationFieldMetadataId,
   );
+
+  const isToManyRelation =
+    selectedRelationField?.relation?.type === RelationType.ONE_TO_MANY;
 
   const associatedObjectMetadataItem = objectMetadataItems.find(
     (item) =>
@@ -115,9 +121,22 @@ export const SettingsDataModelFieldSyncForm = ({
           }
         />
       )}
+      {isToManyRelation && (
+        <Select<FieldSyncPolicy>
+          dropdownId="field-sync-policy-select"
+          label={t`When several records are associated, use`}
+          fullWidth
+          value={value.policy ?? 'MOST_RECENTLY_CREATED'}
+          options={[
+            { label: t`Most recently created`, value: 'MOST_RECENTLY_CREATED' },
+            { label: t`First created`, value: 'FIRST_CREATED' },
+          ]}
+          onChange={(policy) => onChange({ ...value, policy })}
+        />
+      )}
       <StyledHint>
         {relationFields.length === 0
-          ? t`This object has no relation to a single associated record yet.`
+          ? t`This object has no relation to an associated record yet.`
           : t`The value is copied from the associated record and stays read-only.`}
       </StyledHint>
     </StyledContainer>

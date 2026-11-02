@@ -64,6 +64,10 @@ export class FieldSyncService {
     sourceRecordIds: string[];
   }): Promise<void> {
     await this.runForConfig(workspaceId, targetFieldId, async (config) => {
+      if (config.cardinality !== 'TO_ONE') {
+        return;
+      }
+
       const targets = await this.getTargetRepository(config).find({
         where: { [config.joinColumnName]: In(sourceRecordIds) },
       });
@@ -88,6 +92,10 @@ export class FieldSyncService {
     targetFieldId: string;
   }): Promise<void> {
     await this.runForConfig(workspaceId, targetFieldId, async (config) => {
+      if (config.cardinality !== 'TO_ONE') {
+        return;
+      }
+
       await this.getTargetRepository(config).update(
         {
           [config.joinColumnName]: IsNull(),
@@ -171,24 +179,7 @@ export class FieldSyncService {
       where: { id: In(targetRecordIds) },
     });
 
-    const sourceIds = [
-      ...new Set(
-        targets
-          .map((target) => target[config.joinColumnName])
-          .filter(isNonEmptyString),
-      ),
-    ];
-
-    const sources =
-      sourceIds.length === 0
-        ? []
-        : await this.workspaceOrmManager
-            .getRepository<SyncRecord>(config.sourceObjectNameSingular, {
-              shouldBypassPermissionChecks: true,
-            })
-            .find({ where: { id: In(sourceIds) } });
-
-    const sourceById = new Map(sources.map((source) => [source.id, source]));
+    const sourceByTargetId = await this.getSourceByTargetId(config, targets);
 
     const recordIdsByValue = new Map<
       string,
@@ -196,15 +187,9 @@ export class FieldSyncService {
     >();
 
     for (const target of targets) {
-      const sourceId = target[config.joinColumnName];
-
-      const source = isNonEmptyString(sourceId)
-        ? sourceById.get(sourceId)
-        : undefined;
-
       const value = formatSyncedValue({
         sourceFieldType: config.sourceFieldType,
-        value: source?.[config.sourceFieldName],
+        value: sourceByTargetId.get(target.id)?.[config.sourceFieldName],
       });
 
       const valueKey = JSON.stringify(value);
@@ -231,5 +216,73 @@ export class FieldSyncService {
         { [config.targetFieldName]: value },
       );
     }
+  }
+
+  private getSourceRepository(config: ResolvedFieldSyncConfig) {
+    return this.workspaceOrmManager.getRepository<SyncRecord>(
+      config.sourceObjectNameSingular,
+      { shouldBypassPermissionChecks: true },
+    );
+  }
+
+  // Soft-deleted sources are excluded by the repository, so they count as no association.
+  private async getSourceByTargetId(
+    config: ResolvedFieldSyncConfig,
+    targets: SyncRecord[],
+  ): Promise<Map<string, SyncRecord>> {
+    const sourceByTargetId = new Map<string, SyncRecord>();
+
+    if (config.cardinality === 'TO_MANY') {
+      const sources = await this.getSourceRepository(config).find({
+        where: {
+          [config.sourceJoinColumnName]: In(targets.map(({ id }) => id)),
+        },
+        order: {
+          createdAt: config.policy === 'FIRST_CREATED' ? 'ASC' : 'DESC',
+          id: 'ASC',
+        },
+      });
+
+      for (const source of sources) {
+        const targetId = source[config.sourceJoinColumnName];
+
+        if (isNonEmptyString(targetId) && !sourceByTargetId.has(targetId)) {
+          sourceByTargetId.set(targetId, source);
+        }
+      }
+
+      return sourceByTargetId;
+    }
+
+    const sourceIds = [
+      ...new Set(
+        targets
+          .map((target) => target[config.joinColumnName])
+          .filter(isNonEmptyString),
+      ),
+    ];
+
+    if (sourceIds.length === 0) {
+      return sourceByTargetId;
+    }
+
+    const sources = await this.getSourceRepository(config).find({
+      where: { id: In(sourceIds) },
+    });
+
+    const sourceById = new Map(sources.map((source) => [source.id, source]));
+
+    for (const target of targets) {
+      const sourceId = target[config.joinColumnName];
+      const source = isNonEmptyString(sourceId)
+        ? sourceById.get(sourceId)
+        : undefined;
+
+      if (isDefined(source)) {
+        sourceByTargetId.set(target.id, source);
+      }
+    }
+
+    return sourceByTargetId;
   }
 }
