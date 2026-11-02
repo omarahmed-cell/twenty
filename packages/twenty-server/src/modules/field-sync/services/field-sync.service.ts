@@ -1,13 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
 import { isNonEmptyString } from '@sniptt/guards';
+import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { In, IsNull, MoreThan, Not } from 'typeorm';
 
+import { FieldMetadataService } from 'src/engine/metadata-modules/field-metadata/services/field-metadata.service';
+import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { type ResolvedFieldSyncConfig } from 'src/modules/field-sync/types/resolved-field-sync-config.type';
+import {
+  areSyncedFieldOptionsEqual,
+  buildSyncedFieldOptions,
+  type SyncedFieldOption,
+} from 'src/modules/field-sync/utils/build-synced-field-options.util';
 import { formatSyncedValue } from 'src/modules/field-sync/utils/format-synced-value.util';
 import { resolveFieldSyncConfigs } from 'src/modules/field-sync/utils/resolve-field-sync-configs.util';
 
@@ -20,6 +28,7 @@ export class FieldSyncService {
   constructor(
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly workspaceCacheService: WorkspaceCacheService,
+    private readonly fieldMetadataService: FieldMetadataService,
   ) {}
 
   async getConfigs(workspaceId: string): Promise<ResolvedFieldSyncConfig[]> {
@@ -109,10 +118,22 @@ export class FieldSyncService {
   async backfill({
     workspaceId,
     targetFieldId,
+    sourceOptionsBefore,
   }: {
     workspaceId: string;
     targetFieldId: string;
+    sourceOptionsBefore?: SyncedFieldOption[];
   }): Promise<void> {
+    // Backfills follow metadata changes, which this process's 10s cache memoizer may not have seen yet.
+    await this.workspaceCacheService.evictWorkspaceFromLocalCache(workspaceId);
+
+    // Options first: writing a value the target's enum doesn't have yet would fail.
+    await this.syncTargetOptions({
+      workspaceId,
+      targetFieldId,
+      sourceOptionsBefore,
+    });
+
     await this.runForConfig(workspaceId, targetFieldId, async (config) => {
       const targetRepository = this.getTargetRepository(config);
 
@@ -136,6 +157,56 @@ export class FieldSyncService {
 
         lastId = targets[targets.length - 1].id;
       }
+    });
+  }
+
+  private async syncTargetOptions({
+    workspaceId,
+    targetFieldId,
+    sourceOptionsBefore,
+  }: {
+    workspaceId: string;
+    targetFieldId: string;
+    sourceOptionsBefore?: SyncedFieldOption[];
+  }): Promise<void> {
+    const config = (await this.getConfigs(workspaceId)).find(
+      (resolvedConfig) => resolvedConfig.targetFieldId === targetFieldId,
+    );
+
+    if (
+      !isDefined(config) ||
+      (config.sourceFieldType !== FieldMetadataType.SELECT &&
+        config.sourceFieldType !== FieldMetadataType.MULTI_SELECT)
+    ) {
+      return;
+    }
+
+    const { flatFieldMetadataMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatFieldMetadataMaps',
+      ]);
+
+    const getOptions = (fieldId: string) =>
+      (findFlatEntityByIdInFlatEntityMaps({
+        flatEntityId: fieldId,
+        flatEntityMaps: flatFieldMetadataMaps,
+      })?.options ?? []) as SyncedFieldOption[];
+
+    const targetOptions = getOptions(targetFieldId);
+
+    const options = buildSyncedFieldOptions({
+      sourceOptions: getOptions(config.sourceFieldId),
+      sourceOptionsBefore,
+      targetOptions,
+    });
+
+    if (areSyncedFieldOptionsEqual(options, targetOptions)) {
+      return;
+    }
+
+    await this.fieldMetadataService.updateOneField({
+      updateFieldInput: { id: targetFieldId, options },
+      workspaceId,
     });
   }
 

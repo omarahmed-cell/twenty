@@ -39,6 +39,7 @@ const buildService = ({
   const service = new FieldSyncService(
     workspaceOrmManager as never,
     {} as never,
+    {} as never,
   );
 
   jest.spyOn(service, 'getConfigs').mockResolvedValue([config]);
@@ -54,7 +55,9 @@ const buildConfig = (
   targetFieldName: 'synced',
   targetObjectNameSingular: 'opportunity',
   joinColumnName: 'companyId',
+  relationFieldId: 'relation-field',
   sourceObjectNameSingular: 'company',
+  sourceFieldId: 'source-field',
   sourceFieldName: 'value',
   sourceFieldType,
 });
@@ -68,7 +71,9 @@ const buildToManyConfig = (
   targetFieldId: 'target-field',
   targetFieldName: 'synced',
   targetObjectNameSingular: 'opportunity',
+  relationFieldId: 'relation-field',
   sourceObjectNameSingular: 'task',
+  sourceFieldId: 'source-field',
   sourceFieldName: 'value',
   sourceFieldType: FieldMetadataType.TEXT,
 });

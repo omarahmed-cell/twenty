@@ -4,12 +4,13 @@ import { Process } from 'src/engine/core-modules/message-queue/decorators/proces
 import { Processor } from 'src/engine/core-modules/message-queue/decorators/processor.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { FieldSyncService } from 'src/modules/field-sync/services/field-sync.service';
+import { type SyncedFieldOption } from 'src/modules/field-sync/utils/build-synced-field-options.util';
 
 export type FieldSyncJobTask =
   | { type: 'TARGETS'; targetRecordIds: string[] }
   | { type: 'SOURCES'; sourceRecordIds: string[] }
   | { type: 'ORPHANS' }
-  | { type: 'BACKFILL' };
+  | { type: 'BACKFILL'; sourceOptionsBefore?: SyncedFieldOption[] };
 
 export type FieldSyncJobData = {
   workspaceId: string;
@@ -49,7 +50,11 @@ export class FieldSyncJob {
 
         return;
       case 'BACKFILL':
-        await this.fieldSyncService.backfill({ workspaceId, targetFieldId });
+        await this.fieldSyncService.backfill({
+          workspaceId,
+          targetFieldId,
+          sourceOptionsBefore: data.sourceOptionsBefore,
+        });
 
         return;
     }

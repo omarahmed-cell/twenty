@@ -105,7 +105,8 @@ export class FieldSyncRecordListener {
                 (properties.updatedFields ?? []).some(
                   (fieldName) =>
                     fieldName === config.sourceFieldName ||
-                    fieldName === config.sourceJoinColumnName,
+                    fieldName === config.sourceJoinColumnName ||
+                    fieldName === 'createdAt',
                 ),
               ),
               ['before', 'after'],

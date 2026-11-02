@@ -49,6 +49,8 @@ type SettingsDataModelNewFieldFormValues = z.infer<
 
 const DEFAULT_ICON_FOR_NEW_FIELD = 'IconUsers';
 
+const SYNC_FIELD_DEFAULT_ICON = 'IconRefresh';
+
 export const SettingsObjectNewFieldConfigure = () => {
   const { t } = useLingui();
 
@@ -82,8 +84,10 @@ export const SettingsObjectNewFieldConfigure = () => {
     ),
     defaultValues: {
       type: fieldType,
-      icon:
-        DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ?? DEFAULT_ICON_FOR_NEW_FIELD,
+      icon: isSyncMode
+        ? SYNC_FIELD_DEFAULT_ICON
+        : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
+          DEFAULT_ICON_FOR_NEW_FIELD),
       label: '',
       name: '',
       // The text settings card that normally fills this is not rendered for synced fields.
@@ -94,9 +98,12 @@ export const SettingsObjectNewFieldConfigure = () => {
   useEffect(() => {
     formConfig.setValue(
       'icon',
-      DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ?? DEFAULT_ICON_FOR_NEW_FIELD,
+      isSyncMode
+        ? SYNC_FIELD_DEFAULT_ICON
+        : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
+            DEFAULT_ICON_FOR_NEW_FIELD),
     );
-  }, [fieldType, formConfig]);
+  }, [fieldType, formConfig, isSyncMode]);
 
   const [isSaving, setIsSaving] = useState(false);
 

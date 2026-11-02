@@ -16,7 +16,9 @@ export type ResolvedFieldSyncConfig = {
   targetFieldId: string;
   targetFieldName: string;
   targetObjectNameSingular: string;
+  relationFieldId: string;
   sourceObjectNameSingular: string;
+  sourceFieldId: string;
   sourceFieldName: string;
   sourceFieldType: FieldMetadataType;
 } & FieldSyncCardinality;

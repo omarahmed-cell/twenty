@@ -17,6 +17,15 @@ import { FIELD_NAME_MAXIMUM_LENGTH } from '@/settings/data-model/constants/Field
 import { SettingsDataModelFieldDescriptionForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldDescriptionForm';
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
+import {
+  SettingsDataModelFieldSyncForm,
+  type SettingsDataModelFieldSyncFormValue,
+} from '@/settings/data-model/fields/forms/sync/components/SettingsDataModelFieldSyncForm';
+import { SettingsDataModelFieldSyncResyncButton } from '@/settings/data-model/fields/forms/sync/components/SettingsDataModelFieldSyncResyncButton';
+import {
+  getFieldSyncSettings,
+  getSyncFormValueFromField,
+} from '@/settings/data-model/fields/forms/sync/utils/getSyncFormValueFromField';
 import { settingsFieldFormSchema } from '@/settings/data-model/fields/forms/validation-schemas/settingsFieldFormSchema';
 import { type SettingsDataModelFieldEditFormValues } from '@/settings/data-model/types/SettingsDataModelFieldEditFormValues';
 import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFieldType';
@@ -40,12 +49,16 @@ import { Section } from 'twenty-ui/components/layout';
 import { IconArchive, IconArchiveOff, IconTrash } from 'twenty-ui/icon';
 import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
-import { FieldMetadataType } from '~/generated-metadata/graphql';
+import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 import { getFieldMetadataItemInitialValues } from '@/settings/data-model/fields/forms/utils/getFieldMetadataItemInitialValues';
 
 const DELETE_FIELD_MODAL_ID = 'delete-field-confirmation-modal';
+const StyledSyncActions = styled.div`
+  margin-top: ${themeCssVariables.spacing[4]};
+`;
+
 const StyledDangerButtons = styled.div`
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
@@ -103,6 +116,8 @@ export const SettingsObjectFieldEdit = () => {
     null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  const [syncFormDraft, setSyncFormDraft] =
+    useState<SettingsDataModelFieldSyncFormValue | null>(null);
 
   const fieldMetadataItem = objectMetadataItem?.fields.find(
     (fieldMetadataItem) =>
@@ -128,6 +143,8 @@ export const SettingsObjectFieldEdit = () => {
   const { settings, defaultValue } =
     getFieldMetadataItemInitialValues(fieldMetadataItem);
 
+  const isSyncField = isDefined(getFieldSyncSettings(fieldMetadataItem));
+
   const formConfig = useForm<SettingsDataModelFieldEditFormValues>({
     mode: 'onTouched',
     resolver: zodResolver(settingsFieldFormSchema()),
@@ -139,7 +156,15 @@ export const SettingsObjectFieldEdit = () => {
       isLabelSyncedWithName: fieldMetadataItem?.isLabelSyncedWithName ?? true,
       settings,
       defaultValue,
-    },
+      // The cards that normally fill these are not rendered for synced fields.
+      ...(isSyncField
+        ? {
+            settings: { displayedMaxRows: null, ...settings },
+            options: fieldMetadataItem?.options ?? [],
+            defaultValue: fieldMetadataItem?.defaultValue ?? null,
+          }
+        : {}),
+    } as SettingsDataModelFieldEditFormValues,
   });
 
   useEffect(() => {
@@ -162,7 +187,11 @@ export const SettingsObjectFieldEdit = () => {
 
   const isDirty = !isEmptyObject(dirtyFields);
 
-  const canSave = isDirty && isValid && !isSubmitting;
+  const canSave =
+    (isDirty || isDefined(syncFormDraft)) &&
+    (!isDefined(syncFormDraft) || isDefined(syncFormDraft.sourceField)) &&
+    isValid &&
+    !isSubmitting;
 
   if (!isDefined(objectMetadataItem) || !isDefined(fieldMetadataItem)) {
     return workspaceSurface.type === 'side-panel' ? (
@@ -190,6 +219,15 @@ export const SettingsObjectFieldEdit = () => {
   const fieldCanBeDeactivated = !fieldNamesThatCannotBeDeactivated.includes(
     fieldMetadataItem.name,
   );
+
+  const savedSyncFormValue = getSyncFormValueFromField(
+    fieldMetadataItem,
+    objectMetadataItem,
+    objectMetadataItems,
+  );
+
+  const isSyncPaused =
+    isSyncField && !isDefined(savedSyncFormValue.sourceField);
 
   const handleSave = async (
     formValues: SettingsDataModelFieldEditFormValues,
@@ -226,7 +264,7 @@ export const SettingsObjectFieldEdit = () => {
 
     const otherDirtyFields = omit(dirtyFields, 'relation');
 
-    if (Object.keys(otherDirtyFields).length > 0) {
+    if (Object.keys(otherDirtyFields).length > 0 || isDefined(syncFormDraft)) {
       const formattedInput = Object.fromEntries(
         Object.entries(formatFieldMetadataItemInput(formValues)).filter(
           ([key]) => Object.keys(otherDirtyFields).includes(key),
@@ -236,7 +274,30 @@ export const SettingsObjectFieldEdit = () => {
       const updateResult = await updateOneFieldMetadataItem({
         objectMetadataId: objectMetadataItem.id,
         fieldMetadataIdToUpdate: fieldMetadataItem.id,
-        updatePayload: formattedInput,
+        updatePayload: {
+          ...formattedInput,
+          ...(isDefined(syncFormDraft?.sourceField) &&
+          isDefined(syncFormDraft.relationFieldMetadataId)
+            ? {
+                settings: {
+                  ...fieldMetadataItem.settings,
+                  sync: {
+                    relationFieldMetadataId:
+                      syncFormDraft.relationFieldMetadataId,
+                    sourceFieldMetadataId: syncFormDraft.sourceField.id,
+                    ...(objectMetadataItem.fields.find(
+                      ({ id }) => id === syncFormDraft.relationFieldMetadataId,
+                    )?.relation?.type === RelationType.ONE_TO_MANY
+                      ? {
+                          policy:
+                            syncFormDraft.policy ?? 'MOST_RECENTLY_CREATED',
+                        }
+                      : {}),
+                  },
+                },
+              }
+            : {}),
+        },
       });
 
       if (updateResult.status === 'successful') {
@@ -373,7 +434,31 @@ export const SettingsObjectFieldEdit = () => {
                 readonly={readonly}
               />
             </Section.Root>
-            {!isReverseJunctionRelation && (
+            {isSyncField && (
+              <Section.Root>
+                <Section.Header
+                  title={t`Sync`}
+                  description={t`Mirror a property of an associated record`}
+                />
+                <SettingsDataModelFieldSyncForm
+                  objectMetadataItem={objectMetadataItem}
+                  value={syncFormDraft ?? savedSyncFormValue}
+                  onChange={setSyncFormDraft}
+                  targetFieldType={fieldMetadataItem.type}
+                  isPaused={isSyncPaused}
+                  disabled={readonly}
+                />
+                <StyledSyncActions>
+                  <SettingsDataModelFieldSyncResyncButton
+                    fieldMetadataId={fieldMetadataItem.id}
+                    disabled={
+                      readonly || isSyncPaused || isDefined(syncFormDraft)
+                    }
+                  />
+                </StyledSyncActions>
+              </Section.Root>
+            )}
+            {!isReverseJunctionRelation && !isSyncField && (
               <Section.Root>
                 {fieldMetadataItem.isUnique ? (
                   <Section.Header

@@ -10,7 +10,9 @@ const TO_MANY_CONFIG: ResolvedFieldSyncConfig = {
   targetFieldId: 'target-field',
   targetFieldName: 'latestStage',
   targetObjectNameSingular: 'company',
+  relationFieldId: 'relation-field',
   sourceObjectNameSingular: 'opportunity',
+  sourceFieldId: 'source-field',
   sourceFieldName: 'stage',
   sourceFieldType: FieldMetadataType.SELECT,
 };
@@ -21,7 +23,9 @@ const TO_ONE_CONFIG: ResolvedFieldSyncConfig = {
   targetFieldId: 'target-field',
   targetFieldName: 'operatesIn',
   targetObjectNameSingular: 'opportunity',
+  relationFieldId: 'relation-field',
   sourceObjectNameSingular: 'company',
+  sourceFieldId: 'source-field',
   sourceFieldName: 'operatesIn',
   sourceFieldType: FieldMetadataType.MULTI_SELECT,
 };
