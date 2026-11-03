@@ -12,6 +12,7 @@ const buildConfig = (
   targetFieldId: 'target-field',
   targetFieldName: 'computed',
   outputType,
+  outputConfig: { optionValues: ['HIGH', 'LOW'], currencyCode: 'SAR' },
   objectNameSingular: 'opportunity',
   expression,
   dependencies: [
@@ -75,6 +76,33 @@ describe('FieldFormulaService', () => {
     const update = await recompute(
       buildConfig(FieldMetadataType.NUMBER, FORMULA),
       [{ id: 'deal', price: null, branches: 5, computed: 500 }],
+    );
+
+    expect(update.mock.calls[0][1]).toEqual({ computed: null });
+  });
+
+  it('stores an empty currency as a composite, not null', async () => {
+    const update = await recompute(
+      buildConfig(FieldMetadataType.CURRENCY, 'null'),
+      [
+        {
+          id: 'deal',
+          price: 1,
+          branches: 1,
+          computed: { amountMicros: 5, currencyCode: 'SAR' },
+        },
+      ],
+    );
+
+    expect(update.mock.calls[0][1]).toEqual({
+      computed: { amountMicros: null, currencyCode: null },
+    });
+  });
+
+  it('stores empty when a select value is not one of its options', async () => {
+    const update = await recompute(
+      buildConfig(FieldMetadataType.SELECT, '"NOPE"'),
+      [{ id: 'deal', price: 1, branches: 1, computed: 'HIGH' }],
     );
 
     expect(update.mock.calls[0][1]).toEqual({ computed: null });
@@ -145,6 +173,25 @@ describe('FieldFormulaService', () => {
     [FieldMetadataType.BOOLEAN, 'price > 1', true],
     [FieldMetadataType.BOOLEAN, 'price < 1', false],
     [FieldMetadataType.BOOLEAN, 'null', null],
+    [FieldMetadataType.DATE, 'date("2026-03-15")', '2026-03-15'],
+    [FieldMetadataType.DATE, 'null', null],
+    [
+      FieldMetadataType.DATE_TIME,
+      'date("2026-03-15T12:30:00Z")',
+      new Date('2026-03-15T12:30:00Z'),
+    ],
+    [FieldMetadataType.SELECT, '"HIGH"', 'HIGH'],
+    [FieldMetadataType.SELECT, 'null', null],
+    [
+      FieldMetadataType.CURRENCY,
+      'price * 2',
+      { amountMicros: '200000000', currencyCode: 'SAR' },
+    ],
+    [
+      FieldMetadataType.CURRENCY,
+      'null',
+      { amountMicros: null, currencyCode: '' },
+    ],
   ] as const)(
     'does not rewrite an up-to-date %s: %s',
     async (outputType, expression, storedValue) => {

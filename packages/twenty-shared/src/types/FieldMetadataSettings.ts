@@ -1,4 +1,5 @@
 import { type AllowedAddressSubField } from '@/types/AddressFieldsType';
+import { type DurationUnit } from '@/utils/formula/formatDuration';
 import { type FieldMetadataFormulaSettings } from '@/types/FieldMetadataFormulaSettings';
 import { type FieldMetadataMultiItemSettings } from '@/types/FieldMetadataMultiItemSettings';
 import { type FieldMetadataSyncSettings } from '@/types/FieldMetadataSyncSettings';
@@ -20,7 +21,11 @@ export enum DateDisplayFormat {
   CUSTOM = 'CUSTOM',
 }
 
-export type FieldNumberVariant = 'number' | 'percentage';
+export type FieldNumberVariant =
+  | 'number'
+  | 'percentage'
+  | 'unformatted'
+  | 'duration';
 
 export type FieldCurrencyFormat = 'short' | 'full';
 
@@ -32,12 +37,14 @@ type FieldMetadataNumberSettings = {
   dataType?: NumberDataType;
   decimals?: number;
   type?: FieldNumberVariant;
+  durationUnit?: DurationUnit;
   formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataCurrencySettings = {
   format?: FieldCurrencyFormat;
   decimals?: number;
+  formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataTextSettings = {
@@ -52,14 +59,17 @@ type FieldMetadataBooleanSettings = {
 
 type FieldMetadataSelectSettings = {
   sync?: FieldMetadataSyncSettings;
+  formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataDateSettings = {
   displayFormat?: DateDisplayFormat;
+  formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataDateTimeSettings = {
   displayFormat?: DateDisplayFormat;
+  formula?: FieldMetadataFormulaSettings;
 };
 
 type FieldMetadataRelationSettings = {

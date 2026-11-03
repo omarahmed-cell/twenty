@@ -202,7 +202,10 @@ export { formatToShortNumber } from './format/formatToShortNumber';
 export { buildFormulaVariables } from './formula/buildFormulaVariables';
 export type {
   FormulaOutputFieldType,
+  FormulaCurrencyValue,
+  FormulaResultValue,
   CoercedFormulaResult,
+  FormulaOutputConfig,
 } from './formula/coerceFormulaResult';
 export {
   FORMULA_OUTPUT_FIELD_TYPES,
@@ -212,7 +215,13 @@ export type { FormulaEvaluation } from './formula/evaluateFormula';
 export { evaluateFormula } from './formula/evaluateFormula';
 export type { ComputedGraphField } from './formula/findComputedFieldCycleMembers';
 export { findComputedFieldCycleMembers } from './formula/findComputedFieldCycleMembers';
-export { FORMULA_FUNCTIONS, FORMULA_ENGINE } from './formula/formulaEngine';
+export type { DurationUnit } from './formula/formatDuration';
+export { DURATION_UNITS, formatDuration } from './formula/formatDuration';
+export {
+  FORMULA_FUNCTIONS,
+  FORMULA_FUNCTION_SIGNATURES,
+  FORMULA_ENGINE,
+} from './formula/formulaEngine';
 export { isFormulaValueUnchanged } from './formula/isFormulaValueUnchanged';
 export type { ParsedFormula } from './formula/parseFormula';
 export { parseFormula } from './formula/parseFormula';

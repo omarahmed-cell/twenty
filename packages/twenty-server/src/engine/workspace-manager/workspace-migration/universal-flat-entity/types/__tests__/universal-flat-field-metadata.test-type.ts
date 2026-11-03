@@ -1,3 +1,4 @@
+import { type DurationUnit } from 'twenty-shared/utils';
 import {
   type Equal,
   type Expect,
@@ -118,6 +119,7 @@ type SettingsExpectedResult =
       dataType?: NumberDataType | undefined;
       decimals?: number | undefined;
       type?: FieldNumberVariant | undefined;
+      durationUnit?: DurationUnit | undefined;
       formula?: FieldMetadataFormulaSettings | undefined;
       __JsonbPropertyBrand__?: undefined;
     }

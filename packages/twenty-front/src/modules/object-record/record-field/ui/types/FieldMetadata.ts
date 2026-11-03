@@ -1,6 +1,7 @@
 import { type FieldMetadataItemRelation } from '@/object-metadata/types/FieldMetadataItemRelation';
 import { type ZodHelperLiteral } from '@/object-record/record-field/ui/types/ZodHelperLiteral';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { type DurationUnit } from 'twenty-shared/utils';
 import { type CurrencyCode } from 'twenty-shared/constants';
 import {
   ConnectedAccountProvider,
@@ -68,6 +69,8 @@ export const FIELD_NUMBER_VARIANT = [
   'number',
   'percentage',
   'shortNumber',
+  'unformatted',
+  'duration',
 ] as const;
 export type FieldNumberVariant = (typeof FIELD_NUMBER_VARIANT)[number];
 
@@ -77,6 +80,7 @@ export type FieldNumberMetadata = BaseFieldMetadata & {
   settings?: {
     decimals?: number;
     type?: FieldNumberVariant;
+    durationUnit?: DurationUnit;
   };
 };
 

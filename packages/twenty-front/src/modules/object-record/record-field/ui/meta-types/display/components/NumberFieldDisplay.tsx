@@ -1,6 +1,10 @@
 import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { useNumberFieldDisplay } from '@/object-record/record-field/ui/meta-types/hooks/useNumberFieldDisplay';
-import { formatToShortNumber, isDefined } from 'twenty-shared/utils';
+import {
+  formatDuration,
+  formatToShortNumber,
+  isDefined,
+} from 'twenty-shared/utils';
 import { Text } from 'twenty-ui/primitives/typography';
 
 export const NumberFieldDisplay = () => {
@@ -20,6 +24,13 @@ export const NumberFieldDisplay = () => {
     formattedValue = `${formatNumber(numericValue * 100, { decimals })}%`;
   } else if (type === 'shortNumber') {
     formattedValue = formatToShortNumber(numericValue);
+  } else if (type === 'unformatted') {
+    formattedValue = String(numericValue);
+  } else if (type === 'duration') {
+    formattedValue = formatDuration(
+      numericValue,
+      fieldDefinition.metadata.settings?.durationUnit,
+    );
   } else {
     formattedValue = formatNumber(numericValue, { decimals });
   }

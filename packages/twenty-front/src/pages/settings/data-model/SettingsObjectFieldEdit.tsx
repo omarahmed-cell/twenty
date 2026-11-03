@@ -8,7 +8,10 @@ import { useGetRelationMetadata } from '@/object-metadata/hooks/useGetRelationMe
 import { useUpdateOneFieldMetadataItem } from '@/object-metadata/hooks/useUpdateOneFieldMetadataItem';
 import { formatFieldMetadataItemInput } from '@/object-metadata/utils/formatFieldMetadataItemInput';
 import { isLabelIdentifierField } from '@/object-metadata/utils/isLabelIdentifierField';
-import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
+import {
+  FORMULA_FORM_DEFAULT_SETTINGS,
+  getFormulaFormDefaultValue,
+} from '@/settings/data-model/fields/forms/formula/utils/getFormulaFormDefaults';
 import { isObjectMetadataReadOnly } from '@/object-record/read-only/utils/isObjectMetadataReadOnly';
 import { resolveJunctionConfig } from '@/object-record/record-field/ui/utils/junction/resolveJunctionConfig';
 import { SaveAndCancelButtons } from '@/settings/components/SaveAndCancelButtons/SaveAndCancelButtons';
@@ -177,16 +180,14 @@ export const SettingsObjectFieldEdit = () => {
       // The cards that normally fill these are not rendered for synced fields.
       ...(isFormulaField
         ? {
-            settings: {
-              displayedMaxRows: null,
-              type: 'number',
-              decimals: DEFAULT_DECIMAL_VALUE,
-              ...settings,
-            },
+            settings: { ...FORMULA_FORM_DEFAULT_SETTINGS, ...settings },
+            options: fieldMetadataItem?.options ?? [],
             defaultValue:
-              fieldMetadataItem?.type === FieldMetadataType.BOOLEAN
-                ? false
-                : null,
+              fieldMetadataItem?.type === FieldMetadataType.CURRENCY
+                ? fieldMetadataItem.defaultValue
+                : getFormulaFormDefaultValue(
+                    fieldMetadataItem?.type as FormulaOutputFieldType,
+                  ),
           }
         : {}),
       ...(isSyncField
@@ -344,9 +345,7 @@ export const SettingsObjectFieldEdit = () => {
             ? {
                 settings: {
                   ...fieldMetadataItem.settings,
-                  ...(fieldMetadataItem.type === FieldMetadataType.NUMBER
-                    ? formattedInput.settings
-                    : {}),
+                  ...formattedInput.settings,
                   formula: {
                     expression: formulaDraft ?? savedFormula.expression,
                   },

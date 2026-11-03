@@ -10,7 +10,8 @@ import { NUMBER_DATA_MODEL_SELECT_OPTIONS } from '@/settings/data-model/fields/f
 import { Select } from '@/ui/input/components/Select';
 import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
-import { IconDecimal, IconEye } from 'twenty-ui/icon';
+import { type DurationUnit } from 'twenty-shared/utils';
+import { IconClock, IconDecimal, IconEye } from 'twenty-ui/icon';
 import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
 
 export const settingsDataModelFieldNumberFormSchema = z.object({
@@ -49,6 +50,7 @@ export const SettingsDataModelFieldNumberForm = ({
       render={({ field: { onChange, value } }) => {
         const count = value?.decimals ?? 0;
         const type = value?.type ?? 'number';
+        const durationUnit = value?.durationUnit ?? 'days';
         const example = `${(type === 'percentage' ? 99 : 1000).toFixed(count)}${type === 'percentage' ? '%' : ''}`;
 
         return (
@@ -56,18 +58,19 @@ export const SettingsDataModelFieldNumberForm = ({
             <SettingsOptionCardContentSelect
               Icon={IconEye}
               title={t`Number type`}
-              description={t`Display as a plain number or a percentage`}
+              description={t`How the number is displayed`}
             >
               <Select<string>
                 selectSizeVariant="small"
                 dropdownId="number-type"
-                dropdownWidth={120}
+                dropdownWidth={150}
                 value={type}
                 onChange={(value) =>
                   onChange({
                     type: value,
                     decimals:
                       value === 'shortNumber' ? DEFAULT_DECIMAL_VALUE : count,
+                    durationUnit: value === 'duration' ? durationUnit : null,
                   })
                 }
                 disabled={disabled}
@@ -79,7 +82,33 @@ export const SettingsDataModelFieldNumberForm = ({
               />
             </SettingsOptionCardContentSelect>
             <SettingsCardSeparator />
-            {type !== 'shortNumber' && (
+            {type === 'duration' && (
+              <SettingsOptionCardContentSelect
+                Icon={IconClock}
+                title={t`Stored in`}
+                description={t`The unit of the number, shown like 3d 4h`}
+              >
+                <Select<DurationUnit>
+                  selectSizeVariant="small"
+                  dropdownId="number-duration-unit"
+                  dropdownWidth={150}
+                  value={durationUnit}
+                  onChange={(unit) =>
+                    onChange({ type, decimals: count, durationUnit: unit })
+                  }
+                  disabled={disabled}
+                  needIconCheck={false}
+                  options={[
+                    { label: t`Days`, value: 'days' },
+                    { label: t`Hours`, value: 'hours' },
+                    { label: t`Minutes`, value: 'minutes' },
+                    { label: t`Seconds`, value: 'seconds' },
+                    { label: t`Milliseconds`, value: 'milliseconds' },
+                  ]}
+                />
+              </SettingsOptionCardContentSelect>
+            )}
+            {(type === 'number' || type === 'percentage') && (
               <SettingsOptionCardContentCounter
                 Icon={IconDecimal}
                 title={t`Number of decimals`}

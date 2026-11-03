@@ -82,6 +82,7 @@ describe('resolveFieldFormulaConfigs', () => {
       targetFieldId: 'total',
       targetFieldName: 'total',
       outputType: FieldMetadataType.NUMBER,
+      outputConfig: { optionValues: [], currencyCode: undefined },
       objectNameSingular: 'opportunity',
       expression: 'price * branches',
       dependencies: [

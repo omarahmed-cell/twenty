@@ -8,11 +8,13 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import {
   buildFormulaVariables,
   coerceFormulaResult,
   evaluateFormula,
   type FormulaOutputFieldType,
+  type FormulaResultValue,
   isDefined,
 } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -66,6 +68,11 @@ const toSampleValue = (text: string, type: FieldMetadataType) => {
   return text;
 };
 
+const formatResult = (value: FormulaResultValue) =>
+  typeof value === 'object' && value !== null
+    ? `${value.amountMicros / 1_000_000} ${value.currencyCode}`
+    : String(value);
+
 type SettingsDataModelFieldFormulaTestProps = {
   expression: string;
   outputType: FormulaOutputFieldType;
@@ -97,6 +104,14 @@ export const SettingsDataModelFieldFormulaTest = ({
     ]),
   );
 
+  // Reads the options and currency being edited, so a test reflects unsaved changes.
+  const { watch } = useFormContext();
+  const options = watch('options') as { value: string }[] | undefined;
+  const defaultValue = watch('defaultValue') as
+    | { currencyCode?: string }
+    | null
+    | undefined;
+
   const evaluation = evaluateFormula(
     expression,
     buildFormulaVariables(selectedRecord ?? sampleRecord, dependencies),
@@ -104,7 +119,10 @@ export const SettingsDataModelFieldFormulaTest = ({
 
   const result =
     evaluation.status === 'success'
-      ? coerceFormulaResult(evaluation.value, outputType)
+      ? coerceFormulaResult(evaluation.value, outputType, {
+          optionValues: (options ?? []).map(({ value }) => value),
+          currencyCode: defaultValue?.currencyCode?.replace(/'/g, ''),
+        })
       : evaluation;
 
   return (
@@ -151,7 +169,7 @@ export const SettingsDataModelFieldFormulaTest = ({
       {result.status === 'success' ? (
         <StyledResult>
           {t`Result`}:{' '}
-          {isDefined(result.value) ? String(result.value) : t`Empty`}
+          {isDefined(result.value) ? formatResult(result.value) : t`Empty`}
         </StyledResult>
       ) : (
         <StyledError>{result.error}</StyledError>

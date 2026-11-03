@@ -9,7 +9,11 @@ import { PERCENT_AGGREGATE_OPERATION_OPTIONS } from '@/object-record/record-tabl
 import { type ExtendedAggregateOperations } from '@/object-record/record-table/types/ExtendedAggregateOperations';
 
 import { FieldMetadataType, type Nullable } from 'twenty-shared/types';
-import { formatToShortNumber, isDefined } from 'twenty-shared/utils';
+import {
+  formatDuration,
+  formatToShortNumber,
+  isDefined,
+} from 'twenty-shared/utils';
 import {
   type AggregateOperations,
   ChartNumberFormat,
@@ -70,7 +74,11 @@ export const transformAggregateRawValueIntoAggregateDisplayValue = ({
 
       case FieldMetadataType.NUMBER: {
         const castedValue = Number(aggregateRawValue);
-        const { decimals, type } = aggregateFieldMetadataItem.settings ?? {};
+        const { decimals, type, durationUnit } =
+          aggregateFieldMetadataItem.settings ?? {};
+        if (type === 'duration') {
+          return formatDuration(castedValue, durationUnit);
+        }
         if (type === 'percentage') {
           return `${formatNumber(castedValue * 100, { decimals, format: numberFormat })}%`;
         }

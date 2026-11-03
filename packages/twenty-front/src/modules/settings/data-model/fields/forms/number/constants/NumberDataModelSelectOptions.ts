@@ -2,6 +2,8 @@ import { type FieldNumberVariant } from '@/object-record/record-field/ui/types/F
 import { type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import {
+  IconClock,
+  IconNumbers,
   IconLetterK,
   IconNumber9,
   IconPercentage,
@@ -28,5 +30,15 @@ export const NUMBER_DATA_MODEL_SELECT_OPTIONS = [
     Icon: IconPercentage,
     label: msg`Percentage`,
     value: 'percentage',
+  },
+  {
+    Icon: IconNumbers,
+    label: msg`Unformatted`,
+    value: 'unformatted',
+  },
+  {
+    Icon: IconClock,
+    label: msg`Duration`,
+    value: 'duration',
   },
 ] as const satisfies Array<NumberDataModelSelectOptions>;

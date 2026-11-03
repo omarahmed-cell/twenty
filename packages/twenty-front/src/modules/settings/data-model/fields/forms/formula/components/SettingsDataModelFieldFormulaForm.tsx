@@ -6,12 +6,17 @@ import {
   getFormulaReferenceableFields,
   validateFormula,
 } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
+import { SettingsDataModelFieldFormulaInsertMenus } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaInsertMenus';
+import { SettingsDataModelFieldCurrencyForm } from '@/settings/data-model/fields/forms/currency/components/SettingsDataModelFieldCurrencyForm';
+import { SettingsDataModelFieldDateForm } from '@/settings/data-model/fields/forms/date/components/SettingsDataModelFieldDateForm';
 import { SettingsDataModelFieldNumberForm } from '@/settings/data-model/fields/forms/number/components/SettingsDataModelFieldNumberForm';
+import { SettingsDataModelFieldSelectForm } from '@/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectForm';
 import { Select } from '@/ui/input/components/Select';
 import { TextArea } from '@/ui/input/components/TextArea';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
+import { useRef } from 'react';
 import { type FormulaOutputFieldType } from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { Card } from 'twenty-ui/primitives/surfaces';
@@ -22,10 +27,6 @@ const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${themeCssVariables.spacing[4]};
-`;
-
-const StyledHint = styled.div`
-  color: ${themeCssVariables.font.color.tertiary};
 `;
 
 const StyledError = styled.div`
@@ -70,10 +71,26 @@ export const SettingsDataModelFieldFormulaForm = ({
     targetField,
   });
 
-  const availableFieldNames = referenceableFields
-    .filter(({ isSystem }) => isSystem !== true)
-    .map(({ name }) => name)
-    .join(', ');
+  const textAreaContainerRef = useRef<HTMLDivElement>(null);
+
+  // The text area keeps its selection while a dropdown has focus, so this inserts where the
+  // caret was. The offset leaves the caret inside the parentheses of a function.
+  const insertAtCaret = (text: string, caretOffsetFromEnd = 0) => {
+    const textArea = textAreaContainerRef.current?.querySelector('textarea');
+    const start = textArea?.selectionStart ?? expression.length;
+    const end = textArea?.selectionEnd ?? expression.length;
+
+    onExpressionChange(
+      `${expression.slice(0, start)}${text}${expression.slice(end)}`,
+    );
+
+    requestAnimationFrame(() => {
+      const caret = start + text.length - caretOffsetFromEnd;
+
+      textArea?.focus();
+      textArea?.setSelectionRange(caret, caret);
+    });
+  };
 
   return (
     <StyledContainer>
@@ -92,6 +109,10 @@ export const SettingsDataModelFieldFormulaForm = ({
           { label: t`Number`, value: FieldMetadataType.NUMBER },
           { label: t`Text`, value: FieldMetadataType.TEXT },
           { label: t`True/False`, value: FieldMetadataType.BOOLEAN },
+          { label: t`Date`, value: FieldMetadataType.DATE },
+          { label: t`Date and time`, value: FieldMetadataType.DATE_TIME },
+          { label: t`Select`, value: FieldMetadataType.SELECT },
+          { label: t`Currency`, value: FieldMetadataType.CURRENCY },
         ]}
         onChange={onOutputTypeChange}
       />
@@ -103,23 +124,53 @@ export const SettingsDataModelFieldFormulaForm = ({
           />
         </Card.Root>
       )}
-      <TextArea
-        textAreaId="field-formula-expression"
-        label={t`Formula`}
-        minRows={3}
-        maxRows={12}
+      {outputType === FieldMetadataType.CURRENCY && (
+        <Card.Root>
+          <SettingsDataModelFieldCurrencyForm
+            disabled={disabled}
+            existingFieldMetadataId={targetField?.id ?? ''}
+          />
+        </Card.Root>
+      )}
+      {(outputType === FieldMetadataType.DATE ||
+        outputType === FieldMetadataType.DATE_TIME) && (
+        <Card.Root>
+          <SettingsDataModelFieldDateForm
+            disabled={disabled}
+            existingFieldMetadataId={targetField?.id ?? ''}
+          />
+        </Card.Root>
+      )}
+      {outputType === FieldMetadataType.SELECT && (
+        <Card.Root>
+          <SettingsDataModelFieldSelectForm
+            fieldType={FieldMetadataType.SELECT}
+            disabled={disabled}
+            existingFieldMetadataId={targetField?.id ?? ''}
+          />
+        </Card.Root>
+      )}
+      <SettingsDataModelFieldFormulaInsertMenus
+        referenceableFields={referenceableFields}
+        onInsert={insertAtCaret}
         disabled={disabled}
-        placeholder={t`branches >= 1 && branches <= 10 ? price * branches : 0`}
-        value={expression}
-        onChange={onExpressionChange}
       />
+      <div ref={textAreaContainerRef}>
+        <TextArea
+          textAreaId="field-formula-expression"
+          label={t`Formula`}
+          minRows={3}
+          maxRows={12}
+          disabled={disabled}
+          placeholder={t`branches >= 1 && branches <= 10 ? price * branches : 0`}
+          value={expression}
+          onChange={onExpressionChange}
+        />
+      </div>
       {isNonEmptyString(expression.trim()) &&
         validation.status === 'invalid' && (
           <StyledError>{validation.error}</StyledError>
         )}
-      <StyledHint>
-        {t`Fields you can use`}: {availableFieldNames}
-      </StyledHint>
       {validation.status === 'valid' && (
         <Section.Root>
           <Section.Header

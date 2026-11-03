@@ -117,7 +117,7 @@ export const SettingsDataModelFieldSyncForm = ({
     <StyledContainer>
       {isPaused && (
         <StyledWarning>
-          {t`This field stopped syncing because its source or relation was removed or deactivated. It keeps its last values. Pick a new source to resume.`}
+          {t`This field stopped syncing because its source or relation was removed or deactivated, or it is part of a loop. It keeps its last values. Pick a new source to resume.`}
         </StyledWarning>
       )}
       <Select

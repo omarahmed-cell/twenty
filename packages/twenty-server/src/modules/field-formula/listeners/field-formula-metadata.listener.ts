@@ -81,6 +81,7 @@ export class FieldFormulaMetadataListener {
       if (
         isDefined(getFieldFormulaSettings(after)) &&
         (needsCatchUp ||
+          !isSameJson(before.options, after.options) ||
           !isSameJson(
             getFieldFormulaSettings(before),
             getFieldFormulaSettings(after),

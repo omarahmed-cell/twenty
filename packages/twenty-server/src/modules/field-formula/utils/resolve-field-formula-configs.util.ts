@@ -46,6 +46,24 @@ export const getFieldFormulaSettings = (
     : undefined;
 };
 
+// Currency defaults are stored as a quoted SQL literal, like 'USD'.
+const getOutputConfig = (
+  field: FlatFieldMetadata,
+): ResolvedFieldFormulaConfig['outputConfig'] => {
+  const currencyCode = (field.defaultValue as { currencyCode?: unknown } | null)
+    ?.currencyCode;
+
+  return {
+    optionValues: ((field.options ?? []) as { value: string }[]).map(
+      ({ value }) => value,
+    ),
+    currencyCode:
+      typeof currencyCode === 'string'
+        ? currencyCode.replace(/'/g, '')
+        : undefined,
+  };
+};
+
 const resolveFieldFormulaConfig = (
   targetField: FlatFieldMetadata,
   objectFields: FlatFieldMetadata[],
@@ -95,6 +113,7 @@ const resolveFieldFormulaConfig = (
     targetFieldId: targetField.id,
     targetFieldName: targetField.name,
     outputType: targetField.type,
+    outputConfig: getOutputConfig(targetField),
     objectNameSingular: targetObject.nameSingular,
     expression: formula.expression,
     dependencies: dependencies.map(({ id, name, type }) => ({

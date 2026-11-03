@@ -9,6 +9,9 @@ const FORMULA_MAX_LENGTH = 5000;
 
 const FORBIDDEN_NAMES = new Set(['constructor', '__proto__', 'prototype']);
 
+// jexl has no null keyword: these read as fields that are always empty, which is what they mean.
+const EMPTY_VALUE_NAMES = new Set(['null', 'undefined']);
+
 const FORMULA_FUNCTION_NAMES = new Set(Object.keys(FORMULA_FUNCTIONS));
 
 type FormulaAstNode = {
@@ -17,6 +20,27 @@ type FormulaAstNode = {
   from?: unknown;
   name?: string;
   pool?: string;
+};
+
+// jexl's lexer only reads "-5" after an operator or an opening bracket, and has no unary
+// minus on a field, and a ternary cannot directly follow a function call.
+const SYNTAX_ERROR_HINTS: { pattern: RegExp; hint: string }[] = [
+  {
+    pattern: /Token - \(binaryOp\) unexpected|Invalid expression token: -/,
+    hint: 'For a negative value, write 0 - value.',
+  },
+  {
+    pattern: /Token \? +\(question\) unexpected/,
+    hint: 'Wrap the condition in parentheses, or use if(condition, a, b).',
+  },
+];
+
+const withSyntaxHint = (message: string) => {
+  const hint = SYNTAX_ERROR_HINTS.find(({ pattern }) =>
+    pattern.test(message),
+  )?.hint;
+
+  return hint === undefined ? message : `${message} ${hint}`;
 };
 
 export type ParsedFormula =
@@ -91,7 +115,9 @@ export const parseFormula = (expression: string): ParsedFormula => {
   } catch (error) {
     return {
       status: 'invalid',
-      error: error instanceof Error ? error.message : String(error),
+      error: withSyntaxHint(
+        error instanceof Error ? error.message : String(error),
+      ),
     };
   }
 
@@ -111,7 +137,8 @@ export const parseFormula = (expression: string): ParsedFormula => {
     if (
       node.type === 'Identifier' &&
       typeof node.value === 'string' &&
-      node.from === undefined
+      node.from === undefined &&
+      !EMPTY_VALUE_NAMES.has(node.value)
     ) {
       fieldNames.add(node.value);
     }

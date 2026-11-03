@@ -1,5 +1,8 @@
 import { type FieldMetadataType } from 'twenty-shared/types';
-import { type FormulaOutputFieldType } from 'twenty-shared/utils';
+import {
+  type FormulaOutputConfig,
+  type FormulaOutputFieldType,
+} from 'twenty-shared/utils';
 
 export type FieldFormulaDependency = {
   fieldId: string;
@@ -11,6 +14,7 @@ export type ResolvedFieldFormulaConfig = {
   targetFieldId: string;
   targetFieldName: string;
   outputType: FormulaOutputFieldType;
+  outputConfig: FormulaOutputConfig;
   objectNameSingular: string;
   expression: string;
   dependencies: FieldFormulaDependency[];

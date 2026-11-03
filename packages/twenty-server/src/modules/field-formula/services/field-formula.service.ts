@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { FieldMetadataType } from 'twenty-shared/types';
 import {
   buildFormulaVariables,
   coerceFormulaResult,
@@ -22,6 +23,8 @@ import {
 } from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
 
 const BATCH_SIZE = 500;
+
+const EMPTY_CURRENCY = { amountMicros: null, currencyCode: null };
 
 type FormulaRecord = Record<string, unknown> & { id: string };
 
@@ -233,7 +236,11 @@ export class FieldFormulaService {
 
     const result =
       evaluation.status === 'success'
-        ? coerceFormulaResult(evaluation.value, config.outputType)
+        ? coerceFormulaResult(
+            evaluation.value,
+            config.outputType,
+            config.outputConfig,
+          )
         : evaluation;
 
     if (result.status === 'success') {
@@ -275,7 +282,10 @@ export class FieldFormulaService {
             config.outputType,
           )
         ) {
-          patch[config.targetFieldName] = value;
+          patch[config.targetFieldName] =
+            value === null && config.outputType === FieldMetadataType.CURRENCY
+              ? EMPTY_CURRENCY
+              : value;
         }
       }
 

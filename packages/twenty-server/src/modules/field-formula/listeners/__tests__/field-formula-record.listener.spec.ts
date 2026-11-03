@@ -7,6 +7,7 @@ const CONFIG: ResolvedFieldFormulaConfig = {
   targetFieldId: 'target-field',
   targetFieldName: 'computed',
   outputType: FieldMetadataType.NUMBER,
+  outputConfig: {},
   objectNameSingular: 'opportunity',
   expression: 'price * branches',
   dependencies: [

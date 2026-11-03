@@ -29,6 +29,28 @@ const onDefinedNumbers =
   (...values: TNumbers) =>
     values.every(isDefined) ? compute(...values) : null;
 
+const toValidTimestamp = (value: unknown) => {
+  const timestamp = new Date(value as string | number).getTime();
+
+  return Number.isNaN(timestamp) ? null : timestamp;
+};
+
+const addUtcMonths = (timestamp: number, months: number) => {
+  const date = new Date(timestamp);
+  const dayOfMonth = date.getUTCDate();
+
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() + months);
+
+  const lastDayOfMonth = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+
+  date.setUTCDate(Math.min(dayOfMonth, lastDayOfMonth));
+
+  return date.getTime();
+};
+
 const timeBetween =
   (unitInMilliseconds: number) => (left: number, right: number) =>
     (left - right) / unitInMilliseconds;
@@ -69,6 +91,51 @@ export const FORMULA_FUNCTIONS: Record<
     container?.includes(value) ?? false,
   daysBetween: onDefinedNumbers(timeBetween(MILLISECONDS_PER_DAY)),
   hoursBetween: onDefinedNumbers(timeBetween(MILLISECONDS_PER_HOUR)),
+  date: (value: unknown) => (isDefined(value) ? toValidTimestamp(value) : null),
+  addDays: onDefinedNumbers(
+    (timestamp: number, days: number) =>
+      timestamp + days * MILLISECONDS_PER_DAY,
+  ),
+  addHours: onDefinedNumbers(
+    (timestamp: number, hours: number) =>
+      timestamp + hours * MILLISECONDS_PER_HOUR,
+  ),
+  addMonths: onDefinedNumbers(addUtcMonths),
+  year: onDefinedNumbers((timestamp: number) =>
+    new Date(timestamp).getUTCFullYear(),
+  ),
+  month: onDefinedNumbers(
+    (timestamp: number) => new Date(timestamp).getUTCMonth() + 1,
+  ),
+  dayOfMonth: onDefinedNumbers((timestamp: number) =>
+    new Date(timestamp).getUTCDate(),
+  ),
+};
+
+export const FORMULA_FUNCTION_SIGNATURES: Record<string, string> = {
+  if: 'if(condition, whenTrue, whenFalse)',
+  between: 'between(value, low, high)',
+  isEmpty: 'isEmpty(value)',
+  abs: 'abs(number)',
+  round: 'round(number, digits)',
+  floor: 'floor(number)',
+  ceil: 'ceil(number)',
+  min: 'min(a, b, ...)',
+  max: 'max(a, b, ...)',
+  concat: 'concat(a, b, ...)',
+  lower: 'lower(text)',
+  upper: 'upper(text)',
+  length: 'length(textOrList)',
+  contains: 'contains(textOrList, value)',
+  daysBetween: 'daysBetween(later, earlier)',
+  hoursBetween: 'hoursBetween(later, earlier)',
+  date: 'date("2026-01-31")',
+  addDays: 'addDays(date, days)',
+  addHours: 'addHours(date, hours)',
+  addMonths: 'addMonths(date, months)',
+  year: 'year(date)',
+  month: 'month(date)',
+  dayOfMonth: 'dayOfMonth(date)',
 };
 
 const createFormulaEngine = () => {

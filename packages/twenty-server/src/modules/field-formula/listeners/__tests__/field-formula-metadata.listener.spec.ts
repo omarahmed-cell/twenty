@@ -8,6 +8,7 @@ const CONFIG: ResolvedFieldFormulaConfig = {
   targetFieldId: 'target-field',
   targetFieldName: 'computed',
   outputType: FieldMetadataType.NUMBER,
+  outputConfig: {},
   objectNameSingular: 'opportunity',
   expression: 'price * 2',
   dependencies: [
@@ -107,6 +108,25 @@ describe('FieldFormulaMetadataListener', () => {
       {
         id: 'target-field',
         settings: { formula: { expression: 'price * 3' } },
+      },
+    );
+
+    expect(calls()).toEqual(BACKFILL_NOW_AND_LATER);
+  });
+
+  it("backfills when the formula field's own options change", async () => {
+    const { handleUpdate, calls } = setup();
+
+    await handleUpdate(
+      {
+        id: 'target-field',
+        settings: FORMULA_SETTINGS,
+        options: [{ value: 'A' }],
+      },
+      {
+        id: 'target-field',
+        settings: FORMULA_SETTINGS,
+        options: [{ value: 'B' }],
       },
     );
 

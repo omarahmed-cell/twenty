@@ -9,7 +9,10 @@ import { FIELD_NAME_MAXIMUM_LENGTH } from '@/settings/data-model/constants/Field
 import { SettingsObjectNewFieldHeaderIcon } from '@/settings/data-model/fields/components/SettingsObjectNewFieldHeaderIcon';
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
-import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
+import {
+  FORMULA_FORM_DEFAULT_SETTINGS,
+  getFormulaFormDefaultValue,
+} from '@/settings/data-model/fields/forms/formula/utils/getFormulaFormDefaults';
 import { SettingsDataModelFieldFormulaForm } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
 import { validateFormula } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -106,7 +109,7 @@ export const SettingsObjectNewFieldConfigure = () => {
         ? {
             type: FieldMetadataType.NUMBER,
             defaultValue: null,
-            settings: { type: 'number', decimals: DEFAULT_DECIMAL_VALUE },
+            settings: FORMULA_FORM_DEFAULT_SETTINGS,
           }
         : {}),
     },
@@ -141,17 +144,20 @@ export const SettingsObjectNewFieldConfigure = () => {
     formConfig.setValue('type', outputType as never, { shouldValidate: true });
     formConfig.setValue(
       'defaultValue',
-      (outputType === FieldMetadataType.BOOLEAN ? false : null) as never,
+      getFormulaFormDefaultValue(outputType) as never,
       { shouldValidate: true },
     );
-    formConfig.setValue(
-      'settings',
-      (outputType === FieldMetadataType.NUMBER
-        ? { type: 'number', decimals: DEFAULT_DECIMAL_VALUE }
-        : { displayedMaxRows: null }) as never,
-      { shouldValidate: true },
-    );
+    formConfig.setValue('settings', FORMULA_FORM_DEFAULT_SETTINGS as never, {
+      shouldValidate: true,
+    });
   };
+
+  // The output's form card only registers its own defaults (like select options) once mounted.
+  useEffect(() => {
+    if (isFormulaMode) {
+      formConfig.trigger();
+    }
+  }, [formConfig, formulaOutputType, isFormulaMode]);
 
   useEffect(() => {
     if (
@@ -251,13 +257,14 @@ export const SettingsObjectNewFieldConfigure = () => {
       const creationResult = await createMetadataField({
         ...formValues,
         type: formulaOutputType,
-        defaultValue: null,
+        defaultValue:
+          formulaOutputType === FieldMetadataType.CURRENCY
+            ? formValues.defaultValue
+            : null,
         isUnique: false,
         isUIEditable: false,
         settings: {
-          ...(formulaOutputType === FieldMetadataType.NUMBER
-            ? formValues.settings
-            : {}),
+          ...formValues.settings,
           formula: { expression: formulaExpression },
         },
         objectMetadataId: activeObjectMetadataItem.id,
