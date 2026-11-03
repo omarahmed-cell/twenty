@@ -4,6 +4,7 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { SettingsDataModelFieldFormulaTest } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaTest';
 import {
   getFormulaReferenceableFields,
+  getUnknownOptionWarnings,
   validateFormula,
 } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
 import { SettingsDataModelFieldFormulaInsertMenus } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaInsertMenus';
@@ -31,6 +32,10 @@ const StyledContainer = styled.div`
 
 const StyledError = styled.div`
   color: ${themeCssVariables.font.color.danger};
+`;
+
+const StyledWarning = styled.div`
+  color: ${themeCssVariables.color.orange11};
 `;
 
 type SettingsDataModelFieldFormulaFormProps = {
@@ -170,6 +175,14 @@ export const SettingsDataModelFieldFormulaForm = ({
       {isNonEmptyString(expression.trim()) &&
         validation.status === 'invalid' && (
           <StyledError>{validation.error}</StyledError>
+        )}
+      {validation.status === 'valid' &&
+        getUnknownOptionWarnings(expression, validation.dependencies).map(
+          ({ value, fieldLabel }) => (
+            <StyledWarning key={`${fieldLabel}-${value}`}>
+              {t`"${value}" is not an option of ${fieldLabel}, so this comparison is never true.`}
+            </StyledWarning>
+          ),
         )}
       {validation.status === 'valid' && (
         <Section.Root>

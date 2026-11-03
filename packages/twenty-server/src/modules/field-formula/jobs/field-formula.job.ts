@@ -16,10 +16,12 @@ export type FieldFormulaJobData = { workspaceId: string } & (
   | { type: 'RECORDS'; objectNameSingular: string; recordIds: string[] }
   | { type: 'BACKFILL'; targetFieldId: string }
   | {
-      type: 'RENAME';
+      type: 'REWRITE_REFERENCES';
       objectMetadataId: string;
+      fieldId: string;
       previousName: string;
       nextName: string;
+      optionValueRenames: { from: string; to: string }[];
     }
 );
 
@@ -39,9 +41,9 @@ export class FieldFormulaJob {
       return;
     }
 
-    if (data.type === 'RENAME') {
+    if (data.type === 'REWRITE_REFERENCES') {
       const targetFieldIds =
-        await this.fieldFormulaService.rewriteRenamedReferences(data);
+        await this.fieldFormulaService.rewriteReferences(data);
 
       for (const targetFieldId of targetFieldIds) {
         await this.messageQueueService.add<FieldFormulaJobData>(

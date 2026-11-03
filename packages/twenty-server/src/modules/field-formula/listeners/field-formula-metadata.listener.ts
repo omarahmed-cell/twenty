@@ -24,6 +24,25 @@ type FieldMetadataEventBatch = MetadataEventBatch<
 const isSameJson = (left: unknown, right: unknown) =>
   JSON.stringify(left ?? null) === JSON.stringify(right ?? null);
 
+type FieldOption = { id?: string; value: string };
+
+const getOptionValueRenames = (
+  before: FlatFieldMetadata,
+  after: FlatFieldMetadata,
+) => {
+  const beforeOptions = (before.options ?? []) as FieldOption[];
+
+  return ((after.options ?? []) as FieldOption[]).flatMap(({ id, value }) => {
+    const previous = beforeOptions.find(
+      (option) => isDefined(id) && option.id === id,
+    );
+
+    return isDefined(previous) && previous.value !== value
+      ? [{ from: previous.value, to: value }]
+      : [];
+  });
+};
+
 @Injectable()
 export class FieldFormulaMetadataListener {
   constructor(
@@ -75,6 +94,28 @@ export class FieldFormulaMetadataListener {
       const before = event.properties.before as FlatFieldMetadata;
       const after = event.properties.after as FlatFieldMetadata;
 
+      const optionValueRenames = getOptionValueRenames(before, after);
+
+      if (before.name !== after.name || optionValueRenames.length > 0) {
+        await this.messageQueueService.add<FieldFormulaJobData>(
+          FieldFormulaJob.name,
+          {
+            type: 'REWRITE_REFERENCES',
+            workspaceId: payload.workspaceId,
+            objectMetadataId: after.objectMetadataId,
+            fieldId: after.id,
+            previousName: before.name,
+            nextName: after.name,
+            optionValueRenames,
+          },
+        );
+      }
+
+      // That job backfills once the text is right: doing it now would write results from the old values.
+      if (optionValueRenames.length > 0) {
+        continue;
+      }
+
       const needsCatchUp =
         (!before.isActive && after.isActive) || before.name !== after.name;
 
@@ -107,28 +148,6 @@ export class FieldFormulaMetadataListener {
 
     for (const targetFieldId of targetFieldIds) {
       await this.enqueueBackfill(payload.workspaceId, targetFieldId);
-    }
-
-    for (const event of payload.events) {
-      if (event.type !== 'updated') {
-        continue;
-      }
-
-      const before = event.properties.before as FlatFieldMetadata;
-      const after = event.properties.after as FlatFieldMetadata;
-
-      if (before.name !== after.name) {
-        await this.messageQueueService.add<FieldFormulaJobData>(
-          FieldFormulaJob.name,
-          {
-            type: 'RENAME',
-            workspaceId: payload.workspaceId,
-            objectMetadataId: after.objectMetadataId,
-            previousName: before.name,
-            nextName: after.name,
-          },
-        );
-      }
     }
   }
 

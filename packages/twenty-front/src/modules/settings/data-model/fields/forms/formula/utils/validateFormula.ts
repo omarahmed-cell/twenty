@@ -4,6 +4,7 @@ import { type FieldMetadataFormulaSettings } from 'twenty-shared/types';
 import {
   type ComputedGraphField,
   findComputedFieldCycleMembers,
+  getFormulaComparedValues,
   isDefined,
   parseFormula,
 } from 'twenty-shared/utils';
@@ -69,6 +70,21 @@ export const getLoopFieldLabels = (
     ? fields.filter(({ id }) => members.has(id)).map(({ label }) => label)
     : [];
 };
+
+// Comparing against a value the field cannot hold is always false, and it still evaluates fine.
+export const getUnknownOptionWarnings = (
+  expression: string,
+  dependencies: FieldMetadataItem[],
+) =>
+  dependencies
+    .filter(({ type }) =>
+      [FieldMetadataType.SELECT, FieldMetadataType.MULTI_SELECT].includes(type),
+    )
+    .flatMap(({ name, label, options }) =>
+      getFormulaComparedValues(expression, name)
+        .filter((value) => !options?.some((option) => option.value === value))
+        .map((value) => ({ value, fieldLabel: label })),
+    );
 
 export type FormulaValidation =
   | { status: 'valid'; dependencies: FieldMetadataItem[] }

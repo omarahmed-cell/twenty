@@ -222,6 +222,10 @@ export {
   FORMULA_FUNCTION_SIGNATURES,
   FORMULA_ENGINE,
 } from './formula/formulaEngine';
+export {
+  getFormulaComparedValues,
+  renameFormulaOptionValues,
+} from './formula/formulaOptionValues';
 export { isFormulaValueUnchanged } from './formula/isFormulaValueUnchanged';
 export type { ParsedFormula } from './formula/parseFormula';
 export { parseFormula } from './formula/parseFormula';

@@ -9,6 +9,7 @@ import {
   isFormulaValueUnchanged,
   parseFormula,
   renameFormulaField,
+  renameFormulaOptionValues,
 } from 'twenty-shared/utils';
 import { In, MoreThan } from 'typeorm';
 
@@ -27,6 +28,27 @@ const BATCH_SIZE = 500;
 const EMPTY_CURRENCY = { amountMicros: null, currencyCode: null };
 
 type FormulaRecord = Record<string, unknown> & { id: string };
+
+// Configs arrive in dependency order. Staying this narrow also means a backfill never evaluates
+// an unrelated formula whose text a running rewrite has not reached yet.
+const selectTargetAndDownstream = (
+  configs: ResolvedFieldFormulaConfig[],
+  targetFieldId: string,
+) => {
+  const selectedFieldIds = new Set([targetFieldId]);
+
+  return configs.filter((config) => {
+    const isSelected =
+      selectedFieldIds.has(config.targetFieldId) ||
+      config.dependencies.some(({ fieldId }) => selectedFieldIds.has(fieldId));
+
+    if (isSelected) {
+      selectedFieldIds.add(config.targetFieldId);
+    }
+
+    return isSelected;
+  });
+};
 
 @Injectable()
 export class FieldFormulaService {
@@ -96,8 +118,9 @@ export class FieldFormulaService {
     await this.runForObject(
       workspaceId,
       objectNameSingular,
-      async (configs) => {
+      async (allConfigs) => {
         const repository = this.getRepository(objectNameSingular);
+        const configs = selectTargetAndDownstream(allConfigs, targetFieldId);
 
         let lastId: string | undefined;
 
@@ -120,17 +143,23 @@ export class FieldFormulaService {
     );
   }
 
-  // Formulas store field names, so a rename would otherwise silently pause them.
-  async rewriteRenamedReferences({
+  // Formulas store field names and option values as text, so a rename would otherwise pause
+  // them or silently change their result. Backfills run after the rewrite so that no record
+  // is ever written from the outdated text.
+  async rewriteReferences({
     workspaceId,
     objectMetadataId,
+    fieldId,
     previousName,
     nextName,
+    optionValueRenames,
   }: {
     workspaceId: string;
     objectMetadataId: string;
+    fieldId: string;
     previousName: string;
     nextName: string;
+    optionValueRenames: { from: string; to: string }[];
   }): Promise<string[]> {
     await this.workspaceCacheService.evictWorkspaceFromLocalCache(workspaceId);
 
@@ -139,11 +168,15 @@ export class FieldFormulaService {
         'flatFieldMetadataMaps',
       ]);
 
-    const fields = Object.values(
-      flatFieldMetadataMaps.byUniversalIdentifier,
-    ).filter(isDefined);
+    // Readers first, so that a backfill of the changed field finds them already rewritten.
+    const fields = Object.values(flatFieldMetadataMaps.byUniversalIdentifier)
+      .filter(isDefined)
+      .sort(
+        (left, right) =>
+          Number(left.id === fieldId) - Number(right.id === fieldId),
+      );
 
-    const rewrittenFieldIds: string[] = [];
+    const affectedFieldIds: string[] = [];
 
     for (const field of fields) {
       const formula = getFieldFormulaSettings(field);
@@ -154,37 +187,50 @@ export class FieldFormulaService {
 
       const parsedFormula = parseFormula(formula.expression);
 
-      if (
-        parsedFormula.status !== 'valid' ||
-        !parsedFormula.fieldNames.includes(previousName)
-      ) {
+      if (parsedFormula.status !== 'valid') {
         continue;
       }
 
-      await this.fieldMetadataService.updateOneField({
-        updateFieldInput: {
-          id: field.id,
-          settings: {
-            ...(field.settings as object),
-            formula: {
-              ...formula,
-              expression: renameFormulaField(
-                formula.expression,
-                previousName,
-                nextName,
-              ),
-            },
-          } as never,
-        },
-        workspaceId,
-      });
+      const readsField = parsedFormula.fieldNames.includes(previousName);
+      const isOwnOptionChange =
+        field.id === fieldId && optionValueRenames.length > 0;
 
-      await this.backfill({ workspaceId, targetFieldId: field.id });
+      if (!readsField && !isOwnOptionChange) {
+        continue;
+      }
 
-      rewrittenFieldIds.push(field.id);
+      const expression = renameFormulaField(
+        renameFormulaOptionValues({
+          expression: formula.expression,
+          renames: optionValueRenames,
+          comparedFieldName: readsField ? previousName : undefined,
+          includeResults: isOwnOptionChange,
+        }),
+        previousName,
+        nextName,
+      );
+
+      if (expression !== formula.expression) {
+        await this.fieldMetadataService.updateOneField({
+          updateFieldInput: {
+            id: field.id,
+            settings: {
+              ...(field.settings as object),
+              formula: { ...formula, expression },
+            } as never,
+          },
+          workspaceId,
+        });
+      }
+
+      affectedFieldIds.push(field.id);
     }
 
-    return rewrittenFieldIds;
+    for (const targetFieldId of affectedFieldIds) {
+      await this.backfill({ workspaceId, targetFieldId });
+    }
+
+    return affectedFieldIds;
   }
 
   private async runForObject(

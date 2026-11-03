@@ -154,24 +154,58 @@ describe('FieldFormulaMetadataListener', () => {
 
     expect(calls().map(({ data }) => data)).toEqual([
       {
-        type: 'RENAME',
+        type: 'REWRITE_REFERENCES',
         workspaceId: 'workspace',
         objectMetadataId: 'opportunity',
+        fieldId: 'other-field',
         previousName: 'before',
         nextName: 'after',
+        optionValueRenames: [],
       },
     ]);
   });
 
-  it('backfills when a dependency option changes, since values migrate in SQL', async () => {
+  it('backfills when a dependency gains or loses an option', async () => {
     const { handleUpdate, calls } = setup();
 
     await handleUpdate(
-      { id: 'price-field', options: [{ value: 'A' }] },
-      { id: 'price-field', options: [{ value: 'B' }] },
+      { id: 'price-field', options: [{ id: 'a', value: 'A' }] },
+      { id: 'price-field', options: [{ id: 'b', value: 'B' }] },
     );
 
     expect(calls()).toEqual(BACKFILL_NOW_AND_LATER);
+  });
+
+  it('leaves the backfill to the rewrite job when an option is renamed', async () => {
+    const { handleUpdate, calls } = setup();
+
+    await handleUpdate(
+      { id: 'price-field', name: 'price', options: [{ id: 'a', value: 'A' }] },
+      { id: 'price-field', name: 'price', options: [{ id: 'a', value: 'B' }] },
+    );
+
+    expect(calls().map(({ data }) => data)).toEqual([
+      {
+        type: 'REWRITE_REFERENCES',
+        workspaceId: 'workspace',
+        objectMetadataId: 'opportunity',
+        fieldId: 'price-field',
+        previousName: 'price',
+        nextName: 'price',
+        optionValueRenames: [{ from: 'A', to: 'B' }],
+      },
+    ]);
+  });
+
+  it('ignores an option label edit', async () => {
+    const { handleUpdate, calls } = setup();
+
+    await handleUpdate(
+      { id: 'other-field', options: [{ id: 'a', value: 'A', label: 'One' }] },
+      { id: 'other-field', options: [{ id: 'a', value: 'A', label: 'Two' }] },
+    );
+
+    expect(calls()).toEqual([]);
   });
 
   it('catches up when a dependency is reactivated', async () => {
