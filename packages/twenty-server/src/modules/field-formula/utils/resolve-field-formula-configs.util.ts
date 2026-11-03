@@ -6,6 +6,7 @@ import {
 import {
   FORMULA_OUTPUT_FIELD_TYPES,
   type FormulaOutputFieldType,
+  findComputedFieldCycleMembers,
   isDefined,
   isPlainObject,
   parseFormula,
@@ -73,8 +74,7 @@ const resolveFieldFormulaConfig = (
         field.isActive &&
         field.id !== targetField.id &&
         !FIELD_TYPES_WITHOUT_A_VALUE.has(field.type) &&
-        !FIELD_NAMES_NOT_REFERENCEABLE.has(field.name) &&
-        !isDefined(getFieldFormulaSettings(field)),
+        !FIELD_NAMES_NOT_REFERENCEABLE.has(field.name),
     ),
   );
 
@@ -105,6 +105,38 @@ const resolveFieldFormulaConfig = (
   };
 };
 
+// Formulas on the same object are evaluated in this order, so each one reads its
+// dependencies' fresh values. Loop members were already excluded, so this terminates.
+const sortByDependencies = (configs: ResolvedFieldFormulaConfig[]) => {
+  const configByFieldId = new Map(
+    configs.map((config) => [config.targetFieldId, config]),
+  );
+  const visited = new Set<string>();
+  const sorted: ResolvedFieldFormulaConfig[] = [];
+
+  const visit = (config: ResolvedFieldFormulaConfig) => {
+    if (visited.has(config.targetFieldId)) {
+      return;
+    }
+
+    visited.add(config.targetFieldId);
+
+    for (const { fieldId } of config.dependencies) {
+      const dependency = configByFieldId.get(fieldId);
+
+      if (isDefined(dependency)) {
+        visit(dependency);
+      }
+    }
+
+    sorted.push(config);
+  };
+
+  configs.forEach(visit);
+
+  return sorted;
+};
+
 const configsCache = new WeakMap<
   FlatEntityMaps<FlatFieldMetadata>,
   ResolvedFieldFormulaConfig[]
@@ -125,8 +157,14 @@ export const resolveFieldFormulaConfigs = (
     flatFieldMetadataMaps.byUniversalIdentifier,
   ).filter(isDefined);
 
+  const cycleMembers = findComputedFieldCycleMembers(fields);
+
   const configs = fields
-    .filter((field) => isDefined(getFieldFormulaSettings(field)))
+    .filter(
+      (field) =>
+        isDefined(getFieldFormulaSettings(field)) &&
+        !cycleMembers.has(field.id),
+    )
     .map((field) =>
       resolveFieldFormulaConfig(
         field,
@@ -138,7 +176,9 @@ export const resolveFieldFormulaConfigs = (
     )
     .filter(isDefined);
 
-  configsCache.set(flatFieldMetadataMaps, configs);
+  const sortedConfigs = sortByDependencies(configs);
 
-  return configs;
+  configsCache.set(flatFieldMetadataMaps, sortedConfigs);
+
+  return sortedConfigs;
 };

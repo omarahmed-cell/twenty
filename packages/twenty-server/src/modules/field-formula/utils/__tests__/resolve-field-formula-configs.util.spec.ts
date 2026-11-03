@@ -125,12 +125,24 @@ describe('resolveFieldFormulaConfigs', () => {
     ).toEqual([]);
   });
 
-  it('holds formula-on-formula references until ordering exists', () => {
+  it('orders formulas so that dependencies come first', () => {
     expect(
       resolveNames(
-        buildFormulaField('first', 'price * 2'),
+        buildFormulaField('third', 'second + first'),
         buildFormulaField('second', 'first + 1'),
+        buildFormulaField('first', 'price * 2'),
       ),
-    ).toEqual(['first']);
+    ).toEqual(['first', 'second', 'third']);
+  });
+
+  it('pauses the members of a loop but keeps what depends on them', () => {
+    expect(
+      resolveNames(
+        buildFormulaField('first', 'second + 1'),
+        buildFormulaField('second', 'first + 1'),
+        buildFormulaField('unrelated', 'price + 1'),
+        buildFormulaField('downstream', 'first + 1'),
+      ),
+    ).toEqual(['unrelated', 'downstream']);
   });
 });

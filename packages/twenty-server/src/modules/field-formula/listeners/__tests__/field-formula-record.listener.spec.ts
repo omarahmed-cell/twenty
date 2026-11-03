@@ -15,11 +15,11 @@ const CONFIG: ResolvedFieldFormulaConfig = {
   ],
 };
 
-const setup = () => {
+const setup = (configs: ResolvedFieldFormulaConfig[] = [CONFIG]) => {
   const add = jest.fn();
 
   const listener = new FieldFormulaRecordListener(
-    { getConfigs: async () => [CONFIG] } as never,
+    { getConfigs: async () => configs } as never,
     { add } as never,
   );
 
@@ -79,6 +79,32 @@ describe('FieldFormulaRecordListener', () => {
     await listener.handleUpdated(
       buildPayload('opportunity', [
         { recordId: 'deal', updatedFields: ['computed'] },
+      ]),
+    );
+
+    expect(jobs()).toEqual([]);
+  });
+
+  it('needs no job for a change to a formula another formula reads', async () => {
+    const { listener, jobs } = setup([
+      CONFIG,
+      {
+        ...CONFIG,
+        targetFieldId: 'derived-field',
+        targetFieldName: 'derived',
+        dependencies: [
+          {
+            fieldId: 'target-field',
+            name: 'computed',
+            type: FieldMetadataType.NUMBER,
+          },
+        ],
+      },
+    ]);
+
+    await listener.handleUpdated(
+      buildPayload('opportunity', [
+        { recordId: 'deal', updatedFields: ['computed', 'derived'] },
       ]),
     );
 

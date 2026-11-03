@@ -45,9 +45,17 @@ export class FieldFormulaRecordListener {
   @OnDatabaseBatchEvent('*', DatabaseEventAction.UPDATED)
   async handleUpdated(payload: RecordEventBatch) {
     await this.enqueue(payload, (configs) => {
+      // A job recomputes every formula on the object in order, so a change to a formula
+      // field never needs a job of its own: that one would find nothing left to do.
+      const formulaFieldIds = new Set(
+        configs.map(({ targetFieldId }) => targetFieldId),
+      );
+
       const dependencyNames = new Set(
         configs.flatMap(({ dependencies }) =>
-          dependencies.map(({ name }) => name),
+          dependencies
+            .filter(({ fieldId }) => !formulaFieldIds.has(fieldId))
+            .map(({ name }) => name),
         ),
       );
 

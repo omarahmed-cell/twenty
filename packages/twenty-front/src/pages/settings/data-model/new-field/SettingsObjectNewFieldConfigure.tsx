@@ -11,10 +11,8 @@ import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/field
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
 import { DEFAULT_DECIMAL_VALUE } from '@/localization/utils/formatNumber';
 import { SettingsDataModelFieldFormulaForm } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
-import {
-  getFormulaReferenceableFields,
-  validateFormula,
-} from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
+import { validateFormula } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
+import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import {
   SettingsDataModelFieldSyncForm,
   type SettingsDataModelFieldSyncFormValue,
@@ -77,6 +75,7 @@ export const SettingsObjectNewFieldConfigure = () => {
 
   const { findObjectMetadataItemByNamePlural } =
     useFilteredObjectMetadataItems();
+  const { objectMetadataItems } = useObjectMetadataItems();
   const activeObjectMetadataItem =
     findObjectMetadataItemByNamePlural(objectNamePlural);
   const { createMetadataField } = useFieldMetadataItem();
@@ -179,10 +178,11 @@ export const SettingsObjectNewFieldConfigure = () => {
     !isDDLLocked &&
     (!isSyncMode || isDefined(syncFormValue.sourceField)) &&
     (!isFormulaMode ||
-      validateFormula(
-        formulaExpression,
-        getFormulaReferenceableFields(activeObjectMetadataItem),
-      ).status === 'valid');
+      validateFormula({
+        expression: formulaExpression,
+        objectMetadataItem: activeObjectMetadataItem,
+        objectMetadataItems,
+      }).status === 'valid');
 
   const handleSave = async (
     formValues: SettingsDataModelNewFieldFormValues,

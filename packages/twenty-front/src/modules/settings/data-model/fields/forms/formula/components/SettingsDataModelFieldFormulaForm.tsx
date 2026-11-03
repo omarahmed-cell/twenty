@@ -1,4 +1,6 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
+import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
+import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { SettingsDataModelFieldFormulaTest } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaTest';
 import {
   getFormulaReferenceableFields,
@@ -37,7 +39,7 @@ type SettingsDataModelFieldFormulaFormProps = {
   outputType: FormulaOutputFieldType;
   // Omitted for an existing field, whose column type is fixed.
   onOutputTypeChange?: (outputType: FormulaOutputFieldType) => void;
-  targetFieldId?: string;
+  targetField?: FieldMetadataItem;
   isPaused?: boolean;
   disabled?: boolean;
 };
@@ -48,18 +50,25 @@ export const SettingsDataModelFieldFormulaForm = ({
   onExpressionChange,
   outputType,
   onOutputTypeChange,
-  targetFieldId,
+  targetField,
   isPaused = false,
   disabled = false,
 }: SettingsDataModelFieldFormulaFormProps) => {
   const { t } = useLingui();
 
+  const { objectMetadataItems } = useObjectMetadataItems();
+
   const referenceableFields = getFormulaReferenceableFields(
     objectMetadataItem,
-    targetFieldId,
+    targetField?.id,
   );
 
-  const validation = validateFormula(expression, referenceableFields);
+  const validation = validateFormula({
+    expression,
+    objectMetadataItem,
+    objectMetadataItems,
+    targetField,
+  });
 
   const availableFieldNames = referenceableFields
     .filter(({ isSystem }) => isSystem !== true)
@@ -70,7 +79,7 @@ export const SettingsDataModelFieldFormulaForm = ({
     <StyledContainer>
       {isPaused && (
         <StyledError>
-          {t`This field stopped calculating because its formula uses a field that was removed or deactivated. It keeps its last values. Fix the formula to resume.`}
+          {t`This field stopped calculating because its formula is invalid, uses a field that was removed or deactivated, or is part of a loop. It keeps its last values. Fix the formula to resume.`}
         </StyledError>
       )}
       <Select<FormulaOutputFieldType>
@@ -90,7 +99,7 @@ export const SettingsDataModelFieldFormulaForm = ({
         <Card.Root>
           <SettingsDataModelFieldNumberForm
             disabled={disabled}
-            existingFieldMetadataId={targetFieldId ?? ''}
+            existingFieldMetadataId={targetField?.id ?? ''}
           />
         </Card.Root>
       )}

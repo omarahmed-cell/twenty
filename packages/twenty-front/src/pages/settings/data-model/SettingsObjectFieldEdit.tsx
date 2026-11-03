@@ -19,9 +19,10 @@ import { SettingsDataModelFieldDescriptionForm } from '@/settings/data-model/fie
 import { SettingsDataModelFieldIconLabelForm } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldIconLabelForm';
 import { SettingsDataModelFieldSettingsFormCard } from '@/settings/data-model/fields/forms/components/SettingsDataModelFieldSettingsFormCard';
 import { SettingsDataModelFieldFormulaForm } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaForm';
+import { SettingsDataModelFieldFormulaResyncButton } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaResyncButton';
 import {
+  getComputedGraphFields,
   getFieldFormulaSettings,
-  getFormulaReferenceableFields,
   validateFormula,
 } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
 import {
@@ -53,6 +54,7 @@ import { AppPath, SettingsPath } from 'twenty-shared/types';
 import {
   FORMULA_OUTPUT_FIELD_TYPES,
   type FormulaOutputFieldType,
+  findComputedFieldCycleMembers,
   getSettingsPath,
   isDefined,
   isEmptyObject,
@@ -220,13 +222,12 @@ export const SettingsObjectFieldEdit = () => {
   const isFormulaDraftValid =
     !isDefined(formulaDraft) ||
     (isDefined(objectMetadataItem) &&
-      validateFormula(
-        formulaDraft,
-        getFormulaReferenceableFields(
-          objectMetadataItem,
-          fieldMetadataItem?.id,
-        ),
-      ).status === 'valid');
+      validateFormula({
+        expression: formulaDraft,
+        objectMetadataItem,
+        objectMetadataItems,
+        targetField: fieldMetadataItem,
+      }).status === 'valid');
 
   const canSave =
     (isDirty || isDefined(syncFormDraft) || isDefined(formulaDraft)) &&
@@ -274,13 +275,19 @@ export const SettingsObjectFieldEdit = () => {
 
   const isFormulaPaused =
     isFormulaField &&
-    validateFormula(
-      savedFormula.expression,
-      getFormulaReferenceableFields(objectMetadataItem, fieldMetadataItem.id),
-    ).status === 'invalid';
+    validateFormula({
+      expression: savedFormula.expression,
+      objectMetadataItem,
+      objectMetadataItems,
+      targetField: fieldMetadataItem,
+    }).status === 'invalid';
 
   const isSyncPaused =
-    isSyncField && !isDefined(savedSyncFormValue.sourceField);
+    isSyncField &&
+    (!isDefined(savedSyncFormValue.sourceField) ||
+      findComputedFieldCycleMembers(
+        getComputedGraphFields(objectMetadataItems),
+      ).has(fieldMetadataItem.id));
 
   const handleSave = async (
     formValues: SettingsDataModelFieldEditFormValues,
@@ -515,10 +522,18 @@ export const SettingsObjectFieldEdit = () => {
                   expression={formulaDraft ?? savedFormula.expression}
                   onExpressionChange={setFormulaDraft}
                   outputType={fieldMetadataItem.type as FormulaOutputFieldType}
-                  targetFieldId={fieldMetadataItem.id}
+                  targetField={fieldMetadataItem}
                   isPaused={isFormulaPaused}
                   disabled={readonly}
                 />
+                <StyledSyncActions>
+                  <SettingsDataModelFieldFormulaResyncButton
+                    fieldMetadataId={fieldMetadataItem.id}
+                    disabled={
+                      readonly || isFormulaPaused || isDefined(formulaDraft)
+                    }
+                  />
+                </StyledSyncActions>
               </Section.Root>
             )}
             {isSyncField && (
@@ -531,7 +546,7 @@ export const SettingsObjectFieldEdit = () => {
                   objectMetadataItem={objectMetadataItem}
                   value={syncFormDraft ?? savedSyncFormValue}
                   onChange={setSyncFormDraft}
-                  targetFieldType={fieldMetadataItem.type}
+                  targetField={fieldMetadataItem}
                   isPaused={isSyncPaused}
                   disabled={readonly}
                 />

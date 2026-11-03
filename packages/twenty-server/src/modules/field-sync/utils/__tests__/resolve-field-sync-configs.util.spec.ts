@@ -156,6 +156,50 @@ const buildToManyConfig = (targetField: string, policy: string) => ({
 });
 
 describe('resolveFieldSyncConfigs', () => {
+  it('pauses a sync field that is part of a loop through a formula', () => {
+    const loopingFormula = getFlatFieldMetadataMock({
+      id: 'company-formula',
+      universalIdentifier: 'company-formula-uid',
+      objectMetadataId: 'company',
+      name: 'companyFormula',
+      type: FieldMetadataType.TEXT,
+      settings: { formula: { expression: 'upper(companySync)' } },
+    } as Partial<FlatFieldMetadata> as FlatFieldMetadata);
+
+    const dealSync = buildSyncField('dealSync', FieldMetadataType.TEXT, {
+      relationFieldMetadataId: companyRelationField.id,
+      sourceFieldMetadataId: loopingFormula.id,
+    });
+
+    const dealFormula = getFlatFieldMetadataMock({
+      id: 'deal-formula',
+      universalIdentifier: 'deal-formula-uid',
+      objectMetadataId: 'opportunity',
+      name: 'dealFormula',
+      type: FieldMetadataType.TEXT,
+      settings: { formula: { expression: 'upper(dealSync)' } },
+    } as Partial<FlatFieldMetadata> as FlatFieldMetadata);
+
+    const companySync = buildSyncField(
+      'companySync',
+      FieldMetadataType.TEXT,
+      {
+        relationFieldMetadataId: dealsRelationField.id,
+        sourceFieldMetadataId: dealFormula.id,
+      },
+      'company',
+    );
+
+    const resolved = resolveFieldSyncConfigs(
+      flatObjectMetadataMaps,
+      toMaps([...fields, loopingFormula, dealSync, dealFormula, companySync]),
+    ).map(({ targetFieldName }) => targetFieldName);
+
+    expect(resolved).not.toContain('dealSync');
+    expect(resolved).not.toContain('companySync');
+    expect(resolved).toContain('dealOperatesIn');
+  });
+
   it('resolves to-one and to-many syncs and skips invalid configs', () => {
     expect(
       resolveFieldSyncConfigs(flatObjectMetadataMaps, toMaps(fields)),

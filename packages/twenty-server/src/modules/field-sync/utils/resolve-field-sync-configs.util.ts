@@ -6,6 +6,7 @@ import {
   RelationType,
 } from 'twenty-shared/types';
 import {
+  findComputedFieldCycleMembers,
   getFieldSyncTargetFieldType,
   isDefined,
   isPlainObject,
@@ -199,8 +200,14 @@ export const resolveFieldSyncConfigs = (
     return cachedConfigs;
   }
 
-  const configs = Object.values(flatFieldMetadataMaps.byUniversalIdentifier)
-    .filter(isDefined)
+  const fields = Object.values(
+    flatFieldMetadataMaps.byUniversalIdentifier,
+  ).filter(isDefined);
+
+  const cycleMembers = findComputedFieldCycleMembers(fields);
+
+  const configs = fields
+    .filter((field) => !cycleMembers.has(field.id))
     .map((field) =>
       resolveFieldSyncConfig(
         field,

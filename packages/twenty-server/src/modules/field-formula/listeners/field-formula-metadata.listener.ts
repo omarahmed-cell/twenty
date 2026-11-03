@@ -9,6 +9,7 @@ import { MessageQueueService } from 'src/engine/core-modules/message-queue/servi
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type MetadataEventBatch } from 'src/engine/subscriptions/metadata-event/types/metadata-event-batch.type';
 import {
+  FIELD_FORMULA_CATCH_UP_DELAY_MS,
   FieldFormulaJob,
   type FieldFormulaJobData,
 } from 'src/modules/field-formula/jobs/field-formula.job';
@@ -42,6 +43,17 @@ export class FieldFormulaMetadataListener {
 
       if (isDefined(getFieldFormulaSettings(field))) {
         await this.enqueueBackfill(payload.workspaceId, field.id);
+      }
+
+      // A formula can be saved before a field it references exists, which pauses it until now.
+      const configs = await this.fieldFormulaService.getConfigs(
+        payload.workspaceId,
+      );
+
+      for (const config of configs) {
+        if (config.dependencies.some(({ fieldId }) => fieldId === field.id)) {
+          await this.enqueueBackfill(payload.workspaceId, config.targetFieldId);
+        }
       }
     }
   }
@@ -95,12 +107,40 @@ export class FieldFormulaMetadataListener {
     for (const targetFieldId of targetFieldIds) {
       await this.enqueueBackfill(payload.workspaceId, targetFieldId);
     }
+
+    for (const event of payload.events) {
+      if (event.type !== 'updated') {
+        continue;
+      }
+
+      const before = event.properties.before as FlatFieldMetadata;
+      const after = event.properties.after as FlatFieldMetadata;
+
+      if (before.name !== after.name) {
+        await this.messageQueueService.add<FieldFormulaJobData>(
+          FieldFormulaJob.name,
+          {
+            type: 'RENAME',
+            workspaceId: payload.workspaceId,
+            objectMetadataId: after.objectMetadataId,
+            previousName: before.name,
+            nextName: after.name,
+          },
+        );
+      }
+    }
   }
 
   private async enqueueBackfill(workspaceId: string, targetFieldId: string) {
     await this.messageQueueService.add<FieldFormulaJobData>(
       FieldFormulaJob.name,
       { type: 'BACKFILL', workspaceId, targetFieldId },
+    );
+
+    await this.messageQueueService.add<FieldFormulaJobData>(
+      FieldFormulaJob.name,
+      { type: 'BACKFILL', workspaceId, targetFieldId },
+      { delay: FIELD_FORMULA_CATCH_UP_DELAY_MS },
     );
   }
 }

@@ -32,6 +32,7 @@ const recompute = async (
       getRepository: () => ({ find: async () => records, update }),
     } as never,
     {} as never,
+    {} as never,
   );
 
   jest.spyOn(service, 'getConfigs').mockResolvedValue([config]);
@@ -86,6 +87,50 @@ describe('FieldFormulaService', () => {
     );
 
     expect(update.mock.calls[0][1]).toEqual({ computed: null });
+  });
+
+  it('feeds a formula the fresh value of the one before it, in one write', async () => {
+    const update = jest.fn();
+
+    const service = new FieldFormulaService(
+      {
+        executeInWorkspaceContext: (callback: () => Promise<void>) =>
+          callback(),
+        getRepository: () => ({
+          find: async () => [
+            { id: 'deal', price: 100, branches: 5, computed: 1, derived: 2 },
+          ],
+          update,
+        }),
+      } as never,
+      {} as never,
+      {} as never,
+    );
+
+    jest.spyOn(service, 'getConfigs').mockResolvedValue([
+      buildConfig(FieldMetadataType.NUMBER, FORMULA),
+      {
+        ...buildConfig(FieldMetadataType.NUMBER, 'computed + 1'),
+        targetFieldId: 'derived-field',
+        targetFieldName: 'derived',
+        dependencies: [
+          {
+            fieldId: 'target-field',
+            name: 'computed',
+            type: FieldMetadataType.NUMBER,
+          },
+        ],
+      },
+    ]);
+
+    await service.recomputeRecords({
+      workspaceId: 'workspace',
+      objectNameSingular: 'opportunity',
+      recordIds: ['deal'],
+    });
+
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(update.mock.calls[0][1]).toEqual({ computed: 500, derived: 501 });
   });
 
   // Rewriting on every run is what caused the sync field's endless job loop.

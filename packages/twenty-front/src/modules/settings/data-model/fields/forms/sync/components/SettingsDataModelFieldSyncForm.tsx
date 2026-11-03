@@ -1,6 +1,7 @@
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { getLoopFieldLabels } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
 import { getFieldSyncSettings } from '@/settings/data-model/fields/forms/sync/utils/getSyncFormValueFromField';
 import { Select } from '@/ui/input/components/Select';
 import { styled } from '@linaria/react';
@@ -8,7 +9,6 @@ import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import {
   CoreObjectNameSingular,
-  type FieldMetadataType,
   type FieldSyncPolicy,
 } from 'twenty-shared/types';
 import { getFieldSyncTargetFieldType, isDefined } from 'twenty-shared/utils';
@@ -39,8 +39,9 @@ type SettingsDataModelFieldSyncFormProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   value: SettingsDataModelFieldSyncFormValue;
   onChange: (value: SettingsDataModelFieldSyncFormValue) => void;
-  // An existing field's column type is fixed, so only sources of a matching type can be offered.
-  targetFieldType?: FieldMetadataType;
+  // An existing field's column type is fixed, so only sources of a matching type can be
+  // offered, and a source that reads this field back would create a loop.
+  targetField?: FieldMetadataItem;
   isPaused?: boolean;
   disabled?: boolean;
 };
@@ -49,7 +50,7 @@ export const SettingsDataModelFieldSyncForm = ({
   objectMetadataItem,
   value,
   onChange,
-  targetFieldType,
+  targetField,
   isPaused = false,
   disabled = false,
 }: SettingsDataModelFieldSyncFormProps) => {
@@ -100,7 +101,14 @@ export const SettingsDataModelFieldSyncForm = ({
         field.isSystem !== true &&
         !isDefined(getFieldSyncSettings(field)) &&
         isDefined(syncedFieldType) &&
-        (!isDefined(targetFieldType) || syncedFieldType === targetFieldType)
+        (!isDefined(targetField) ||
+          (syncedFieldType === targetField.type &&
+            getLoopFieldLabels(objectMetadataItems, targetField.id, {
+              sync: {
+                relationFieldMetadataId: value.relationFieldMetadataId,
+                sourceFieldMetadataId: field.id,
+              },
+            }).length === 0))
       );
     },
   );

@@ -6,14 +6,20 @@ import {
   evaluateFormula,
   isDefined,
   isFormulaValueUnchanged,
+  parseFormula,
+  renameFormulaField,
 } from 'twenty-shared/utils';
 import { In, MoreThan } from 'typeorm';
 
+import { FieldMetadataService } from 'src/engine/metadata-modules/field-metadata/services/field-metadata.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { type ResolvedFieldFormulaConfig } from 'src/modules/field-formula/types/resolved-field-formula-config.type';
-import { resolveFieldFormulaConfigs } from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
+import {
+  getFieldFormulaSettings,
+  resolveFieldFormulaConfigs,
+} from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
 
 const BATCH_SIZE = 500;
 
@@ -26,6 +32,7 @@ export class FieldFormulaService {
   constructor(
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly workspaceCacheService: WorkspaceCacheService,
+    private readonly fieldMetadataService: FieldMetadataService,
   ) {}
 
   async getConfigs(workspaceId: string): Promise<ResolvedFieldFormulaConfig[]> {
@@ -110,6 +117,73 @@ export class FieldFormulaService {
     );
   }
 
+  // Formulas store field names, so a rename would otherwise silently pause them.
+  async rewriteRenamedReferences({
+    workspaceId,
+    objectMetadataId,
+    previousName,
+    nextName,
+  }: {
+    workspaceId: string;
+    objectMetadataId: string;
+    previousName: string;
+    nextName: string;
+  }): Promise<string[]> {
+    await this.workspaceCacheService.evictWorkspaceFromLocalCache(workspaceId);
+
+    const { flatFieldMetadataMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatFieldMetadataMaps',
+      ]);
+
+    const fields = Object.values(
+      flatFieldMetadataMaps.byUniversalIdentifier,
+    ).filter(isDefined);
+
+    const rewrittenFieldIds: string[] = [];
+
+    for (const field of fields) {
+      const formula = getFieldFormulaSettings(field);
+
+      if (field.objectMetadataId !== objectMetadataId || !isDefined(formula)) {
+        continue;
+      }
+
+      const parsedFormula = parseFormula(formula.expression);
+
+      if (
+        parsedFormula.status !== 'valid' ||
+        !parsedFormula.fieldNames.includes(previousName)
+      ) {
+        continue;
+      }
+
+      await this.fieldMetadataService.updateOneField({
+        updateFieldInput: {
+          id: field.id,
+          settings: {
+            ...(field.settings as object),
+            formula: {
+              ...formula,
+              expression: renameFormulaField(
+                formula.expression,
+                previousName,
+                nextName,
+              ),
+            },
+          } as never,
+        },
+        workspaceId,
+      });
+
+      await this.backfill({ workspaceId, targetFieldId: field.id });
+
+      rewrittenFieldIds.push(field.id);
+    }
+
+    return rewrittenFieldIds;
+  }
+
   private async runForObject(
     workspaceId: string,
     objectNameSingular: string,
@@ -186,8 +260,13 @@ export class FieldFormulaService {
     for (const record of records) {
       const patch: Record<string, unknown> = {};
 
+      // Configs arrive in dependency order, so a later formula reads an earlier one's new value.
+      const workingRecord = { ...record };
+
       for (const config of configs) {
-        const value = this.computeValue(config, record);
+        const value = this.computeValue(config, workingRecord);
+
+        workingRecord[config.targetFieldName] = value;
 
         if (
           !isFormulaValueUnchanged(

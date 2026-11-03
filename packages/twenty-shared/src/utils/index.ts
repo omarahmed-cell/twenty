@@ -210,10 +210,13 @@ export {
 } from './formula/coerceFormulaResult';
 export type { FormulaEvaluation } from './formula/evaluateFormula';
 export { evaluateFormula } from './formula/evaluateFormula';
+export type { ComputedGraphField } from './formula/findComputedFieldCycleMembers';
+export { findComputedFieldCycleMembers } from './formula/findComputedFieldCycleMembers';
 export { FORMULA_FUNCTIONS, FORMULA_ENGINE } from './formula/formulaEngine';
 export { isFormulaValueUnchanged } from './formula/isFormulaValueUnchanged';
 export type { ParsedFormula } from './formula/parseFormula';
 export { parseFormula } from './formula/parseFormula';
+export { renameFormulaField } from './formula/renameFormulaField';
 export { fromArrayToUniqueKeyRecord } from './from-array-to-unique-key-record.util';
 export { fromArrayToValuesByKeyRecord } from './fromArrayToValuesByKeyRecord.util';
 export { getUrlSafely } from './getUrlSafely';
