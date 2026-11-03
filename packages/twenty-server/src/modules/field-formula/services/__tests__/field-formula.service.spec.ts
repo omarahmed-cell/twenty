@@ -161,6 +161,99 @@ describe('FieldFormulaService.backfill', () => {
   });
 });
 
+describe('FieldFormulaService.recomputeTimeBased', () => {
+  const buildScheduledRun = async (records: TestRecord[]) => {
+    const update = jest.fn();
+    const getRepository = jest.fn(() => ({
+      find: jest
+        .fn()
+        .mockResolvedValueOnce(records)
+        .mockResolvedValue([]),
+      update,
+    }));
+
+    const service = new FieldFormulaService(
+      {
+        executeInWorkspaceContext: (callback: () => Promise<void>) =>
+          callback(),
+        getRepository,
+      } as never,
+      {} as never,
+      {} as never,
+    );
+
+    jest.spyOn(service, 'getConfigs').mockResolvedValue([
+      {
+        ...buildConfig(FieldMetadataType.NUMBER, 'price * 2'),
+        targetFieldId: 'unrelated',
+        targetFieldName: 'unrelated',
+      },
+      {
+        ...buildConfig(FieldMetadataType.NUMBER, 'daysSince(date("2026-01-01"))'),
+        targetFieldId: 'age',
+        targetFieldName: 'age',
+        dependencies: [],
+      },
+      {
+        ...buildConfig(FieldMetadataType.NUMBER, 'age * 2'),
+        targetFieldId: 'doubled',
+        targetFieldName: 'doubled',
+        dependencies: [
+          { fieldId: 'age', name: 'age', type: FieldMetadataType.NUMBER },
+        ],
+      },
+    ]);
+
+    const changedFieldIds = await service.recomputeTimeBased({
+      workspaceId: 'workspace',
+    });
+
+    return { update, getRepository, changedFieldIds };
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers({ now: Date.UTC(2026, 0, 11, 5) });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('updates time-based formulas and their dependents, keeping updatedAt', async () => {
+    const { update, changedFieldIds } = await buildScheduledRun([
+      { id: 'deal', price: 2, age: 9, doubled: 18, updatedAt: 'then' },
+    ]);
+
+    expect(update.mock.calls[0][1]).toEqual({
+      age: 10,
+      doubled: 20,
+      updatedAt: 'then',
+    });
+    expect(changedFieldIds).toEqual(['age', 'doubled']);
+  });
+
+  it('writes silently', async () => {
+    const { getRepository } = await buildScheduledRun([
+      { id: 'deal', price: 2, age: 9, doubled: 18, updatedAt: 'then' },
+    ]);
+
+    expect(getRepository).toHaveBeenLastCalledWith(
+      'opportunity',
+      { shouldBypassPermissionChecks: true },
+      { shouldSkipEventEmission: true },
+    );
+  });
+
+  it('writes nothing when the clock has not moved a value', async () => {
+    const { update, changedFieldIds } = await buildScheduledRun([
+      { id: 'deal', price: 2, age: 10, doubled: 20, updatedAt: 'then' },
+    ]);
+
+    expect(update).not.toHaveBeenCalled();
+    expect(changedFieldIds).toEqual([]);
+  });
+});
+
 describe('FieldFormulaService.rewriteReferences', () => {
   it('saves every formula before backfilling, the changed field last', async () => {
     const { savedExpressions, updateOrder, backfillOrder } = await rewrite(

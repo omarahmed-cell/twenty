@@ -6,6 +6,7 @@ import {
   coerceFormulaResult,
   evaluateFormula,
   isDefined,
+  isFormulaTimeBased,
   isFormulaValueUnchanged,
   parseFormula,
   renameFormulaField,
@@ -22,6 +23,7 @@ import {
   getFieldFormulaSettings,
   resolveFieldFormulaConfigs,
 } from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
+import { resolveFieldSyncConfigs } from 'src/modules/field-sync/utils/resolve-field-sync-configs.util';
 
 const BATCH_SIZE = 500;
 
@@ -31,11 +33,11 @@ type FormulaRecord = Record<string, unknown> & { id: string };
 
 // Configs arrive in dependency order. Staying this narrow also means a backfill never evaluates
 // an unrelated formula whose text a running rewrite has not reached yet.
-const selectTargetAndDownstream = (
+const selectWithDownstream = (
   configs: ResolvedFieldFormulaConfig[],
-  targetFieldId: string,
+  fieldIds: string[],
 ) => {
-  const selectedFieldIds = new Set([targetFieldId]);
+  const selectedFieldIds = new Set(fieldIds);
 
   return configs.filter((config) => {
     const isSelected =
@@ -119,28 +121,99 @@ export class FieldFormulaService {
       workspaceId,
       objectNameSingular,
       async (allConfigs) => {
-        const repository = this.getRepository(objectNameSingular);
-        const configs = selectTargetAndDownstream(allConfigs, targetFieldId);
-
-        let lastId: string | undefined;
-
-        for (;;) {
-          const records = await repository.find({
-            where: isDefined(lastId) ? { id: MoreThan(lastId) } : {},
-            order: { id: 'ASC' },
-            take: BATCH_SIZE,
-          });
-
-          if (records.length === 0) {
-            return;
-          }
-
-          await this.writeChanges(configs, objectNameSingular, records);
-
-          lastId = records[records.length - 1].id;
-        }
+        await this.recomputeAllRecords(
+          selectWithDownstream(allConfigs, [targetFieldId]),
+          objectNameSingular,
+        );
       },
     );
+  }
+
+  // Runs on a schedule across every record, so it stays silent and leaves updatedAt alone: the
+  // clock moving is not an edit, and must not fire "any update" workflows or fill timelines.
+  async recomputeTimeBased({
+    workspaceId,
+  }: {
+    workspaceId: string;
+  }): Promise<string[]> {
+    const timeBasedConfigs = (await this.getConfigs(workspaceId)).filter(
+      ({ expression }) => isFormulaTimeBased(expression),
+    );
+
+    const changedFieldIds = new Set<string>();
+
+    for (const objectNameSingular of new Set(
+      timeBasedConfigs.map((config) => config.objectNameSingular),
+    )) {
+      await this.runForObject(
+        workspaceId,
+        objectNameSingular,
+        async (allConfigs) => {
+          const fieldIds = await this.recomputeAllRecords(
+            selectWithDownstream(
+              allConfigs,
+              timeBasedConfigs.map(({ targetFieldId }) => targetFieldId),
+            ),
+            objectNameSingular,
+            { isScheduled: true },
+          );
+
+          fieldIds.forEach((fieldId) => changedFieldIds.add(fieldId));
+        },
+      );
+    }
+
+    return [...changedFieldIds];
+  }
+
+  // Silent writes emit nothing for the Sync listener, so these targets need telling directly.
+  async getSyncTargetFieldIdsReading(
+    workspaceId: string,
+    sourceFieldIds: string[],
+  ): Promise<string[]> {
+    const { flatObjectMetadataMaps, flatFieldMetadataMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatObjectMetadataMaps',
+        'flatFieldMetadataMaps',
+      ]);
+
+    return resolveFieldSyncConfigs(flatObjectMetadataMaps, flatFieldMetadataMaps)
+      .filter(({ sourceFieldId }) => sourceFieldIds.includes(sourceFieldId))
+      .map(({ targetFieldId }) => targetFieldId);
+  }
+
+  private async recomputeAllRecords(
+    configs: ResolvedFieldFormulaConfig[],
+    objectNameSingular: string,
+    options: { isScheduled: boolean } = { isScheduled: false },
+  ): Promise<string[]> {
+    const repository = this.getRepository(objectNameSingular);
+    const changedFieldIds = new Set<string>();
+
+    let lastId: string | undefined;
+
+    for (;;) {
+      const records = await repository.find({
+        where: isDefined(lastId) ? { id: MoreThan(lastId) } : {},
+        order: { id: 'ASC' },
+        take: BATCH_SIZE,
+      });
+
+      if (records.length === 0) {
+        return [...changedFieldIds];
+      }
+
+      const fieldIds = await this.writeChanges(
+        configs,
+        objectNameSingular,
+        records,
+        options,
+      );
+
+      fieldIds.forEach((fieldId) => changedFieldIds.add(fieldId));
+
+      lastId = records[records.length - 1].id;
+    }
   }
 
   // Formulas store field names and option values as text, so a rename would otherwise pause
@@ -252,10 +325,14 @@ export class FieldFormulaService {
     );
   }
 
-  private getRepository(objectNameSingular: string) {
+  private getRepository(
+    objectNameSingular: string,
+    { shouldSkipEventEmission = false } = {},
+  ) {
     return this.workspaceOrmManager.getRepository<FormulaRecord>(
       objectNameSingular,
       { shouldBypassPermissionChecks: true },
+      { shouldSkipEventEmission },
     );
   }
 
@@ -304,11 +381,13 @@ export class FieldFormulaService {
     configs: ResolvedFieldFormulaConfig[],
     objectNameSingular: string,
     records: FormulaRecord[],
-  ): Promise<void> {
+    { isScheduled }: { isScheduled: boolean } = { isScheduled: false },
+  ): Promise<string[]> {
     const recordIdsByPatch = new Map<
       string,
       { patch: Record<string, unknown>; recordIds: string[] }
     >();
+    const changedFieldIds = new Set<string>();
 
     for (const record of records) {
       const patch: Record<string, unknown> = {};
@@ -328,6 +407,7 @@ export class FieldFormulaService {
             config.outputType,
           )
         ) {
+          changedFieldIds.add(config.targetFieldId);
           patch[config.targetFieldName] =
             value === null && config.outputType === FieldMetadataType.CURRENCY
               ? EMPTY_CURRENCY
@@ -339,6 +419,11 @@ export class FieldFormulaService {
         continue;
       }
 
+      // Setting updatedAt explicitly is the only way to stop the ORM bumping it.
+      if (isScheduled) {
+        patch.updatedAt = record.updatedAt;
+      }
+
       const patchKey = JSON.stringify(patch);
       const group = recordIdsByPatch.get(patchKey) ?? { patch, recordIds: [] };
 
@@ -346,10 +431,14 @@ export class FieldFormulaService {
       recordIdsByPatch.set(patchKey, group);
     }
 
-    const repository = this.getRepository(objectNameSingular);
+    const repository = this.getRepository(objectNameSingular, {
+      shouldSkipEventEmission: isScheduled,
+    });
 
     for (const { patch, recordIds } of recordIdsByPatch.values()) {
       await repository.update({ id: In(recordIds) }, patch);
     }
+
+    return [...changedFieldIds];
   }
 }

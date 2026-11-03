@@ -55,6 +55,29 @@ const timeBetween =
   (unitInMilliseconds: number) => (left: number, right: number) =>
     (left - right) / unitInMilliseconds;
 
+// Snapped to the hour, the schedule that recalculates these formulas: an exact clock would
+// give a different value on every evaluation, and so a rewrite of every record.
+const getCurrentHour = () =>
+  Math.floor(Date.now() / MILLISECONDS_PER_HOUR) * MILLISECONDS_PER_HOUR;
+
+const wholeUnitsSince = (unitInMilliseconds: number) =>
+  onDefinedNumbers((timestamp: number) =>
+    Math.floor((getCurrentHour() - timestamp) / unitInMilliseconds),
+  );
+
+const wholeUnitsUntil = (unitInMilliseconds: number) =>
+  onDefinedNumbers((timestamp: number) =>
+    Math.floor((timestamp - getCurrentHour()) / unitInMilliseconds),
+  );
+
+export const FORMULA_TIME_FUNCTION_NAMES = [
+  'now',
+  'daysSince',
+  'daysUntil',
+  'hoursSince',
+  'hoursUntil',
+];
+
 export const FORMULA_FUNCTIONS: Record<
   string,
   // oxlint-disable-next-line typescript/no-explicit-any
@@ -91,6 +114,11 @@ export const FORMULA_FUNCTIONS: Record<
     container?.includes(value) ?? false,
   daysBetween: onDefinedNumbers(timeBetween(MILLISECONDS_PER_DAY)),
   hoursBetween: onDefinedNumbers(timeBetween(MILLISECONDS_PER_HOUR)),
+  now: getCurrentHour,
+  daysSince: wholeUnitsSince(MILLISECONDS_PER_DAY),
+  daysUntil: wholeUnitsUntil(MILLISECONDS_PER_DAY),
+  hoursSince: wholeUnitsSince(MILLISECONDS_PER_HOUR),
+  hoursUntil: wholeUnitsUntil(MILLISECONDS_PER_HOUR),
   date: (value: unknown) => (isDefined(value) ? toValidTimestamp(value) : null),
   addDays: onDefinedNumbers(
     (timestamp: number, days: number) =>
@@ -129,6 +157,11 @@ export const FORMULA_FUNCTION_SIGNATURES: Record<string, string> = {
   contains: 'contains(textOrList, value)',
   daysBetween: 'daysBetween(later, earlier)',
   hoursBetween: 'hoursBetween(later, earlier)',
+  now: 'now()',
+  daysSince: 'daysSince(date)',
+  daysUntil: 'daysUntil(date)',
+  hoursSince: 'hoursSince(date)',
+  hoursUntil: 'hoursUntil(date)',
   date: 'date("2026-01-31")',
   addDays: 'addDays(date, days)',
   addHours: 'addHours(date, hours)',

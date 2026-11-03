@@ -218,6 +218,7 @@ export { findComputedFieldCycleMembers } from './formula/findComputedFieldCycleM
 export type { DurationUnit } from './formula/formatDuration';
 export { DURATION_UNITS, formatDuration } from './formula/formatDuration';
 export {
+  FORMULA_TIME_FUNCTION_NAMES,
   FORMULA_FUNCTIONS,
   FORMULA_FUNCTION_SIGNATURES,
   FORMULA_ENGINE,
@@ -226,6 +227,7 @@ export {
   getFormulaComparedValues,
   renameFormulaOptionValues,
 } from './formula/formulaOptionValues';
+export { isFormulaTimeBased } from './formula/isFormulaTimeBased';
 export { isFormulaValueUnchanged } from './formula/isFormulaValueUnchanged';
 export type { ParsedFormula } from './formula/parseFormula';
 export { parseFormula } from './formula/parseFormula';

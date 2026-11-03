@@ -18,7 +18,10 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useRef } from 'react';
-import { type FormulaOutputFieldType } from 'twenty-shared/utils';
+import {
+  type FormulaOutputFieldType,
+  isFormulaTimeBased,
+} from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { Card } from 'twenty-ui/primitives/surfaces';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -32,6 +35,10 @@ const StyledContainer = styled.div`
 
 const StyledError = styled.div`
   color: ${themeCssVariables.font.color.danger};
+`;
+
+const StyledNote = styled.div`
+  color: ${themeCssVariables.font.color.tertiary};
 `;
 
 const StyledWarning = styled.div`
@@ -184,6 +191,11 @@ export const SettingsDataModelFieldFormulaForm = ({
             </StyledWarning>
           ),
         )}
+      {validation.status === 'valid' && isFormulaTimeBased(expression) && (
+        <StyledNote>
+          {t`This formula uses the current time, so it recalculates every hour. Those updates don't appear on the timeline, trigger workflows or change Last update.`}
+        </StyledNote>
+      )}
       {validation.status === 'valid' && (
         <Section.Root>
           <Section.Header

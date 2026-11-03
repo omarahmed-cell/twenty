@@ -6,6 +6,10 @@ import { Processor } from 'src/engine/core-modules/message-queue/decorators/proc
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
 import { FieldFormulaService } from 'src/modules/field-formula/services/field-formula.service';
+import {
+  FieldSyncJob,
+  type FieldSyncJobData,
+} from 'src/modules/field-sync/jobs/field-sync.job';
 
 // Every process memoizes workspace metadata for 10s, so a record edit just after a metadata
 // change can be checked against stale fields and missed. A later backfill repairs it, at no
@@ -15,6 +19,7 @@ export const FIELD_FORMULA_CATCH_UP_DELAY_MS = 11_000;
 export type FieldFormulaJobData = { workspaceId: string } & (
   | { type: 'RECORDS'; objectNameSingular: string; recordIds: string[] }
   | { type: 'BACKFILL'; targetFieldId: string }
+  | { type: 'TIME_BASED' }
   | {
       type: 'REWRITE_REFERENCES';
       objectMetadataId: string;
@@ -37,6 +42,27 @@ export class FieldFormulaJob {
   async handle(data: FieldFormulaJobData): Promise<void> {
     if (data.type === 'RECORDS') {
       await this.fieldFormulaService.recomputeRecords(data);
+
+      return;
+    }
+
+    if (data.type === 'TIME_BASED') {
+      const changedFieldIds =
+        await this.fieldFormulaService.recomputeTimeBased(data);
+
+      const syncTargetFieldIds =
+        await this.fieldFormulaService.getSyncTargetFieldIdsReading(
+          data.workspaceId,
+          changedFieldIds,
+        );
+
+      for (const targetFieldId of syncTargetFieldIds) {
+        await this.messageQueueService.add<FieldSyncJobData>(FieldSyncJob.name, {
+          type: 'BACKFILL',
+          workspaceId: data.workspaceId,
+          targetFieldId,
+        });
+      }
 
       return;
     }
