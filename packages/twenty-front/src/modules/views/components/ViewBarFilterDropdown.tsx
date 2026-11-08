@@ -43,7 +43,10 @@ export const ViewBarFilterDropdown = () => {
   };
 
   return (
+    // floating-ui compares middleware by function source, so without a remount
+    // size() keeps writing max-height to the previous object's dropdown state
     <Dropdown
+      key={dropdownId}
       dropdownId={dropdownId}
       onClose={handleDropdownClose}
       onOpen={handleDropdownOpen}
