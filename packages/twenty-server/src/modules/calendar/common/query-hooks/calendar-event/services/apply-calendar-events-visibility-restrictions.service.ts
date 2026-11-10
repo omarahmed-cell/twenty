@@ -77,6 +77,11 @@ export class ApplyCalendarEventsVisibilityRestrictionsService {
               association.calendarEventId === calendarEvents[i].id,
           );
 
+          // Events not synced from a calendar channel (e.g. imported via API) have no owner to protect.
+          if (associations.length === 0) {
+            continue;
+          }
+
           const calendarChannels = associations
             .map((association) =>
               calendarChannelMap.get(association.calendarChannelId),

@@ -277,8 +277,12 @@ export class TimelineCalendarEventService {
 
         const participants = await Promise.all(participantPromises);
 
-        const hasFullAccess = event.calendarChannelEventAssociations.some(
-          (association) => {
+        const isNotFromCalendarChannel =
+          event.calendarChannelEventAssociations.length === 0;
+
+        const hasFullAccess =
+          isNotFromCalendarChannel ||
+          event.calendarChannelEventAssociations.some((association) => {
             const channel = calendarChannelMap.get(
               association.calendarChannelId,
             );
@@ -287,8 +291,7 @@ export class TimelineCalendarEventService {
               channel?.visibility === 'SHARE_EVERYTHING' ||
               channel?.isOwnedByCurrentUser
             );
-          },
-        );
+          });
 
         const visibility = hasFullAccess
           ? CalendarChannelVisibility.SHARE_EVERYTHING
