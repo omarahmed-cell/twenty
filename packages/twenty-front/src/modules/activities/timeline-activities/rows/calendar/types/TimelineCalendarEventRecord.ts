@@ -5,6 +5,7 @@ export type TimelineCalendarEventRecord = CalendarEvent & {
   meetingType: string | null;
   locationType: string | null;
   assignedToId: string | null;
+  createdBy?: { name?: string | null } | null;
   calendarChannelEventAssociations: {
     id: string;
     calendarChannelId: string;

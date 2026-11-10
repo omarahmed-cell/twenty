@@ -1233,6 +1233,15 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: 'd5402005-e8f9-4fbe-8696-b6723cd85018',
     },
   },
+  opportunityContact: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityContact,
+    ),
+    opportunity: {
+      universalIdentifier: 'c9a0580a-9eab-44f9-b65c-7ba6f20216cf',
+    },
+    person: { universalIdentifier: 'c1cebe58-bfb0-4ea7-90c1-50de57e62a93' },
+  },
   messageChannelMessageAssociation: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,
@@ -1498,6 +1507,9 @@ export const STANDARD_OBJECT_FIELDS = {
     lineItems: {
       universalIdentifier: '5cc0767e-d40e-4ae8-a6e5-a5ec5551cb85',
     },
+    contacts: {
+      universalIdentifier: '846b77df-cfd3-4b42-8cad-50b040f3bc4d',
+    },
     taskTargets: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -1690,6 +1702,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     listMemberships: {
       universalIdentifier: '8b8d1be0-4c94-4413-a2c9-c7ede205a81d',
+    },
+    opportunities: {
+      universalIdentifier: 'a0a4848a-5cbc-49fb-b0db-6c1f69b357fb',
     },
     callTargets: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({

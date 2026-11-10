@@ -130,6 +130,31 @@ describe('EventRowCalendarEvent', () => {
     expect(screen.getByText('Agenda: pricing')).toBeInTheDocument();
   });
 
+  it('names the imported creator when no channel, organizer or member authored it', () => {
+    jest.mocked(useTimelineChannelOwnerName).mockReturnValue({
+      getChannelOwnerName: () => undefined,
+    });
+    jest.mocked(useFindOneRecord).mockReturnValue({
+      record: {
+        id: 'calendar-event-id',
+        title: 'Imported meeting',
+        startsAt: '2026-07-15T10:00:00.000Z',
+        endsAt: '2026-07-15T11:00:00.000Z',
+        createdBy: { name: 'Marwan Mansi' },
+        calendarEventParticipants: [],
+        calendarChannelEventAssociations: [],
+        callRecordings: [],
+      },
+      loading: false,
+      error: undefined,
+    } as never);
+
+    renderCard();
+
+    expect(screen.getByText('Marwan Mansi')).toBeInTheDocument();
+    expect(screen.queryByText('Ada Lovelace')).not.toBeInTheDocument();
+  });
+
   it('does not render a title masked by calendar visibility', () => {
     jest.mocked(useFindOneRecord).mockReturnValue({
       record: {

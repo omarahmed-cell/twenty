@@ -73,6 +73,18 @@ const OPPORTUNITY_PAGE_TABS = {
         fieldUniversalIdentifier:
           STANDARD_OBJECTS.opportunity.fields.services.universalIdentifier,
       },
+      contacts: {
+        universalIdentifier:
+          STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS.opportunityRecordPage.tabs
+            .home.widgets.contacts.universalIdentifier,
+        title: i18nLabel(
+          msg({ message: 'Contacts', context: 'pageLayoutWidget.title' }),
+        ),
+        type: WidgetType.FIELD,
+        position: VERTICAL_LIST_LAYOUT_POSITIONS.SIXTH,
+        fieldUniversalIdentifier:
+          STANDARD_OBJECTS.opportunity.fields.contacts.universalIdentifier,
+      },
     },
   },
   lineItems: {

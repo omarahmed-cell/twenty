@@ -748,6 +748,27 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  opportunityContact: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityContact,
+    fields: STANDARD_OBJECT_FIELDS.opportunityContact,
+    indexes: {
+      opportunityIdIndex: {
+        universalIdentifier: '61a374f7-60f9-4749-bf84-fcf61b989172',
+      },
+      personOpportunityUniqueIndex: {
+        universalIdentifier: 'eded5a2e-da7c-4e86-9363-b96a544f69a0',
+      },
+    },
+    views: {
+      allOpportunityContacts: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityContact,
+        fields: STANDARD_OBJECT_FIELDS.opportunityContact,
+        viewFieldNames: ['id', 'opportunity', 'person', 'createdAt'],
+      }),
+    },
+  },
   messageChannelMessageAssociation: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

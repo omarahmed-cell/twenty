@@ -1,5 +1,8 @@
 import { useMemo } from 'react';
-import { type RecordGqlOperationSignature } from 'twenty-shared/types';
+import {
+  FieldMetadataType,
+  type RecordGqlOperationSignature,
+} from 'twenty-shared/types';
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
 
 import { type TimelineActivity } from '@/activities/timeline-activities/types/TimelineActivity';
@@ -75,10 +78,20 @@ export const useLinkedRecordsIdentifiers = ({
           return undefined;
         }
 
+        const hasCreatedByField = objectMetadataItem.fields.some(
+          (field) =>
+            field.name === 'createdBy' &&
+            field.type === FieldMetadataType.ACTOR,
+        );
+
         return {
           objectNameSingular: objectMetadataItem.nameSingular,
           variables: { filter: { id: { in: [...recordIds] } } },
-          fields: { id: true, [labelIdentifierField.name]: true },
+          fields: {
+            id: true,
+            [labelIdentifierField.name]: true,
+            ...(hasCreatedByField && { createdBy: true }),
+          },
         } satisfies RecordGqlOperationSignature;
       })
       .filter(isDefined);

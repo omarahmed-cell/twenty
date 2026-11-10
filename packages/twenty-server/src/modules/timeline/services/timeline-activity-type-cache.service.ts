@@ -44,6 +44,35 @@ export class TimelineActivityTypeCacheService {
     return resolveTimelineActivityType;
   }
 
+  async findActiveTimelineActivityTypeByUniversalIdentifier({
+    workspaceId,
+    universalIdentifier,
+  }: {
+    workspaceId: string;
+    universalIdentifier: string;
+  }): Promise<ResolvedTimelineActivityType | undefined> {
+    const { flatTimelineActivityTypeMaps } =
+      await this.workspaceManyOrAllFlatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
+        { workspaceId, flatMapsKeys: ['flatTimelineActivityTypeMaps'] },
+      );
+
+    const timelineActivityType =
+      flatTimelineActivityTypeMaps.byUniversalIdentifier[universalIdentifier];
+
+    if (
+      !isDefined(timelineActivityType) ||
+      !resolveEffectiveFlatEntityProperty({
+        metadataName: 'timelineActivityType',
+        flatEntity: timelineActivityType,
+        property: 'isActive',
+      })
+    ) {
+      return undefined;
+    }
+
+    return toResolvedTimelineActivityType(timelineActivityType);
+  }
+
   async getTimelineActivityTypeByIdOrThrow({
     workspaceId,
     timelineActivityTypeId,

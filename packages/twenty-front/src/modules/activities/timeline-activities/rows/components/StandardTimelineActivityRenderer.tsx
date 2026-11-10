@@ -47,6 +47,7 @@ const CalendarEventTimelineActivityRenderer = ({
     <EventRowCalendarEvent
       calendarEventId={event.linkedRecordId}
       authorFullName={authorFullName}
+      isAuthorWorkspaceMember={isDefined(event.workspaceMember)}
       happensAt={event.happensAt}
     />
   ) : null;

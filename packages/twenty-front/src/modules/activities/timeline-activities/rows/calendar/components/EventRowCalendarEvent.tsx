@@ -1,4 +1,5 @@
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { isNonEmptyString } from '@sniptt/guards';
 import { t } from '@lingui/core/macro';
 import { type ReactNode, useState } from 'react';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
@@ -21,12 +22,14 @@ const hasGraphQLErrorCode = (error: unknown, code: string) =>
 type EventRowCalendarEventProps = {
   calendarEventId: string;
   authorFullName: string;
+  isAuthorWorkspaceMember?: boolean;
   happensAt: string;
 };
 
 export const EventRowCalendarEvent = ({
   calendarEventId,
   authorFullName,
+  isAuthorWorkspaceMember = false,
   happensAt,
 }: EventRowCalendarEventProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,7 +94,10 @@ export const EventRowCalendarEvent = ({
     ) ??
     (isDefined(organizer)
       ? getCalendarEventParticipantName(organizer)
-      : authorFullName);
+      : !isAuthorWorkspaceMember &&
+          isNonEmptyString(calendarEvent.createdBy?.name)
+        ? calendarEvent.createdBy.name
+        : authorFullName);
 
   return (
     <EventRowWithCard

@@ -13,6 +13,7 @@ import { useTimelineActivityTypes } from '@/activities/timeline-activities/hooks
 import { getTimelineActivityAction } from '@/activities/timeline-activities/utils/getTimelineActivityAction';
 import { getTimelineActivityType } from '@/activities/timeline-activities/utils/getTimelineActivityType';
 import { getTimelineActivityLinkedObjectMetadataItem } from '@/activities/timeline-activities/utils/getTimelineActivityLinkedObjectMetadataItem';
+import { useRecordCreatorName } from '@/activities/timeline-activities/hooks/useRecordCreatorName';
 import { getTimelineActivityAuthorFullName } from '@/activities/timeline-activities/utils/getTimelineActivityAuthorFullName';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { getObjectRecordIdentifier } from '@/object-metadata/utils/getObjectRecordIdentifier';
@@ -109,6 +110,7 @@ export const EventRow = ({
   const { recordId } = useContext(TimelineActivityContext);
 
   const recordStore = useAtomFamilyStateValue(recordStoreFamilyState, recordId);
+  const linkedRecordCreatorName = useRecordCreatorName(event.linkedRecordId);
 
   const { timelineActivityTypeMaps } = useTimelineActivityTypes();
   const frontComponents = useAtomStateValue(frontComponentsSelector);
@@ -161,7 +163,17 @@ export const EventRow = ({
     allowRequestsToTwentyIcons,
   });
 
-  const authorFullName = getTimelineActivityAuthorFullName(event);
+  const recordCreatorName =
+    timelineActivityAction === 'linked'
+      ? linkedRecordCreatorName
+      : timelineActivityAction === 'created' && !isDefined(event.linkedRecordId)
+        ? recordStore.createdBy?.name
+        : undefined;
+
+  const authorFullName = getTimelineActivityAuthorFullName(
+    event,
+    recordCreatorName,
+  );
 
   return (
     <>

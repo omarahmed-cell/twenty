@@ -30,6 +30,7 @@ export const STANDARD_OBJECT_ICONS = {
   communicationTarget: 'IconCheckbox',
   noteTarget: 'IconCheckbox',
   opportunity: 'IconTargetArrow',
+  opportunityContact: 'IconUser',
   person: 'IconUser',
   service: 'IconBriefcase',
   product: 'IconPackage',

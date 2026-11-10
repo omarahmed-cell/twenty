@@ -14,6 +14,7 @@ export const TIMELINE_CALENDAR_EVENT_GQL_FIELDS: RecordGqlFields = {
   meetingType: true,
   locationType: true,
   assignedToId: true,
+  createdBy: true,
   calendarEventParticipants: {
     id: true,
     handle: true,

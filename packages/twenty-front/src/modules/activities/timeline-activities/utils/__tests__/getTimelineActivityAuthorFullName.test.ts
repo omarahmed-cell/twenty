@@ -34,6 +34,28 @@ describe('getTimelineActivityAuthorFullName', () => {
     );
   });
 
+  it('should fall back to the record creator name without a workspace member', () => {
+    expect(
+      getTimelineActivityAuthorFullName({} as TimelineActivity, 'Marwan Mansi'),
+    ).toBe('Marwan Mansi');
+  });
+
+  it('should prefer the workspace member over the record creator name', () => {
+    const event = {
+      workspaceMember: {
+        id: '789',
+        name: { firstName: 'John', lastName: 'Doe' },
+      },
+    };
+
+    expect(
+      getTimelineActivityAuthorFullName(
+        event as TimelineActivity,
+        'Marwan Mansi',
+      ),
+    ).toBe('John Doe');
+  });
+
   it('should return "Twenty" if the workspace member is not defined', () => {
     expect(getTimelineActivityAuthorFullName({} as TimelineActivity)).toBe(
       'Twenty',

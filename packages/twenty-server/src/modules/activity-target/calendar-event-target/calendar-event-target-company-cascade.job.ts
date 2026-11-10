@@ -39,7 +39,7 @@ export class CalendarEventTargetCompanyCascadeJob {
       calendarEventTargetIds.map((id) => ({ id })),
     );
 
-    await this.calendarEventCompanyTimelineService.addCompanyTimelineActivities(
+    await this.calendarEventCompanyTimelineService.addLinkedRecordTimelineActivities(
       { workspaceId, calendarEventTargetIds },
     );
   }

@@ -202,6 +202,7 @@ export const STANDARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIERS = {
           company: 'Company',
           owner: 'Owner',
           services: 'Services',
+          contacts: 'Contacts',
         },
       },
       lineItems: {
