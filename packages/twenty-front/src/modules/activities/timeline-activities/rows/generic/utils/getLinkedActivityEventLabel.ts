@@ -101,16 +101,12 @@ export const getLinkedActivityEventLabel = ({
   switch (action) {
     case 'linked':
       if (objectNameSingular === CoreObjectNameSingular.Email) {
-        const label = getLinkedLabel(
+        return getLinkedLabel(
           objectNameSingular,
           objectLabel,
           detailLabel,
           emailDirection,
         );
-
-        return isNonEmptyString(detailLabel)
-          ? `${label} · ${detailLabel}`
-          : label;
       }
 
       return objectNameSingular === CoreObjectNameSingular.Communication

@@ -33,16 +33,15 @@ describe('getLinkedActivityEventLabel', () => {
     ).toBe('logged a call — Connected');
   });
 
-  it('should say a rep sent an outgoing email, with its subject', () => {
+  it('should say a rep sent an outgoing email', () => {
     expect(
       getLinkedActivityEventLabel({
         action: 'linked',
         objectNameSingular: 'email',
         objectLabel: 'email',
-        detailLabel: 'Pricing follow-up',
         emailDirection: 'OUTGOING',
       }),
-    ).toBe('sent an email · Pricing follow-up');
+    ).toBe('sent an email');
   });
 
   it('should say an email was logged when it is not outgoing', () => {

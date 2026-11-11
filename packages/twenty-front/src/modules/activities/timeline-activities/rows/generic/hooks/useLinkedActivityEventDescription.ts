@@ -14,7 +14,6 @@ const DETAIL_FIELD_NAME_BY_OBJECT_NAME_SINGULAR: Partial<
 > = {
   [CoreObjectNameSingular.Call]: 'outcome',
   [CoreObjectNameSingular.Communication]: 'channelType',
-  [CoreObjectNameSingular.Email]: 'subject',
 };
 
 const OBJECT_NAME_SINGULARS_WITH_BODY: string[] = [
@@ -59,15 +58,12 @@ export const useLinkedActivityEventDescription = ({
     skip: !hasBody || !isDefined(linkedRecordId),
   });
 
-  const detailLabel = isEmail
-    ? (record?.subject ?? undefined)
-    : isDefined(detailFieldName)
-      ? linkedObjectMetadataItem?.fields
-          .find((field) => field.name === detailFieldName)
-          ?.options?.find(
-            (option) => option.value === record?.[detailFieldName],
-          )?.label
-      : undefined;
+  const detailLabel = isDefined(detailFieldName)
+    ? linkedObjectMetadataItem?.fields
+        .find((field) => field.name === detailFieldName)
+        ?.options?.find((option) => option.value === record?.[detailFieldName])
+        ?.label
+    : undefined;
 
   const preview = getActivityPreview(record?.bodyV2?.blocknote ?? null)
     .split('\n')
