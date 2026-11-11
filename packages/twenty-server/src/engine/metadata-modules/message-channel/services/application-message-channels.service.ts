@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { isNonEmptyString } from '@sniptt/guards';
 import {
   ConnectedAccountProvider,
-  MessageChannelContactAutoCreationPolicy,
   MessageChannelPendingGroupEmailsAction,
   MessageChannelSyncStage,
   MessageChannelSyncStatus,
@@ -25,6 +24,7 @@ import {
 } from 'src/engine/metadata-modules/message-channel/message-channel.exception';
 import { type MessageChannelDeletedEvent } from 'src/engine/metadata-modules/message-channel/types/message-channel-deleted.type';
 import { WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/workspace-event-emitter';
+import { LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION } from 'src/engine/metadata-modules/message-channel/constants/locked-message-channel-contact-auto-creation.constant';
 
 type ApplicationScope = {
   applicationId: string;
@@ -149,8 +149,7 @@ export class ApplicationMessageChannelsService {
       // inert since app channels skip the polling crons; mirrors EMAIL_GROUP so the UI reads healthy
       syncStage: MessageChannelSyncStage.MESSAGE_LIST_FETCH_PENDING,
       syncStatus: MessageChannelSyncStatus.ACTIVE,
-      isContactAutoCreationEnabled: false,
-      contactAutoCreationPolicy: MessageChannelContactAutoCreationPolicy.SENT,
+      ...LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION,
       excludeGroupEmails: false,
       excludeNonProfessionalEmails: false,
       pendingGroupEmailsAction: MessageChannelPendingGroupEmailsAction.NONE,

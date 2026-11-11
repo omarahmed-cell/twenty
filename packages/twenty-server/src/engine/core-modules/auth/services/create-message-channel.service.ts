@@ -13,6 +13,7 @@ import {
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
+import { LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION } from 'src/engine/metadata-modules/message-channel/constants/locked-message-channel-contact-auto-creation.constant';
 
 export type CreateMessageChannelInput = {
   workspaceId: string;
@@ -59,6 +60,7 @@ export class CreateMessageChannelService {
           ? MessageChannelSyncStage.MESSAGE_LIST_FETCH_PENDING
           : MessageChannelSyncStage.PENDING_CONFIGURATION,
         pendingGroupEmailsAction: MessageChannelPendingGroupEmailsAction.NONE,
+        ...LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION,
         workspaceId,
       });
 

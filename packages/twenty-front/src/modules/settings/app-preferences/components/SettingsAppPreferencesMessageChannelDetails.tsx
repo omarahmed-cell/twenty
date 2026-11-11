@@ -120,7 +120,6 @@ export const SettingsAppPreferencesMessageChannelDetails = ({
           description={t`Automatically create People records when receiving or sending emails`}
         />
         <SettingsAccountsMessageAutoCreationCard
-          value={messageChannel.contactAutoCreationPolicy}
           onChange={handleContactAutoCreationChange}
         />
       </Section.Root>

@@ -9,7 +9,6 @@ import { In, Repository } from 'typeorm';
 
 import {
   ConnectedAccountProvider,
-  MessageChannelContactAutoCreationPolicy,
   MessageChannelPendingGroupEmailsAction,
   MessageChannelSyncStage,
   MessageChannelSyncStatus,
@@ -36,6 +35,7 @@ import { INBOUND_EMAIL_LOCAL_PART_PREFIX } from 'src/modules/messaging/message-i
 import { INBOUND_EMAIL_LOCAL_PART_RANDOM_BYTES } from 'src/modules/messaging/message-import-manager/drivers/inbound-email/constants/inbound-email-local-part-random-bytes.constant';
 import { MessageChannelSyncStatusService } from 'src/modules/messaging/common/services/message-channel-sync-status.service';
 import { getDomainFromEmail } from 'src/utils/get-domain-from-email';
+import { LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION } from 'src/engine/metadata-modules/message-channel/constants/locked-message-channel-contact-auto-creation.constant';
 
 @Injectable()
 export class MessageChannelMetadataService {
@@ -246,7 +246,10 @@ export class MessageChannelMetadataService {
       syncStage: MessageChannelSyncStage;
     },
   ): Promise<MessageChannelDTO> {
-    const entity = this.repository.create(data);
+    const entity = this.repository.create({
+      ...data,
+      ...LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION,
+    });
 
     return this.repository.save(entity);
   }
@@ -260,10 +263,10 @@ export class MessageChannelMetadataService {
     workspaceId: string;
     data: Partial<MessageChannelEntity>;
   }): Promise<MessageChannelDTO> {
-    await this.repository.update(
-      { id, workspaceId },
-      data as Record<string, unknown>,
-    );
+    await this.repository.update({ id, workspaceId }, {
+      ...data,
+      ...LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION,
+    } as Record<string, unknown>);
 
     return this.repository.findOneOrFail({ where: { id, workspaceId } });
   }
@@ -348,9 +351,7 @@ export class MessageChannelMetadataService {
       syncStage: MessageChannelSyncStage.MESSAGE_LIST_FETCH_PENDING,
       syncStatus: MessageChannelSyncStatus.ACTIVE,
       isSyncEnabled: true,
-      isContactAutoCreationEnabled: true,
-      contactAutoCreationPolicy:
-        MessageChannelContactAutoCreationPolicy.SENT_AND_RECEIVED,
+      ...LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION,
       excludeGroupEmails: false,
       excludeNonProfessionalEmails: false,
       pendingGroupEmailsAction: MessageChannelPendingGroupEmailsAction.NONE,
