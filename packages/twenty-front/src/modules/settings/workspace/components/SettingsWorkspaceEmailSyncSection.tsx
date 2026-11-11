@@ -7,9 +7,13 @@ import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
-import { IconMail } from 'twenty-ui/icon';
+import { IconCalendarEvent, IconMail } from 'twenty-ui/icon';
 import { Card } from 'twenty-ui/primitives/surfaces';
 import { UpdateWorkspaceDocument } from '~/generated-metadata/graphql';
+
+type InternalImportSetting =
+  | 'isInternalMessagesImportEnabled'
+  | 'isInternalCalendarEventsImportEnabled';
 
 export const SettingsWorkspaceEmailSyncSection = () => {
   const { t } = useLingui();
@@ -20,24 +24,27 @@ export const SettingsWorkspaceEmailSyncSection = () => {
   const { enqueueToast } = useToast();
   const [updateWorkspace] = useMutation(UpdateWorkspaceDocument);
 
-  const handleSyncInternalEmailsChange = (value: boolean) => {
+  const handleInternalImportSettingChange = (
+    setting: InternalImportSetting,
+    value: boolean,
+  ) => {
     if (!isDefined(currentWorkspace)) {
       return;
     }
 
-    if (value === currentWorkspace.isInternalMessagesImportEnabled) {
+    if (value === currentWorkspace[setting]) {
       return;
     }
 
     setCurrentWorkspace({
       ...currentWorkspace,
-      isInternalMessagesImportEnabled: value,
+      [setting]: value,
     });
 
     updateWorkspace({
       variables: {
         input: {
-          isInternalMessagesImportEnabled: value,
+          [setting]: value,
         },
       },
     }).catch((error) => {
@@ -57,7 +64,27 @@ export const SettingsWorkspaceEmailSyncSection = () => {
           title={t`Sync Internal Emails`}
           description={t`Include emails where all participants share the same domain.`}
           checked={currentWorkspace?.isInternalMessagesImportEnabled ?? false}
-          onChange={handleSyncInternalEmailsChange}
+          onChange={(value) =>
+            handleInternalImportSettingChange(
+              'isInternalMessagesImportEnabled',
+              value,
+            )
+          }
+          divider
+        />
+        <SettingsOptionCardContentSwitch
+          Icon={IconCalendarEvent}
+          title={t`Sync Internal Meetings`}
+          description={t`Include calendar events where all attendees share the same domain.`}
+          checked={
+            currentWorkspace?.isInternalCalendarEventsImportEnabled ?? false
+          }
+          onChange={(value) =>
+            handleInternalImportSettingChange(
+              'isInternalCalendarEventsImportEnabled',
+              value,
+            )
+          }
         />
       </Card.Root>
     </Section.Root>

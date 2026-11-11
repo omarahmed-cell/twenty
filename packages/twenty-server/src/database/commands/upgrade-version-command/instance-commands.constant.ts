@@ -248,6 +248,7 @@ import { AddUserCreditsFallbackToBillingCustomerFastInstanceCommand } from 'src/
 import { AddConnectionProviderScopeFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-instance-command-fast-1792162723868-add-connection-provider-scope';
 import { AddConnectedAccountScopeFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-instance-command-fast-1792170228100-add-connected-account-scope';
 import { AddCallsCommunicationsWidgetTypesFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-instance-command-fast-1792668059428-add-calls-communications-widget-types';
+import { AddIsInternalCalendarEventsImportEnabledFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-instance-command-fast-1794405000000-add-is-internal-calendar-events-import-enabled';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -498,4 +499,5 @@ export const INSTANCE_COMMANDS = [
   AddConnectionProviderScopeFastInstanceCommand,
   AddConnectedAccountScopeFastInstanceCommand,
   AddCallsCommunicationsWidgetTypesFastInstanceCommand,
+  AddIsInternalCalendarEventsImportEnabledFastInstanceCommand,
 ];

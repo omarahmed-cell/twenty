@@ -12,6 +12,7 @@ type StandardObjectNameWithTargetMorphField =
   | 'attachment'
   | 'callTarget'
   | 'communicationTarget'
+  | 'emailTarget'
   | 'calendarEventTarget'
   | 'messageThreadTarget'
   | 'noteTarget'

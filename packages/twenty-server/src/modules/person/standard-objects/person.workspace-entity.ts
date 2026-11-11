@@ -15,6 +15,7 @@ import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calend
 import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-objects/call-target.workspace-entity';
 import { type SegmentMemberWorkspaceEntity } from 'src/modules/segment/standard-objects/segment-member.workspace-entity';
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
+import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-objects/email-target.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type MessageListMemberWorkspaceEntity } from 'src/modules/emailing/standard-objects/message-list-member.workspace-entity';
 import { type OpportunityContactWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity-contact.workspace-entity';
@@ -51,6 +52,7 @@ export class PersonWorkspaceEntity extends BaseWorkspaceEntity {
   segmentMembers: EntityRelation<SegmentMemberWorkspaceEntity[]>;
   segmentMembership: string[] | null;
   communicationTargets: EntityRelation<CommunicationTargetWorkspaceEntity[]>;
+  emailTargets: EntityRelation<EmailTargetWorkspaceEntity[]>;
   agentChatThreadTargets: EntityRelation<
     AgentChatThreadTargetWorkspaceEntity[]
   >;

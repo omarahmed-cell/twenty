@@ -76,6 +76,7 @@ describe('useColumnDefinitionsFromObjectMetadata', () => {
       isAutoModelSelectionEnabled: true,
       aiModelIdByTier: {},
       isInternalMessagesImportEnabled: false,
+      isInternalCalendarEventsImportEnabled: false,
     });
 
     const companyObjectMetadata = getTestEnrichedObjectMetadataItemsMock().find(

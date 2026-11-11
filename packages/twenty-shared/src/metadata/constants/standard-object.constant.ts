@@ -45,6 +45,9 @@ export const STANDARD_OBJECTS = {
       communicationIdIndex: {
         universalIdentifier: '3aec16b7-3d7b-4027-8756-3b189c8b2765',
       },
+      emailIdIndex: {
+        universalIdentifier: '17047b22-bbdd-4e2a-8197-691ccf116891',
+      },
     },
     views: {
       allAttachments: buildStandardObjectIndexView({
@@ -241,6 +244,8 @@ export const STANDARD_OBJECTS = {
           'isFullDay',
           'isCanceled',
           'conferenceLink',
+          'recordedVideo',
+          'transcript',
           'location',
           'description',
           'calendarEventTargets',
@@ -436,6 +441,51 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  email: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.email,
+    fields: STANDARD_OBJECT_FIELDS.email,
+    indexes: {
+      searchVectorGinIndex: {
+        universalIdentifier: '6de2e82c-1077-415f-8bb0-db097a20487a',
+      },
+    },
+    views: {
+      allEmails: buildStandardObjectIndexView({
+        objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.email,
+        fields: STANDARD_OBJECT_FIELDS.email,
+        viewFieldNames: [
+          'subject',
+          'emailTargets',
+          'direction',
+          'from',
+          'to',
+          'sentAt',
+          'status',
+          'createdBy',
+        ],
+      }),
+      emailRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.email,
+        fields: STANDARD_OBJECT_FIELDS.email,
+        viewFieldNames: [
+          'emailTargets',
+          'direction',
+          'from',
+          'to',
+          'sentAt',
+          'status',
+          'hubspotId',
+          'createdAt',
+          'createdBy',
+          'attachments',
+          'timelineActivities',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
+        },
+      }),
+    },
+  },
   communicationTarget: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communicationTarget,
@@ -483,6 +533,59 @@ export const STANDARD_OBJECTS = {
         viewFieldNames: [
           'id',
           'communication',
+          'targetPerson',
+          'targetCompany',
+          'targetOpportunity',
+          'targetService',
+        ],
+      }),
+    },
+  },
+  emailTarget: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTarget,
+    fields: STANDARD_OBJECT_FIELDS.emailTarget,
+    morphIds: {
+      targetMorphId: {
+        morphId: STANDARD_OBJECT_FIELDS.emailTarget.target.universalIdentifier,
+      },
+    },
+    indexes: {
+      emailIdIndex: {
+        universalIdentifier: '8e0e620e-af59-4c8f-bea0-0ae1dd4b0ed6',
+      },
+      personIdIndex: {
+        universalIdentifier: 'c465c4e2-d64a-43af-b41e-96d341dcfc06',
+      },
+      companyIdIndex: {
+        universalIdentifier: '33e6e217-874f-4087-8aa5-f30560d99ef2',
+      },
+      opportunityIdIndex: {
+        universalIdentifier: 'edf624b4-05c6-4de7-9f34-2708c30594ab',
+      },
+      serviceIdIndex: {
+        universalIdentifier: '069dc9c6-a48c-43e6-b6fd-be6161300bdb',
+      },
+      emailPersonUniqueIndex: {
+        universalIdentifier: '6d8a98b9-da12-4e02-9986-693ac577b58c',
+      },
+      emailCompanyUniqueIndex: {
+        universalIdentifier: '1a620edf-c7c9-4f2e-b1e2-7aea3f64c53e',
+      },
+      emailOpportunityUniqueIndex: {
+        universalIdentifier: 'e903c02f-8a20-45ce-85c9-225718d50ce4',
+      },
+      emailServiceUniqueIndex: {
+        universalIdentifier: 'c821366a-e479-4e7a-ac6c-6b741f7a8668',
+      },
+    },
+    views: {
+      allEmailTargets: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTarget,
+        fields: STANDARD_OBJECT_FIELDS.emailTarget,
+        viewFieldNames: [
+          'id',
+          'email',
           'targetPerson',
           'targetCompany',
           'targetOpportunity',
@@ -589,6 +692,7 @@ export const STANDARD_OBJECTS = {
           'childCompanies',
           'callTargets',
           'communicationTargets',
+          'emailTargets',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -1199,6 +1303,7 @@ export const STANDARD_OBJECTS = {
           'lineItems',
           'callTargets',
           'communicationTargets',
+          'emailTargets',
         ],
         viewFieldGroupNames: {
           deal: 'Deal',
@@ -1262,6 +1367,7 @@ export const STANDARD_OBJECTS = {
           'services',
           'callTargets',
           'communicationTargets',
+          'emailTargets',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -1339,6 +1445,7 @@ export const STANDARD_OBJECTS = {
           'taskTargets',
           'callTargets',
           'communicationTargets',
+          'emailTargets',
           'messageThreadTargets',
           'calendarEventTargets',
         ],
@@ -1828,6 +1935,9 @@ export const STANDARD_OBJECTS = {
       },
       communicationIdIndex: {
         universalIdentifier: '755f8b6e-9b3a-4d73-8231-5bac3bd49786',
+      },
+      emailIdIndex: {
+        universalIdentifier: '04dff617-8b57-4f10-b3a8-6ac563a7da07',
       },
     },
     views: {

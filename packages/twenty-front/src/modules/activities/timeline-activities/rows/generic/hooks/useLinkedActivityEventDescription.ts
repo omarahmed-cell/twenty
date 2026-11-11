@@ -14,6 +14,7 @@ const DETAIL_FIELD_NAME_BY_OBJECT_NAME_SINGULAR: Partial<
 > = {
   [CoreObjectNameSingular.Call]: 'outcome',
   [CoreObjectNameSingular.Communication]: 'channelType',
+  [CoreObjectNameSingular.Email]: 'subject',
 };
 
 const OBJECT_NAME_SINGULARS_WITH_BODY: string[] = [
@@ -21,6 +22,7 @@ const OBJECT_NAME_SINGULARS_WITH_BODY: string[] = [
   CoreObjectNameSingular.Task,
   CoreObjectNameSingular.Call,
   CoreObjectNameSingular.Communication,
+  CoreObjectNameSingular.Email,
 ];
 
 export const useLinkedActivityEventDescription = ({
@@ -43,6 +45,7 @@ export const useLinkedActivityEventDescription = ({
   const hasBody =
     isDefined(objectNameSingular) &&
     OBJECT_NAME_SINGULARS_WITH_BODY.includes(objectNameSingular);
+  const isEmail = objectNameSingular === CoreObjectNameSingular.Email;
 
   const { record } = useFindOneRecord({
     objectNameSingular: objectNameSingular ?? CoreObjectNameSingular.Note,
@@ -51,16 +54,20 @@ export const useLinkedActivityEventDescription = ({
       id: true,
       ...(hasBody ? { bodyV2: true } : {}),
       ...(isDefined(detailFieldName) ? { [detailFieldName]: true } : {}),
+      ...(isEmail ? { direction: true } : {}),
     },
     skip: !hasBody || !isDefined(linkedRecordId),
   });
 
-  const detailLabel = isDefined(detailFieldName)
-    ? linkedObjectMetadataItem?.fields
-        .find((field) => field.name === detailFieldName)
-        ?.options?.find((option) => option.value === record?.[detailFieldName])
-        ?.label
-    : undefined;
+  const detailLabel = isEmail
+    ? (record?.subject ?? undefined)
+    : isDefined(detailFieldName)
+      ? linkedObjectMetadataItem?.fields
+          .find((field) => field.name === detailFieldName)
+          ?.options?.find(
+            (option) => option.value === record?.[detailFieldName],
+          )?.label
+      : undefined;
 
   const preview = getActivityPreview(record?.bodyV2?.blocknote ?? null)
     .split('\n')
@@ -73,6 +80,7 @@ export const useLinkedActivityEventDescription = ({
       objectLabel,
       detailLabel,
       eventTypeLabel,
+      emailDirection: isEmail ? (record?.direction ?? undefined) : undefined,
     }),
     preview,
   };

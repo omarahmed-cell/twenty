@@ -93,6 +93,7 @@ export const mockCurrentWorkspace = {
   isAutoModelSelectionEnabled: true,
   aiModelIdByTier: {},
   isInternalMessagesImportEnabled: false,
+  isInternalCalendarEventsImportEnabled: false,
   currentBillingSubscription: {
     __typename: 'BillingSubscription',
     id: '7efbc3f7-6e5e-4128-957e-8d86808cdf6a',

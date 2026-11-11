@@ -17,6 +17,7 @@ const FLAT_NAVIGATION_MENU_ITEM_NAMES = [
   'allCallRecordings',
   'allCalls',
   'allCommunications',
+  'allEmails',
   'allCompanies',
   'allDashboards',
   'allLineItems',

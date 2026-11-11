@@ -23,12 +23,14 @@ export type ActivityTargetJunction = {
     | 'taskTarget'
     | 'callTarget'
     | 'communicationTarget'
+    | 'emailTarget'
     | 'calendarEventTarget';
   activityIdFieldName:
     | 'noteId'
     | 'taskId'
     | 'callId'
     | 'communicationId'
+    | 'emailId'
     | 'calendarEventId';
   createdTargetDefaults?: Record<string, boolean>;
 };

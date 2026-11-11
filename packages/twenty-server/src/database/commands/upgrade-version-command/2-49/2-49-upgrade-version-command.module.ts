@@ -14,6 +14,8 @@ import { ProvisionMeetingNavigationCommand } from 'src/database/commands/upgrade
 import { ProvisionSegmentsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793188101860-provision-segments.command';
 import { ProvisionSegmentPullCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1793359696206-provision-segment-pull.command';
 import { ProvisionOpportunityContactsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794324498712-provision-opportunity-contacts.command';
+import { ProvisionEmailsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794400000000-provision-emails.command';
+import { RemoveOutOfHorizonAndInternalCalendarEventsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794410000000-remove-out-of-horizon-and-internal-calendar-events.command';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { WorkspaceSchemaManagerModule } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.module';
@@ -43,6 +45,8 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionSegmentsCommand,
     ProvisionSegmentPullCommand,
     ProvisionOpportunityContactsCommand,
+    ProvisionEmailsCommand,
+    RemoveOutOfHorizonAndInternalCalendarEventsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

@@ -352,6 +352,16 @@ export class ConfigVariables {
   MESSAGING_MESSAGES_GET_BATCH_SIZE = 400;
 
   @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Calendar events starting more than this many days ahead are not imported; a weekly full resync imports them once they come within range',
+    type: ConfigVariableType.NUMBER,
+  })
+  @CastToPositiveNumber()
+  @IsOptional()
+  CALENDAR_EVENTS_IMPORT_HORIZON_DAYS = 365;
+
+  @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.MICROSOFT_AUTH,
     description: 'Enable or disable the Microsoft Calendar integration',
     type: ConfigVariableType.BOOLEAN,

@@ -12,10 +12,12 @@ import { CalendarCommonModule } from 'src/modules/calendar/common/calendar-commo
 import { CalendarTriggerEventListFetchCommand } from 'src/modules/calendar/calendar-event-import-manager/commands/calendar-trigger-event-list-fetch.command';
 import { CalendarEventListFetchCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-event-list-fetch.cron.command';
 import { CalendarEventsImportCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-import.cron.command';
+import { CalendarFullResyncCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-full-resync.cron.command';
 import { CalendarOngoingStaleCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-ongoing-stale.cron.command';
 import { CalendarRelaunchFailedCalendarChannelsCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-relaunch-failed-calendar-channels.cron.command';
 import { CalendarEventListFetchCronJob } from 'src/modules/calendar/calendar-event-import-manager/crons/jobs/calendar-event-list-fetch.cron.job';
 import { CalendarEventsImportCronJob } from 'src/modules/calendar/calendar-event-import-manager/crons/jobs/calendar-events-import.cron.job';
+import { CalendarFullResyncCronJob } from 'src/modules/calendar/calendar-event-import-manager/crons/jobs/calendar-full-resync.cron.job';
 import { CalendarOngoingStaleCronJob } from 'src/modules/calendar/calendar-event-import-manager/crons/jobs/calendar-ongoing-stale.cron.job';
 import { CalendarRelaunchFailedCalendarChannelsCronJob } from 'src/modules/calendar/calendar-event-import-manager/crons/jobs/calendar-relaunch-failed-calendar-channels.cron.job';
 import { CalDavDriverModule } from 'src/modules/calendar/calendar-event-import-manager/drivers/caldav/caldav-driver.module';
@@ -74,6 +76,8 @@ import { BlocklistRepository } from 'src/modules/blocklist/repositories/blocklis
     CalendarRelaunchFailedCalendarChannelsCronJob,
     CalendarRelaunchFailedCalendarChannelsCronCommand,
     CalendarRelaunchFailedCalendarChannelJob,
+    CalendarFullResyncCronJob,
+    CalendarFullResyncCronCommand,
   ],
   exports: [
     CalendarEventsImportService,
@@ -83,6 +87,7 @@ import { BlocklistRepository } from 'src/modules/blocklist/repositories/blocklis
     CalendarEventsImportCronCommand,
     CalendarOngoingStaleCronCommand,
     CalendarRelaunchFailedCalendarChannelsCronCommand,
+    CalendarFullResyncCronCommand,
   ],
 })
 export class CalendarEventImportManagerModule {}

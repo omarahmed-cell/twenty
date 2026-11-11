@@ -11,6 +11,7 @@ type StandardTargetObjectName =
   | 'calendarEventTarget'
   | 'callTarget'
   | 'communicationTarget'
+  | 'emailTarget'
   | 'messageThreadTarget'
   | 'noteTarget'
   | 'segmentMember'

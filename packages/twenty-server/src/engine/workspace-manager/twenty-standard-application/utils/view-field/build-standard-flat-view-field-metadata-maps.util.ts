@@ -1,5 +1,7 @@
 import { computeStandardCommunicationViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-communication-view-fields.util';
+import { computeStandardEmailViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-email-view-fields.util';
 import { computeStandardCommunicationTargetViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-communication-target-view-fields.util';
+import { computeStandardEmailTargetViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-email-target-view-fields.util';
 import { computeStandardCallTargetViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-call-target-view-fields.util';
 import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/constant/create-empty-flat-entity-maps.constant';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
@@ -57,7 +59,9 @@ const STANDARD_FLAT_VIEW_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   call: computeStandardCallViewFields,
   callTarget: computeStandardCallTargetViewFields,
   communication: computeStandardCommunicationViewFields,
+  email: computeStandardEmailViewFields,
   communicationTarget: computeStandardCommunicationTargetViewFields,
+  emailTarget: computeStandardEmailTargetViewFields,
   callRecording: computeStandardCallRecordingViewFields,
   company: computeStandardCompanyViewFields,
   dashboard: computeStandardDashboardViewFields,

@@ -20,6 +20,7 @@ export const UPDATE_WORKSPACE = gql`
       isPasswordAuthEnabled
       isTwoFactorAuthenticationEnforced
       isInternalMessagesImportEnabled
+      isInternalCalendarEventsImportEnabled
       defaultRole {
         ...RoleFragment
       }

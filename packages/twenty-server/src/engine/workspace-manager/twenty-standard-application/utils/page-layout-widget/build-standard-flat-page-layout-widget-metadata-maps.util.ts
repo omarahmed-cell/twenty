@@ -95,6 +95,7 @@ const RECORD_PAGE_FIELDS_VIEW_NAME_BY_OBJECT: Partial<
   calendarEventParticipant: 'calendarEventParticipantRecordPageFields',
   call: 'callRecordPageFields',
   communication: 'communicationRecordPageFields',
+  email: 'emailRecordPageFields',
   callRecording: 'callRecordingRecordPageFields',
   company: 'companyRecordPageFields',
   message: 'messageRecordPageFields',

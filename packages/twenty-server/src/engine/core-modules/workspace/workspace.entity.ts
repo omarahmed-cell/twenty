@@ -316,6 +316,14 @@ export class WorkspaceEntity {
   @Column({ default: false })
   isInternalMessagesImportEnabled: boolean;
 
+  @Field()
+  @WasIntroducedInUpgrade({
+    upgradeCommandName:
+      '2.49.0_AddIsInternalCalendarEventsImportEnabledFastInstanceCommand_1794405000000',
+  })
+  @Column({ default: false })
+  isInternalCalendarEventsImportEnabled: boolean;
+
   @Field(() => [String], { nullable: true })
   @WasIntroducedInUpgrade({
     upgradeCommandName:

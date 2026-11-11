@@ -52,7 +52,12 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
     { name: 'title', type: FieldMetadataType.TEXT },
     { name: 'bodyV2', type: FieldMetadataType.RICH_TEXT },
   ],
+  email: [
+    { name: 'subject', type: FieldMetadataType.TEXT },
+    { name: 'bodyV2', type: FieldMetadataType.RICH_TEXT },
+  ],
   communicationTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
+  emailTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
   call: [
     { name: 'title', type: FieldMetadataType.TEXT },
     { name: 'bodyV2', type: FieldMetadataType.RICH_TEXT },

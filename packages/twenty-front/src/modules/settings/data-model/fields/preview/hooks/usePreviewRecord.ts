@@ -34,6 +34,8 @@ export const usePreviewRecord = ({
     recordGqlFields = { id: true, call: true };
   if (objectNameSingular === CoreObjectNameSingular.CommunicationTarget)
     recordGqlFields = { id: true, communication: true };
+  if (objectNameSingular === CoreObjectNameSingular.EmailTarget)
+    recordGqlFields = { id: true, email: true };
 
   const { records } = useFindManyRecords({
     objectNameSingular,

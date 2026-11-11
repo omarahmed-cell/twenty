@@ -4,6 +4,7 @@ import { BaseWorkspaceEntity } from 'src/engine/twenty-orm/base.workspace-entity
 import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
 import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-objects/call-target.workspace-entity';
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
+import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-objects/email-target.workspace-entity';
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type MessageThreadTargetWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread-target.workspace-entity';
@@ -28,6 +29,7 @@ export class ServiceWorkspaceEntity extends BaseWorkspaceEntity {
   taskTargets: EntityRelation<TaskTargetWorkspaceEntity[]>;
   callTargets: EntityRelation<CallTargetWorkspaceEntity[]>;
   communicationTargets: EntityRelation<CommunicationTargetWorkspaceEntity[]>;
+  emailTargets: EntityRelation<EmailTargetWorkspaceEntity[]>;
   messageThreadTargets: EntityRelation<MessageThreadTargetWorkspaceEntity[]>;
   calendarEventTargets: EntityRelation<CalendarEventTargetWorkspaceEntity[]>;
   timelineActivities: EntityRelation<TimelineActivityWorkspaceEntity[]>;

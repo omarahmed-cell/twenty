@@ -9,6 +9,8 @@ import { parseGoogleCalendarError } from 'src/modules/calendar/calendar-event-im
 import { type GetCalendarEventsResponse } from 'src/modules/calendar/calendar-event-import-manager/services/calendar-get-events.service';
 import { GoogleOAuth2ClientProvider } from 'src/modules/connected-account/oauth2-client-manager/drivers/google/google-oauth2-client.provider';
 import { type ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
+import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { isBeyondCalendarEventsImportHorizon } from 'src/modules/calendar/calendar-event-import-manager/utils/is-beyond-calendar-events-import-horizon.util';
 
 @Injectable()
 export class GoogleCalendarGetEventsService {
@@ -16,6 +18,7 @@ export class GoogleCalendarGetEventsService {
 
   constructor(
     private readonly googleOAuth2ClientProvider: GoogleOAuth2ClientProvider,
+    private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
   public async getCalendarEvents(
@@ -37,6 +40,10 @@ export class GoogleCalendarGetEventsService {
     const calendarEventIdsToDelete: string[] = [];
 
     let hasMoreEvents = true;
+
+    const horizonDays = this.twentyConfigService.get(
+      'CALENDAR_EVENTS_IMPORT_HORIZON_DAYS',
+    );
 
     while (hasMoreEvents) {
       const googleCalendarEvents = await googleCalendarClient.events
@@ -74,7 +81,13 @@ export class GoogleCalendarGetEventsService {
           continue;
         }
 
-        if (item.status === 'cancelled') {
+        // Unbounded recurring series expand for decades; the weekly full resync picks these up later.
+        const isBeyondHorizon = isBeyondCalendarEventsImportHorizon({
+          startsAt: item.start?.dateTime ?? item.start?.date,
+          horizonDays,
+        });
+
+        if (item.status === 'cancelled' || isBeyondHorizon) {
           calendarEventIdsToDelete.push(item.id);
         } else {
           calendarEventIds.push(item.id);

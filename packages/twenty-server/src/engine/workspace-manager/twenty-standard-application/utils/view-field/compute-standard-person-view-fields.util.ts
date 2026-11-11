@@ -426,5 +426,18 @@ export const computeStandardPersonViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
+    personRecordPageFieldsEmailTargets: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'person',
+      context: {
+        viewName: 'personRecordPageFields',
+        viewFieldName: 'emailTargets',
+        fieldName: 'emailTargets',
+        position: 13.5,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

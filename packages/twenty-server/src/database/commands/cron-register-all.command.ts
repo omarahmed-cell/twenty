@@ -29,6 +29,7 @@ import { CleanSuspendedWorkspacesCronCommand } from 'src/engine/workspace-manage
 import { CalendarEventListFetchCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-event-list-fetch.cron.command';
 import { GoogleMeetRecordingsImportCronCommand } from 'src/modules/call-recording/google-meet/crons/commands/google-meet-recordings-import.cron.command';
 import { CalendarEventsImportCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-import.cron.command';
+import { CalendarFullResyncCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-full-resync.cron.command';
 import { CalendarOngoingStaleCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-ongoing-stale.cron.command';
 import { CalendarRelaunchFailedCalendarChannelsCronCommand } from 'src/modules/calendar/calendar-event-import-manager/crons/commands/calendar-relaunch-failed-calendar-channels.cron.command';
 import { MessagingMessageListFetchCronCommand } from 'src/modules/messaging/message-import-manager/crons/commands/messaging-message-list-fetch.cron.command';
@@ -59,6 +60,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly calendarEventsImportCronCommand: CalendarEventsImportCronCommand,
     private readonly calendarOngoingStaleCronCommand: CalendarOngoingStaleCronCommand,
     private readonly calendarRelaunchFailedCalendarChannelsCronCommand: CalendarRelaunchFailedCalendarChannelsCronCommand,
+    private readonly calendarFullResyncCronCommand: CalendarFullResyncCronCommand,
 
     private readonly webhookSubscriptionRenewalCronCommand: WebhookSubscriptionRenewalCronCommand,
 
@@ -144,6 +146,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'CalendarRelaunchFailedCalendarChannels',
         command: this.calendarRelaunchFailedCalendarChannelsCronCommand,
+      },
+      {
+        name: 'CalendarFullResync',
+        command: this.calendarFullResyncCronCommand,
       },
       {
         name: 'WebhookSubscriptionRenewal',

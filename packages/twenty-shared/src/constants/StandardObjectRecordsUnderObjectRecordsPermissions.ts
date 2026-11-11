@@ -11,4 +11,5 @@ export const STANDARD_OBJECT_RECORDS_UNDER_OBJECT_RECORDS_PERMISSIONS = [
   'task',
   'call',
   'communication',
+  'email',
 ];

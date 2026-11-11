@@ -211,6 +211,34 @@ export const computeStandardCalendarEventViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
+    calendarEventRecordPageFieldsRecordedVideo:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'calendarEvent',
+        context: {
+          viewName: 'calendarEventRecordPageFields',
+          viewFieldName: 'recordedVideo',
+          fieldName: 'recordedVideo',
+          position: 5.25,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
+    calendarEventRecordPageFieldsTranscript:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'calendarEvent',
+        context: {
+          viewName: 'calendarEventRecordPageFields',
+          viewFieldName: 'transcript',
+          fieldName: 'transcript',
+          position: 5.5,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
     calendarEventRecordPageFieldsLocation: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'calendarEvent',

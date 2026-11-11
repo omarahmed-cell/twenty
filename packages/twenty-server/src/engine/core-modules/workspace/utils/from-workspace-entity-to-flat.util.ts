@@ -39,6 +39,8 @@ export const fromWorkspaceEntityToFlat = (
   aiEvaluationModelId: entity.aiEvaluationModelId,
   aiAdditionalInstructions: entity.aiAdditionalInstructions,
   isInternalMessagesImportEnabled: entity.isInternalMessagesImportEnabled,
+  isInternalCalendarEventsImportEnabled:
+    entity.isInternalCalendarEventsImportEnabled,
   workspaceCustomApplicationId: entity.workspaceCustomApplicationId,
   createdAt: entity.createdAt.toISOString(),
   updatedAt: entity.updatedAt.toISOString(),

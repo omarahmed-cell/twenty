@@ -238,6 +238,19 @@ export const computeStandardServiceViewFields = (
           viewFieldGroupName: 'relations',
         },
       }),
+    serviceRecordPageFieldsEmailTargets: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'serviceRecordPageFields',
+        viewFieldName: 'emailTargets',
+        fieldName: 'emailTargets',
+        position: 7.5,
+        isVisible: false,
+        size: 150,
+        viewFieldGroupName: 'relations',
+      },
+    }),
     serviceRecordPageFieldsMessageThreadTargets:
       createStandardViewFieldFlatMetadata({
         ...args,

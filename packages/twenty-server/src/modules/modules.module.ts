@@ -15,6 +15,7 @@ import { FieldFormulaModule } from 'src/modules/field-formula/field-formula.modu
 import { FieldSyncModule } from 'src/modules/field-sync/field-sync.module';
 import { SegmentModule } from 'src/modules/segment/segment.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
+import { EmailQueryHookModule } from 'src/modules/email/query-hooks/email-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
 import { TaskQueryHookModule } from 'src/modules/task/query-hooks/task-query-hook.module';
 import { TimelineQueryHookModule } from 'src/modules/timeline/query-hooks/timeline-query-hook.module';
@@ -64,6 +65,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     FieldFormulaModule,
     SegmentModule,
     CommunicationQueryHookModule,
+    EmailQueryHookModule,
     NoteQueryHookModule,
     TaskQueryHookModule,
     TimelineQueryHookModule,

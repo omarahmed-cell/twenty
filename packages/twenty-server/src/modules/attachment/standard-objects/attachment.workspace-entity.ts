@@ -7,6 +7,7 @@ import { type CustomWorkspaceEntity } from 'src/engine/twenty-orm/custom.workspa
 import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
 import { type CallWorkspaceEntity } from 'src/modules/call/standard-objects/call.workspace-entity';
 import { type CommunicationWorkspaceEntity } from 'src/modules/communication/standard-objects/communication.workspace-entity';
+import { type EmailWorkspaceEntity } from 'src/modules/email/standard-objects/email.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type DashboardWorkspaceEntity } from 'src/modules/dashboard/standard-objects/dashboard.workspace-entity';
 import { type NoteWorkspaceEntity } from 'src/modules/note/standard-objects/note.workspace-entity';
@@ -38,7 +39,9 @@ export class AttachmentWorkspaceEntity extends BaseWorkspaceEntity {
   targetCall: EntityRelation<CallWorkspaceEntity> | null;
   targetCallId: string | null;
   targetCommunication: EntityRelation<CommunicationWorkspaceEntity> | null;
+  targetEmail: EntityRelation<EmailWorkspaceEntity> | null;
   targetCommunicationId: string | null;
+  targetEmailId: string | null;
   targetPerson: EntityRelation<PersonWorkspaceEntity> | null;
   targetPersonId: string | null;
   targetCompany: EntityRelation<CompanyWorkspaceEntity> | null;

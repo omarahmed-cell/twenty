@@ -40,6 +40,7 @@ describe('resolveSystemRelationTargetFlatObjectMetadatas', () => {
         'agentChatThreadTarget',
         'callTarget',
         'communicationTarget',
+        'emailTarget',
       ],
     );
     expect(missingDefaultRelationObjectNameSingulars).toEqual([]);
@@ -61,12 +62,13 @@ describe('resolveSystemRelationTargetFlatObjectMetadatas', () => {
         'taskTarget',
         'callTarget',
         'communicationTarget',
+        'emailTarget',
       ],
     );
     expect(missingDefaultRelationObjectNameSingulars).toEqual([]);
   });
 
-  it('leaves out the call and communication targets without reporting them before their upgrade provisions them', () => {
+  it('leaves out the call, communication and email targets without reporting them before their upgrade provisions them', () => {
     const flatObjectMetadataMapsWithoutActivityTargets = {
       ...flatObjectMetadataMaps,
       byUniversalIdentifier: Object.fromEntries(
@@ -75,7 +77,9 @@ describe('resolveSystemRelationTargetFlatObjectMetadatas', () => {
             universalIdentifier !==
               STANDARD_OBJECTS.callTarget.universalIdentifier &&
             universalIdentifier !==
-              STANDARD_OBJECTS.communicationTarget.universalIdentifier,
+              STANDARD_OBJECTS.communicationTarget.universalIdentifier &&
+            universalIdentifier !==
+              STANDARD_OBJECTS.emailTarget.universalIdentifier,
         ),
       ),
     };

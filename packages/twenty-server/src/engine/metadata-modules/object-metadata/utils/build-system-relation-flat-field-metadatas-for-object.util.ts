@@ -44,6 +44,7 @@ const MORPH_ID_BY_STANDARD_OBJECT_NAME_SINGULAR = {
   callTarget: STANDARD_OBJECTS.callTarget.morphIds.targetMorphId.morphId,
   communicationTarget:
     STANDARD_OBJECTS.communicationTarget.morphIds.targetMorphId.morphId,
+  emailTarget: STANDARD_OBJECTS.emailTarget.morphIds.targetMorphId.morphId,
 } satisfies Record<
   | DefaultRelationStandardObjectNameSingular
   | OptionalDefaultRelationStandardObjectNameSingular,

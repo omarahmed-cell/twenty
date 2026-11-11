@@ -77,6 +77,13 @@ export const STANDARD_NAVIGATION_MENU_ITEMS = {
         .universalIdentifier,
     position: 10,
   },
+  allEmails: {
+    universalIdentifier: 'cd1d7564-62bb-4007-9f83-d3a138c1118d',
+    type: NavigationMenuItemType.OBJECT,
+    viewUniversalIdentifier:
+      STANDARD_OBJECTS.email.views.allEmails.universalIdentifier,
+    position: 10,
+  },
   allProducts: {
     universalIdentifier: 'b1c345ca-eb41-45bf-bb0e-ca3b347ff7f7',
     type: NavigationMenuItemType.OBJECT,
@@ -159,6 +166,7 @@ export const STANDARD_NAVIGATION_MENU_ITEM_DEFAULT_COLORS: Partial<
   allNotes: 'turquoise',
   allCalls: 'turquoise',
   allCommunications: 'turquoise',
+  allEmails: 'turquoise',
   allCalendarEvents: 'turquoise',
   allCallRecordings: 'turquoise',
   allOpportunities: 'red',

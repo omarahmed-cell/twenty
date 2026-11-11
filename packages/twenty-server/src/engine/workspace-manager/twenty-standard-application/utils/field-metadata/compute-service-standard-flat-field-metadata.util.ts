@@ -509,6 +509,36 @@ export const buildServiceStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  emailTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'emailTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Emails`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Emails tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMail',
+      isNullable: true,
+      targetObjectName: 'emailTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   messageThreadTargets: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

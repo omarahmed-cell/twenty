@@ -1,5 +1,7 @@
 import { buildCommunicationStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-communication-standard-flat-field-metadata.util';
+import { buildEmailStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-email-standard-flat-field-metadata.util';
 import { buildCommunicationTargetStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-communication-target-standard-flat-field-metadata.util';
+import { buildEmailTargetStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-email-target-standard-flat-field-metadata.util';
 import { buildCallTargetStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-target-standard-flat-field-metadata.util';
 import { buildCampaignDeliveryStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-campaign-delivery-standard-flat-field-metadata.util';
 import { buildMessageSuppressionStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-suppression-standard-flat-field-metadata.util';
@@ -84,7 +86,9 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   call: buildCallStandardFlatFieldMetadatas,
   callTarget: buildCallTargetStandardFlatFieldMetadatas,
   communication: buildCommunicationStandardFlatFieldMetadatas,
+  email: buildEmailStandardFlatFieldMetadatas,
   communicationTarget: buildCommunicationTargetStandardFlatFieldMetadatas,
+  emailTarget: buildEmailTargetStandardFlatFieldMetadatas,
   callRecording: buildCallRecordingStandardFlatFieldMetadatas,
   company: buildCompanyStandardFlatFieldMetadatas,
   dashboard: buildDashboardStandardFlatFieldMetadatas,

@@ -8,6 +8,7 @@ const getLinkedLabel = (
   objectNameSingular: string | undefined,
   objectLabel: string,
   detailLabel: string | undefined,
+  emailDirection: string | undefined,
 ): string => {
   switch (objectNameSingular) {
     case CoreObjectNameSingular.Note:
@@ -20,6 +21,10 @@ const getLinkedLabel = (
       return isNonEmptyString(detailLabel)
         ? t`logged a ${detailLabel} message`
         : t`logged a message`;
+    case CoreObjectNameSingular.Email:
+      return emailDirection === 'OUTGOING'
+        ? t`sent an email`
+        : t`logged an email`;
     case CoreObjectNameSingular.Attachment:
       return t`attached a file`;
     case CoreObjectNameSingular.Message:
@@ -44,6 +49,8 @@ const getUnlinkedLabel = (
       return t`removed a call`;
     case CoreObjectNameSingular.Communication:
       return t`removed a message`;
+    case CoreObjectNameSingular.Email:
+      return t`removed an email`;
     case CoreObjectNameSingular.Attachment:
       return t`removed an attachment`;
     default:
@@ -64,6 +71,8 @@ const getUpdatedLabel = (
       return t`updated a call`;
     case CoreObjectNameSingular.Communication:
       return t`updated a message`;
+    case CoreObjectNameSingular.Email:
+      return t`updated an email`;
     default:
       return t`updated a ${objectLabel}`;
   }
@@ -77,22 +86,47 @@ export const getLinkedActivityEventLabel = ({
   objectLabel,
   detailLabel,
   eventTypeLabel,
+  emailDirection,
 }: {
   action: TimelineActivityAction | null;
   objectNameSingular: string | undefined;
   objectLabel: string;
   detailLabel?: string;
   eventTypeLabel?: string;
+  emailDirection?: string;
 }): string => {
   const appendDetail = (label: string) =>
     isNonEmptyString(detailLabel) ? `${label} — ${detailLabel}` : label;
 
   switch (action) {
     case 'linked':
+      if (objectNameSingular === CoreObjectNameSingular.Email) {
+        const label = getLinkedLabel(
+          objectNameSingular,
+          objectLabel,
+          detailLabel,
+          emailDirection,
+        );
+
+        return isNonEmptyString(detailLabel)
+          ? `${label} · ${detailLabel}`
+          : label;
+      }
+
       return objectNameSingular === CoreObjectNameSingular.Communication
-        ? getLinkedLabel(objectNameSingular, objectLabel, detailLabel)
+        ? getLinkedLabel(
+            objectNameSingular,
+            objectLabel,
+            detailLabel,
+            undefined,
+          )
         : appendDetail(
-            getLinkedLabel(objectNameSingular, objectLabel, detailLabel),
+            getLinkedLabel(
+              objectNameSingular,
+              objectLabel,
+              detailLabel,
+              undefined,
+            ),
           );
     case 'unlinked':
       return getUnlinkedLabel(objectNameSingular, objectLabel);

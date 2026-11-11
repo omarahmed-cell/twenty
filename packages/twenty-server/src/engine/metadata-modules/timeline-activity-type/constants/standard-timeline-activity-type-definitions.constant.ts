@@ -280,6 +280,65 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       },
     },
     {
+      name: 'emailLinked',
+      universalIdentifier: '59db2046-3ad7-483f-9635-b8b9529d0d8d',
+      label: msg({
+        message: `logged an email`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconMail',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'linked',
+        objectUniversalIdentifier: STANDARD_OBJECTS.email.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.email.fields.emailTargets.universalIdentifier,
+          happensAtFieldUniversalIdentifier:
+            STANDARD_OBJECTS.email.fields.sentAt.universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'emailUnlinked',
+      universalIdentifier: '10f59e39-11fb-4a4b-9e94-87e0c98e4165',
+      label: msg({
+        message: `removed an email`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconUnlink',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'unlinked',
+        objectUniversalIdentifier: STANDARD_OBJECTS.email.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.email.fields.emailTargets.universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'emailUpdated',
+      universalIdentifier: '2485f805-8876-4443-9b3b-acb3cfc5e1b4',
+      label: msg({
+        message: `updated an email`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconEditCircle',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'updated',
+        objectUniversalIdentifier: STANDARD_OBJECTS.email.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.email.fields.emailTargets.universalIdentifier,
+          triggerFieldUniversalIdentifiers: [
+            STANDARD_OBJECTS.email.fields.subject.universalIdentifier,
+          ],
+        },
+      },
+    },
+    {
       name: 'taskLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0c',
       label: msg({

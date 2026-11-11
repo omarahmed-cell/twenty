@@ -33,6 +33,29 @@ describe('getLinkedActivityEventLabel', () => {
     ).toBe('logged a call — Connected');
   });
 
+  it('should say a rep sent an outgoing email, with its subject', () => {
+    expect(
+      getLinkedActivityEventLabel({
+        action: 'linked',
+        objectNameSingular: 'email',
+        objectLabel: 'email',
+        detailLabel: 'Pricing follow-up',
+        emailDirection: 'OUTGOING',
+      }),
+    ).toBe('sent an email · Pricing follow-up');
+  });
+
+  it('should say an email was logged when it is not outgoing', () => {
+    expect(
+      getLinkedActivityEventLabel({
+        action: 'linked',
+        objectNameSingular: 'email',
+        objectLabel: 'email',
+        emailDirection: 'INCOMING',
+      }),
+    ).toBe('logged an email');
+  });
+
   it('should name the channel when a communication is logged', () => {
     expect(
       getLinkedActivityEventLabel({

@@ -35,4 +35,39 @@ describe('filterEventsAndReturnEventsToRemove', () => {
     expect(filteredEvents).toEqual([]);
     expect(eventsToRemove).toEqual([]);
   });
+
+  it('should route internal events to removal only when internal import is off', () => {
+    const internalEvent = buildFetchedCalendarEvent({
+      id: 'internal',
+      participants: [
+        {
+          handle: 'teammate@acme.com',
+          displayName: 'Teammate',
+          responseStatus: 'accepted',
+          isOrganizer: true,
+        },
+      ],
+    });
+    const externalEvent = buildFetchedCalendarEvent({ id: 'external' });
+
+    expect(
+      filterEventsAndReturnEventsToRemove(
+        ['me@acme.com'],
+        [internalEvent, externalEvent],
+        [],
+        false,
+      ),
+    ).toEqual({
+      filteredEvents: [externalEvent],
+      eventsToRemove: [internalEvent],
+    });
+    expect(
+      filterEventsAndReturnEventsToRemove(
+        ['me@acme.com'],
+        [internalEvent, externalEvent],
+        [],
+        true,
+      ).filteredEvents,
+    ).toEqual([internalEvent, externalEvent]);
+  });
 });

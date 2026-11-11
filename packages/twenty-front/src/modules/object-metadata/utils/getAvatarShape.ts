@@ -35,7 +35,8 @@ export const getAvatarShape = (
     objectMetadataItem.nameSingular === CoreObjectNameSingular.Task ||
     objectMetadataItem.nameSingular === CoreObjectNameSingular.Note ||
     objectMetadataItem.nameSingular === CoreObjectNameSingular.Call ||
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.Communication
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Communication ||
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Email
   ) {
     return 'rounded-square';
   }

@@ -497,6 +497,52 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  recordedVideo: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'recordedVideo',
+      type: FieldMetadataType.LINKS,
+      label: i18nLabel(
+        msg({ message: `Recorded Video`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Link to the meeting recording`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconVideo',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  transcript: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'transcript',
+      type: FieldMetadataType.LINKS,
+      label: i18nLabel(
+        msg({ message: `Transcript`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Link to the meeting transcript`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconFileText',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   locationType: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

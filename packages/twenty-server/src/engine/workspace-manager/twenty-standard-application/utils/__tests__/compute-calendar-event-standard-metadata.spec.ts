@@ -45,7 +45,7 @@ describe('CalendarEvent standard metadata build', () => {
       (viewField) => viewField.fieldMetadataUniversalIdentifier,
     );
 
-    expect(viewFieldFieldUniversalIdentifiers).toHaveLength(17);
+    expect(viewFieldFieldUniversalIdentifiers).toHaveLength(19);
     expect(viewFieldFieldUniversalIdentifiers).toEqual(
       expect.arrayContaining([
         STANDARD_OBJECTS.calendarEvent.fields.title.universalIdentifier,
@@ -55,6 +55,8 @@ describe('CalendarEvent standard metadata build', () => {
         STANDARD_OBJECTS.calendarEvent.fields.isCanceled.universalIdentifier,
         STANDARD_OBJECTS.calendarEvent.fields.conferenceLink
           .universalIdentifier,
+        STANDARD_OBJECTS.calendarEvent.fields.recordedVideo.universalIdentifier,
+        STANDARD_OBJECTS.calendarEvent.fields.transcript.universalIdentifier,
         STANDARD_OBJECTS.calendarEvent.fields.location.universalIdentifier,
         STANDARD_OBJECTS.calendarEvent.fields.description.universalIdentifier,
         STANDARD_OBJECTS.calendarEvent.fields.calendarEventTargets
@@ -92,6 +94,8 @@ describe('CalendarEvent standard metadata build', () => {
       STANDARD_OBJECTS.calendarEvent.fields.startsAt.universalIdentifier,
       STANDARD_OBJECTS.calendarEvent.fields.endsAt.universalIdentifier,
       STANDARD_OBJECTS.calendarEvent.fields.conferenceLink.universalIdentifier,
+      STANDARD_OBJECTS.calendarEvent.fields.recordedVideo.universalIdentifier,
+      STANDARD_OBJECTS.calendarEvent.fields.transcript.universalIdentifier,
       STANDARD_OBJECTS.calendarEvent.fields.location.universalIdentifier,
       STANDARD_OBJECTS.calendarEvent.fields.description.universalIdentifier,
       STANDARD_OBJECTS.calendarEvent.fields.calendarEventTargets

@@ -37,6 +37,14 @@ export const getLinkToShowPage = (
     );
   }
 
+  if (objectNameSingular === CoreObjectNameSingular.EmailTarget) {
+    return (
+      getBasePathToShowPage({
+        objectNameSingular: CoreObjectNameSingular.Email,
+      }) + record.email?.id
+    );
+  }
+
   if (objectNameSingular === CoreObjectNameSingular.CommunicationTarget) {
     return (
       getBasePathToShowPage({

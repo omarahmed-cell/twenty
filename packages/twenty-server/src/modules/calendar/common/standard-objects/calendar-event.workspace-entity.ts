@@ -20,6 +20,8 @@ export class CalendarEventWorkspaceEntity extends BaseWorkspaceEntity {
   iCalUid: string | null;
   conferenceSolution: string | null;
   conferenceLink: LinksMetadata;
+  recordedVideo: LinksMetadata | null;
+  transcript: LinksMetadata | null;
   locationType: string | null;
   meetingType: string | null;
   meetingOutcome: string;

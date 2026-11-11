@@ -34,7 +34,8 @@ export const recordIdentifierToObjectRecordIdentifier = ({
     objectMetadataItem.nameSingular === CoreObjectNameSingular.TaskTarget ||
     objectMetadataItem.nameSingular === CoreObjectNameSingular.CallTarget ||
     objectMetadataItem.nameSingular ===
-      CoreObjectNameSingular.CommunicationTarget
+      CoreObjectNameSingular.CommunicationTarget ||
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.EmailTarget
   ) {
     linkToShowPage = '';
   } else if (

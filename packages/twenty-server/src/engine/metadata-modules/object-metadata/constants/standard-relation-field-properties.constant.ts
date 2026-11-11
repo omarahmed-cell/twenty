@@ -40,6 +40,13 @@ export const STANDARD_RELATION_FIELD_PROPERTIES_BY_RELATION_OBJECT = {
     }),
     icon: 'IconMessageCircle',
   },
+  emailTarget: {
+    label: msg({
+      message: `Emails`,
+      context: 'fieldMetadata.label',
+    }),
+    icon: 'IconMail',
+  },
 } satisfies Record<
   | (typeof DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS)[number]
   | (typeof OPTIONAL_DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS)[number],

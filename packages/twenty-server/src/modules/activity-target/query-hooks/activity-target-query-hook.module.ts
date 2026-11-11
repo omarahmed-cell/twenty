@@ -12,7 +12,9 @@ import { TaskTargetCreateManyPostQueryHook } from 'src/modules/activity-target/q
 import { CallTargetCreateOnePostQueryHook } from 'src/modules/activity-target/query-hooks/call-target-create-one.post-query.hook';
 import { CallTargetCreateManyPostQueryHook } from 'src/modules/activity-target/query-hooks/call-target-create-many.post-query.hook';
 import { CommunicationTargetCreateOnePostQueryHook } from 'src/modules/activity-target/query-hooks/communication-target-create-one.post-query.hook';
+import { EmailTargetCreateOnePostQueryHook } from 'src/modules/activity-target/query-hooks/email-target-create-one.post-query.hook';
 import { CommunicationTargetCreateManyPostQueryHook } from 'src/modules/activity-target/query-hooks/communication-target-create-many.post-query.hook';
+import { EmailTargetCreateManyPostQueryHook } from 'src/modules/activity-target/query-hooks/email-target-create-many.post-query.hook';
 
 @Module({
   imports: [TimelineActivityModule],
@@ -28,7 +30,9 @@ import { CommunicationTargetCreateManyPostQueryHook } from 'src/modules/activity
     CallTargetCreateOnePostQueryHook,
     CallTargetCreateManyPostQueryHook,
     CommunicationTargetCreateOnePostQueryHook,
+    EmailTargetCreateOnePostQueryHook,
     CommunicationTargetCreateManyPostQueryHook,
+    EmailTargetCreateManyPostQueryHook,
   ],
 })
 export class ActivityTargetQueryHookModule {}
