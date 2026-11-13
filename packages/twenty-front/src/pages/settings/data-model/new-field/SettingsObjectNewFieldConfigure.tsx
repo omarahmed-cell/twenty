@@ -30,6 +30,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useParams, useSearchParams } from 'react-router-dom';
 import {
   AppPath,
+  CoreObjectNameSingular,
   type RelationCreationPayload,
   SettingsPath,
 } from 'twenty-shared/types';
@@ -59,6 +60,7 @@ const DEFAULT_ICON_FOR_NEW_FIELD = 'IconUsers';
 
 const SYNC_FIELD_DEFAULT_ICON = 'IconRefresh';
 const FORMULA_FIELD_DEFAULT_ICON = 'IconCalculator';
+const USER_FIELD_DEFAULT_ICON = 'IconUserCircle';
 
 export const SettingsObjectNewFieldConfigure = () => {
   const { t } = useLingui();
@@ -74,6 +76,7 @@ export const SettingsObjectNewFieldConfigure = () => {
     FieldMetadataType.TEXT;
   const isSyncMode = searchParams.get('sync') === 'true';
   const isFormulaMode = searchParams.get('formula') === 'true';
+  const isUserMode = searchParams.get('user') === 'true';
   const { enqueueToast } = useToast();
 
   const { findObjectMetadataItemByNamePlural } =
@@ -81,6 +84,11 @@ export const SettingsObjectNewFieldConfigure = () => {
   const { objectMetadataItems } = useObjectMetadataItems();
   const activeObjectMetadataItem =
     findObjectMetadataItemByNamePlural(objectNamePlural);
+  const workspaceMemberObjectMetadataItem = objectMetadataItems.find(
+    (objectMetadataItem) =>
+      objectMetadataItem.nameSingular ===
+      CoreObjectNameSingular.WorkspaceMember,
+  );
   const { createMetadataField } = useFieldMetadataItem();
 
   const formConfig = useForm<SettingsDataModelNewFieldFormValues>({
@@ -95,16 +103,33 @@ export const SettingsObjectNewFieldConfigure = () => {
     ),
     defaultValues: {
       type: fieldType,
-      icon: isFormulaMode
-        ? FORMULA_FIELD_DEFAULT_ICON
-        : isSyncMode
-          ? SYNC_FIELD_DEFAULT_ICON
-          : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
-            DEFAULT_ICON_FOR_NEW_FIELD),
+      icon: isUserMode
+        ? USER_FIELD_DEFAULT_ICON
+        : isFormulaMode
+          ? FORMULA_FIELD_DEFAULT_ICON
+          : isSyncMode
+            ? SYNC_FIELD_DEFAULT_ICON
+            : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
+              DEFAULT_ICON_FOR_NEW_FIELD),
       label: '',
       name: '',
       // The text settings card that normally fills this is not rendered for synced fields.
       ...(isSyncMode ? { settings: { displayedMaxRows: null } } : {}),
+      // The relation card is not rendered for User fields, so these stand in for it.
+      ...(isUserMode
+        ? {
+            type: FieldMetadataType.MORPH_RELATION,
+            morphRelationObjectMetadataIds: isDefined(
+              workspaceMemberObjectMetadataItem,
+            )
+              ? [workspaceMemberObjectMetadataItem.id]
+              : [],
+            relationType: RelationType.MANY_TO_ONE,
+            targetFieldLabel: activeObjectMetadataItem?.labelPlural ?? '',
+            iconOnDestination:
+              activeObjectMetadataItem?.icon ?? DEFAULT_ICON_FOR_NEW_FIELD,
+          }
+        : {}),
       ...(isFormulaMode
         ? {
             type: FieldMetadataType.NUMBER,
@@ -118,14 +143,16 @@ export const SettingsObjectNewFieldConfigure = () => {
   useEffect(() => {
     formConfig.setValue(
       'icon',
-      isFormulaMode
-        ? FORMULA_FIELD_DEFAULT_ICON
-        : isSyncMode
-          ? SYNC_FIELD_DEFAULT_ICON
-          : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
-            DEFAULT_ICON_FOR_NEW_FIELD),
+      isUserMode
+        ? USER_FIELD_DEFAULT_ICON
+        : isFormulaMode
+          ? FORMULA_FIELD_DEFAULT_ICON
+          : isSyncMode
+            ? SYNC_FIELD_DEFAULT_ICON
+            : (DEFAULT_ICONS_BY_FIELD_TYPE[fieldType] ??
+              DEFAULT_ICON_FOR_NEW_FIELD),
     );
-  }, [fieldType, formConfig, isFormulaMode, isSyncMode]);
+  }, [fieldType, formConfig, isFormulaMode, isSyncMode, isUserMode]);
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -282,12 +309,12 @@ export const SettingsObjectNewFieldConfigure = () => {
       return createCleanUp(creationResult);
     }
 
-    const {
-      morphRelationObjectMetadataIds,
-      targetFieldLabel,
-      iconOnDestination,
-      relationType,
-    } = formValues;
+    const { morphRelationObjectMetadataIds, iconOnDestination, relationType } =
+      formValues;
+    // Names the inverse field on workspaceMember <objectNamePlural><FieldName>, e.g. companiesSdrOwner.
+    const targetFieldLabel = isUserMode
+      ? `${activeObjectMetadataItem.labelPlural} ${formValues.label}`
+      : formValues.targetFieldLabel;
 
     switch (true) {
       case morphRelationObjectMetadataIds.length > 1: {
@@ -396,7 +423,14 @@ export const SettingsObjectNewFieldConfigure = () => {
               isCreationMode={true}
             />
           </Section.Root>
-          {isFormulaMode ? (
+          {isUserMode ? (
+            <Section.Root>
+              <Section.Header
+                title={t`User`}
+                description={t`Each record can be assigned to one workspace member`}
+              />
+            </Section.Root>
+          ) : isFormulaMode ? (
             <Section.Root>
               <Section.Header
                 title={t`Calculation`}

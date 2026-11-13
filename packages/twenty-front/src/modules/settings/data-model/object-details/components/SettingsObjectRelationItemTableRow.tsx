@@ -10,6 +10,7 @@ import { SettingsItemTypeTag } from '@/settings/components/SettingsItemTypeTag';
 import { SettingsNameCellSecondaryLabel } from '@/settings/components/SettingsNameCellSecondaryLabel';
 import { SettingsTextLink } from '@/settings/components/SettingsTextLink';
 import { RELATION_TYPES } from '@/settings/data-model/constants/RelationTypes';
+import { isUserFieldMetadataItem } from '@/settings/data-model/utils/isUserFieldMetadataItem';
 import { SettingsObjectFieldInactiveActionDropdown } from '@/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
@@ -23,6 +24,7 @@ import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 import {
   IconChevronRight,
   IconRelationManyToMany,
+  IconUserCircle,
   useIcons,
 } from 'twenty-ui/icon';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
@@ -105,9 +107,10 @@ export const SettingsObjectRelationItemTableRow = ({
       fieldName: fieldMetadataItem.name,
     });
 
-  const isRelatedObjectLinkable = isDefined(
-    relationObjectMetadataItem?.namePlural,
-  );
+  const isUserField = isUserFieldMetadataItem(fieldMetadataItem);
+
+  const isRelatedObjectLinkable =
+    !isUserField && isDefined(relationObjectMetadataItem?.namePlural);
 
   const isMorphRelation =
     fieldMetadataItem.type === FieldMetadataType.MORPH_RELATION;
@@ -121,15 +124,20 @@ export const SettingsObjectRelationItemTableRow = ({
     : relationType;
 
   const relationTypeLabel = (() => {
+    if (isUserField) {
+      return t`User`;
+    }
     if (isDefined(displayRelationType) === true) {
       return t(RELATION_TYPES[displayRelationType].label);
     }
     return '';
   })();
 
-  const RelationIcon = displayRelationType
-    ? RELATION_TYPES[displayRelationType].Icon
-    : undefined;
+  const RelationIcon = isUserField
+    ? IconUserCircle
+    : displayRelationType
+      ? RELATION_TYPES[displayRelationType].Icon
+      : undefined;
 
   const NameIcon = isMorphRelation ? IconRelationManyToMany : Icon;
 
@@ -144,7 +152,7 @@ export const SettingsObjectRelationItemTableRow = ({
     : fieldMetadataItem.label;
 
   const shouldDisplayFieldLabelAsSubtitle =
-    isMorphRelation || isDefined(relationObjectMetadataItem);
+    !isUserField && (isMorphRelation || isDefined(relationObjectMetadataItem));
 
   return (
     <TableRow

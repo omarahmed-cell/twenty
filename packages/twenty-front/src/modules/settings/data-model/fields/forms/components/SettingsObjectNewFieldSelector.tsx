@@ -19,7 +19,12 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
-import { IconRefresh, IconSearch, IconVariable } from 'twenty-ui/icon';
+import {
+  IconRefresh,
+  IconSearch,
+  IconUserCircle,
+  IconVariable,
+} from 'twenty-ui/icon';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { type SettingsDataModelFieldTypeFormValues } from '@/settings/data-model/fields/forms/validation-schemas/settingsDataModelFieldTypeFormSchema';
@@ -85,6 +90,10 @@ export const SettingsObjectNewFieldSelector = ({
 
   const formulaCardLabel = t`Calculation`;
   const isFormulaCardVisible = formulaCardLabel
+    .toLowerCase()
+    .includes(searchQuery.toLowerCase());
+  const userCardLabel = t`User`;
+  const isUserCardVisible = userCardLabel
     .toLowerCase()
     .includes(searchQuery.toLowerCase());
   const syncCardLabel = t`Sync`;
@@ -191,6 +200,32 @@ export const SettingsObjectNewFieldSelector = ({
                         />
                       </StyledCardContainer>
                     ))}
+                  {category === 'Relation' && isUserCardVisible && (
+                    <StyledCardContainer>
+                      <SettingsCard
+                        to={getSettingsPath(
+                          SettingsPath.ObjectNewFieldConfigure,
+                          { objectNamePlural },
+                          {
+                            fieldType: FieldMetadataType.MORPH_RELATION,
+                            user: 'true',
+                          },
+                        )}
+                        onClick={() =>
+                          setValue('type', FieldMetadataType.MORPH_RELATION)
+                        }
+                        Icon={
+                          <StyledFieldTypeIconContainer>
+                            <IconUserCircle
+                              size={theme.icon.size.xl}
+                              stroke={theme.icon.stroke.sm}
+                            />
+                          </StyledFieldTypeIconContainer>
+                        }
+                        title={userCardLabel}
+                      />
+                    </StyledCardContainer>
+                  )}
                   {category === 'Advanced' && isSyncCardVisible && (
                     <StyledCardContainer>
                       <SettingsCard

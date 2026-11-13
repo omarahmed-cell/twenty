@@ -40,6 +40,7 @@ import {
 import { settingsFieldFormSchema } from '@/settings/data-model/fields/forms/validation-schemas/settingsFieldFormSchema';
 import { type SettingsDataModelFieldEditFormValues } from '@/settings/data-model/types/SettingsDataModelFieldEditFormValues';
 import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFieldType';
+import { isUserFieldMetadataItem } from '@/settings/data-model/utils/isUserFieldMetadataItem';
 import { SettingsTranslationsCard } from '@/settings/translations/components/SettingsTranslationsCard';
 import { ConfirmationDialog } from '@/ui/layout/dialog/components/ConfirmationDialog';
 import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
@@ -559,27 +560,38 @@ export const SettingsObjectFieldEdit = () => {
                 </StyledSyncActions>
               </Section.Root>
             )}
-            {!isReverseJunctionRelation && !isSyncField && !isFormulaField && (
+            {isUserFieldMetadataItem(fieldMetadataItem) && (
               <Section.Root>
-                {fieldMetadataItem.isUnique ? (
-                  <Section.Header
-                    title={t`Values`}
-                    description={t`The values of this field must be unique`}
-                  />
-                ) : (
-                  <Section.Header
-                    title={t`Values`}
-                    description={t`The values of this field`}
-                  />
-                )}
-                <SettingsDataModelFieldSettingsFormCard
-                  fieldType={fieldMetadataItem.type}
-                  existingFieldMetadataId={fieldMetadataItem.id}
-                  objectNameSingular={objectMetadataItem.nameSingular}
-                  disabled={readonly}
+                <Section.Header
+                  title={t`User`}
+                  description={t`Each record can be assigned to one workspace member`}
                 />
               </Section.Root>
             )}
+            {!isReverseJunctionRelation &&
+              !isSyncField &&
+              !isFormulaField &&
+              !isUserFieldMetadataItem(fieldMetadataItem) && (
+                <Section.Root>
+                  {fieldMetadataItem.isUnique ? (
+                    <Section.Header
+                      title={t`Values`}
+                      description={t`The values of this field must be unique`}
+                    />
+                  ) : (
+                    <Section.Header
+                      title={t`Values`}
+                      description={t`The values of this field`}
+                    />
+                  )}
+                  <SettingsDataModelFieldSettingsFormCard
+                    fieldType={fieldMetadataItem.type}
+                    existingFieldMetadataId={fieldMetadataItem.id}
+                    objectNameSingular={objectMetadataItem.nameSingular}
+                    disabled={readonly}
+                  />
+                </Section.Root>
+              )}
             <Section.Root>
               <Section.Header
                 title={t`Description`}

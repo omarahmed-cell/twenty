@@ -18,7 +18,7 @@ import { styled } from '@linaria/react';
 import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
-import { FieldMetadataType } from 'twenty-shared/types';
+import { CoreObjectNameSingular, FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { Dropdown } from 'twenty-ui/components/navigation';
 import { SettingsRow } from 'twenty-ui/components/settings';
@@ -132,12 +132,15 @@ export const SettingsObjectRelationsTable = ({
       const relationTargetObjectMetadataIds =
         getRelationTargetObjectMetadataIds(field);
 
+      // Owner-type relations point at workspaceMember, a system object, but are user-facing fields.
       const isRelationToSystemObject = relationTargetObjectMetadataIds.some(
         (objectMetadataId) =>
           objectMetadataItems.some(
             (objectMetadataItem) =>
               objectMetadataItem.id === objectMetadataId &&
-              objectMetadataItem.isSystem,
+              objectMetadataItem.isSystem &&
+              objectMetadataItem.nameSingular !==
+                CoreObjectNameSingular.WorkspaceMember,
           ),
       );
 
