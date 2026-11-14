@@ -41,6 +41,8 @@ import { WorkflowHandleStaledRunsCronCommand } from 'src/modules/workflow/workfl
 import { WorkflowRunEnqueueCronCommand } from 'src/modules/workflow/workflow-runner/workflow-run-queue/cron/command/workflow-run-enqueue.cron.command';
 import { WorkflowCronTriggerCronCommand } from 'src/modules/workflow/workflow-trigger/automated-trigger/crons/commands/workflow-cron-trigger.cron.command';
 import { FieldFormulaTimeBasedCronCommand } from 'src/modules/field-formula/crons/commands/field-formula-time-based.cron.command';
+import { CompanyCalculatedFieldsNightlyCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-calculated-fields-nightly.cron.command';
+import { CompanyPastMeetingsCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-past-meetings.cron.command';
 
 @Command({
   name: 'cron:register:all',
@@ -67,6 +69,8 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly emailingOngoingStaleCronCommand: EmailingOngoingStaleCronCommand,
     private readonly reconcileCampaignStatsCronCommand: ReconcileCampaignStatsCronCommand,
     private readonly fieldFormulaTimeBasedCronCommand: FieldFormulaTimeBasedCronCommand,
+    private readonly companyCalculatedFieldsNightlyCronCommand: CompanyCalculatedFieldsNightlyCronCommand,
+    private readonly companyPastMeetingsCronCommand: CompanyPastMeetingsCronCommand,
 
     private readonly workflowCronTriggerCronCommand: WorkflowCronTriggerCronCommand,
     private readonly workflowRunEnqueueCronCommand: WorkflowRunEnqueueCronCommand,
@@ -162,6 +166,14 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'FieldFormulaTimeBased',
         command: this.fieldFormulaTimeBasedCronCommand,
+      },
+      {
+        name: 'CompanyCalculatedFieldsNightly',
+        command: this.companyCalculatedFieldsNightlyCronCommand,
+      },
+      {
+        name: 'CompanyPastMeetings',
+        command: this.companyPastMeetingsCronCommand,
       },
       {
         name: 'ReconcileCampaignStats',

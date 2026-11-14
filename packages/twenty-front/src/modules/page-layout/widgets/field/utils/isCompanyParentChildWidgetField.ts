@@ -1,6 +1,6 @@
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 
-export const isCompanyHierarchyField = ({
+export const isCompanyParentChildWidgetField = ({
   objectNameSingular,
   fieldName,
 }: {

@@ -8,6 +8,7 @@ import { resolveJunctionConfig } from '@/object-record/record-field/ui/utils/jun
 import { useIsPageLayoutInEditMode } from '@/page-layout/hooks/useIsPageLayoutInEditMode';
 import { type PageLayoutWidget } from '@/page-layout/types/PageLayoutWidget';
 import { useFieldWidgetFieldDefinition } from '@/page-layout/widgets/field/hooks/useFieldWidgetFieldDefinition';
+import { isCompanyParentChildWidgetField } from '@/page-layout/widgets/field/utils/isCompanyParentChildWidgetField';
 import { isFieldWidget } from '@/page-layout/widgets/field/utils/isFieldWidget';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { isDefined } from 'twenty-shared/utils';
@@ -77,7 +78,14 @@ export const useFieldWidgetActionVisibility = ({
     objectPermissionsByObjectMetadataId,
   });
 
+  // The company parent/child widget adds links through its own Parent/Child flow
+  const isCompanyParentChildWidget = isCompanyParentChildWidgetField({
+    objectNameSingular: objectMetadataItem.nameSingular,
+    fieldName: fieldMetadataItem.name,
+  });
+
   const showEdit =
+    !isCompanyParentChildWidget &&
     !isPageLayoutInEditMode &&
     !isFieldReadOnly &&
     (!isDefined(junctionConfig) || isUsableJunctionConfig(junctionConfig));

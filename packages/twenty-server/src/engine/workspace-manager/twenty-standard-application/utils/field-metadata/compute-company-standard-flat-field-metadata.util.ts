@@ -4,6 +4,7 @@ import {
   DateDisplayFormat,
   FieldMetadataType,
   RelationOnDeleteAction,
+  MetadataWritability,
   RelationType,
 } from 'twenty-shared/types';
 
@@ -640,7 +641,7 @@ export const buildCompanyStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'parentCompany',
       label: i18nLabel(
-        msg({ message: `Parent Company`, context: 'fieldMetadata.label' }),
+        msg({ message: `Parent company`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({
@@ -671,7 +672,7 @@ export const buildCompanyStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'childCompanies',
       label: i18nLabel(
-        msg({ message: `Child Companies`, context: 'fieldMetadata.label' }),
+        msg({ message: `Child companies`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({
@@ -902,4 +903,1034 @@ export const buildCompanyStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  isParentCompany: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isParentCompany',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({ message: `Is Parent company`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `True when the company has at least one direct child company`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconHierarchy2',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: false,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isChildCompany: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isChildCompany',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({ message: `Is Child company`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `True when the company has a parent company`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconHierarchy',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: false,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  numberOfChildCompanies: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'numberOfChildCompanies',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Number of child companies`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of direct child companies`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconNumber',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: 0,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  numberOfAssociatedContacts: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'numberOfAssociatedContacts',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Number of Associated Contacts`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of people linked to the company`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconUsers',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: 0,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  numberOfAssociatedDeals: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'numberOfAssociatedDeals',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Number of Associated Deals`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of opportunities linked to the company`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconTargetArrow',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: 0,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  numberOfOpenDeals: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'numberOfOpenDeals',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Number of open deals`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Number of opportunities linked to the company whose stage is open`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconTarget',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: 0,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  lastActivityDate: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'lastActivityDate',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Last Activity Date`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Latest call, meeting, note, task, email or communication on the company, its people or its opportunities`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarEvent',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  lifecycleStage: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'lifecycleStage',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Lifecycle Stage`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The qualification of companies to sales readiness throughout the buying journey`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconProgressCheck',
+      isNullable: true,
+      options: [
+        {
+          id: '969f1d4a-ff22-471e-9d83-d50f91869801',
+          value: 'NEW',
+          label: i18nLabel(
+            msg({ message: `New`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'gray',
+        },
+        {
+          id: '49c2d8a5-56ab-42cc-bc68-d6d836f608eb',
+          value: 'LEAD',
+          label: i18nLabel(
+            msg({ message: `Lead`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'gray',
+        },
+        {
+          id: '4dc283e9-0c6a-4a47-8006-f30e3edc646c',
+          value: 'MARKETING_QUALIFIED_LEAD',
+          label: i18nLabel(
+            msg({
+              message: `Marketing Qualified Lead`,
+              context: 'fieldMetadata.label',
+            }),
+          ),
+          position: 2,
+          color: 'gray',
+        },
+        {
+          id: '9c598b02-cd64-456f-a713-51cf808957b5',
+          value: 'SALES_QUALIFIED_LEAD',
+          label: i18nLabel(
+            msg({
+              message: `Sales Qualified Lead`,
+              context: 'fieldMetadata.label',
+            }),
+          ),
+          position: 3,
+          color: 'gray',
+        },
+        {
+          id: 'a0dfb9df-feea-4c22-b24c-c529d4ec032d',
+          value: 'OPPORTUNITY',
+          label: i18nLabel(
+            msg({ message: `Opportunity`, context: 'fieldMetadata.label' }),
+          ),
+          position: 4,
+          color: 'gray',
+        },
+        {
+          id: 'a66a063a-1003-409f-af59-bf9b672a21b6',
+          value: 'CUSTOMER',
+          label: i18nLabel(
+            msg({ message: `Customer`, context: 'fieldMetadata.label' }),
+          ),
+          position: 5,
+          color: 'gray',
+        },
+        {
+          id: '7dd98b4c-89f8-49f5-aa7a-bc10c593a2f6',
+          value: 'PROMOTER',
+          label: i18nLabel(
+            msg({ message: `Promoter`, context: 'fieldMetadata.label' }),
+          ),
+          position: 6,
+          color: 'gray',
+        },
+        {
+          id: 'd43c50f8-421a-42b4-8960-ab3c14712da1',
+          value: 'OTHER',
+          label: i18nLabel(
+            msg({ message: `Other`, context: 'fieldMetadata.label' }),
+          ),
+          position: 7,
+          color: 'gray',
+        },
+        {
+          id: '2588a500-63af-4a67-b662-030ba2d6af9a',
+          value: 'CLOSING',
+          label: i18nLabel(
+            msg({ message: `Closing`, context: 'fieldMetadata.label' }),
+          ),
+          position: 8,
+          color: 'gray',
+        },
+        {
+          id: 'cc42d3d2-d74b-4963-b27a-3bf8a00fb240',
+          value: 'ON_HOLD',
+          label: i18nLabel(
+            msg({ message: `On Hold`, context: 'fieldMetadata.label' }),
+          ),
+          position: 9,
+          color: 'gray',
+        },
+        {
+          id: 'ce47f785-f1b4-46da-bff6-cf0ba6f6257d',
+          value: 'BIN',
+          label: i18nLabel(
+            msg({ message: `Bin`, context: 'fieldMetadata.label' }),
+          ),
+          position: 10,
+          color: 'gray',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  dateEnteredCurrentStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredCurrentStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered current stage`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company entered its current lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconClockPlay',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredNewLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredNewLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'New (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the New lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedNewLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedNewLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'New (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the New lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredLeadLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredLeadLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Lead (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Lead lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedLeadLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedLeadLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Lead (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Lead lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredMarketingQualifiedLeadLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredMarketingQualifiedLeadLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Marketing Qualified Lead (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Marketing Qualified Lead lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedMarketingQualifiedLeadLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedMarketingQualifiedLeadLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Marketing Qualified Lead (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Marketing Qualified Lead lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredSalesQualifiedLeadLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredSalesQualifiedLeadLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Sales Qualified Lead (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Sales Qualified Lead lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedSalesQualifiedLeadLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedSalesQualifiedLeadLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Sales Qualified Lead (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Sales Qualified Lead lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredOpportunityLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredOpportunityLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Opportunity (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Opportunity lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedOpportunityLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedOpportunityLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Opportunity (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Opportunity lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredCustomerLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredCustomerLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Customer (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Customer lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedCustomerLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedCustomerLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Customer (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Customer lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredPromoterLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredPromoterLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Promoter (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Promoter lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedPromoterLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedPromoterLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Promoter (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Promoter lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredOtherLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredOtherLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Other (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Other lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedOtherLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedOtherLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Other (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Other lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredClosingLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredClosingLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Closing (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Closing lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedClosingLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedClosingLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Closing (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Closing lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredOnHoldLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredOnHoldLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'On Hold (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the On Hold lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedOnHoldLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedOnHoldLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'On Hold (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the On Hold lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateEnteredBinLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredBinLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered 'Bin (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last entered the Bin lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  dateExitedBinLifecycleStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateExitedBinLifecycleStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date exited 'Bin (Lifecycle Stage)'`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the company last left the Bin lifecycle stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
 });

@@ -15,7 +15,7 @@ import { resolveJunctionConfig } from '@/object-record/record-field/ui/utils/jun
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
 import { useResolveFieldMetadataIdFromNameOrId } from '@/page-layout/hooks/useResolveFieldMetadataIdFromNameOrId';
 import { type PageLayoutWidget } from '@/page-layout/types/PageLayoutWidget';
-import { FieldWidgetCompanyHierarchyField } from '@/page-layout/widgets/field/components/FieldWidgetCompanyHierarchyField';
+import { FieldWidgetCompanyParentChildField } from '@/page-layout/widgets/field/components/FieldWidgetCompanyParentChildField';
 import { FieldWidgetFilesPreview } from '@/page-layout/widgets/field/components/FieldWidgetFilesPreview';
 import { FieldWidgetDisplay } from '@/page-layout/widgets/field/components/FieldWidgetDisplay';
 import { FieldWidgetJunctionRelationCard } from '@/page-layout/widgets/field/components/FieldWidgetJunctionRelationCard';
@@ -29,7 +29,8 @@ import { FieldWidgetRichTextEditor } from '@/page-layout/widgets/field/component
 import { FieldWidgetTextEditor } from '@/page-layout/widgets/field/components/FieldWidgetTextEditor';
 import { assertFieldWidgetOrThrow } from '@/page-layout/widgets/field/utils/assertFieldWidgetOrThrow';
 import { getFieldWidgetEffectiveDisplayMode } from '@/page-layout/widgets/field/utils/getFieldWidgetEffectiveDisplayMode';
-import { isCompanyHierarchyField } from '@/page-layout/widgets/field/utils/isCompanyHierarchyField';
+import { generateFieldWidgetInstanceId } from '@/page-layout/widgets/field/utils/generateFieldWidgetInstanceId';
+import { isCompanyParentChildWidgetField } from '@/page-layout/widgets/field/utils/isCompanyParentChildWidgetField';
 import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/AnimatedPlaceholder/AnimatedPlaceholder';
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
@@ -132,16 +133,22 @@ export const FieldWidget = ({ widget }: FieldWidgetProps) => {
     );
   }
 
-  // Twenty has no association labels, so the parent joins the children list with Parent/Child tags
   if (
-    isCompanyHierarchyField({
+    isCompanyParentChildWidgetField({
       objectNameSingular: objectMetadataItem.nameSingular,
       fieldName: fieldMetadataItem.name,
     })
   ) {
     return (
-      <FieldWidgetCompanyHierarchyField
+      <FieldWidgetCompanyParentChildField
         recordId={targetRecord.id}
+        fieldMetadataId={fieldMetadataItem.id}
+        instanceId={generateFieldWidgetInstanceId({
+          widgetId: widget.id,
+          recordId: targetRecord.id,
+          fieldName: fieldMetadataItem.name,
+          isInSidePanel,
+        })}
         isInSidePanel={isInSidePanel}
       />
     );

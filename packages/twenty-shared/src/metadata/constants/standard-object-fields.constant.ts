@@ -1222,6 +1222,99 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTarget,
       }),
     },
+    lifecycleStage: {
+      universalIdentifier: '31f66b47-5872-4826-a4a4-d0bf051f4fb2',
+    },
+    isParentCompany: {
+      universalIdentifier: '564cb6eb-93da-41c1-99e8-67db49941739',
+    },
+    isChildCompany: {
+      universalIdentifier: '197939c3-5d62-4447-9c09-1e909ff90368',
+    },
+    numberOfChildCompanies: {
+      universalIdentifier: '23e48e31-4c14-4076-b87e-826c142d3d50',
+    },
+    numberOfAssociatedContacts: {
+      universalIdentifier: 'd3c7bcb9-69de-4cf9-be32-0cb0c6631fb7',
+    },
+    numberOfAssociatedDeals: {
+      universalIdentifier: 'f2371015-4afc-4f86-bc3a-097950861aec',
+    },
+    numberOfOpenDeals: {
+      universalIdentifier: '1fc41f94-97f1-44f1-8afd-e57329b676a9',
+    },
+    lastActivityDate: {
+      universalIdentifier: 'e47f3266-19a0-4d47-9ed3-5c28ff832ed7',
+    },
+    dateEnteredCurrentStage: {
+      universalIdentifier: 'e4215a27-cfe2-4e60-8aaf-0d35bd874623',
+    },
+    dateEnteredNewLifecycleStage: {
+      universalIdentifier: '0519bffb-a7ec-4e42-b3e9-a7828ff18e47',
+    },
+    dateExitedNewLifecycleStage: {
+      universalIdentifier: '61c0b470-edbd-4650-b193-6316f20cf588',
+    },
+    dateEnteredLeadLifecycleStage: {
+      universalIdentifier: '5877b642-aee1-4a32-83a3-7c5e63eb3324',
+    },
+    dateExitedLeadLifecycleStage: {
+      universalIdentifier: '0bc89e51-8ebc-4731-9053-57b034168b25',
+    },
+    dateEnteredMarketingQualifiedLeadLifecycleStage: {
+      universalIdentifier: '3923c7a4-ee24-423d-aa8b-213506512410',
+    },
+    dateExitedMarketingQualifiedLeadLifecycleStage: {
+      universalIdentifier: '6235b136-c3cd-4d2f-bf48-7a517ef1e502',
+    },
+    dateEnteredSalesQualifiedLeadLifecycleStage: {
+      universalIdentifier: '86be7fec-e94e-42fd-bc6d-f6721918b0a6',
+    },
+    dateExitedSalesQualifiedLeadLifecycleStage: {
+      universalIdentifier: 'f46cdf4f-0516-4113-85bd-7729551a66d3',
+    },
+    dateEnteredOpportunityLifecycleStage: {
+      universalIdentifier: '69cf4ccb-ada4-42ba-81db-84666137b16a',
+    },
+    dateExitedOpportunityLifecycleStage: {
+      universalIdentifier: '05842970-f5a5-47fa-950b-f1a671eb06c0',
+    },
+    dateEnteredCustomerLifecycleStage: {
+      universalIdentifier: '2236dbfd-bd62-4392-80e9-ce04b22fb69e',
+    },
+    dateExitedCustomerLifecycleStage: {
+      universalIdentifier: '8d4ea361-aae1-4312-a5f1-9bd1fe55f6a7',
+    },
+    dateEnteredPromoterLifecycleStage: {
+      universalIdentifier: '56a76686-b80e-4514-bde0-2f1941ccda2c',
+    },
+    dateExitedPromoterLifecycleStage: {
+      universalIdentifier: '4c313a85-cfbc-458f-85bd-4608544c4f25',
+    },
+    dateEnteredOtherLifecycleStage: {
+      universalIdentifier: '0f08f4da-1580-4a42-a657-99d9023ba371',
+    },
+    dateExitedOtherLifecycleStage: {
+      universalIdentifier: '64d442f5-a404-44e1-a9a3-755452349697',
+    },
+    dateEnteredClosingLifecycleStage: {
+      universalIdentifier: '5f348f67-154f-4654-9691-d5a202fda9ce',
+    },
+    dateExitedClosingLifecycleStage: {
+      universalIdentifier: '905a4bbb-7ed2-438b-b269-fb3032d27b3c',
+    },
+    dateEnteredOnHoldLifecycleStage: {
+      universalIdentifier: '97244df8-a13a-4441-8832-ae466f16ab79',
+    },
+    dateExitedOnHoldLifecycleStage: {
+      universalIdentifier: 'dd45d0d5-ab05-47f0-99e7-d14cbbdb849d',
+    },
+    dateEnteredBinLifecycleStage: {
+      universalIdentifier: '303b099c-fcf7-4fad-a73f-04d8d2ff45ff',
+    },
+    dateExitedBinLifecycleStage: {
+      universalIdentifier: 'b97150d4-4c65-4c84-873d-7957870bcce5',
+    },
   },
   dashboard: {
     ...buildStandardObjectSystemFields(

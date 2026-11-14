@@ -373,5 +373,130 @@ export const computeStandardCompanyViewFields = (
         viewFieldGroupName: 'general',
       },
     }),
+    companyRecordPageFieldsIsParentCompany: createStandardViewFieldFlatMetadata(
+      {
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'isParentCompany',
+          fieldName: 'isParentCompany',
+          position: 1,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      },
+    ),
+    companyRecordPageFieldsIsChildCompany: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'isChildCompany',
+        fieldName: 'isChildCompany',
+        position: 2,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'business',
+      },
+    }),
+    companyRecordPageFieldsNumberOfChildCompanies:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'numberOfChildCompanies',
+          fieldName: 'numberOfChildCompanies',
+          position: 3,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
+    companyRecordPageFieldsNumberOfAssociatedContacts:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'numberOfAssociatedContacts',
+          fieldName: 'numberOfAssociatedContacts',
+          position: 4,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
+    companyRecordPageFieldsNumberOfAssociatedDeals:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'numberOfAssociatedDeals',
+          fieldName: 'numberOfAssociatedDeals',
+          position: 5,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
+    companyRecordPageFieldsNumberOfOpenDeals:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'numberOfOpenDeals',
+          fieldName: 'numberOfOpenDeals',
+          position: 6,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
+    companyRecordPageFieldsLastActivityDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'lastActivityDate',
+          fieldName: 'lastActivityDate',
+          position: 7,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
+    companyRecordPageFieldsLifecycleStage: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'lifecycleStage',
+        fieldName: 'lifecycleStage',
+        position: 8,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'business',
+      },
+    }),
+    companyRecordPageFieldsDateEnteredCurrentStage:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'dateEnteredCurrentStage',
+          fieldName: 'dateEnteredCurrentStage',
+          position: 9,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
   };
 };

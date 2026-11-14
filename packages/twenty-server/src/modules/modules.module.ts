@@ -12,6 +12,9 @@ import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hoo
 import { GoogleMeetRecordingModule } from 'src/modules/call-recording/google-meet/google-meet-recording.module';
 import { LineItemQueryHookModule } from 'src/modules/line-item/query-hooks/line-item-query-hook.module';
 import { FieldFormulaModule } from 'src/modules/field-formula/field-formula.module';
+import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
+import { CompanyHierarchyModule } from 'src/modules/company-hierarchy/company-hierarchy.module';
+import { StageDateTrackingModule } from 'src/modules/stage-date-tracking/stage-date-tracking.module';
 import { FieldSyncModule } from 'src/modules/field-sync/field-sync.module';
 import { SegmentModule } from 'src/modules/segment/segment.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
@@ -63,6 +66,9 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     LineItemQueryHookModule,
     FieldSyncModule,
     FieldFormulaModule,
+    CompanyCalculatedFieldsModule,
+    CompanyHierarchyModule,
+    StageDateTrackingModule,
     SegmentModule,
     CommunicationQueryHookModule,
     EmailQueryHookModule,

@@ -1,0 +1,33 @@
+import { Command, CommandRunner } from 'nest-commander';
+
+import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
+import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
+import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
+import {
+  COMPANY_PAST_MEETINGS_CRON_PATTERN,
+  CompanyPastMeetingsCronJob,
+} from 'src/modules/company-calculated-fields/crons/jobs/company-past-meetings.cron.job';
+
+@Command({
+  name: 'cron:company-calculated-fields:past-meetings',
+  description:
+    'Starts the cron that updates Last Activity Date once a meeting has started',
+})
+export class CompanyPastMeetingsCronCommand extends CommandRunner {
+  constructor(
+    @InjectMessageQueue(MessageQueue.cronQueue)
+    private readonly messageQueueService: MessageQueueService,
+  ) {
+    super();
+  }
+
+  async run(): Promise<void> {
+    await this.messageQueueService.addCron<undefined>({
+      jobName: CompanyPastMeetingsCronJob.name,
+      data: undefined,
+      options: {
+        repeat: { pattern: COMPANY_PAST_MEETINGS_CRON_PATTERN },
+      },
+    });
+  }
+}

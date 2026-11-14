@@ -20,6 +20,17 @@ describe('Standard field writability', () => {
     allFlatEntityMaps.flatFieldMetadataMaps.byUniversalIdentifier,
   ).filter(isDefined);
 
+  const companyServerComputedFieldUniversalIdentifiers = new Set(
+    Object.entries(STANDARD_OBJECTS.company.fields)
+      .filter(
+        ([fieldName]) =>
+          /^(isParentCompany|isChildCompany|numberOf[A-Za-z]+|lastActivityDate|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
+            fieldName,
+          ),
+      )
+      .map(([, { universalIdentifier }]) => universalIdentifier),
+  );
+
   const searchVectorFlatFieldMetadatas = standardFlatFieldMetadatas.filter(
     (flatFieldMetadata) =>
       flatFieldMetadata.type === FieldMetadataType.TS_VECTOR,
@@ -35,12 +46,32 @@ describe('Standard field writability', () => {
     ).toBe(true);
   });
 
+  it('marks the server-computed company fields as SYSTEM, so only the server writes them', () => {
+    const companyServerComputedFlatFieldMetadatas =
+      standardFlatFieldMetadatas.filter((flatFieldMetadata) =>
+        companyServerComputedFieldUniversalIdentifiers.has(
+          flatFieldMetadata.universalIdentifier,
+        ),
+      );
+
+    expect(companyServerComputedFlatFieldMetadatas).toHaveLength(30);
+    expect(
+      companyServerComputedFlatFieldMetadatas.every(
+        (flatFieldMetadata) =>
+          flatFieldMetadata.writability === MetadataWritability.SYSTEM,
+      ),
+    ).toBe(true);
+  });
+
   it('leaves fields outside protected history and search vectors OPEN', () => {
     const nonSearchVectorWritabilities = new Set(
       standardFlatFieldMetadatas
         .filter(
           (flatFieldMetadata) =>
             flatFieldMetadata.type !== FieldMetadataType.TS_VECTOR &&
+            !companyServerComputedFieldUniversalIdentifiers.has(
+              flatFieldMetadata.universalIdentifier,
+            ) &&
             ![
               STANDARD_OBJECTS.agentChatThread.universalIdentifier,
               STANDARD_OBJECTS.agentMessage.universalIdentifier,
