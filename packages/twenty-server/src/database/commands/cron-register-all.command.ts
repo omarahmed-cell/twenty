@@ -43,6 +43,7 @@ import { WorkflowCronTriggerCronCommand } from 'src/modules/workflow/workflow-tr
 import { FieldFormulaTimeBasedCronCommand } from 'src/modules/field-formula/crons/commands/field-formula-time-based.cron.command';
 import { CompanyCalculatedFieldsNightlyCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-calculated-fields-nightly.cron.command';
 import { CompanyPastMeetingsCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-past-meetings.cron.command';
+import { PersonCalculatedFieldsNightlyCronCommand } from 'src/modules/person-calculated-fields/crons/commands/person-calculated-fields-nightly.cron.command';
 
 @Command({
   name: 'cron:register:all',
@@ -71,6 +72,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly fieldFormulaTimeBasedCronCommand: FieldFormulaTimeBasedCronCommand,
     private readonly companyCalculatedFieldsNightlyCronCommand: CompanyCalculatedFieldsNightlyCronCommand,
     private readonly companyPastMeetingsCronCommand: CompanyPastMeetingsCronCommand,
+    private readonly personCalculatedFieldsNightlyCronCommand: PersonCalculatedFieldsNightlyCronCommand,
 
     private readonly workflowCronTriggerCronCommand: WorkflowCronTriggerCronCommand,
     private readonly workflowRunEnqueueCronCommand: WorkflowRunEnqueueCronCommand,
@@ -174,6 +176,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'CompanyPastMeetings',
         command: this.companyPastMeetingsCronCommand,
+      },
+      {
+        name: 'PersonCalculatedFieldsNightly',
+        command: this.personCalculatedFieldsNightlyCronCommand,
       },
       {
         name: 'ReconcileCampaignStats',

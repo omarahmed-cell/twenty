@@ -498,5 +498,46 @@ export const computeStandardCompanyViewFields = (
           viewFieldGroupName: 'business',
         },
       }),
+    companyRecordPageFieldsOwnerAssignedDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'ownerAssignedDate',
+          fieldName: 'ownerAssignedDate',
+          position: 1.25,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
+    companyRecordPageFieldsSdrOwner: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'company',
+      context: {
+        viewName: 'companyRecordPageFields',
+        viewFieldName: 'sdrOwner',
+        fieldName: 'sdrOwner',
+        position: 1.5,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    companyRecordPageFieldsSdrOwnerAssignedDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'sdrOwnerAssignedDate',
+          fieldName: 'sdrOwnerAssignedDate',
+          position: 1.75,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
   };
 };

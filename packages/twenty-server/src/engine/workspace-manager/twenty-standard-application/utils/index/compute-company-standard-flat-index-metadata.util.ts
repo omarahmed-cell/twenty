@@ -17,6 +17,18 @@ export const buildCompanyStandardFlatIndexMetadatas = ({
   AllStandardObjectIndexName<'company'>,
   FlatIndexMetadata
 > => ({
+  sdrOwnerIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'sdrOwnerIdIndex',
+      relatedFieldNames: ['sdrOwner'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   accountOwnerIdIndex: createStandardIndexFlatMetadata({
     objectName,
     workspaceId,

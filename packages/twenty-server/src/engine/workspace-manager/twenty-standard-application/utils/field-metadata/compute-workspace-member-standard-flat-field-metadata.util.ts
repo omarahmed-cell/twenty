@@ -1130,4 +1130,93 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  ownedPeople: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'ownedPeople',
+      label: i18nLabel(
+        msg({ message: `Owned people`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `People the member owns`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsers',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'person',
+      targetFieldName: 'contactOwner',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  sdrOwnedPeople: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'sdrOwnedPeople',
+      label: i18nLabel(
+        msg({ message: `SDR-owned people`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `People the member is the SDR for`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsers',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'person',
+      targetFieldName: 'contactSdrOwner',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  sdrOwnedCompanies: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'sdrOwnedCompanies',
+      label: i18nLabel(
+        msg({ message: `SDR-owned companies`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The SDR Responsible for this Company`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconBuildingSkyscraper',
+      isNullable: true,
+      targetObjectName: 'company',
+      targetFieldName: 'sdrOwner',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

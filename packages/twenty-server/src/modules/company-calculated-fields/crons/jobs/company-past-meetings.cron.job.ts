@@ -10,6 +10,7 @@ import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queu
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { CompanyCalculationQueueService } from 'src/modules/company-calculated-fields/services/company-calculation-queue.service';
+import { PersonCalculationQueueService } from 'src/modules/person-calculated-fields/services/person-calculation-queue.service';
 
 export const COMPANY_PAST_MEETINGS_CRON_PATTERN = '*/15 * * * *';
 
@@ -27,6 +28,7 @@ export class CompanyPastMeetingsCronJob {
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
     private readonly companyCalculationQueueService: CompanyCalculationQueueService,
+    private readonly personCalculationQueueService: PersonCalculationQueueService,
   ) {}
 
   @Process(CompanyPastMeetingsCronJob.name)
@@ -45,9 +47,15 @@ export class CompanyPastMeetingsCronJob {
             AND "startsAt" > now() - interval '${LOOKBACK_MINUTES} minutes'`,
         );
 
+        const references = meetings.map(({ id }) => `calendarEvent:${id}`);
+
         await this.companyCalculationQueueService.enqueueReferences({
           workspaceId,
-          references: meetings.map(({ id }) => `calendarEvent:${id}`),
+          references,
+        });
+        await this.personCalculationQueueService.enqueueReferences({
+          workspaceId,
+          references,
         });
       } catch (error) {
         this.logger.error(

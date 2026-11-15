@@ -14,6 +14,7 @@ import {
   StageDateTrackingJob,
   type StageDateTrackingJobData,
 } from 'src/modules/stage-date-tracking/jobs/stage-date-tracking.job';
+import { type StageDateUpdates } from 'src/modules/stage-date-tracking/types/stage-date-tracking-config.type';
 import { computeStageDateUpdates } from 'src/modules/stage-date-tracking/utils/compute-stage-date-updates.util';
 
 type StageEventBatch = WorkspaceEventBatch<
@@ -78,7 +79,7 @@ export class StageDateTrackingListener {
               changedAt,
             }),
           ),
-        ) as Record<string, string>;
+        ) as StageDateUpdates;
 
         return Object.keys(values).length > 0 ? { recordId, values } : null;
       })

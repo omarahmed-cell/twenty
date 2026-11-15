@@ -18,6 +18,7 @@ import { ProvisionEmailsCommand } from 'src/database/commands/upgrade-version-co
 import { RemoveOutOfHorizonAndInternalCalendarEventsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794410000000-remove-out-of-horizon-and-internal-calendar-events.command';
 import { LockMessageChannelContactAutoCreationCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794500000000-lock-message-channel-contact-auto-creation.command';
 import { ProvisionCompanyCalculatedFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794600000000-provision-company-calculated-fields.command';
+import { ProvisionPersonFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794757116582-provision-person-fields.command';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { WorkspaceSchemaManagerModule } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.module';
@@ -51,6 +52,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     RemoveOutOfHorizonAndInternalCalendarEventsCommand,
     LockMessageChannelContactAutoCreationCommand,
     ProvisionCompanyCalculatedFieldsCommand,
+    ProvisionPersonFieldsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

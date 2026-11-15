@@ -439,5 +439,142 @@ export const computeStandardPersonViewFields = (
         viewFieldGroupName: 'general',
       },
     }),
+    personRecordPageFieldsLifecycleStage: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'person',
+      context: {
+        viewName: 'personRecordPageFields',
+        viewFieldName: 'lifecycleStage',
+        fieldName: 'lifecycleStage',
+        position: 14,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    personRecordPageFieldsDateEnteredCurrentStage:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'dateEnteredCurrentStage',
+          fieldName: 'dateEnteredCurrentStage',
+          position: 15,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
+    personRecordPageFieldsTimeInCurrentStage:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'timeInCurrentStage',
+          fieldName: 'timeInCurrentStage',
+          position: 16,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
+    personRecordPageFieldsTeam: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'person',
+      context: {
+        viewName: 'personRecordPageFields',
+        viewFieldName: 'team',
+        fieldName: 'team',
+        position: 17,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    personRecordPageFieldsContactOwner: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'person',
+      context: {
+        viewName: 'personRecordPageFields',
+        viewFieldName: 'contactOwner',
+        fieldName: 'contactOwner',
+        position: 18,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    personRecordPageFieldsOwnerAssignedDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'ownerAssignedDate',
+          fieldName: 'ownerAssignedDate',
+          position: 19,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
+    personRecordPageFieldsContactSdrOwner: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'person',
+      context: {
+        viewName: 'personRecordPageFields',
+        viewFieldName: 'contactSdrOwner',
+        fieldName: 'contactSdrOwner',
+        position: 20,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
+    personRecordPageFieldsSdrOwnerAssignedDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'sdrOwnerAssignedDate',
+          fieldName: 'sdrOwnerAssignedDate',
+          position: 21,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
+    personRecordPageFieldsLastActivityDate: createStandardViewFieldFlatMetadata(
+      {
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'lastActivityDate',
+          fieldName: 'lastActivityDate',
+          position: 22,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      },
+    ),
+    personRecordPageFieldsFirstDealCreatedDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'firstDealCreatedDate',
+          fieldName: 'firstDealCreatedDate',
+          position: 23,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
   };
 };

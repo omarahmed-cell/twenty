@@ -1,6 +1,9 @@
 import { isDefined } from 'twenty-shared/utils';
 
-import { type StageDateTrackingConfig } from 'src/modules/stage-date-tracking/types/stage-date-tracking-config.type';
+import {
+  type StageDateTrackingConfig,
+  type StageDateUpdates,
+} from 'src/modules/stage-date-tracking/types/stage-date-tracking-config.type';
 
 // Moving A -> B stamps B entered, A exited and the current-stage date; clearing only stamps A exited
 export const computeStageDateUpdates = ({
@@ -13,7 +16,7 @@ export const computeStageDateUpdates = ({
   previousStage: string | null | undefined;
   nextStage: string | null | undefined;
   changedAt: string;
-}): Record<string, string> => {
+}): StageDateUpdates => {
   const normalizedPreviousStage = previousStage ?? null;
   const normalizedNextStage = nextStage ?? null;
 
@@ -21,7 +24,7 @@ export const computeStageDateUpdates = ({
     return {};
   }
 
-  const updates: Record<string, string> = {};
+  const updates: StageDateUpdates = {};
 
   const previousStageFieldNames = isDefined(normalizedPreviousStage)
     ? config.fieldNamesByStage[normalizedPreviousStage]
@@ -41,6 +44,12 @@ export const computeStageDateUpdates = ({
 
   if (isDefined(normalizedNextStage)) {
     updates[config.currentStageEnteredFieldName] = changedAt;
+  }
+
+  if (isDefined(config.daysInCurrentStageFieldName)) {
+    updates[config.daysInCurrentStageFieldName] = isDefined(normalizedNextStage)
+      ? 0
+      : null;
   }
 
   return updates;

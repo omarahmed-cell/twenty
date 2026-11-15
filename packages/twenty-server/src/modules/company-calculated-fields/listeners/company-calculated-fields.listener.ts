@@ -5,24 +5,16 @@ import { type ObjectRecordBaseEvent } from 'twenty-shared/database-events';
 import { OnDatabaseBatchEvent } from 'src/engine/api/graphql/graphql-query-runner/decorators/on-database-batch-event.decorator';
 import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
 import { type WorkspaceEventBatch } from 'src/engine/workspace-event-emitter/types/workspace-event-batch.type';
+import { isImportWrite } from 'src/modules/assigned-date-tracking/utils/is-import-write.util';
 import { CompanyCalculationQueueService } from 'src/modules/company-calculated-fields/services/company-calculation-queue.service';
 import {
   COMPANY_CALCULATION_WATCHED_OBJECT_NAMES,
-  type CompanyCalculationRecord,
   collectCompanyCalculationReferences,
 } from 'src/modules/company-calculated-fields/utils/collect-company-calculation-references.util';
 
 type CompanyCalculationEventBatch = WorkspaceEventBatch<
   ObjectRecordBaseEvent<Record<string, unknown>>
 >;
-
-// Only the actor of this write counts: a record imported long ago is edited live later
-const isImportWrite = (record: CompanyCalculationRecord, isUpdate: boolean) =>
-  (
-    (isUpdate ? record?.updatedBy : record?.createdBy) as
-      | { source?: string }
-      | undefined
-  )?.source === 'IMPORT';
 
 // Listens to the ORM, so UI, API, workflow and import writes all reach it
 @Injectable()

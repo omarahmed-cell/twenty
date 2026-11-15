@@ -639,6 +639,9 @@ export const STANDARD_OBJECTS = {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company,
     fields: STANDARD_OBJECT_FIELDS.company,
     indexes: {
+      sdrOwnerIdIndex: {
+        universalIdentifier: '71ae57f9-82b2-495c-9f13-b0c95db31996',
+      },
       accountOwnerIdIndex: {
         universalIdentifier: 'ec2ebfc9-0c9b-4597-a87d-aa295e2d8bfe',
       },
@@ -702,6 +705,9 @@ export const STANDARD_OBJECTS = {
           'lastActivityDate',
           'lifecycleStage',
           'dateEnteredCurrentStage',
+          'ownerAssignedDate',
+          'sdrOwner',
+          'sdrOwnerAssignedDate',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -1326,6 +1332,12 @@ export const STANDARD_OBJECTS = {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person,
     fields: STANDARD_OBJECT_FIELDS.person,
     indexes: {
+      contactOwnerIdIndex: {
+        universalIdentifier: '0d932b24-293a-4e02-a910-bccb3838dcc9',
+      },
+      contactSdrOwnerIdIndex: {
+        universalIdentifier: '026cc866-54f6-4dad-b9a3-44518b5aadcb',
+      },
       companyIdIndex: {
         universalIdentifier: '8a265a5c-d3ae-47dc-bdf9-b42cfa2ba639',
       },
@@ -1377,6 +1389,16 @@ export const STANDARD_OBJECTS = {
           'callTargets',
           'communicationTargets',
           'emailTargets',
+          'lifecycleStage',
+          'dateEnteredCurrentStage',
+          'timeInCurrentStage',
+          'team',
+          'contactOwner',
+          'ownerAssignedDate',
+          'contactSdrOwner',
+          'sdrOwnerAssignedDate',
+          'lastActivityDate',
+          'firstDealCreatedDate',
         ],
         viewFieldGroupNames: {
           general: 'General',

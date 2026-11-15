@@ -1,4 +1,5 @@
 import { COMPANY_LIFECYCLE_STAGE_DATE_TRACKING_CONFIG } from 'src/modules/stage-date-tracking/constants/company-lifecycle-stage-date-tracking-config.constant';
+import { PERSON_LIFECYCLE_STAGE_DATE_TRACKING_CONFIG } from 'src/modules/stage-date-tracking/constants/person-lifecycle-stage-date-tracking-config.constant';
 import { computeStageDateUpdates } from 'src/modules/stage-date-tracking/utils/compute-stage-date-updates.util';
 
 const CHANGED_AT = '2026-11-14T10:00:00.000Z';
@@ -64,5 +65,35 @@ describe('computeStageDateUpdates', () => {
         changedAt: CHANGED_AT,
       }),
     ).toEqual({});
+  });
+
+  it('resets the days in the current stage when a person enters a stage', () => {
+    expect(
+      computeStageDateUpdates({
+        config: PERSON_LIFECYCLE_STAGE_DATE_TRACKING_CONFIG,
+        previousStage: 'LEAD',
+        nextStage: 'CUSTOMER',
+        changedAt: CHANGED_AT,
+      }),
+    ).toEqual({
+      dateExitedLeadLifecycleStage: CHANGED_AT,
+      dateEnteredCustomerLifecycleStage: CHANGED_AT,
+      dateEnteredCurrentStage: CHANGED_AT,
+      timeInCurrentStage: 0,
+    });
+  });
+
+  it('empties the days in the current stage when a person stage is cleared', () => {
+    expect(
+      computeStageDateUpdates({
+        config: PERSON_LIFECYCLE_STAGE_DATE_TRACKING_CONFIG,
+        previousStage: 'CUSTOMER',
+        nextStage: null,
+        changedAt: CHANGED_AT,
+      }),
+    ).toEqual({
+      dateExitedCustomerLifecycleStage: CHANGED_AT,
+      timeInCurrentStage: null,
+    });
   });
 });

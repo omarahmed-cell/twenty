@@ -1315,6 +1315,15 @@ export const STANDARD_OBJECT_FIELDS = {
     dateExitedBinLifecycleStage: {
       universalIdentifier: 'b97150d4-4c65-4c84-873d-7957870bcce5',
     },
+    ownerAssignedDate: {
+      universalIdentifier: 'd72fa7e5-c313-4568-a3de-9ec832c1427d',
+    },
+    sdrOwner: {
+      universalIdentifier: '76b2dc74-c10f-4e39-8a99-b52f37308d5e',
+    },
+    sdrOwnerAssignedDate: {
+      universalIdentifier: '7712d9c6-f161-492e-8d59-2b6566c048c8',
+    },
   },
   dashboard: {
     ...buildStandardObjectSystemFields(
@@ -1955,6 +1964,102 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTarget,
       }),
     },
+    lifecycleStage: {
+      universalIdentifier: 'e86c704e-49a9-4a09-8304-8aaed1d05aa5',
+    },
+    team: {
+      universalIdentifier: '4a38fc60-2cdb-4228-891e-b8490663612e',
+    },
+    contactOwner: {
+      universalIdentifier: '0590242c-ad51-46ac-abba-679c027e55b1',
+    },
+    contactSdrOwner: {
+      universalIdentifier: 'ac0d42a1-1879-4f02-9a12-0dae5cc7516f',
+    },
+    ownerAssignedDate: {
+      universalIdentifier: '121ed87f-1a82-4375-ab77-e8b7969434c0',
+    },
+    sdrOwnerAssignedDate: {
+      universalIdentifier: '8d4317a3-e6c9-4eb7-8c31-6f3ddc39118f',
+    },
+    lastActivityDate: {
+      universalIdentifier: '0c60d2de-95b5-469e-9b94-80ce82bfa6f0',
+    },
+    firstDealCreatedDate: {
+      universalIdentifier: 'e9c13cc9-f43a-4093-a8ba-faf229ba022b',
+    },
+    timeInCurrentStage: {
+      universalIdentifier: '9868610b-1351-47bd-abe5-9346372faa4a',
+    },
+    dateEnteredCurrentStage: {
+      universalIdentifier: '9079efb4-cb10-48db-a219-377016c7ba97',
+    },
+    dateEnteredNewLifecycleStage: {
+      universalIdentifier: '4182abc0-480f-4b3a-9e50-7dbc9d7c88af',
+    },
+    dateExitedNewLifecycleStage: {
+      universalIdentifier: '76fad40e-7c5d-445e-972c-7e7e518f09bd',
+    },
+    dateEnteredLeadLifecycleStage: {
+      universalIdentifier: '43285727-e7c4-4946-a956-c5194e383b72',
+    },
+    dateExitedLeadLifecycleStage: {
+      universalIdentifier: 'e6e99385-cf8b-4e4e-9d25-15ed600f13b6',
+    },
+    dateEnteredMarketingQualifiedLeadLifecycleStage: {
+      universalIdentifier: 'a7db1f2b-f588-4140-8c8f-bd24105845f6',
+    },
+    dateExitedMarketingQualifiedLeadLifecycleStage: {
+      universalIdentifier: '2fac3486-6324-4ccc-b27c-86c518ea9f2f',
+    },
+    dateEnteredSalesQualifiedLeadLifecycleStage: {
+      universalIdentifier: '90cee89a-f52d-4ed4-ae65-f12443134baf',
+    },
+    dateExitedSalesQualifiedLeadLifecycleStage: {
+      universalIdentifier: 'c4872a14-5b87-4b3f-962e-178cb26652a9',
+    },
+    dateEnteredOpportunityLifecycleStage: {
+      universalIdentifier: '58e79228-6ee2-4a89-b586-3c5d90a01242',
+    },
+    dateExitedOpportunityLifecycleStage: {
+      universalIdentifier: 'ed5b7b61-23de-4039-b6e9-aeec3c55470d',
+    },
+    dateEnteredCustomerLifecycleStage: {
+      universalIdentifier: 'e90c2c0e-8955-411a-9edd-170c9e3d18b6',
+    },
+    dateExitedCustomerLifecycleStage: {
+      universalIdentifier: 'ebfccf78-ef30-45d2-86b7-333fbe427dd9',
+    },
+    dateEnteredPromoterLifecycleStage: {
+      universalIdentifier: '4dab6d7b-19b3-48b4-9299-b4fd37acad77',
+    },
+    dateExitedPromoterLifecycleStage: {
+      universalIdentifier: '607645d5-731d-49d6-b84e-4171a9951900',
+    },
+    dateEnteredOtherLifecycleStage: {
+      universalIdentifier: '10228ab8-e1a9-4240-9cc0-b3f1b264c2d6',
+    },
+    dateExitedOtherLifecycleStage: {
+      universalIdentifier: '97aca986-f8f2-4677-88e7-ad2d08b165d6',
+    },
+    dateEnteredClosingLifecycleStage: {
+      universalIdentifier: 'abaff562-7e62-444d-b526-67fc38c1237a',
+    },
+    dateExitedClosingLifecycleStage: {
+      universalIdentifier: 'cf17d284-97ec-4464-b630-e0597e392cfc',
+    },
+    dateEnteredOnHoldLifecycleStage: {
+      universalIdentifier: '68b4048f-96f2-48be-9d1d-e20d7af2754f',
+    },
+    dateExitedOnHoldLifecycleStage: {
+      universalIdentifier: '22089e52-9d94-4446-974c-3fe80d5bb4b0',
+    },
+    dateEnteredBinLifecycleStage: {
+      universalIdentifier: '63381340-e2e7-4ca4-a0e7-304d8b5c99a2',
+    },
+    dateExitedBinLifecycleStage: {
+      universalIdentifier: 'b8831b8e-bbf6-498b-b43b-f19c7a6a02a0',
+    },
   },
   service: {
     ...buildStandardObjectSystemFields(
@@ -2462,6 +2567,15 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     numberFormat: {
       universalIdentifier: '20202020-7f40-4e7f-b126-11c0eda6b141',
+    },
+    ownedPeople: {
+      universalIdentifier: '2e493318-2fb6-46ac-b87b-abeb761cf7a3',
+    },
+    sdrOwnedPeople: {
+      universalIdentifier: 'bbdb9c89-4a1d-4ffe-886c-00b1b7c106ea',
+    },
+    sdrOwnedCompanies: {
+      universalIdentifier: 'c3edab47-d356-43da-8516-3e230a53e09b',
     },
   },
 } satisfies Record<string, Record<string, { universalIdentifier: string }>>;

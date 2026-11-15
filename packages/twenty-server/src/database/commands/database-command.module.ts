@@ -60,6 +60,7 @@ import { CalendarEventImportManagerModule } from 'src/modules/calendar/calendar-
 import { GoogleMeetRecordingModule } from 'src/modules/call-recording/google-meet/google-meet-recording.module';
 import { EmailingModule } from 'src/modules/emailing/emailing.module';
 import { FieldFormulaModule } from 'src/modules/field-formula/field-formula.module';
+import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
 import { MessagingImportManagerModule } from 'src/modules/messaging/message-import-manager/messaging-import-manager.module';
 import { WorkflowRunQueueModule } from 'src/modules/workflow/workflow-runner/workflow-run-queue/workflow-run-queue.module';
@@ -79,6 +80,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     EmailingModule,
     FieldFormulaModule,
     CompanyCalculatedFieldsModule,
+    PersonCalculatedFieldsModule,
     AutomatedTriggerModule,
     PendingWakeUpModule,
     FileModule,

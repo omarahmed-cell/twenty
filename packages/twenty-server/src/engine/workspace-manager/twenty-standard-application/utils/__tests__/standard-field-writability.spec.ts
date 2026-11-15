@@ -22,14 +22,34 @@ describe('Standard field writability', () => {
 
   const companyServerComputedFieldUniversalIdentifiers = new Set(
     Object.entries(STANDARD_OBJECTS.company.fields)
-      .filter(
-        ([fieldName]) =>
-          /^(isParentCompany|isChildCompany|numberOf[A-Za-z]+|lastActivityDate|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
-            fieldName,
-          ),
+      .filter(([fieldName]) =>
+        /^(isParentCompany|isChildCompany|numberOf[A-Za-z]+|lastActivityDate|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
+          fieldName,
+        ),
       )
       .map(([, { universalIdentifier }]) => universalIdentifier),
   );
+
+  const personServerComputedFieldUniversalIdentifiers = new Set(
+    Object.entries(STANDARD_OBJECTS.person.fields)
+      .filter(([fieldName]) =>
+        /^(ownerAssignedDate|sdrOwnerAssignedDate|lastActivityDate|firstDealCreatedDate|timeInCurrentStage|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
+          fieldName,
+        ),
+      )
+      .map(([, { universalIdentifier }]) => universalIdentifier),
+  );
+
+  const companyAssignedDateFieldUniversalIdentifiers = new Set([
+    STANDARD_OBJECTS.company.fields.ownerAssignedDate.universalIdentifier,
+    STANDARD_OBJECTS.company.fields.sdrOwnerAssignedDate.universalIdentifier,
+  ]);
+
+  const serverWrittenFieldUniversalIdentifiers = new Set([
+    ...companyServerComputedFieldUniversalIdentifiers,
+    ...personServerComputedFieldUniversalIdentifiers,
+    ...companyAssignedDateFieldUniversalIdentifiers,
+  ]);
 
   const searchVectorFlatFieldMetadatas = standardFlatFieldMetadatas.filter(
     (flatFieldMetadata) =>
@@ -63,13 +83,33 @@ describe('Standard field writability', () => {
     ).toBe(true);
   });
 
+  it('marks the server-written person fields and the assigned dates as SYSTEM', () => {
+    const serverWrittenFlatFieldMetadatas = standardFlatFieldMetadatas.filter(
+      (flatFieldMetadata) =>
+        personServerComputedFieldUniversalIdentifiers.has(
+          flatFieldMetadata.universalIdentifier,
+        ) ||
+        companyAssignedDateFieldUniversalIdentifiers.has(
+          flatFieldMetadata.universalIdentifier,
+        ),
+    );
+
+    expect(serverWrittenFlatFieldMetadatas).toHaveLength(30);
+    expect(
+      serverWrittenFlatFieldMetadatas.every(
+        (flatFieldMetadata) =>
+          flatFieldMetadata.writability === MetadataWritability.SYSTEM,
+      ),
+    ).toBe(true);
+  });
+
   it('leaves fields outside protected history and search vectors OPEN', () => {
     const nonSearchVectorWritabilities = new Set(
       standardFlatFieldMetadatas
         .filter(
           (flatFieldMetadata) =>
             flatFieldMetadata.type !== FieldMetadataType.TS_VECTOR &&
-            !companyServerComputedFieldUniversalIdentifiers.has(
+            !serverWrittenFieldUniversalIdentifiers.has(
               flatFieldMetadata.universalIdentifier,
             ) &&
             ![
