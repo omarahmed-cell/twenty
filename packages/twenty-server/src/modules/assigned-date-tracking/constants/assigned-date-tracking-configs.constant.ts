@@ -21,4 +21,9 @@ export const ASSIGNED_DATE_TRACKING_CONFIGS: AssignedDateTrackingConfig[] = [
     userFieldJoinColumnName: 'sdrOwnerId',
     assignedDateFieldName: 'sdrOwnerAssignedDate',
   },
+  {
+    objectNameSingular: 'opportunity',
+    userFieldJoinColumnName: 'ownerId',
+    assignedDateFieldName: 'ownerAssignedDate',
+  },
 ];

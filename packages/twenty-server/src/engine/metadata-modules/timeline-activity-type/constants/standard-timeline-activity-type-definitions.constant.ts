@@ -478,6 +478,46 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
         },
       },
     },
+    {
+      name: 'dealCollaboratorLinked',
+      universalIdentifier: '76c1f5a1-c9f5-4a42-8609-7715963069eb',
+      label: msg({
+        message: `added a collaborator`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconUserPlus',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'linked',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.workspaceMember.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.workspaceMember.fields.collaboratingOpportunities
+              .universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'dealCollaboratorUnlinked',
+      universalIdentifier: 'd7dc5aab-aea5-40bf-981a-22675e0fbde9',
+      label: msg({
+        message: `removed a collaborator`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconUserMinus',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'unlinked',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.workspaceMember.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.workspaceMember.fields.collaboratingOpportunities
+              .universalIdentifier,
+        },
+      },
+    },
   ];
 
 // Normalized properties keep the committed 2.34 upgrade command stable

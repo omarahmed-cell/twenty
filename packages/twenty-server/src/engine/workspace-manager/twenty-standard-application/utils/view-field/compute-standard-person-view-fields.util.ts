@@ -576,5 +576,20 @@ export const computeStandardPersonViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
+    personRecordPageFieldsNextActivityDate: createStandardViewFieldFlatMetadata(
+      {
+        ...args,
+        objectName: 'person',
+        context: {
+          viewName: 'personRecordPageFields',
+          viewFieldName: 'nextActivityDate',
+          fieldName: 'nextActivityDate',
+          position: 24,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      },
+    ),
   };
 };

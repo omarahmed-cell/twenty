@@ -539,5 +539,19 @@ export const computeStandardCompanyViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
+    companyRecordPageFieldsNextActivityDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'company',
+        context: {
+          viewName: 'companyRecordPageFields',
+          viewFieldName: 'nextActivityDate',
+          fieldName: 'nextActivityDate',
+          position: 7.5,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'business',
+        },
+      }),
   };
 };

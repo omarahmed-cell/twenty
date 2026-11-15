@@ -1324,6 +1324,9 @@ export const STANDARD_OBJECT_FIELDS = {
     sdrOwnerAssignedDate: {
       universalIdentifier: '7712d9c6-f161-492e-8d59-2b6566c048c8',
     },
+    nextActivityDate: {
+      universalIdentifier: 'c6421216-b331-4c40-a080-5fbca8369eaa',
+    },
   },
   dashboard: {
     ...buildStandardObjectSystemFields(
@@ -1462,6 +1465,17 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: 'c9a0580a-9eab-44f9-b65c-7ba6f20216cf',
     },
     person: { universalIdentifier: 'c1cebe58-bfb0-4ea7-90c1-50de57e62a93' },
+  },
+  opportunityCollaborator: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityCollaborator,
+    ),
+    opportunity: {
+      universalIdentifier: '29d16c8e-42c4-4b89-973a-4085c06a5dc3',
+    },
+    workspaceMember: {
+      universalIdentifier: '8ac45b39-8324-4f14-a63e-685a87327f99',
+    },
   },
   messageChannelMessageAssociation: {
     ...buildStandardObjectSystemFields(
@@ -1831,6 +1845,25 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTarget,
       }),
     },
+    team: { universalIdentifier: 'df1a7520-16f7-4753-bd3b-66fdfdd15683' },
+    dealCollaborators: {
+      universalIdentifier: 'acb590ca-c49d-4067-b0ef-ef98d6aed58c',
+    },
+    ownerAssignedDate: {
+      universalIdentifier: '4c12e55a-2c9b-4a77-95b6-90fe7612d5b2',
+    },
+    lastActivityDate: {
+      universalIdentifier: 'a65228b6-69a3-4395-a2dd-29302081a9ff',
+    },
+    numberOfAssociatedContacts: {
+      universalIdentifier: 'c62ee97f-4669-4294-974f-55c21fefa463',
+    },
+    numberOfAssociatedLineItems: {
+      universalIdentifier: 'd235ffb0-68bf-4c09-a0cd-368e8f25489f',
+    },
+    nextActivityDate: {
+      universalIdentifier: 'a75ed1eb-355b-487b-ba44-c33e941b4c48',
+    },
   },
   person: {
     ...buildStandardObjectSystemFields(
@@ -2059,6 +2092,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     dateExitedBinLifecycleStage: {
       universalIdentifier: 'b8831b8e-bbf6-498b-b43b-f19c7a6a02a0',
+    },
+    nextActivityDate: {
+      universalIdentifier: '80a5362a-34ab-4fd7-98c4-fedea2841860',
     },
   },
   service: {
@@ -2576,6 +2612,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     sdrOwnedCompanies: {
       universalIdentifier: 'c3edab47-d356-43da-8516-3e230a53e09b',
+    },
+    collaboratingOpportunities: {
+      universalIdentifier: '6c559b88-f7ff-4b5d-b4fb-30737b4918b7',
     },
   },
 } satisfies Record<string, Record<string, { universalIdentifier: string }>>;

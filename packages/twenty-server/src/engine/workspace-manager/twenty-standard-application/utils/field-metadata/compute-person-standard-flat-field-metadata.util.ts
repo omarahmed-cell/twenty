@@ -2136,4 +2136,34 @@ export const buildPersonStandardFlatFieldMetadatas = ({
     }),
     writability: MetadataWritability.SYSTEM,
   },
+  nextActivityDate: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'nextActivityDate',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Next Activity Date`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Earliest upcoming meeting or open task due on the contact`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarDue',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
 });

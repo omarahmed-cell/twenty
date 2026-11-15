@@ -8,7 +8,7 @@ import { PersonCalculatedFieldsService } from 'src/modules/person-calculated-fie
 @Command({
   name: 'person:recompute-calculated-fields',
   description:
-    'Fully recompute the calculated fields (Last Activity Date, First Deal Created Date, Time in current stage) of every person. Run it after a data migration.',
+    'Fully recompute the calculated fields (Last Activity Date, Next Activity Date, First Deal Created Date, Time in current stage) of every person. Run it after a data migration.',
 })
 export class RecomputePersonCalculatedFieldsCommand extends ProvisionedWorkspaceCommandRunner {
   constructor(

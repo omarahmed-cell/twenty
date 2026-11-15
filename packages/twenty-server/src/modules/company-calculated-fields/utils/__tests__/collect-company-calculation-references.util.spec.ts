@@ -86,4 +86,26 @@ describe('collectCompanyCalculationReferences', () => {
       }),
     ).toEqual([]);
   });
+
+  it('reaches the company through the people and deals an open task is linked to', () => {
+    expect(
+      collectCompanyCalculationReferences({
+        objectNameSingular: 'taskTarget',
+        isUpdate: false,
+        before: undefined,
+        after: { targetPersonId: 'person-1', targetOpportunityId: 'deal-1' },
+      }),
+    ).toEqual(['person:person-1', 'opportunity:deal-1']);
+  });
+
+  it('recomputes when a task due date moves', () => {
+    expect(
+      collectCompanyCalculationReferences({
+        objectNameSingular: 'task',
+        isUpdate: true,
+        before: { id: 'task-1', dueAt: '2026-11-16T09:00:00.000Z' },
+        after: { id: 'task-1', dueAt: '2026-11-18T09:00:00.000Z' },
+      }),
+    ).toEqual(['task:task-1', 'task:task-1']);
+  });
 });

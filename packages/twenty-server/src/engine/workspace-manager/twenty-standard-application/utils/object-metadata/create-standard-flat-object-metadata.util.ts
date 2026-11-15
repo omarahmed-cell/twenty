@@ -1225,6 +1225,52 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  opportunityCollaborator: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'opportunityCollaborator'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'opportunityCollaborator',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.opportunityCollaborator.universalIdentifier,
+        nameSingular: 'opportunityCollaborator',
+        namePlural: 'opportunityCollaborators',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Deal Collaborator`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Deal Collaborators`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A workspace member collaborating on a deal`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconUsers',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   messageChannelMessageAssociation: ({
     now,
     workspaceId,

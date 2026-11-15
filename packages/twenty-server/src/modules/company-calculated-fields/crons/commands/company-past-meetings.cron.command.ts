@@ -11,7 +11,7 @@ import {
 @Command({
   name: 'cron:company-calculated-fields:past-meetings',
   description:
-    'Starts the cron that updates Last Activity Date once a meeting has started',
+    'Starts the cron that updates Last and Next Activity Date once a meeting starts or a task due date passes',
 })
 export class CompanyPastMeetingsCronCommand extends CommandRunner {
   constructor(

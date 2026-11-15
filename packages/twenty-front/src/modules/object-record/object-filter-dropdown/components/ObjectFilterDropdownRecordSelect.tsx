@@ -21,6 +21,7 @@ import { type RelationFilterValue } from '@/views/view-filter-value/types/Relati
 import { t } from '@lingui/core/macro';
 import {
   arrayOfUuidOrVariableSchema,
+  getJunctionTargetFieldId,
   isDefined,
   jsonRelationFilterValueSchema,
 } from 'twenty-shared/utils';
@@ -273,11 +274,21 @@ export const ObjectFilterDropdownRecordSelect = ({
       }).fieldMetadataItem
     : undefined;
 
+  // A many-to-many field picks records from its junction's target (deal → collaborators ⇒ WorkspaceMember)
+  const junctionTargetFieldId = getJunctionTargetFieldId(
+    fieldMetadataItemUsedInFilterDropdown,
+  );
+
   const effectiveFieldMetadataItem = isDefined(
     relationTargetFieldMetadataIdUsedInDropdown,
   )
     ? relationTargetFieldMetadataItem
-    : fieldMetadataItemUsedInFilterDropdown;
+    : isDefined(junctionTargetFieldId)
+      ? getFieldMetadataItemById({
+          fieldMetadataId: junctionTargetFieldId,
+          objectMetadataItems,
+        }).fieldMetadataItem
+      : fieldMetadataItemUsedInFilterDropdown;
 
   const objectNameSingular = isDefined(effectiveFieldMetadataItem)
     ? getRelationObjectMetadataNameSingular({

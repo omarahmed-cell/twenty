@@ -3,6 +3,10 @@ import { isDefined } from 'twenty-shared/utils';
 
 import { COMPANY_ACTIVITY_DATE_SOURCES } from 'src/modules/company-calculated-fields/constants/company-activity-date-sources.constant';
 import { pickLatestActivityDate } from 'src/modules/company-calculated-fields/utils/pick-latest-activity-date.util';
+import {
+  type NextActivityCandidate,
+  pickNextActivityDate,
+} from 'src/modules/company-calculated-fields/utils/pick-next-activity-date.util';
 import { type PersonCalculatedFieldValues } from 'src/modules/person-calculated-fields/constants/person-calculated-field-names.constant';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1_000;
@@ -12,6 +16,7 @@ export type PersonCalculationInput = {
   dateEnteredCurrentStage: string | Date | null;
   dealCreatedDates: (string | Date | null)[] | null;
   activityDates: { activityType: string; date: string | Date | null }[] | null;
+  nextActivityCandidates?: NextActivityCandidate[] | null;
 };
 
 const toTimestamp = (date: string | Date | null | undefined) =>
@@ -58,5 +63,9 @@ export const computePersonCalculatedFieldValues = ({
                 MILLISECONDS_PER_DAY,
             ),
           ),
+    nextActivityDate: pickNextActivityDate({
+      now,
+      candidates: input.nextActivityCandidates ?? [],
+    }),
   };
 };

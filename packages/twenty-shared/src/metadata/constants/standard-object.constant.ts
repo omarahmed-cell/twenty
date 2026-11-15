@@ -708,6 +708,7 @@ export const STANDARD_OBJECTS = {
           'ownerAssignedDate',
           'sdrOwner',
           'sdrOwnerAssignedDate',
+          'nextActivityDate',
         ],
         viewFieldGroupNames: {
           general: 'General',
@@ -885,6 +886,27 @@ export const STANDARD_OBJECTS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityContact,
         fields: STANDARD_OBJECT_FIELDS.opportunityContact,
         viewFieldNames: ['id', 'opportunity', 'person', 'createdAt'],
+      }),
+    },
+  },
+  opportunityCollaborator: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityCollaborator,
+    fields: STANDARD_OBJECT_FIELDS.opportunityCollaborator,
+    indexes: {
+      opportunityIdIndex: {
+        universalIdentifier: '32adb5df-eed9-4302-b406-0ee4e0fca67f',
+      },
+      workspaceMemberOpportunityUniqueIndex: {
+        universalIdentifier: 'abdde8ca-e9d8-4957-aa37-004a92afa5d6',
+      },
+    },
+    views: {
+      allOpportunityCollaborators: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityCollaborator,
+        fields: STANDARD_OBJECT_FIELDS.opportunityCollaborator,
+        viewFieldNames: ['id', 'opportunity', 'workspaceMember', 'createdAt'],
       }),
     },
   },
@@ -1319,6 +1341,13 @@ export const STANDARD_OBJECTS = {
           'callTargets',
           'communicationTargets',
           'emailTargets',
+          'team',
+          'dealCollaborators',
+          'ownerAssignedDate',
+          'lastActivityDate',
+          'nextActivityDate',
+          'numberOfAssociatedContacts',
+          'numberOfAssociatedLineItems',
         ],
         viewFieldGroupNames: {
           deal: 'Deal',
@@ -1399,6 +1428,7 @@ export const STANDARD_OBJECTS = {
           'sdrOwnerAssignedDate',
           'lastActivityDate',
           'firstDealCreatedDate',
+          'nextActivityDate',
         ],
         viewFieldGroupNames: {
           general: 'General',

@@ -417,5 +417,102 @@ export const computeStandardOpportunityViewFields = (
           viewFieldGroupName: 'deal',
         },
       }),
+    opportunityRecordPageFieldsTeam: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'opportunity',
+      context: {
+        viewName: 'opportunityRecordPageFields',
+        viewFieldName: 'team',
+        fieldName: 'team',
+        position: 3,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'deal',
+      },
+    }),
+    opportunityRecordPageFieldsOwnerAssignedDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'ownerAssignedDate',
+          fieldName: 'ownerAssignedDate',
+          position: 2.5,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'relations',
+        },
+      }),
+    opportunityRecordPageFieldsDealCollaborators:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'dealCollaborators',
+          fieldName: 'dealCollaborators',
+          position: 3,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'relations',
+        },
+      }),
+    opportunityRecordPageFieldsLastActivityDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'lastActivityDate',
+          fieldName: 'lastActivityDate',
+          position: 12,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
+    opportunityRecordPageFieldsNextActivityDate:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'nextActivityDate',
+          fieldName: 'nextActivityDate',
+          position: 13,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
+    opportunityRecordPageFieldsNumberOfAssociatedContacts:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'numberOfAssociatedContacts',
+          fieldName: 'numberOfAssociatedContacts',
+          position: 14,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
+    opportunityRecordPageFieldsNumberOfAssociatedLineItems:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'numberOfAssociatedLineItems',
+          fieldName: 'numberOfAssociatedLineItems',
+          position: 15,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
   };
 };

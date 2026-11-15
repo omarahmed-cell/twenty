@@ -33,6 +33,7 @@ export const STANDARD_OBJECT_ICONS = {
   noteTarget: 'IconCheckbox',
   opportunity: 'IconTargetArrow',
   opportunityContact: 'IconUser',
+  opportunityCollaborator: 'IconUsers',
   person: 'IconUser',
   service: 'IconBriefcase',
   product: 'IconPackage',

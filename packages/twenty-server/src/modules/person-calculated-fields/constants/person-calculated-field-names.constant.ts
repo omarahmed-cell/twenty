@@ -2,6 +2,7 @@ export const PERSON_CALCULATED_FIELD_NAMES = [
   'lastActivityDate',
   'firstDealCreatedDate',
   'timeInCurrentStage',
+  'nextActivityDate',
 ] as const;
 
 export type PersonCalculatedFieldName =

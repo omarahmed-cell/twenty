@@ -12,6 +12,9 @@ const PERSON_CONFIGS = ASSIGNED_DATE_TRACKING_CONFIGS.filter(
 const COMPANY_CONFIGS = ASSIGNED_DATE_TRACKING_CONFIGS.filter(
   ({ objectNameSingular }) => objectNameSingular === 'company',
 );
+const OPPORTUNITY_CONFIGS = ASSIGNED_DATE_TRACKING_CONFIGS.filter(
+  ({ objectNameSingular }) => objectNameSingular === 'opportunity',
+);
 
 const compute = (
   args: Partial<Parameters<typeof computeAssignedDateUpdates>[0]>,
@@ -100,6 +103,52 @@ describe('computeAssignedDateUpdates', () => {
     ).toEqual({
       ownerAssignedDate: CHANGED_AT,
       sdrOwnerAssignedDate: CHANGED_AT,
+    });
+  });
+
+  describe('deal owner', () => {
+    const computeForDeal = (
+      args: Partial<Parameters<typeof computeAssignedDateUpdates>[0]>,
+    ) => compute({ configs: OPPORTUNITY_CONFIGS, ...args });
+
+    it('stamps the date when a deal owner is set, then again when it changes', () => {
+      expect(
+        computeForDeal({
+          before: { ownerId: null },
+          after: { ownerId: MEMBER_A },
+        }),
+      ).toEqual({ ownerAssignedDate: CHANGED_AT });
+      expect(
+        computeForDeal({
+          before: { ownerId: MEMBER_A },
+          after: { ownerId: MEMBER_B },
+        }),
+      ).toEqual({ ownerAssignedDate: CHANGED_AT });
+    });
+
+    it('keeps the date when the deal owner is cleared or left as is', () => {
+      expect(
+        computeForDeal({
+          before: { ownerId: MEMBER_A },
+          after: { ownerId: null },
+        }),
+      ).toEqual({});
+      expect(
+        computeForDeal({
+          before: { ownerId: MEMBER_A, name: 'Old' },
+          after: { ownerId: MEMBER_A, name: 'New' },
+        }),
+      ).toEqual({});
+    });
+
+    it('skips imported deals', () => {
+      expect(
+        computeForDeal({
+          isUpdate: false,
+          isImport: true,
+          after: { ownerId: MEMBER_A },
+        }),
+      ).toEqual({});
     });
   });
 });

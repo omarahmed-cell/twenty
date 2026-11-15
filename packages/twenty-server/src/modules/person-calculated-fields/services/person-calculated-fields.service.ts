@@ -8,6 +8,7 @@ import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/ge
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { COMPANY_ACTIVITY_DATE_SOURCES } from 'src/modules/company-calculated-fields/constants/company-activity-date-sources.constant';
+import { buildNextActivityCandidateSelects } from 'src/modules/company-calculated-fields/constants/next-activity-date-sources.constant';
 import {
   PERSON_CALCULATED_FIELD_NAMES,
   type PersonCalculatedFieldValues,
@@ -227,14 +228,27 @@ export class PersonCalculatedFieldsService {
       GROUP BY target."targetPersonId"`,
     ).join('\n      UNION ALL');
 
+    const nextActivityCandidateSelects = buildNextActivityCandidateSelects({
+      schema,
+      ownerSelect: () => 'links."personId"',
+      from: (source) => `(
+        SELECT target."${source.activityIdColumnName}" AS "activityId", target."targetPersonId" AS "personId"
+        FROM ${schema}."${source.targetTableName}" target
+        WHERE target."deletedAt" IS NULL AND target."targetPersonId" = ANY($1::uuid[])
+      ) links`,
+    });
+
     return `
       WITH "activityDates" AS (${activityDateSelects}
+      ),
+      "nextActivityCandidates" AS (${nextActivityCandidateSelects}
       )
       SELECT person."id",
         json_build_object(
           'lastActivityDate', person."lastActivityDate",
           'firstDealCreatedDate', person."firstDealCreatedDate",
-          'timeInCurrentStage', person."timeInCurrentStage"
+          'timeInCurrentStage', person."timeInCurrentStage",
+          'nextActivityDate', person."nextActivityDate"
         ) AS "current",
         person."lifecycleStage"::text AS "lifecycleStage",
         person."dateEnteredCurrentStage",
@@ -245,7 +259,9 @@ export class PersonCalculatedFieldsService {
               WHERE opportunityContact."personId" = person."id" AND opportunityContact."deletedAt" IS NULL
             ))) AS "dealCreatedDates",
         (SELECT json_agg(json_build_object('activityType', activityDate."activityType", 'date', activityDate."activityDate"))
-          FROM "activityDates" activityDate WHERE activityDate."personId" = person."id") AS "activityDates"
+          FROM "activityDates" activityDate WHERE activityDate."personId" = person."id") AS "activityDates",
+        (SELECT json_agg(json_build_object('activityType', candidate."activityType", 'date', candidate."date", 'status', candidate."status"))
+          FROM "nextActivityCandidates" candidate WHERE candidate."personId" = person."id") AS "nextActivityCandidates"
       FROM ${schema}."person" person
       WHERE person."id" = ANY($1::uuid[])`;
   }

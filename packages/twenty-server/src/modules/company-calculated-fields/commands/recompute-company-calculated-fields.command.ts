@@ -8,7 +8,7 @@ import { CompanyCalculatedFieldsService } from 'src/modules/company-calculated-f
 @Command({
   name: 'company:recompute-calculated-fields',
   description:
-    'Fully recompute the calculated fields (parent/child flags and counts, contact and deal counts, open deals, Last Activity Date) of every company. Run it after a data migration.',
+    'Fully recompute the calculated fields (parent/child flags and counts, contact and deal counts, open deals, Last Activity Date, Next Activity Date) of every company. Run it after a data migration.',
 })
 export class RecomputeCompanyCalculatedFieldsCommand extends ProvisionedWorkspaceCommandRunner {
   constructor(

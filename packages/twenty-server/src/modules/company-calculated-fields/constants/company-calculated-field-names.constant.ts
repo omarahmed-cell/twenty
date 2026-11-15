@@ -6,6 +6,7 @@ export const COMPANY_CALCULATED_FIELD_NAMES = [
   'numberOfAssociatedDeals',
   'numberOfOpenDeals',
   'lastActivityDate',
+  'nextActivityDate',
 ] as const;
 
 export type CompanyCalculatedFieldName =

@@ -93,6 +93,7 @@ export { computeEmptyGqlOperationFilterForLinks } from './filter/computeEmptyGql
 export { computeEmptyGqlOperationFilterForMorphRelation } from './filter/computeEmptyGqlOperationFilterForMorphRelation';
 export { computeMorphRelationJoinColumnNames } from './filter/computeMorphRelationJoinColumnNames';
 export { computeRecordGqlOperationFilter } from './filter/computeRecordGqlOperationFilter';
+export { computeRelationFilterRecordIds } from './filter/computeRelationFilterRecordIds';
 export type { DateTimePeriod } from './filter/dates/types/DateTimePeriod';
 export { addUnitToDateTime } from './filter/dates/utils/addUnitToDateTime';
 export { addUnitToZonedDateTime } from './filter/dates/utils/addUnitToZonedDateTime';
@@ -127,10 +128,12 @@ export { resolveRelativeDateTimeFilterStringified } from './filter/dates/utils/r
 export { subUnitFromDateTime } from './filter/dates/utils/subUnitFromDateTime';
 export { subUnitFromZonedDateTime } from './filter/dates/utils/subUnitFromZonedDateTime';
 export { filterOutInvalidRecordFilters } from './filter/filterOutInvalidRecordFilters';
+export { getJunctionTargetFieldId } from './filter/getJunctionTargetFieldId';
 export { isEmptinessOperand } from './filter/isEmptinessOperand';
 export { isRecordFilterOperandExpectingValue } from './filter/isRecordFilterOperandExpectingValue';
 export { isRecordFilterValueValid } from './filter/isRecordFilterValueValid';
 export { turnAnyFieldFilterIntoRecordGqlFilter } from './filter/turnAnyFieldFilterIntoRecordGqlFilter';
+export { turnJunctionRelationFilterIntoGqlOperationFilter } from './filter/turnJunctionRelationFilterIntoGqlOperationFilter';
 export type {
   RecordFilter,
   RecordFilterGroup,

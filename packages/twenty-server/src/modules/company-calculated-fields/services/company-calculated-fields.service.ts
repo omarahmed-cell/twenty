@@ -12,11 +12,16 @@ import {
   COMPANY_CALCULATED_FIELD_NAMES,
   type CompanyCalculatedFieldValues,
 } from 'src/modules/company-calculated-fields/constants/company-calculated-field-names.constant';
+import { buildNextActivityCandidateSelects } from 'src/modules/company-calculated-fields/constants/next-activity-date-sources.constant';
 import { getClosedTwentyDealStageValues } from 'src/modules/company-calculated-fields/utils/is-open-deal-stage.util';
 import {
   type ActivityDateCandidate,
   pickLatestActivityDate,
 } from 'src/modules/company-calculated-fields/utils/pick-latest-activity-date.util';
+import {
+  type NextActivityCandidate,
+  pickNextActivityDate,
+} from 'src/modules/company-calculated-fields/utils/pick-next-activity-date.util';
 
 const RECOMPUTE_BATCH_SIZE = 500;
 
@@ -29,6 +34,7 @@ type CompanyCalculationRow = {
   numberOfAssociatedDeals: number;
   numberOfOpenDeals: number;
   activityDates: { activityType: string; date: string | null }[] | null;
+  nextActivityCandidates: NextActivityCandidate[] | null;
 };
 
 @Injectable()
@@ -196,6 +202,10 @@ export class CompanyCalculatedFieldsService {
             }),
           ),
         }),
+        nextActivityDate: pickNextActivityDate({
+          now,
+          candidates: row.nextActivityCandidates ?? [],
+        }),
       };
 
       const changes = Object.fromEntries(
@@ -271,6 +281,24 @@ export class CompanyCalculatedFieldsService {
       GROUP BY links."companyId"`,
     ).join('\n      UNION ALL');
 
+    const nextActivityCandidateSelects = buildNextActivityCandidateSelects({
+      schema,
+      ownerSelect: () => 'links."companyId"',
+      from: (source) => `(
+        SELECT target."${source.activityIdColumnName}" AS "activityId", target."targetCompanyId" AS "companyId"
+          FROM ${schema}."${source.targetTableName}" target
+          WHERE target."deletedAt" IS NULL AND target."targetCompanyId" = ANY($1::uuid[])
+        UNION SELECT target."${source.activityIdColumnName}", companyPerson."companyId"
+          FROM ${schema}."${source.targetTableName}" target
+          JOIN "companyPeople" companyPerson ON companyPerson."id" = target."targetPersonId"
+          WHERE target."deletedAt" IS NULL
+        UNION SELECT target."${source.activityIdColumnName}", companyOpportunity."companyId"
+          FROM ${schema}."${source.targetTableName}" target
+          JOIN "companyOpportunities" companyOpportunity ON companyOpportunity."id" = target."targetOpportunityId"
+          WHERE target."deletedAt" IS NULL
+      ) links`,
+    });
+
     return `
       WITH "companyPeople" AS (
         SELECT "id", "companyId" FROM ${schema}."person"
@@ -281,6 +309,8 @@ export class CompanyCalculatedFieldsService {
         WHERE "companyId" = ANY($1::uuid[]) AND "deletedAt" IS NULL
       ),
       "activityDates" AS (${activityDateSelects}
+      ),
+      "nextActivityCandidates" AS (${nextActivityCandidateSelects}
       )
       SELECT company."id",
         json_build_object(
@@ -290,7 +320,8 @@ export class CompanyCalculatedFieldsService {
           'numberOfAssociatedContacts', company."numberOfAssociatedContacts",
           'numberOfAssociatedDeals', company."numberOfAssociatedDeals",
           'numberOfOpenDeals', company."numberOfOpenDeals",
-          'lastActivityDate', company."lastActivityDate"
+          'lastActivityDate', company."lastActivityDate",
+          'nextActivityDate', company."nextActivityDate"
         ) AS "current",
         company."parentCompanyId" IS NOT NULL AS "isChildCompany",
         (SELECT count(*) FROM ${schema}."company" child
@@ -303,7 +334,9 @@ export class CompanyCalculatedFieldsService {
           WHERE companyOpportunity."companyId" = company."id"
             AND (companyOpportunity."stage" IS NULL OR NOT (companyOpportunity."stage" = ANY($2::text[]))))::int AS "numberOfOpenDeals",
         (SELECT json_agg(json_build_object('activityType', activityDate."activityType", 'date', activityDate."activityDate"))
-          FROM "activityDates" activityDate WHERE activityDate."companyId" = company."id") AS "activityDates"
+          FROM "activityDates" activityDate WHERE activityDate."companyId" = company."id") AS "activityDates",
+        (SELECT json_agg(json_build_object('activityType', candidate."activityType", 'date', candidate."date", 'status', candidate."status"))
+          FROM "nextActivityCandidates" candidate WHERE candidate."companyId" = company."id") AS "nextActivityCandidates"
       FROM ${schema}."company" company
       WHERE company."id" = ANY($1::uuid[])`;
   }

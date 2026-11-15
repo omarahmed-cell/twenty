@@ -23,7 +23,7 @@ describe('Standard field writability', () => {
   const companyServerComputedFieldUniversalIdentifiers = new Set(
     Object.entries(STANDARD_OBJECTS.company.fields)
       .filter(([fieldName]) =>
-        /^(isParentCompany|isChildCompany|numberOf[A-Za-z]+|lastActivityDate|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
+        /^(isParentCompany|isChildCompany|numberOf[A-Za-z]+|lastActivityDate|nextActivityDate|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
           fieldName,
         ),
       )
@@ -33,7 +33,17 @@ describe('Standard field writability', () => {
   const personServerComputedFieldUniversalIdentifiers = new Set(
     Object.entries(STANDARD_OBJECTS.person.fields)
       .filter(([fieldName]) =>
-        /^(ownerAssignedDate|sdrOwnerAssignedDate|lastActivityDate|firstDealCreatedDate|timeInCurrentStage|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
+        /^(ownerAssignedDate|sdrOwnerAssignedDate|lastActivityDate|nextActivityDate|firstDealCreatedDate|timeInCurrentStage|dateEntered[A-Za-z]+|dateExited[A-Za-z]+)$/.test(
+          fieldName,
+        ),
+      )
+      .map(([, { universalIdentifier }]) => universalIdentifier),
+  );
+
+  const opportunityServerWrittenFieldUniversalIdentifiers = new Set(
+    Object.entries(STANDARD_OBJECTS.opportunity.fields)
+      .filter(([fieldName]) =>
+        /^(ownerAssignedDate|lastActivityDate|nextActivityDate|numberOf[A-Za-z]+)$/.test(
           fieldName,
         ),
       )
@@ -49,6 +59,7 @@ describe('Standard field writability', () => {
     ...companyServerComputedFieldUniversalIdentifiers,
     ...personServerComputedFieldUniversalIdentifiers,
     ...companyAssignedDateFieldUniversalIdentifiers,
+    ...opportunityServerWrittenFieldUniversalIdentifiers,
   ]);
 
   const searchVectorFlatFieldMetadatas = standardFlatFieldMetadatas.filter(
@@ -74,7 +85,7 @@ describe('Standard field writability', () => {
         ),
       );
 
-    expect(companyServerComputedFlatFieldMetadatas).toHaveLength(30);
+    expect(companyServerComputedFlatFieldMetadatas).toHaveLength(31);
     expect(
       companyServerComputedFlatFieldMetadatas.every(
         (flatFieldMetadata) =>
@@ -94,9 +105,26 @@ describe('Standard field writability', () => {
         ),
     );
 
-    expect(serverWrittenFlatFieldMetadatas).toHaveLength(30);
+    expect(serverWrittenFlatFieldMetadatas).toHaveLength(31);
     expect(
       serverWrittenFlatFieldMetadatas.every(
+        (flatFieldMetadata) =>
+          flatFieldMetadata.writability === MetadataWritability.SYSTEM,
+      ),
+    ).toBe(true);
+  });
+
+  it('marks the server-written deal fields as SYSTEM', () => {
+    const opportunityServerWrittenFlatFieldMetadatas =
+      standardFlatFieldMetadatas.filter((flatFieldMetadata) =>
+        opportunityServerWrittenFieldUniversalIdentifiers.has(
+          flatFieldMetadata.universalIdentifier,
+        ),
+      );
+
+    expect(opportunityServerWrittenFlatFieldMetadatas).toHaveLength(5);
+    expect(
+      opportunityServerWrittenFlatFieldMetadatas.every(
         (flatFieldMetadata) =>
           flatFieldMetadata.writability === MetadataWritability.SYSTEM,
       ),

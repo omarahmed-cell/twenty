@@ -10,6 +10,7 @@ import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communicati
 import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-objects/email-target.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type LineItemWorkspaceEntity } from 'src/modules/line-item/standard-objects/line-item.workspace-entity';
+import { type OpportunityCollaboratorWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity-collaborator.workspace-entity';
 import { type OpportunityContactWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity-contact.workspace-entity';
 import { type NoteTargetWorkspaceEntity } from 'src/modules/note/standard-objects/note-target.workspace-entity';
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
@@ -51,6 +52,7 @@ export class OpportunityWorkspaceEntity extends BaseWorkspaceEntity {
   services: EntityRelation<ServiceWorkspaceEntity[]>;
   lineItems: EntityRelation<LineItemWorkspaceEntity[]>;
   contacts: EntityRelation<OpportunityContactWorkspaceEntity[]>;
+  dealCollaborators: EntityRelation<OpportunityCollaboratorWorkspaceEntity[]>;
   /** @deprecated */
   probability: string;
   searchVector: string;

@@ -13,6 +13,7 @@ const TARGET_TABLE_NAMES = new Set(
 const ACTIVITY_DATE_FIELD_NAMES = [
   'createdAt',
   'startsAt',
+  'dueAt',
   'sentAt',
   'status',
   'deletedAt',

@@ -7,6 +7,7 @@ import { RecomputeCompanyCalculatedFieldsCommand } from 'src/modules/company-cal
 import { CompanyCalculatedFieldsNightlyCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-calculated-fields-nightly.cron.command';
 import { CompanyPastMeetingsCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-past-meetings.cron.command';
 import { CompanyCalculatedFieldsNightlyCronJob } from 'src/modules/company-calculated-fields/crons/jobs/company-calculated-fields-nightly.cron.job';
+import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calculated-fields/opportunity-calculated-fields.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { CompanyPastMeetingsCronJob } from 'src/modules/company-calculated-fields/crons/jobs/company-past-meetings.cron.job';
 import { CompanyCalculatedFieldsJob } from 'src/modules/company-calculated-fields/jobs/company-calculated-fields.job';
@@ -19,6 +20,7 @@ import { CompanyCalculationQueueService } from 'src/modules/company-calculated-f
     TypeOrmModule.forFeature([WorkspaceEntity]),
     WorkspaceIteratorModule,
     PersonCalculatedFieldsModule,
+    OpportunityCalculatedFieldsModule,
   ],
   providers: [
     CompanyCalculatedFieldsService,

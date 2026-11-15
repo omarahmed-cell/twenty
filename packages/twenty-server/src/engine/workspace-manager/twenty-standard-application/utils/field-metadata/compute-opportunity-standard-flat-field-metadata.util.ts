@@ -4,6 +4,8 @@ import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  MetadataWritability,
+  NumberDataType,
   RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
@@ -928,4 +930,296 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  team: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'team',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Team`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The team the deal belongs to`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsersGroup',
+      options: [
+        {
+          id: '622a2cf9-f2ac-4ade-bb20-38a60b5d2ddf',
+          value: 'ACCOUNT_EXECUTIVE',
+          label: i18nLabel(
+            msg({
+              message: `Account executive`,
+              context: 'fieldMetadata.label',
+            }),
+          ),
+          position: 0,
+          color: 'gray',
+        },
+        {
+          id: '11b985e3-45b2-44dd-b5d7-1a85e5cfa61c',
+          value: 'MANAGEMENT',
+          label: i18nLabel(
+            msg({ message: `Management`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'gray',
+        },
+        {
+          id: 'c70b8154-49b6-4de0-a769-9d5f578ef64a',
+          value: 'INVESTOR',
+          label: i18nLabel(
+            msg({ message: `Investor`, context: 'fieldMetadata.label' }),
+          ),
+          position: 2,
+          color: 'gray',
+        },
+        {
+          id: 'd0f409c3-7496-443b-bdc5-56f29830cea5',
+          value: 'CRM_TEAM',
+          label: i18nLabel(
+            msg({ message: `CRM team`, context: 'fieldMetadata.label' }),
+          ),
+          position: 3,
+          color: 'gray',
+        },
+        {
+          id: 'ee70b9f5-1291-4814-b118-2d8532019601',
+          value: 'SDR',
+          label: i18nLabel(
+            msg({ message: `SDR`, context: 'fieldMetadata.label' }),
+          ),
+          position: 4,
+          color: 'gray',
+        },
+        {
+          id: 'e30e94e1-8c6e-4d10-b8aa-0d8694fb0c25',
+          value: 'PARTNERSHIPS',
+          label: i18nLabel(
+            msg({ message: `Partnerships`, context: 'fieldMetadata.label' }),
+          ),
+          position: 5,
+          color: 'gray',
+        },
+        {
+          id: '2f2111f3-8898-47f1-94a5-4d136c894c4b',
+          value: 'FINANCE',
+          label: i18nLabel(
+            msg({ message: `Finance`, context: 'fieldMetadata.label' }),
+          ),
+          position: 6,
+          color: 'gray',
+        },
+        {
+          id: '12494829-d728-4cc2-abd0-ea96fcb59642',
+          value: 'ACCOUNT_MANAGERS',
+          label: i18nLabel(
+            msg({
+              message: `Account Managers`,
+              context: 'fieldMetadata.label',
+            }),
+          ),
+          position: 7,
+          color: 'gray',
+        },
+      ],
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  dealCollaborators: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'dealCollaborators',
+      label: i18nLabel(
+        msg({ message: `Deal collaborators`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Workspace members collaborating on the deal`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsers',
+      isUIEditable: true,
+      isNullable: true,
+      targetObjectName: 'opportunityCollaborator',
+      targetFieldName: 'opportunity',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+      junctionTargetFieldUniversalIdentifier:
+        STANDARD_OBJECTS.opportunityCollaborator.fields.workspaceMember
+          .universalIdentifier,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  ownerAssignedDate: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'ownerAssignedDate',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Owner assigned date`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the current deal owner was assigned`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  lastActivityDate: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'lastActivityDate',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Last Activity Date`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Latest call, meeting, note, task, email or communication on the deal`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarEvent',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  numberOfAssociatedContacts: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'numberOfAssociatedContacts',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Number of Associated Contacts`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Distinct people on the deal, point of contact included`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconUsers',
+        isUIEditable: false,
+        settings: {
+          dataType: NumberDataType.INT,
+        },
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  numberOfAssociatedLineItems: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'numberOfAssociatedLineItems',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Number of Associated Line Items`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Line items on the deal`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconListNumbers',
+        isUIEditable: false,
+        settings: {
+          dataType: NumberDataType.INT,
+        },
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  nextActivityDate: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'nextActivityDate',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Next Activity Date`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Earliest upcoming meeting or open task due on the deal`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarDue',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
 });

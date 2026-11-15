@@ -24,6 +24,7 @@ describe('computePersonCalculatedFieldValues', () => {
       lastActivityDate: null,
       firstDealCreatedDate: null,
       timeInCurrentStage: null,
+      nextActivityDate: null,
     });
   });
 
@@ -68,6 +69,28 @@ describe('computePersonCalculatedFieldValues', () => {
 
     it('is empty without deals', () => {
       expect(compute({ dealCreatedDates: [] }).firstDealCreatedDate).toBeNull();
+    });
+  });
+
+  describe('nextActivityDate', () => {
+    it('is the earliest upcoming meeting or open task on the contact', () => {
+      expect(
+        compute({
+          nextActivityCandidates: [
+            { activityType: 'calendarEvent', date: '2026-11-22T09:00:00.000Z' },
+            {
+              activityType: 'task',
+              date: '2026-11-16T09:00:00.000Z',
+              status: 'DONE',
+            },
+            {
+              activityType: 'task',
+              date: '2026-11-18T09:00:00.000Z',
+              status: 'TODO',
+            },
+          ],
+        }).nextActivityDate,
+      ).toBe('2026-11-18T09:00:00.000Z');
     });
   });
 

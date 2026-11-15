@@ -1,4 +1,5 @@
 import { msg } from '@lingui/core/macro';
+import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-application/utils/i18n-label.util';
 import {
   DateDisplayFormat,
@@ -1213,6 +1214,39 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
       settings: {
         relationType: RelationType.ONE_TO_MANY,
       },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  collaboratingOpportunities: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'collaboratingOpportunities',
+      label: i18nLabel(
+        msg({ message: `Collaborating deals`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Deals the workspace member collaborates on`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconTargetArrow',
+      isUIEditable: true,
+      isNullable: true,
+      targetObjectName: 'opportunityCollaborator',
+      targetFieldName: 'workspaceMember',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+      junctionTargetFieldUniversalIdentifier:
+        STANDARD_OBJECTS.opportunityCollaborator.fields.opportunity
+          .universalIdentifier,
     },
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,

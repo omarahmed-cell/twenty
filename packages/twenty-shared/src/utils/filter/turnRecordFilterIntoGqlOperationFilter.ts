@@ -67,6 +67,9 @@ import { jsonRelationFilterValueSchema } from '@/utils/filter/utils/validation-s
 import { computeMorphRelationGqlFieldName } from '@/utils/fieldMetadata/compute-morph-relation-gql-field-name';
 import { computeRelationGqlFieldJoinColumnName } from '@/utils/fieldMetadata/compute-relation-gql-field-join-column-name';
 import { computeMorphRelationJoinColumnNames } from '@/utils/filter/computeMorphRelationJoinColumnNames';
+import { computeRelationFilterRecordIds } from '@/utils/filter/computeRelationFilterRecordIds';
+import { getJunctionTargetFieldId } from '@/utils/filter/getJunctionTargetFieldId';
+import { turnJunctionRelationFilterIntoGqlOperationFilter } from '@/utils/filter/turnJunctionRelationFilterIntoGqlOperationFilter';
 
 const PHONE_FILTER_NON_SIGNIFICANT_CHARS = /(?!^)\+|[^0-9+]/g;
 
@@ -102,6 +105,7 @@ export type FieldShared = {
   label: string;
   relation?: { sourceObjectMetadata: { id: string } } | null;
   morphRelations?: FieldSharedMorphRelation[] | null;
+  settings?: unknown;
 };
 
 type TurnRecordFilterIntoRecordGqlOperationFilterParams = {
@@ -163,6 +167,25 @@ export const turnRecordFilterIntoRecordGqlOperationFilter = ({
 
   if (!isRecordFilterValueValid(recordFilter)) {
     return;
+  }
+
+  const junctionTargetFieldId = getJunctionTargetFieldId(
+    sourceFieldMetadataItem,
+  );
+  const junctionTargetFieldMetadataItem = isDefined(junctionTargetFieldId)
+    ? fieldMetadataItemById.get(junctionTargetFieldId)
+    : undefined;
+
+  if (
+    isDefined(junctionTargetFieldMetadataItem) &&
+    !isDefined(recordFilter.relationTargetFieldMetadataId)
+  ) {
+    return turnJunctionRelationFilterIntoGqlOperationFilter({
+      recordFilter,
+      junctionFieldName: sourceFieldMetadataItem.name,
+      junctionTargetFieldName: junctionTargetFieldMetadataItem.name,
+      filterValueDependencies,
+    });
   }
 
   if (
@@ -697,29 +720,10 @@ const buildDirectFieldGqlOperationFilter = ({
           );
       }
     case 'RELATION': {
-      const {
-        isCurrentWorkspaceMemberSelected,
-        isCurrentRecordSelected,
-        selectedRecordIds,
-      } = jsonRelationFilterValueSchema
-        .catch({
-          isCurrentWorkspaceMemberSelected: false,
-          isCurrentRecordSelected: false,
-          selectedRecordIds: arrayOfUuidOrVariableSchema.parse(
-            recordFilter.value,
-          ),
-        })
-        .parse(recordFilter.value);
-
-      const recordIds = [
-        ...selectedRecordIds,
-        ...(isCurrentWorkspaceMemberSelected
-          ? [filterValueDependencies?.currentWorkspaceMemberId]
-          : []),
-        ...(isCurrentRecordSelected
-          ? [filterValueDependencies.currentRecord?.id]
-          : []),
-      ].filter(isDefined);
+      const recordIds = computeRelationFilterRecordIds({
+        value: recordFilter.value,
+        filterValueDependencies,
+      });
 
       if (recordIds.length === 0) return;
 
