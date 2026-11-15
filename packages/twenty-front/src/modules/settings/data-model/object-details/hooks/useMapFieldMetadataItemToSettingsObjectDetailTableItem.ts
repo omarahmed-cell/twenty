@@ -7,6 +7,10 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { type FieldType } from '@/settings/data-model/types/FieldType';
 import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFieldType';
 import { getFieldIdentifierType } from '@/settings/data-model/utils/getFieldIdentifierType';
+import {
+  getSettingsFieldDataTypeDisplay,
+  getSettingsFieldDataTypeText,
+} from '@/settings/data-model/utils/getSettingsFieldDataTypeDisplay';
 import { getSettingsFieldTypeConfig } from '@/settings/data-model/utils/getSettingsFieldTypeConfig';
 import { isFieldTypeSupportedInSettings } from '@/settings/data-model/utils/isFieldTypeSupportedInSettings';
 import { type SettingsObjectDetailTableItem } from '@/settings/data-model/types/SettingsObjectDetailTableItem';
@@ -48,7 +52,11 @@ export const useMapFieldMetadataItemToSettingsObjectDetailTableItem = (
       fieldMetadataType as SettingsFieldType,
     );
     const translatedFieldTypeLabel = isDefined(fieldTypeConfig)
-      ? i18n._(fieldTypeConfig.label)
+      ? getSettingsFieldDataTypeText(
+          getSettingsFieldDataTypeDisplay(fieldMetadataItem, (descriptor) =>
+            i18n._(descriptor),
+          ),
+        )
       : '';
 
     return {

@@ -1,4 +1,6 @@
 import { styled } from '@linaria/react';
+import { isNonEmptyString } from '@sniptt/guards';
+import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { type z } from 'zod';
 
@@ -49,6 +51,12 @@ const StyledInputsContainer = styled.div`
   width: 100%;
 `;
 
+const StyledLabelError = styled.div`
+  color: ${themeCssVariables.font.color.danger};
+  font-size: ${themeCssVariables.font.size.xs};
+  margin-bottom: ${themeCssVariables.spacing[1]};
+`;
+
 const StyledApiSettingsContainer = styled.div`
   padding-top: ${themeCssVariables.spacing[4]};
 `;
@@ -74,12 +82,19 @@ export const SettingsDataModelFieldIconLabelForm = ({
     control,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     trigger,
   } = useFormContext<SettingsDataModelFieldIconLabelFormValues>();
 
   const theme = useTheme();
   const label = watch('label');
+
+  // Other parts of the form validate on mount, which would flag the still-empty name.
+  const [hasEditedLabel, setHasEditedLabel] = useState(false);
+  const labelErrorMessage =
+    hasEditedLabel || isSubmitted
+      ? getErrorMessageFromError(errors.label?.message)
+      : '';
 
   const { t } = useLingui();
 
@@ -147,6 +162,7 @@ export const SettingsDataModelFieldIconLabelForm = ({
               disabled={!isLabelEditEnabled || readonly}
               onChange={(value) => {
                 onChange(value);
+                setHasEditedLabel(true);
                 trigger('label');
                 if (
                   isCreationMode ||
@@ -155,13 +171,19 @@ export const SettingsDataModelFieldIconLabelForm = ({
                   fillNameFromLabel(value);
                 }
               }}
-              error={getErrorMessageFromError(errors.label?.message)}
+              error={labelErrorMessage}
+              noErrorHelper
               maxLength={maxLength}
               fullWidth
             />
           )}
         />
       </StyledInputsContainer>
+      {isNonEmptyString(labelErrorMessage) && (
+        <StyledLabelError aria-live="polite">
+          {labelErrorMessage}
+        </StyledLabelError>
+      )}
       {canToggleSyncLabelWithName && (
         <StyledApiSettingsContainer>
           <Controller

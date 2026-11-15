@@ -1,10 +1,12 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { Select } from '@/ui/input/components/Select';
+import { SettingsDataModelFieldFormulaSelectValuesMenu } from '@/settings/data-model/fields/forms/formula/components/SettingsDataModelFieldFormulaSelectValuesMenu';
 import { type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
-import { FORMULA_FUNCTION_SIGNATURES } from 'twenty-shared/utils';
+import { useState } from 'react';
+import { FORMULA_FUNCTION_SIGNATURES, isDefined } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
@@ -60,7 +62,9 @@ export const SettingsDataModelFieldFormulaInsertMenus = ({
       return {
         label: signature,
         value: name,
-        contextualText: description ? i18n._(description) : undefined,
+        contextualText: isDefined(description)
+          ? i18n._(description)
+          : undefined,
       };
     },
   );
@@ -71,20 +75,31 @@ export const SettingsDataModelFieldFormulaInsertMenus = ({
     contextualText: name,
   }));
 
-  // Comparisons use the stored value and are case-sensitive, which a label would hide.
-  const optionValueOptions = referenceableFields
-    .filter(
-      ({ type }) =>
-        type === FieldMetadataType.SELECT ||
-        type === FieldMetadataType.MULTI_SELECT,
-    )
-    .flatMap(({ id, label: fieldLabel, options }) =>
-      (options ?? []).map(({ label, value }) => ({
-        label: `${fieldLabel}: ${label}`,
-        value: `${id}:${value}`,
-        contextualText: value,
-      })),
+  const selectFields = referenceableFields.filter(
+    ({ type }) =>
+      type === FieldMetadataType.SELECT ||
+      type === FieldMetadataType.MULTI_SELECT,
+  );
+
+  const [lastInsertedSelectFieldId, setLastInsertedSelectFieldId] = useState<
+    string | undefined
+  >();
+
+  const handleFieldInsert = (name: string) => {
+    if (name === '') {
+      return;
+    }
+
+    onInsert(name);
+
+    const insertedSelectField = selectFields.find(
+      (field) => field.name === name,
     );
+
+    if (isDefined(insertedSelectField)) {
+      setLastInsertedSelectFieldId(insertedSelectField.id);
+    }
+  };
 
   return (
     <StyledContainer>
@@ -106,19 +121,13 @@ export const SettingsDataModelFieldFormulaInsertMenus = ({
         value=""
         emptyOption={{ label: t`Fields`, value: '' }}
         options={fieldOptions}
-        onChange={(name) => name !== '' && onInsert(name)}
+        onChange={handleFieldInsert}
       />
-      <Select
-        dropdownId="field-formula-insert-option-value"
-        fullWidth
-        withSearchInput
+      <SettingsDataModelFieldFormulaSelectValuesMenu
+        selectFields={selectFields}
+        defaultFieldId={lastInsertedSelectFieldId}
+        onInsert={onInsert}
         disabled={disabled}
-        value=""
-        emptyOption={{ label: t`Select values`, value: '' }}
-        options={optionValueOptions}
-        onChange={(value) =>
-          value !== '' && onInsert(`"${value.split(':').slice(1).join(':')}"`)
-        }
       />
     </StyledContainer>
   );

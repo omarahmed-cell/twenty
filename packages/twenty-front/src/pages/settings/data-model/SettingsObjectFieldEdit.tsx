@@ -40,6 +40,8 @@ import {
 import { settingsFieldFormSchema } from '@/settings/data-model/fields/forms/validation-schemas/settingsFieldFormSchema';
 import { type SettingsDataModelFieldEditFormValues } from '@/settings/data-model/types/SettingsDataModelFieldEditFormValues';
 import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFieldType';
+import { SettingsObjectFieldDataType } from '@/settings/data-model/object-details/components/SettingsObjectFieldDataType';
+import { getSettingsFieldDataTypeDisplay } from '@/settings/data-model/utils/getSettingsFieldDataTypeDisplay';
 import { isUserFieldMetadataItem } from '@/settings/data-model/utils/isUserFieldMetadataItem';
 import { SettingsTranslationsCard } from '@/settings/translations/components/SettingsTranslationsCard';
 import { ConfirmationDialog } from '@/ui/layout/dialog/components/ConfirmationDialog';
@@ -65,7 +67,12 @@ import {
 } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
-import { IconArchive, IconArchiveOff, IconTrash } from 'twenty-ui/icon';
+import {
+  IconArchive,
+  IconArchiveOff,
+  IconTrash,
+  useIcons,
+} from 'twenty-ui/icon';
 import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
@@ -87,7 +94,8 @@ export const SettingsObjectFieldEdit = () => {
   const navigateSettings = useNavigateSettings();
   const navigateApp = useNavigateApp();
   const workspaceSurface = useWorkspaceSurface();
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
+  const { getIcon } = useIcons();
 
   const { openDialog, closeDialog } = useDialog();
   const { enqueueToast } = useToast();
@@ -463,12 +471,27 @@ export const SettingsObjectFieldEdit = () => {
     closeDialog(DELETE_FIELD_MODAL_ID);
   };
 
+  const dataTypeDisplay = getSettingsFieldDataTypeDisplay(
+    fieldMetadataItem,
+    (descriptor) => i18n._(descriptor),
+  );
+
   return (
     <>
       {/* oxlint-disable-next-line react/jsx-props-no-spreading */}
       <FormProvider {...formConfig}>
         <SettingsPageLayout
           title={fieldMetadataItem?.label}
+          tag={
+            isDefined(dataTypeDisplay.iconName) ? (
+              <SettingsObjectFieldDataType
+                Icon={getIcon(dataTypeDisplay.iconName)}
+                label={dataTypeDisplay.label}
+                labelDetail={dataTypeDisplay.labelDetail}
+                value={fieldMetadataItem.type as SettingsFieldType}
+              />
+            ) : undefined
+          }
           links={[
             {
               children: t`Workspace`,

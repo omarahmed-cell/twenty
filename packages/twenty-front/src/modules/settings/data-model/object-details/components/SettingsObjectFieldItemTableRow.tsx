@@ -10,6 +10,7 @@ import { SettingsNameCellSecondaryLabel } from '@/settings/components/SettingsNa
 import { RELATION_TYPES } from '@/settings/data-model/constants/RelationTypes';
 import { SettingsObjectFieldInactiveActionDropdown } from '@/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown';
 import { settingsObjectFieldsFamilyState } from '@/settings/data-model/object-details/states/settingsObjectFieldsFamilyState';
+import { getSettingsFieldDataTypeDisplay } from '@/settings/data-model/utils/getSettingsFieldDataTypeDisplay';
 import { isFieldTypeSupportedInSettings } from '@/settings/data-model/utils/isFieldTypeSupportedInSettings';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
@@ -44,7 +45,7 @@ type SettingsObjectFieldItemTableRowProps = {
 };
 
 export const OBJECT_FIELD_TABLE_ROW_GRID_TEMPLATE_COLUMNS =
-  'minmax(0, 1fr) 148px 148px 36px';
+  'minmax(0, 1fr) 148px 200px 36px';
 
 const StyledNameContainer = styled.div`
   align-items: center;
@@ -73,7 +74,7 @@ export const SettingsObjectFieldItemTableRow = ({
   isMostlyEmpty = false,
 }: SettingsObjectFieldItemTableRowProps) => {
   const theme = useTheme();
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { fieldMetadataItem, objectMetadataItem } =
     settingsObjectDetailTableItem;
 
@@ -167,6 +168,14 @@ export const SettingsObjectFieldItemTableRow = ({
       ? relationObjectMetadataItem?.labelSingular
       : relationObjectMetadataItem?.labelPlural;
 
+  const dataTypeDisplay = getSettingsFieldDataTypeDisplay(
+    fieldMetadataItem,
+    (descriptor) => i18n._(descriptor),
+  );
+  const DataTypeIcon = isDefined(dataTypeDisplay.iconName)
+    ? getIcon(dataTypeDisplay.iconName)
+    : RelationIcon;
+
   return (
     <TableRow
       gridTemplateColumns={OBJECT_FIELD_TABLE_ROW_GRID_TEMPLATE_COLUMNS}
@@ -218,11 +227,11 @@ export const SettingsObjectFieldItemTableRow = ({
       </TableCell>
       <TableCell>
         <SettingsObjectFieldDataType
-          Icon={RelationIcon}
-          label={label}
-          labelDetail={
-            fieldMetadataItem.settings?.type === 'percentage' ? '%' : undefined
+          Icon={DataTypeIcon}
+          label={
+            isDefined(dataTypeDisplay.iconName) ? dataTypeDisplay.label : label
           }
+          labelDetail={dataTypeDisplay.labelDetail}
           to={
             isRelatedObjectLinkable
               ? getSettingsPath(SettingsPath.Objects, {
