@@ -5,12 +5,20 @@ import { useCanAddSelectOption } from '@/object-record/record-field/ui/meta-type
 import { useFilteredSelectOptionsFromRLSPredicates } from '@/object-record/record-field/ui/meta-types/hooks/useFilteredSelectOptionsFromRLSPredicates';
 import { useSelectField } from '@/object-record/record-field/ui/meta-types/hooks/useSelectField';
 import { FieldInputDropdown } from '@/object-record/record-field/ui/meta-types/input/components/FieldInputDropdown';
+import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
+import { useDealStageOptions } from '@/pipeline/stage-picker/hooks/useDealStageOptions';
+import {
+  DEAL_PIPELINE_FIELD_NAME,
+  isDealStageField,
+} from '@/pipeline/stage-picker/utils/dealStageFields';
 import { SelectInput } from '@/ui/input/components/SelectInput';
+import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
+import { isString } from '@sniptt/guards';
 import { useContext } from 'react';
 import { type SelectOption } from 'twenty-ui/primitives/input';
 
 export const SelectFieldInput = () => {
-  const { fieldDefinition, fieldValue } = useSelectField();
+  const { recordId, fieldDefinition, fieldValue } = useSelectField();
   const { addSelectOption } = useAddSelectOption(
     fieldDefinition.fieldMetadataId,
   );
@@ -27,6 +35,26 @@ export const SelectFieldInput = () => {
         fieldDefinition.metadata.objectMetadataNameSingular,
       options: fieldDefinition.metadata.options,
     });
+
+  const isDealStage = isDealStageField({
+    objectNameSingular: fieldDefinition.metadata.objectMetadataNameSingular,
+    fieldName: fieldDefinition.metadata.fieldName,
+  });
+
+  const dealPipelineKey = useAtomFamilySelectorValue(
+    recordStoreFamilySelector,
+    { recordId, fieldName: DEAL_PIPELINE_FIELD_NAME },
+  );
+
+  const visibleSelectOptions = useDealStageOptions({
+    isDealStage,
+    options: selectOptions,
+    scope: {
+      type: 'pipeline',
+      pipelineKey: isString(dealPipelineKey) ? dealPipelineKey : null,
+      currentStageValue: isString(fieldValue) ? fieldValue : null,
+    },
+  });
 
   const clearField = useClearField();
 
@@ -47,7 +75,7 @@ export const SelectFieldInput = () => {
     <FieldInputDropdown value={fieldValue} onDismiss={handleCancel}>
       <SelectInput
         onOptionSelected={handleSubmit}
-        options={selectOptions}
+        options={visibleSelectOptions}
         value={fieldValue}
         onClear={
           fieldDefinition.metadata.isNullable && canSelectEmpty
@@ -55,7 +83,9 @@ export const SelectFieldInput = () => {
             : undefined
         }
         clearLabel={fieldDefinition.label}
-        onAddSelectOption={canAddSelectOption ? addSelectOption : undefined}
+        onAddSelectOption={
+          canAddSelectOption && !isDealStage ? addSelectOption : undefined
+        }
       />
     </FieldInputDropdown>
   );

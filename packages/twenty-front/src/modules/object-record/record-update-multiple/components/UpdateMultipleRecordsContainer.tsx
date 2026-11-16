@@ -109,6 +109,7 @@ export const UpdateMultipleRecordsContainer = ({
               values={fieldUpdates}
               onChange={handleFieldChange}
               objectNameSingular={objectNameSingular}
+              contextStoreInstanceId={contextStoreInstanceId}
             />
           </StyledContentContainer>
           <UpdateMultipleRecordsFooter

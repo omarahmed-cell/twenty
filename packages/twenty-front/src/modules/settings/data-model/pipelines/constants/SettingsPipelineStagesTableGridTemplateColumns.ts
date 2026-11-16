@@ -1,0 +1,2 @@
+export const SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS =
+  '24px 32px minmax(160px, 1fr) 130px 150px 80px 120px 36px';

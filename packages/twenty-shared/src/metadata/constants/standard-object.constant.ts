@@ -2,6 +2,7 @@ import { STANDARD_OBJECT_FIELDS } from '@/metadata/constants/standard-object-fie
 import { STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from '@/metadata/constants/standard-object-universal-identifiers.constant';
 import { buildStandardObjectIndexView } from '@/metadata/utils/internal/build-standard-object-index-view.util';
 import { buildStandardObjectRecordPageFieldsView } from '@/metadata/utils/internal/build-standard-object-record-page-fields-view.util';
+import { DEALS_BOARD_VIEW_GROUPS } from '@/metadata/constants/deals-board-view-groups.constant';
 
 // Never mutate an existing universal identifier, and delete one only rarely.
 // Group names passed to buildStandardObjectRecordPageFieldsView MUST match the server's standard view-field-group builders.
@@ -910,6 +911,43 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  pipeline: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipeline,
+    fields: STANDARD_OBJECT_FIELDS.pipeline,
+    indexes: {
+      keyUniqueIndex: {
+        universalIdentifier: '43b03cd2-9f1c-4ce6-ad8a-480cd4d9d423',
+      },
+    },
+    views: {
+      allPipelines: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipeline,
+        fields: STANDARD_OBJECT_FIELDS.pipeline,
+        viewFieldNames: ['name', 'description', 'key', 'objectNameSingular'],
+      }),
+    },
+  },
+  pipelineStage: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipelineStage,
+    fields: STANDARD_OBJECT_FIELDS.pipelineStage,
+    indexes: {
+      pipelineIdIndex: {
+        universalIdentifier: 'afd3f008-b8ae-4712-af07-ab0acb7a53a3',
+      },
+      valueUniqueIndex: {
+        universalIdentifier: '7960fb96-4532-49cf-92c1-b1f85b13f1a7',
+      },
+    },
+    views: {
+      allPipelineStages: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipelineStage,
+        fields: STANDARD_OBJECT_FIELDS.pipelineStage,
+        viewFieldNames: ['label', 'pipeline', 'value', 'probability'],
+      }),
+    },
+  },
   messageChannelMessageAssociation: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,
@@ -1299,23 +1337,7 @@ export const STANDARD_OBJECTS = {
             universalIdentifier: '20202020-af04-4a04-8a04-0aa0b2ca2bb4',
           },
         },
-        viewGroups: {
-          new: {
-            universalIdentifier: '20202020-af14-4a04-8a04-0aa0b2ca2bf1',
-          },
-          screening: {
-            universalIdentifier: '20202020-af14-4a04-8a04-0aa0b2ca2bf2',
-          },
-          meeting: {
-            universalIdentifier: '20202020-af14-4a04-8a04-0aa0b2ca2bf3',
-          },
-          proposal: {
-            universalIdentifier: '20202020-af14-4a04-8a04-0aa0b2ca2bf4',
-          },
-          customer: {
-            universalIdentifier: '20202020-af14-4a04-8a04-0aa0b2ca2bf5',
-          },
-        },
+        viewGroups: DEALS_BOARD_VIEW_GROUPS,
       },
       opportunityRecordPageFields: buildStandardObjectRecordPageFieldsView({
         objectUniversalIdentifier:
@@ -1341,6 +1363,14 @@ export const STANDARD_OBJECTS = {
           'callTargets',
           'communicationTargets',
           'emailTargets',
+          'pipeline',
+          'dealProbability',
+          'weightedAmount',
+          'isClosed',
+          'isClosedWon',
+          'isClosedLost',
+          'isOpen',
+          'actualDuration',
           'team',
           'dealCollaborators',
           'ownerAssignedDate',

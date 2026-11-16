@@ -12,8 +12,24 @@ import { recordIndexGroupFieldMetadataItemComponentState } from '@/object-record
 
 import { RecordIndexRemoveSortingModal } from '@/object-record/record-index/components/RecordIndexRemoveSortingModal';
 
+import { useHasPipelineObjects } from '@/pipeline/hooks/useHasPipelineObjects';
+import { PipelineBoardScopeEffect } from '@/pipeline/board/components/PipelineBoardScopeEffect';
+import { PipelineBoardSwitcher } from '@/pipeline/board/components/PipelineBoardSwitcher';
+import { isPipelineBoardEligible } from '@/pipeline/board/utils/isPipelineBoardEligible';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
+
+const StyledPipelineBoardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+const StyledPipelineBoardContent = styled.div`
+  flex: 1;
+  min-height: 0;
+`;
 
 type RecordBoardContainerProps = {
   recordBoardId: string;
@@ -53,9 +69,18 @@ export const RecordBoardContainer = ({
       ...args,
     });
 
+  const hasPipelineObjects = useHasPipelineObjects();
+
   if (!isDefined(recordIndexGroupFieldMetadataItem)) {
     return null;
   }
+
+  const isPipelineBoard =
+    hasPipelineObjects &&
+    isPipelineBoardEligible({
+      objectNameSingular,
+      groupFieldName: recordIndexGroupFieldMetadataItem.name,
+    });
 
   return (
     <RecordBoardContext.Provider
@@ -72,7 +97,17 @@ export const RecordBoardContainer = ({
       <RecordBoardComponentInstanceContext.Provider
         value={{ instanceId: recordBoardId }}
       >
-        <RecordBoard />
+        {isPipelineBoard ? (
+          <StyledPipelineBoardContainer>
+            <PipelineBoardScopeEffect />
+            <PipelineBoardSwitcher recordBoardId={recordBoardId} />
+            <StyledPipelineBoardContent>
+              <RecordBoard />
+            </StyledPipelineBoardContent>
+          </StyledPipelineBoardContainer>
+        ) : (
+          <RecordBoard />
+        )}
         <RecordIndexRemoveSortingModal />
         <RecordBoardHotkeyEffect />
         <RecordBoardBodyEscapeHotkeyEffect />

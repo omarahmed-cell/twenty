@@ -24,6 +24,8 @@ import { computeStandardMessageListViews } from 'src/engine/workspace-manager/tw
 import { computeStandardMessageListMemberViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-message-list-member-views.util';
 import { computeStandardOpportunityContactViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-opportunity-contact-views.util';
 import { computeStandardOpportunityCollaboratorViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-opportunity-collaborator-views.util';
+import { computeStandardPipelineViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-pipeline-views.util';
+import { computeStandardPipelineStageViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-pipeline-stage-views.util';
 import { computeStandardMessageParticipantViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-message-participant-views.util';
 import { computeStandardMessageThreadViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-message-thread-views.util';
 import { computeStandardMessageViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-message-views.util';
@@ -76,6 +78,8 @@ const STANDARD_FLAT_VIEW_METADATA_BUILDERS_BY_OBJECT_NAME = {
   messageListMember: computeStandardMessageListMemberViews,
   opportunityContact: computeStandardOpportunityContactViews,
   opportunityCollaborator: computeStandardOpportunityCollaboratorViews,
+  pipeline: computeStandardPipelineViews,
+  pipelineStage: computeStandardPipelineStageViews,
   messageParticipant: computeStandardMessageParticipantViews,
   messageThread: computeStandardMessageThreadViews,
   note: computeStandardNoteViews,

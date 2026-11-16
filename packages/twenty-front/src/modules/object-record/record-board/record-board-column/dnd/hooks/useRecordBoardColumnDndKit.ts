@@ -33,6 +33,7 @@ export type RecordBoardColumnDndKitContextValues = {
   activeDropTargetIndex: number | null;
 };
 
+import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
 export const useRecordBoardColumnDndKit = (): {
   contextValues: RecordBoardColumnDndKitContextValues;
   handlePendingReorderConfirmClick: () => void;
@@ -59,6 +60,8 @@ export const useRecordBoardColumnDndKit = (): {
     visibleRecordGroupIdsComponentFamilySelector,
     ViewType.KANBAN,
   );
+
+  const pipelineBoardScope = usePipelineBoardScope();
 
   const [, setRecordIndexRecordGroupSort] = useAtomComponentState(
     recordIndexRecordGroupSortComponentState,
@@ -102,7 +105,8 @@ export const useRecordBoardColumnDndKit = (): {
     setActiveDropTargetIndex(null);
     setDragSelectionStartEnabled(true);
 
-    if (event.canceled || !isDefined(source)) {
+    // A pipeline board shows stages in their Settings order, so columns are reordered there
+    if (event.canceled || !isDefined(source) || isDefined(pipelineBoardScope)) {
       return;
     }
 

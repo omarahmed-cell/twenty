@@ -3,7 +3,9 @@ import { isRecordBoardViewSettingsReadOnlyComponentState } from '@/object-record
 import { AddRecordGroupButton } from '@/object-record/record-group/components/AddRecordGroupButton';
 import { useRecordIndexContextOrThrow } from '@/object-record/record-index/contexts/RecordIndexContext';
 import { canAddRecordGroupForFieldMetadataItem } from '@/object-record/record-group/utils/canAddRecordGroupForFieldMetadataItem';
+import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
+import { isDefined } from 'twenty-shared/utils';
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -24,7 +26,10 @@ export const RecordBoardAddGroupColumn = () => {
     isRecordBoardViewSettingsReadOnlyComponentState,
   );
 
-  if (isRecordBoardViewSettingsReadOnly) {
+  // Stages of a pipeline board are added in Settings, where the pipeline config lives
+  const pipelineBoardScope = usePipelineBoardScope();
+
+  if (isRecordBoardViewSettingsReadOnly || isDefined(pipelineBoardScope)) {
     return null;
   }
 

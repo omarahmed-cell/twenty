@@ -258,6 +258,31 @@ export { getAppPath } from './navigation/getAppPath';
 export { getSettingsPath } from './navigation/getSettingsPath';
 export { getPageLayoutWidgetHeightBehavior } from './pageLayout/getPageLayoutWidgetHeightBehavior';
 export { parseJson } from './parseJson';
+export type {
+  PipelineSelectSourceStage,
+  PipelineSelectSource,
+  PipelineSelectOption,
+} from './pipeline/buildPipelineSelectOptions';
+export { buildPipelineSelectOptions } from './pipeline/buildPipelineSelectOptions';
+export type {
+  DealStageStatus,
+  PipelineStageListRule,
+  PipelineRules,
+} from './pipeline/pipeline-config';
+export {
+  DEFAULT_PIPELINE_RULES,
+  PIPELINE_STAGE_LABEL_SEPARATOR,
+  getDealStageStatus,
+  isClosedDealStageProbability,
+  normalizePipelineRules,
+  countEnabledPipelineRules,
+  countPipelineRulesForStage,
+  formatPipelineStageLabel,
+  PIPELINE_KEY_SUFFIX,
+  buildPipelineKey,
+  buildPipelineStageValue,
+  PIPELINE_COPY_SUFFIX,
+} from './pipeline/pipeline-config';
 export { removePropertiesFromRecord } from './removePropertiesFromRecord';
 export { removeUndefinedFields } from './removeUndefinedFields';
 export { safeParseRelativeDateFilterJsonStringified } from './safeParseRelativeDateFilterJsonStringified';

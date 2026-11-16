@@ -70,6 +70,18 @@ export class OpportunityCalculatedFieldsService {
       }
     };
 
+    const stageValues = [...(recordIdsByObjectName.get('pipelineStage') ?? [])];
+
+    if (stageValues.length > 0) {
+      addOpportunityIds(
+        await this.coreDataSource.query(
+          `SELECT "id" AS "opportunityId" FROM ${schema}."opportunity"
+          WHERE "stage"::text = ANY($1::text[]) AND "deletedAt" IS NULL`,
+          [stageValues],
+        ),
+      );
+    }
+
     const personIds = [...(recordIdsByObjectName.get('person') ?? [])];
 
     if (personIds.length > 0) {
@@ -176,7 +188,12 @@ export class OpportunityCalculatedFieldsService {
         OPPORTUNITY_CALCULATED_FIELD_NAMES.filter(
           (fieldName) =>
             !this.isSameValue(row.current[fieldName], computed[fieldName]),
-        ).map((fieldName) => [fieldName, computed[fieldName]]),
+        ).map((fieldName) => [
+          fieldName,
+          fieldName === 'weightedAmount' && !isDefined(computed[fieldName])
+            ? { amountMicros: null, currencyCode: null }
+            : computed[fieldName],
+        ]),
       );
 
       if (Object.keys(changes).length > 0) {
@@ -213,6 +230,35 @@ export class OpportunityCalculatedFieldsService {
 
   // Dates come back from Postgres in another ISO form, so they compare as instants
   private isSameValue(currentValue: unknown, computedValue: unknown) {
+    if (
+      isDefined(currentValue) &&
+      typeof currentValue === 'object' &&
+      'amountMicros' in currentValue
+    ) {
+      const current = currentValue as {
+        amountMicros: string | number | null;
+        currencyCode: string | null;
+      };
+      const computed = computedValue as {
+        amountMicros: number | null;
+        currencyCode: string | null;
+      } | null;
+
+      if (!isDefined(computed)) {
+        return !isDefined(current.amountMicros);
+      }
+
+      return (
+        isDefined(current.amountMicros) &&
+        Number(current.amountMicros) === computed.amountMicros &&
+        (current.currencyCode ?? null) === (computed.currencyCode ?? null)
+      );
+    }
+
+    if (typeof computedValue === 'number' && isDefined(currentValue)) {
+      return Number(currentValue) === computedValue;
+    }
+
     if (typeof computedValue === 'string') {
       return (
         isDefined(currentValue) &&
@@ -257,8 +303,25 @@ export class OpportunityCalculatedFieldsService {
           'lastActivityDate', opportunity."lastActivityDate",
           'nextActivityDate', opportunity."nextActivityDate",
           'numberOfAssociatedContacts', opportunity."numberOfAssociatedContacts",
-          'numberOfAssociatedLineItems', opportunity."numberOfAssociatedLineItems"
+          'numberOfAssociatedLineItems', opportunity."numberOfAssociatedLineItems",
+          'dealProbability', opportunity."dealProbability",
+          'weightedAmount', json_build_object(
+            'amountMicros', opportunity."weightedAmountAmountMicros",
+            'currencyCode', opportunity."weightedAmountCurrencyCode"
+          ),
+          'isClosed', opportunity."isClosed",
+          'isClosedWon', opportunity."isClosedWon",
+          'isClosedLost', opportunity."isClosedLost",
+          'isOpen', opportunity."isOpen",
+          'actualDuration', opportunity."actualDuration"
         ) AS "current",
+        (SELECT pipelineStage."probability" FROM ${schema}."pipelineStage" pipelineStage
+          WHERE pipelineStage."value" = opportunity."stage"::text AND pipelineStage."deletedAt" IS NULL
+          LIMIT 1) AS "stageProbability",
+        opportunity."amountAmountMicros" AS "amountMicros",
+        opportunity."amountCurrencyCode" AS "amountCurrencyCode",
+        opportunity."createdAt",
+        opportunity."closeDate",
         (SELECT pointOfContact."id" FROM ${schema}."person" pointOfContact
           WHERE pointOfContact."id" = opportunity."pointOfContactId" AND pointOfContact."deletedAt" IS NULL) AS "pointOfContactId",
         (SELECT json_agg(opportunityContact."personId") FROM ${schema}."opportunityContact" opportunityContact

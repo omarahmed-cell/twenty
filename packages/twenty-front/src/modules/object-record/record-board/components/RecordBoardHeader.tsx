@@ -2,6 +2,7 @@ import { RecordBoardContext } from '@/object-record/record-board/contexts/Record
 import { RecordBoardColumnDnd } from '@/object-record/record-board/record-board-column/components/RecordBoardColumnDnd';
 import { getRecordBoardHeaderHtmlId } from '@/object-record/record-board/utils/getRecordBoardHeaderHtmlId';
 import { RecordIndexGroupAggregatesDataLoader } from '@/object-record/record-index/components/RecordIndexGroupAggregatesDataLoader';
+import { PipelineBoardWeightedAmountDataLoader } from '@/pipeline/board/components/PipelineBoardWeightedAmountDataLoader';
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
 
@@ -27,6 +28,7 @@ export const RecordBoardHeader = () => {
     <StyledHeaderContainer id={getRecordBoardHeaderHtmlId(recordBoardId)}>
       <RecordBoardColumnDnd />
       <RecordIndexGroupAggregatesDataLoader />
+      <PipelineBoardWeightedAmountDataLoader />
     </StyledHeaderContainer>
   );
 };

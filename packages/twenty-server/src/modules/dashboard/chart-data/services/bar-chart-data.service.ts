@@ -21,6 +21,8 @@ import {
   ChartDataExceptionCode,
   generateChartDataExceptionMessage,
 } from 'src/modules/dashboard/chart-data/exceptions/chart-data.exception';
+import { PipelineConfigService } from 'src/modules/pipeline/services/pipeline-config.service';
+import { prefixDealStageOptionLabels } from 'src/modules/pipeline/utils/prefix-deal-stage-option-labels.util';
 import { ChartDataQueryService } from 'src/modules/dashboard/chart-data/services/chart-data-query.service';
 import { ChartRelationLabelService } from 'src/modules/dashboard/chart-data/services/chart-relation-label.service';
 import { filterOutEmptyChartBuckets } from 'src/modules/dashboard/chart-data/utils/filter-out-empty-chart-buckets.util';
@@ -41,6 +43,7 @@ type GetBarChartDataParams = {
 @Injectable()
 export class BarChartDataService {
   constructor(
+    private readonly pipelineConfigService: PipelineConfigService,
     private readonly workspaceManyOrAllFlatEntityMapsCacheService: WorkspaceManyOrAllFlatEntityMapsCacheService,
     private readonly chartDataQueryService: ChartDataQueryService,
     private readonly chartRelationLabelService: ChartRelationLabelService,
@@ -55,13 +58,23 @@ export class BarChartDataService {
     locale,
   }: GetBarChartDataParams): Promise<BarChartDataDTO> {
     try {
-      const { flatObjectMetadataMaps, flatFieldMetadataMaps } =
+      const {
+        flatObjectMetadataMaps,
+        flatFieldMetadataMaps: cachedFlatFieldMetadataMaps,
+      } =
         await this.workspaceManyOrAllFlatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
           {
             workspaceId,
             flatMapsKeys: ['flatObjectMetadataMaps', 'flatFieldMetadataMaps'],
           },
         );
+
+      const flatFieldMetadataMaps = prefixDealStageOptionLabels({
+        flatFieldMetadataMaps: cachedFlatFieldMetadataMaps,
+        pipelines: await this.pipelineConfigService.getPipelines({
+          workspaceId,
+        }),
+      });
 
       if (!isDefined(objectMetadataId)) {
         throw new ChartDataException(

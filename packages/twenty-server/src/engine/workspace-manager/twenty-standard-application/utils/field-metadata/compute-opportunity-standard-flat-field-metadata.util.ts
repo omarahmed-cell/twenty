@@ -1,6 +1,8 @@
 import { msg } from '@lingui/core/macro';
 import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-application/utils/i18n-label.util';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
+import { buildPipelineSelectOptions } from 'twenty-shared/utils';
+import { PIPELINE_SEED } from 'twenty-shared/constants';
 import {
   DateDisplayFormat,
   FieldMetadataType,
@@ -18,6 +20,22 @@ import {
   createStandardFieldFlatMetadata,
 } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-field-flat-metadata.util';
 import { createStandardRelationFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-relation-field-flat-metadata.util';
+const SEEDED_PIPELINE_SELECT_OPTIONS = buildPipelineSelectOptions({
+  pipelines: PIPELINE_SEED.map((pipeline) => ({
+    key: pipeline.key,
+    name: pipeline.name,
+    stages: pipeline.stages.map(({ value, label }) => ({
+      value,
+      label,
+      color: null,
+    })),
+  })),
+  pipelineFieldUniversalIdentifier:
+    STANDARD_OBJECTS.opportunity.fields.pipeline.universalIdentifier,
+  stageFieldUniversalIdentifier:
+    STANDARD_OBJECTS.opportunity.fields.stage.universalIdentifier,
+});
+
 export const buildOpportunityStandardFlatFieldMetadatas = ({
   now,
   objectName,
@@ -210,7 +228,7 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
       fieldName: 'stage',
       type: FieldMetadataType.SELECT,
       label: i18nLabel(
-        msg({ message: `Stage`, context: 'fieldMetadata.label' }),
+        msg({ message: `Deal Stage`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({
@@ -220,54 +238,8 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
       ),
       icon: 'IconProgressCheck',
       isNullable: false,
-      defaultValue: "'NEW'",
-      options: [
-        {
-          id: '20202020-8e01-4afd-9c39-d2063097587a',
-          value: 'NEW',
-          label: i18nLabel(
-            msg({ message: `New`, context: 'fieldMetadata.label' }),
-          ),
-          position: 0,
-          color: 'red',
-        },
-        {
-          id: '20202020-e685-4671-ac32-26d304dacb6e',
-          value: 'SCREENING',
-          label: i18nLabel(
-            msg({ message: `Screening`, context: 'fieldMetadata.label' }),
-          ),
-          position: 1,
-          color: 'purple',
-        },
-        {
-          id: '20202020-dde9-4acc-b5ca-f6531a8ecb4a',
-          value: 'MEETING',
-          label: i18nLabel(
-            msg({ message: `Meeting`, context: 'fieldMetadata.label' }),
-          ),
-          position: 2,
-          color: 'sky',
-        },
-        {
-          id: '20202020-696e-4f6b-91bc-f413e9b2f654',
-          value: 'PROPOSAL',
-          label: i18nLabel(
-            msg({ message: `Proposal`, context: 'fieldMetadata.label' }),
-          ),
-          position: 3,
-          color: 'turquoise',
-        },
-        {
-          id: '20202020-0bb5-4a6f-a8b2-774bbad21104',
-          value: 'CUSTOMER',
-          label: i18nLabel(
-            msg({ message: `Customer`, context: 'fieldMetadata.label' }),
-          ),
-          position: 4,
-          color: 'yellow',
-        },
-      ],
+      defaultValue: `'${SEEDED_PIPELINE_SELECT_OPTIONS.defaultStageValue}'`,
+      options: SEEDED_PIPELINE_SELECT_OPTIONS.stageOptions,
     },
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,
@@ -1213,6 +1185,249 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
         ),
         icon: 'IconCalendarDue',
         isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  pipeline: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'pipeline',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Pipeline`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The pipeline the deal moves through`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconTimelineEvent',
+      isNullable: false,
+      defaultValue: `'${SEEDED_PIPELINE_SELECT_OPTIONS.defaultPipelineValue}'`,
+      options: SEEDED_PIPELINE_SELECT_OPTIONS.pipelineOptions,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  dealProbability: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dealProbability',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Deal probability`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `The probability of the deal stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconPercentage',
+        isUIEditable: false,
+        settings: {
+          dataType: NumberDataType.FLOAT,
+          type: 'percentage',
+          decimals: 0,
+        },
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  weightedAmount: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'weightedAmount',
+        type: FieldMetadataType.CURRENCY,
+        label: i18nLabel(
+          msg({
+            message: `Weighted amount`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Amount times the stage probability, in the currency of Amount`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCoins',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isClosed: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isClosed',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({
+            message: `Is Deal Closed?`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whether the deal stage is won or lost`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCircleCheck',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isClosedWon: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isClosedWon',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({
+            message: `Is Closed Won`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whether the deal stage has a probability of 100`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconTrophy',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isClosedLost: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isClosedLost',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({
+            message: `Is closed lost`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whether the deal stage has a probability of 0`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCircleX',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isOpen: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isOpen',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({
+            message: `Is Open`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whether the deal stage is neither won nor lost`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCircleDot',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  actualDuration: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'actualDuration',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Actual duration`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whole days from creation to Close Date, once the deal is closed`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconHourglass',
+        isUIEditable: false,
+        settings: {
+          dataType: NumberDataType.INT,
+        },
         isNullable: true,
       },
       standardObjectMetadataRelatedEntityIds,

@@ -10,6 +10,9 @@ import { getRelationConnectSubFieldKey } from '@/object-record/spreadsheet-impor
 import { getCompositeSubFieldKey } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetCompositeSubFieldKey';
 import { getCompositeSubFieldLabelWithFieldLabel } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetCompositeSubFieldLabelWithFieldLabel';
 import { getRelationConnectSubFieldLabel } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetRelationConnectSubFieldLabel';
+import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
+import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
+import { getStageOptionsWithPipelineLabels } from '@/pipeline/stage-picker/utils/getStageOptionsForPipeline';
 import { SETTINGS_COMPOSITE_FIELD_TYPE_CONFIGS } from '@/settings/data-model/constants/SettingsCompositeFieldTypeConfigs';
 import { type CompositeFieldType } from '@/settings/data-model/types/CompositeFieldType';
 import {
@@ -38,6 +41,7 @@ const getSourceLocaleAlternateMatches = ({
 export const useBuildSpreadsheetImportFields = () => {
   const { getIcon } = useIcons();
   const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
+  const pipelines = useDealStagePipelineConfigs({ enabled: true });
 
   const buildSpreadsheetImportFields = (
     fieldMetadataItems: FieldMetadataItem[],
@@ -253,7 +257,13 @@ export const useBuildSpreadsheetImportFields = () => {
       fieldType: {
         type: isMulti ? 'multiSelect' : 'select',
         options:
-          fieldMetadataItem.options?.map((option) => ({
+          (isDealStageFieldMetadataItem(fieldMetadataItem)
+            ? getStageOptionsWithPipelineLabels({
+                options: fieldMetadataItem.options ?? [],
+                pipelines,
+              })
+            : fieldMetadataItem.options
+          )?.map((option) => ({
             label: option.label,
             value: option.value,
             color: option.color,

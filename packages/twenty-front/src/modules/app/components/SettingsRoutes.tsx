@@ -18,6 +18,7 @@ import { SETTINGS_AI_TABS } from '@/settings/ai/constants/SettingsAiTabs';
 import { SettingsProtectedRouteWrapper } from '@/settings/components/SettingsProtectedRouteWrapper';
 import { SettingsSkeletonLoader } from '@/settings/components/SettingsSkeletonLoader';
 import { SettingPublicDomain } from '@/settings/domains/components/SettingPublicDomain';
+import { SETTINGS_PIPELINE_PATHS } from '@/settings/data-model/pipelines/constants/SettingsPipelinePaths';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { PermissionFlagType } from '~/generated-metadata/graphql';
@@ -568,6 +569,22 @@ const SettingsObjectSearch = lazy(() =>
   })),
 );
 
+const SettingsObjectPipelineDetail = lazy(() =>
+  import('~/pages/settings/data-model/SettingsObjectPipelineDetail').then(
+    (module) => ({
+      default: module.SettingsObjectPipelineDetail,
+    }),
+  ),
+);
+
+const SettingsObjectNewPipeline = lazy(() =>
+  import('~/pages/settings/data-model/SettingsObjectNewPipeline').then(
+    (module) => ({
+      default: module.SettingsObjectNewPipeline,
+    }),
+  ),
+);
+
 const SettingsObjectIndexes = lazy(() =>
   import('~/pages/settings/data-model/SettingsObjectIndexes').then(
     (module) => ({
@@ -1015,6 +1032,16 @@ const createSettingsRouteElements = ({
       <Route
         path={SettingsPath.ObjectFieldTranslations}
         element={<SettingsObjectTranslations />}
+        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
+        path={SETTINGS_PIPELINE_PATHS.NEW}
+        element={<SettingsObjectNewPipeline />}
+        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
+        path={SETTINGS_PIPELINE_PATHS.DETAIL}
+        element={<SettingsObjectPipelineDetail />}
         handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
       />
     </Route>

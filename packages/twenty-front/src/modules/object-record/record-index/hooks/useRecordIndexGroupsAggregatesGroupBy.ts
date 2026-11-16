@@ -19,6 +19,9 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useQuery } from '@apollo/client/react';
 import { useMemo } from 'react';
+import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
+import { buildPipelineBoardRecordFilter } from '@/pipeline/board/utils/buildPipelineBoardRecordFilter';
+import { orderRecordGroupsForPipelineBoardScope } from '@/pipeline/board/utils/orderRecordGroupsForPipelineBoardScope';
 import { type Nullable } from 'twenty-shared/types';
 import {
   combineFilters,
@@ -106,11 +109,19 @@ export const useRecordIndexGroupsAggregatesGroupBy = ({
     recordGroupDefinitionsComponentSelector,
   );
 
+  const pipelineBoardScope = usePipelineBoardScope();
+
   const recordGroupOptionsFilter = computeRecordGroupOptionsFilter({
     recordGroupFieldMetadata: groupByFieldMetadataItem,
-    recordGroupValues: recordGroupDefinitions
-      .filter((recordGroupDefinition) => recordGroupDefinition.isVisible)
-      .map((recordGroupDefinition) => recordGroupDefinition.value),
+    recordGroupValues: (isDefined(pipelineBoardScope)
+      ? orderRecordGroupsForPipelineBoardScope({
+          recordGroups: recordGroupDefinitions,
+          scope: pipelineBoardScope,
+        })
+      : recordGroupDefinitions.filter(
+          (recordGroupDefinition) => recordGroupDefinition.isVisible,
+        )
+    ).map((recordGroupDefinition) => recordGroupDefinition.value),
   });
 
   const { data, loading, error } = useQuery(groupByAggregateQuery, {
@@ -124,6 +135,7 @@ export const useRecordIndexGroupsAggregatesGroupBy = ({
         anyFieldFilter,
         requestFilters,
         recordGroupOptionsFilter,
+        buildPipelineBoardRecordFilter(pipelineBoardScope),
       ]),
       groupBy: {
         ...groupByGqlInput,

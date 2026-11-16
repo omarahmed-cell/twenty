@@ -13,6 +13,8 @@ export {
   checkIfFieldIsLabelIdentifier,
 } from './check-if-field-is-label-identifier.util';
 export { ALL_METADATA_NAME } from './constants/all-metadata-name.constant';
+export { DEALS_BOARD_VIEW_GROUPS } from './constants/deals-board-view-groups.constant';
+export { DEALS_BOARD_VIEW_UNIVERSAL_IDENTIFIER } from './constants/deals-board-view-universal-identifier.constant';
 export { DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS } from './constants/default-relations-object-standard-ids.constant';
 export { IDENTIFIER_MAX_CHAR_LENGTH } from './constants/identifier-max-char-length.constant';
 export { RESERVED_METADATA_NAME_KEYWORDS } from './constants/reserved-metadata-name-keywords.constant';

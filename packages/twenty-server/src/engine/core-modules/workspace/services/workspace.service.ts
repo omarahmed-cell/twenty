@@ -106,6 +106,7 @@ import { PrefillLogicFunctionService } from 'src/engine/workspace-manager/standa
 import { prefillCompanies } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-companies.util';
 import { prefillDashboards } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-dashboards.util';
 import { prefillOpportunities } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-opportunities.util';
+import { prefillPipelines } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-pipelines.util';
 import { prefillPeople } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-people.util';
 import { getCreateCompanyWhenAddingNewPersonCodeStepLogicFunctionDefinitions } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-workflow-code-step-logic-functions.util';
 import { prefillWorkflowCommandMenuItems } from 'src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-workflow-command-menu-items.util';
@@ -1210,6 +1211,8 @@ export class WorkspaceService {
         flatObjectMetadataMaps,
         flatFieldMetadataMaps,
       );
+
+      await prefillPipelines(queryRunner.manager, schemaName);
 
       await prefillOpportunities(queryRunner.manager, schemaName);
 

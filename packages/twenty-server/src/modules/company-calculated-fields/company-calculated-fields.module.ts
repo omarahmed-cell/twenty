@@ -34,6 +34,7 @@ import { CompanyCalculationQueueService } from 'src/modules/company-calculated-f
     RecomputeCompanyCalculatedFieldsCommand,
   ],
   exports: [
+    CompanyCalculationQueueService,
     CompanyCalculatedFieldsNightlyCronCommand,
     CompanyPastMeetingsCronCommand,
     RecomputeCompanyCalculatedFieldsCommand,

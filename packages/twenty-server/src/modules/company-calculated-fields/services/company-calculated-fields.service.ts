@@ -13,7 +13,6 @@ import {
   type CompanyCalculatedFieldValues,
 } from 'src/modules/company-calculated-fields/constants/company-calculated-field-names.constant';
 import { buildNextActivityCandidateSelects } from 'src/modules/company-calculated-fields/constants/next-activity-date-sources.constant';
-import { getClosedTwentyDealStageValues } from 'src/modules/company-calculated-fields/utils/is-open-deal-stage.util';
 import {
   type ActivityDateCandidate,
   pickLatestActivityDate,
@@ -79,6 +78,18 @@ export class CompanyCalculatedFieldsService {
         }
       }
     };
+
+    const stageValues = [...(recordIdsByObjectName.get('pipelineStage') ?? [])];
+
+    if (stageValues.length > 0) {
+      addCompanyIds(
+        await this.coreDataSource.query(
+          `SELECT DISTINCT "companyId" FROM ${schema}."opportunity"
+          WHERE "stage"::text = ANY($1::text[]) AND "deletedAt" IS NULL`,
+          [stageValues],
+        ),
+      );
+    }
 
     for (const objectName of ['person', 'opportunity']) {
       const recordIds = [...(recordIdsByObjectName.get(objectName) ?? [])];
@@ -173,7 +184,7 @@ export class CompanyCalculatedFieldsService {
 
     const rows: CompanyCalculationRow[] = await this.coreDataSource.query(
       this.buildRecomputeQuery(getWorkspaceSchemaName(workspaceId)),
-      [companyIds, getClosedTwentyDealStageValues()],
+      [companyIds],
     );
 
     const now = new Date();
@@ -332,7 +343,12 @@ export class CompanyCalculatedFieldsService {
           WHERE companyOpportunity."companyId" = company."id")::int AS "numberOfAssociatedDeals",
         (SELECT count(*) FROM "companyOpportunities" companyOpportunity
           WHERE companyOpportunity."companyId" = company."id"
-            AND (companyOpportunity."stage" IS NULL OR NOT (companyOpportunity."stage" = ANY($2::text[]))))::int AS "numberOfOpenDeals",
+            AND NOT EXISTS (
+              SELECT 1 FROM ${schema}."pipelineStage" closedStage
+              WHERE closedStage."value" = companyOpportunity."stage"
+                AND closedStage."deletedAt" IS NULL
+                AND closedStage."probability" IN (0, 100)
+            ))::int AS "numberOfOpenDeals",
         (SELECT json_agg(json_build_object('activityType', activityDate."activityType", 'date', activityDate."activityDate"))
           FROM "activityDates" activityDate WHERE activityDate."companyId" = company."id") AS "activityDates",
         (SELECT json_agg(json_build_object('activityType', candidate."activityType", 'date', candidate."date", 'status', candidate."status"))

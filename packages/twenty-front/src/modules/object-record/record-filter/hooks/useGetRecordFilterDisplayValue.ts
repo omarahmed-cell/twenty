@@ -12,6 +12,9 @@ import { isFilterOnActorSourceSubField } from '@/object-record/object-filter-dro
 import { type RecordFilter } from '@/object-record/record-filter/types/RecordFilter';
 import { RecordFilterOperand } from '@/object-record/record-filter/types/RecordFilterOperand';
 import { isRecordFilterConsideredEmpty } from '@/object-record/record-filter/utils/isRecordFilterConsideredEmpty';
+import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
+import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
+import { getStageOptionsWithPipelineLabels } from '@/pipeline/stage-picker/utils/getStageOptionsForPipeline';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { getTimezoneAbbreviationForZonedDateTime } from '@/ui/input/components/internal/date/utils/getTimeZoneAbbreviationForZonedDateTime';
 import { useCurrencies } from '@/ui/input/components/internal/hooks/useCurrencies';
@@ -38,6 +41,8 @@ export const useGetRecordFilterDisplayValue = () => {
     useGetFieldMetadataItemByIdOrThrow();
 
   const currencies = useCurrencies();
+
+  const pipelines = useDealStagePipelineConfigs({ enabled: true });
 
   const getRecordFilterDisplayValue = (
     recordFilter?: Nullable<RecordFilter>,
@@ -176,7 +181,14 @@ export const useGetRecordFilterDisplayValue = () => {
           recordFilter.fieldMetadataId,
       );
 
-      const fieldMetadataItemOptions = fieldMetadataItem.options;
+      const fieldMetadataItemOptions = isDealStageFieldMetadataItem(
+        fieldMetadataItem,
+      )
+        ? getStageOptionsWithPipelineLabels({
+            options: fieldMetadataItem.options ?? [],
+            pipelines,
+          })
+        : fieldMetadataItem.options;
 
       const optionLabels = valueArray.map(
         (value) =>

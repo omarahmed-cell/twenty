@@ -20,6 +20,9 @@ import { LockMessageChannelContactAutoCreationCommand } from 'src/database/comma
 import { ProvisionCompanyCalculatedFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794600000000-provision-company-calculated-fields.command';
 import { ProvisionPersonFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794757116582-provision-person-fields.command';
 import { ProvisionDealFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794778290530-provision-deal-fields.command';
+import { ProvisionPipelinesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794785676065-provision-pipelines.command';
+import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
+import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { WorkspaceSchemaManagerModule } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.module';
@@ -29,6 +32,8 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
 @Module({
   imports: [
     ApplicationModule,
+    FieldMetadataModule,
+    PipelineModule,
     WorkspaceCacheModule,
     WorkspaceIteratorModule,
     WorkspaceMigrationModule,
@@ -55,6 +60,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionCompanyCalculatedFieldsCommand,
     ProvisionPersonFieldsCommand,
     ProvisionDealFieldsCommand,
+    ProvisionPipelinesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

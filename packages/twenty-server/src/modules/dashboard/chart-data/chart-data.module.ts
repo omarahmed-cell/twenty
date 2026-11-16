@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { CoreCommonApiModule } from 'src/engine/api/common/core-common-api.module';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
+import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { BarChartDataResolver } from 'src/modules/dashboard/chart-data/resolvers/bar-chart-data.resolver';
 import { LineChartDataResolver } from 'src/modules/dashboard/chart-data/resolvers/line-chart-data.resolver';
 import { PieChartDataResolver } from 'src/modules/dashboard/chart-data/resolvers/pie-chart-data.resolver';
@@ -12,7 +13,11 @@ import { LineChartDataService } from 'src/modules/dashboard/chart-data/services/
 import { PieChartDataService } from 'src/modules/dashboard/chart-data/services/pie-chart-data.service';
 
 @Module({
-  imports: [CoreCommonApiModule, WorkspaceManyOrAllFlatEntityMapsCacheModule],
+  imports: [
+    CoreCommonApiModule,
+    WorkspaceManyOrAllFlatEntityMapsCacheModule,
+    PipelineModule,
+  ],
   providers: [
     ChartDataQueryService,
     ChartRelationLabelService,

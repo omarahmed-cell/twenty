@@ -7,6 +7,8 @@ import { getFieldMetadataItemGqlFieldName } from '@/object-metadata/utils/getFie
 import { useCreateNewIndexRecord } from '@/object-record/record-table/hooks/useCreateNewIndexRecord';
 import { RecordTableWidgetContext } from '@/object-record/record-table-widget/contexts/RecordTableWidgetContext';
 import { canCreateRecordsForObjectMetadataItem } from '@/object-record/utils/canCreateRecordsForObjectMetadataItem';
+import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
+import { getPipelineBoardCreateRecordDefaults } from '@/pipeline/board/utils/getPipelineBoardCreateRecordDefaults';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { styled } from '@linaria/react';
@@ -56,6 +58,8 @@ export const RecordBoardColumnNewRecordButton = () => {
     objectMetadataItem: objectMetadataItem,
   });
 
+  const pipelineBoardScope = usePipelineBoardScope();
+
   // Creating through a nested relation or junction needs a record picker only the table layout offers.
   const recordTableWidgetContext = useContext(RecordTableWidgetContext);
 
@@ -87,6 +91,7 @@ export const RecordBoardColumnNewRecordButton = () => {
     <StyledNewButton
       onClick={async () => {
         await createNewIndexRecord({
+          ...getPipelineBoardCreateRecordDefaults(pipelineBoardScope),
           position: 'last',
           [getFieldMetadataItemGqlFieldName(selectFieldMetadataItem)]:
             columnDefinition.value,

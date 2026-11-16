@@ -1477,6 +1477,45 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: '8ac45b39-8324-4f14-a63e-685a87327f99',
     },
   },
+  pipeline: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipeline,
+    ),
+    name: { universalIdentifier: '0c2824e7-0005-460d-9fb7-4a46743701fa' },
+    description: {
+      universalIdentifier: '03b506a7-2cac-4a4e-9190-7f165f6e0899',
+    },
+    key: { universalIdentifier: 'fec61ea7-0ce3-4aa1-816a-ec3a67c9f25c' },
+    objectNameSingular: {
+      universalIdentifier: 'cd14386d-ffbc-4147-82cb-868e20a927b2',
+    },
+    hubspotPipelineId: {
+      universalIdentifier: 'ffd1814f-603e-4054-92db-6df24f08c570',
+    },
+    rules: { universalIdentifier: 'd3b66e48-cec9-4a7a-8246-84eb14e5cc37' },
+    stages: { universalIdentifier: '2978657b-987a-44de-84a0-11e563024eb9' },
+  },
+  pipelineStage: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipelineStage,
+    ),
+    pipeline: { universalIdentifier: '98c201a6-fa6e-4a65-b984-b1d45460595c' },
+    label: { universalIdentifier: 'c90676f2-c1ff-4783-8276-29db4450195e' },
+    value: { universalIdentifier: 'e9176c93-79ae-4f08-a9db-259c05f8e914' },
+    color: { universalIdentifier: '0ede98de-afb8-4284-aca4-6c8569abee4f' },
+    probability: {
+      universalIdentifier: '53605fa2-2620-43da-aa97-f636a85094ac',
+    },
+    hubspotStageId: {
+      universalIdentifier: 'da8424bb-7ef6-447f-acde-435541f3358c',
+    },
+    calcPropsEnabled: {
+      universalIdentifier: 'd9476e6e-8296-41ee-ab67-bd4778f9a828',
+    },
+    conditionalRules: {
+      universalIdentifier: '190eee8a-1faf-4e0e-97ec-ab225e2f216f',
+    },
+  },
   messageChannelMessageAssociation: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,
@@ -1863,6 +1902,24 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     nextActivityDate: {
       universalIdentifier: 'a75ed1eb-355b-487b-ba44-c33e941b4c48',
+    },
+    pipeline: { universalIdentifier: '7e8b2b5e-f188-4828-9424-35369e5d5391' },
+    dealProbability: {
+      universalIdentifier: 'f732cb51-e094-45a7-bc86-82543e273f8f',
+    },
+    weightedAmount: {
+      universalIdentifier: '1f5a289c-d48c-4189-bd1b-f2c698bbaaf3',
+    },
+    isClosed: { universalIdentifier: '6547baa3-9b49-4c55-9064-3e56a6958ec4' },
+    isClosedWon: {
+      universalIdentifier: 'dfa8d1ee-f93c-46af-b5b0-b7564d40cd68',
+    },
+    isClosedLost: {
+      universalIdentifier: '5ec4bf17-45df-46e3-a18f-64d0b2235a1f',
+    },
+    isOpen: { universalIdentifier: '6c0bb04e-bb31-46a0-833d-da7ffcdbdde7' },
+    actualDuration: {
+      universalIdentifier: 'e6fa4b0f-5b2c-4ef7-8b1e-ec306df9aba4',
     },
   },
   person: {

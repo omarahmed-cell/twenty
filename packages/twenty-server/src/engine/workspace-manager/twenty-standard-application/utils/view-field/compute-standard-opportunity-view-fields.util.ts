@@ -514,5 +514,115 @@ export const computeStandardOpportunityViewFields = (
           viewFieldGroupName: 'deal',
         },
       }),
+    opportunityRecordPageFieldsPipeline: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'opportunity',
+      context: {
+        viewName: 'opportunityRecordPageFields',
+        viewFieldName: 'pipeline',
+        fieldName: 'pipeline',
+        position: 0.5,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'deal',
+      },
+    }),
+    opportunityRecordPageFieldsDealProbability:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'dealProbability',
+          fieldName: 'dealProbability',
+          position: 1.25,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
+    opportunityRecordPageFieldsWeightedAmount:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'weightedAmount',
+          fieldName: 'weightedAmount',
+          position: 0.25,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
+    opportunityRecordPageFieldsIsClosed: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'opportunity',
+      context: {
+        viewName: 'opportunityRecordPageFields',
+        viewFieldName: 'isClosed',
+        fieldName: 'isClosed',
+        position: 16,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'deal',
+      },
+    }),
+    opportunityRecordPageFieldsIsClosedWon: createStandardViewFieldFlatMetadata(
+      {
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'isClosedWon',
+          fieldName: 'isClosedWon',
+          position: 17,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      },
+    ),
+    opportunityRecordPageFieldsIsClosedLost:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'isClosedLost',
+          fieldName: 'isClosedLost',
+          position: 18,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
+    opportunityRecordPageFieldsIsOpen: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'opportunity',
+      context: {
+        viewName: 'opportunityRecordPageFields',
+        viewFieldName: 'isOpen',
+        fieldName: 'isOpen',
+        position: 19,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'deal',
+      },
+    }),
+    opportunityRecordPageFieldsActualDuration:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'opportunity',
+        context: {
+          viewName: 'opportunityRecordPageFields',
+          viewFieldName: 'actualDuration',
+          fieldName: 'actualDuration',
+          position: 20,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'deal',
+        },
+      }),
   };
 };

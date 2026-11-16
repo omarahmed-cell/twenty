@@ -14,9 +14,13 @@ import { currentRecordSortsComponentState } from '@/object-record/record-sort/st
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
+import { buildPipelineBoardRecordFilter } from '@/pipeline/board/utils/buildPipelineBoardRecordFilter';
+import { orderRecordGroupsForPipelineBoardScope } from '@/pipeline/board/utils/orderRecordGroupsForPipelineBoardScope';
 import {
   combineFilters,
   computeRecordGqlOperationFilter,
+  isDefined,
   turnAnyFieldFilterIntoRecordGqlFilter,
 } from 'twenty-shared/utils';
 
@@ -78,9 +82,16 @@ export const useRecordIndexGroupCommonQueryVariables = () => {
     recordGroupDefinitionsComponentSelector,
   );
 
-  const visibleRecordGroupDefinitions = recordGroupDefinitions.filter(
-    (recordGroupDefinition) => recordGroupDefinition.isVisible,
-  );
+  const pipelineBoardScope = usePipelineBoardScope();
+
+  const visibleRecordGroupDefinitions = isDefined(pipelineBoardScope)
+    ? orderRecordGroupsForPipelineBoardScope({
+        recordGroups: recordGroupDefinitions,
+        scope: pipelineBoardScope,
+      })
+    : recordGroupDefinitions.filter(
+        (recordGroupDefinition) => recordGroupDefinition.isVisible,
+      );
 
   const recordGroupValues = visibleRecordGroupDefinitions.map(
     (recordGroupDefinition) => recordGroupDefinition.value,
@@ -95,6 +106,7 @@ export const useRecordIndexGroupCommonQueryVariables = () => {
     anyFieldFilter,
     requestFilters,
     recordGroupOptionsFilter,
+    buildPipelineBoardRecordFilter(pipelineBoardScope),
   ]);
 
   const recordGroupsLimit = visibleRecordGroupDefinitions.length;

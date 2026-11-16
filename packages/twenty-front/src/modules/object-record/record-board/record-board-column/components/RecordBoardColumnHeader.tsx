@@ -36,6 +36,10 @@ import { LightIconButton } from 'twenty-ui/components/input';
 import { Dropdown } from 'twenty-ui/components/navigation';
 import { IconDotsVertical, IconPlus } from 'twenty-ui/icon';
 
+import { PipelineBoardColumnWeightedAmount } from '@/pipeline/board/components/PipelineBoardColumnWeightedAmount';
+import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
+import { getPipelineBoardCreateRecordDefaults } from '@/pipeline/board/utils/getPipelineBoardCreateRecordDefaults';
+
 const StyledHeader = styled.div<{ isReadOnly: boolean }>`
   align-items: center;
   cursor: ${({ isReadOnly }) => (isReadOnly ? 'default' : 'pointer')};
@@ -201,8 +205,11 @@ export const RecordBoardColumnHeader = () => {
     dropdownId,
   );
 
+  const pipelineBoardScope = usePipelineBoardScope();
+
   const handleCreateNewRecordClick = async () => {
     await createNewIndexRecord({
+      ...getPipelineBoardCreateRecordDefaults(pipelineBoardScope),
       position: 'first',
       [getFieldMetadataItemGqlFieldName(selectFieldMetadataItem)]:
         columnDefinition.value,
@@ -213,7 +220,9 @@ export const RecordBoardColumnHeader = () => {
     <StyledColumn data-has-left-border={columnIndex > 0 ? 'true' : undefined}>
       <DragDropItemSortableHandle
         fill
-        disabled={isRecordBoardViewSettingsReadOnly}
+        disabled={
+          isRecordBoardViewSettingsReadOnly || isDefined(pipelineBoardScope)
+        }
       >
         <StyledHeader
           isReadOnly={isRecordBoardViewSettingsReadOnly}
@@ -265,6 +274,9 @@ export const RecordBoardColumnHeader = () => {
                   aggregateLabel={recordIndexAggregateDisplayLabel}
                 />
               </StyledAggregateDropdownContainer>
+              <PipelineBoardColumnWeightedAmount
+                stageValue={columnDefinition.value}
+              />
             </StyledLeftContainer>
             {!isRecordBoardViewSettingsReadOnly && (
               <StyledHeaderActions

@@ -116,11 +116,11 @@ const IPAD_DEAL_HANDOVER_CALL = proposeRecordCall({
   recordId: OPPORTUNITY_DATA_SEED_IDS.ID_1,
   arguments: {
     id: OPPORTUNITY_DATA_SEED_IDS.ID_1,
-    stage: 'CUSTOMER',
+    stage: 'SALES_CLOSED_WON_PAID',
     ownerId: WORKSPACE_MEMBER_DATA_SEED_IDS.PHIL,
   },
   currentValues: {
-    stage: 'PROPOSAL',
+    stage: 'SALES_LEGAL_AGREEMENT',
     ownerId: WORKSPACE_MEMBER_DATA_SEED_IDS.TIM,
   },
 });

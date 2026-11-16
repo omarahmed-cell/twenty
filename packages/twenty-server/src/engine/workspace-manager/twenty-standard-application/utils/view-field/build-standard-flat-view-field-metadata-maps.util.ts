@@ -24,6 +24,8 @@ import { computeStandardMessageListViewFields } from 'src/engine/workspace-manag
 import { computeStandardMessageListMemberViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-message-list-member-view-fields.util';
 import { computeStandardOpportunityContactViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-opportunity-contact-view-fields.util';
 import { computeStandardOpportunityCollaboratorViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-opportunity-collaborator-view-fields.util';
+import { computeStandardPipelineViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-pipeline-view-fields.util';
+import { computeStandardPipelineStageViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-pipeline-stage-view-fields.util';
 import { computeStandardMessageParticipantViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-message-participant-view-fields.util';
 import { computeStandardMessageThreadViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-message-thread-view-fields.util';
 import { computeStandardMessageViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-message-view-fields.util';
@@ -76,6 +78,8 @@ const STANDARD_FLAT_VIEW_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   messageListMember: computeStandardMessageListMemberViewFields,
   opportunityContact: computeStandardOpportunityContactViewFields,
   opportunityCollaborator: computeStandardOpportunityCollaboratorViewFields,
+  pipeline: computeStandardPipelineViewFields,
+  pipelineStage: computeStandardPipelineStageViewFields,
   messageParticipant: computeStandardMessageParticipantViewFields,
   messageThread: computeStandardMessageThreadViewFields,
   note: computeStandardNoteViewFields,

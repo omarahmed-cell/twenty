@@ -65,7 +65,17 @@ export const collectOpportunityCalculationReferences = ({
 
   switch (true) {
     case objectNameSingular === 'opportunity':
-      if (isUpdate && !hasChanged(before, after, ['pointOfContactId'])) {
+      if (
+        isUpdate &&
+        !hasChanged(before, after, [
+          'pointOfContactId',
+          'amount',
+          'stage',
+          'pipeline',
+          'closeDate',
+          'createdAt',
+        ])
+      ) {
         return [];
       }
 

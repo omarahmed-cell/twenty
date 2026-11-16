@@ -1271,6 +1271,93 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  pipeline: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<CreateStandardObjectArgs<'pipeline'>, 'context' | 'objectName'>) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'pipeline',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.pipeline.universalIdentifier,
+        nameSingular: 'pipeline',
+        namePlural: 'pipelines',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Pipeline`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Pipelines`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A deal pipeline and its rules`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconTimelineEvent',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'name',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  pipelineStage: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'pipelineStage'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'pipelineStage',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.pipelineStage.universalIdentifier,
+        nameSingular: 'pipelineStage',
+        namePlural: 'pipelineStages',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Pipeline Stage`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Pipeline Stages`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A stage of a pipeline`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconProgressCheck',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'label',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   messageChannelMessageAssociation: ({
     now,
     workspaceId,

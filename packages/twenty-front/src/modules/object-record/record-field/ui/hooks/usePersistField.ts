@@ -55,6 +55,14 @@ import { isFieldText } from '@/object-record/record-field/ui/types/guards/isFiel
 import { isFieldTextValue } from '@/object-record/record-field/ui/types/guards/isFieldTextValue';
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { getForeignKeyNameFromRelationFieldName } from '@/object-record/utils/getForeignKeyNameFromRelationFieldName';
+import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
+import {
+  DEAL_STAGE_FIELD_NAME,
+  isDealPipelineField,
+} from '@/pipeline/stage-picker/utils/dealStageFields';
+import { getFirstStageValueOfPipeline } from '@/pipeline/stage-picker/utils/getStageOptionsForPipeline';
+import { isString } from '@sniptt/guards';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
 import { isDeeplyEqual } from '~/utils/isDeeplyEqual';
@@ -71,6 +79,11 @@ export const usePersistField = ({
   const { objectMetadataItems } = useObjectMetadataItems();
 
   const { updateOneRecord } = useUpdateOneRecord();
+
+  const pipelines = useDealStagePipelineConfigs({
+    enabled:
+      objectMetadataItem?.nameSingular === CoreObjectNameSingular.Opportunity,
+  });
 
   const store = useStore();
   const { upsertRecordsInStore } = useUpsertRecordsInStore();
@@ -270,11 +283,26 @@ export const usePersistField = ({
           return;
         }
 
+        // A deal that changes pipeline starts again at the new pipeline's first stage
+        const firstStageOfNewPipeline =
+          isDealPipelineField({
+            objectNameSingular: objectMetadataItem.nameSingular,
+            fieldName,
+          }) && isString(valueToPersist)
+            ? getFirstStageValueOfPipeline({
+                pipelines,
+                pipelineKey: valueToPersist,
+              })
+            : undefined;
+
         updateOneRecord({
           objectNameSingular: objectMetadataItem.nameSingular,
           idToUpdate: recordId,
           updateOneRecordInput: {
             [fieldName]: valueToPersist,
+            ...(isDefined(firstStageOfNewPipeline)
+              ? { [DEAL_STAGE_FIELD_NAME]: firstStageOfNewPipeline }
+              : {}),
           },
         });
 
@@ -282,6 +310,16 @@ export const usePersistField = ({
           recordStoreFamilySelector.selectorFamily({ recordId, fieldName }),
           valueToPersist,
         );
+
+        if (isDefined(firstStageOfNewPipeline)) {
+          store.set(
+            recordStoreFamilySelector.selectorFamily({
+              recordId,
+              fieldName: DEAL_STAGE_FIELD_NAME,
+            }),
+            firstStageOfNewPipeline,
+          );
+        }
       } else {
         throw new Error(
           doNotTranslate(
@@ -297,6 +335,7 @@ export const usePersistField = ({
     [
       objectMetadataItem?.nameSingular,
       objectMetadataItems,
+      pipelines,
       store,
       updateOneRecord,
       upsertRecordsInStore,

@@ -9,6 +9,9 @@ import { SettingsPageContainer } from '@/settings/components/SettingsPageContain
 import { ObjectFields } from '@/settings/data-model/object-details/components/tabs/ObjectFields';
 import { ObjectLayout } from '@/settings/data-model/object-details/components/tabs/ObjectLayout';
 import { ObjectSettings } from '@/settings/data-model/object-details/components/tabs/ObjectSettings';
+import { SettingsObjectPipelinesTab } from '@/settings/data-model/pipelines/components/SettingsObjectPipelinesTab';
+import { useHasPipelineObjects } from '@/pipeline/hooks/useHasPipelineObjects';
+import { PIPELINE_ENABLED_OBJECT_NAMES } from '@/settings/data-model/pipelines/constants/PipelineEnabledObjectNames';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { SettingsTabBar } from '@/settings/components/layout/SettingsTabBar';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
@@ -34,6 +37,7 @@ import {
   IconListDetails,
   IconPlus,
   IconSettings,
+  IconTargetArrow,
 } from 'twenty-ui/icon';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { SETTINGS_OBJECT_DETAIL_TABS } from '~/pages/settings/data-model/constants/SettingsObjectDetailTabs';
@@ -99,6 +103,8 @@ export const SettingsObjectDetailPage = () => {
     workspaceSurface.type,
   ]);
 
+  const hasPipelineObjects = useHasPipelineObjects();
+
   if (!isDefined(objectMetadataItem)) {
     return workspaceSurface.type === 'side-panel' ? (
       <WorkspaceRouteUnavailable />
@@ -126,6 +132,16 @@ export const SettingsObjectDetailPage = () => {
         objectMetadataItem.isRemote ||
         objectMetadataItem.nameSingular === CoreObjectNameSingular.Dashboard,
     },
+    {
+      id: SETTINGS_OBJECT_DETAIL_TABS.TABS_IDS.PIPELINES,
+      title: t`Pipelines`,
+      Icon: IconTargetArrow,
+      hide:
+        !hasPipelineObjects ||
+        !PIPELINE_ENABLED_OBJECT_NAMES.includes(
+          objectMetadataItem.nameSingular,
+        ),
+    },
   ];
 
   const renderActiveTabContent = () => {
@@ -142,6 +158,10 @@ export const SettingsObjectDetailPage = () => {
         );
       case SETTINGS_OBJECT_DETAIL_TABS.TABS_IDS.LAYOUT:
         return <ObjectLayout objectMetadataItem={objectMetadataItem} />;
+      case SETTINGS_OBJECT_DETAIL_TABS.TABS_IDS.PIPELINES:
+        return (
+          <SettingsObjectPipelinesTab objectMetadataItem={objectMetadataItem} />
+        );
       default:
         return <></>;
     }

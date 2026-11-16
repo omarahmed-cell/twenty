@@ -28,6 +28,13 @@ describe('computeOpportunityCalculatedFieldValues', () => {
       nextActivityDate: null,
       numberOfAssociatedContacts: 0,
       numberOfAssociatedLineItems: 0,
+      dealProbability: null,
+      weightedAmount: null,
+      isClosed: false,
+      isClosedWon: false,
+      isClosedLost: false,
+      isOpen: true,
+      actualDuration: null,
     });
   });
 
@@ -78,6 +85,80 @@ describe('computeOpportunityCalculatedFieldValues', () => {
     ).toMatchObject({
       lastActivityDate: '2026-11-10T09:00:00.000Z',
       nextActivityDate: '2026-11-16T09:00:00.000Z',
+    });
+  });
+
+  describe('stage probability fields', () => {
+    it('weights the amount by the stage probability, in the same currency', () => {
+      expect(
+        compute({
+          stageProbability: 40,
+          amountMicros: '10000000000',
+          amountCurrencyCode: 'USD',
+        }),
+      ).toMatchObject({
+        dealProbability: 0.4,
+        weightedAmount: { amountMicros: 4000000000, currencyCode: 'USD' },
+        isOpen: true,
+        isClosed: false,
+      });
+    });
+
+    it('leaves the weighted amount empty without an amount or a probability', () => {
+      expect(compute({ stageProbability: 40 }).weightedAmount).toBeNull();
+      expect(
+        compute({ amountMicros: 5000000, amountCurrencyCode: 'EUR' })
+          .weightedAmount,
+      ).toBeNull();
+    });
+
+    it('reads won, lost and open from the probability alone', () => {
+      expect(compute({ stageProbability: 100 })).toMatchObject({
+        isClosed: true,
+        isClosedWon: true,
+        isClosedLost: false,
+        isOpen: false,
+      });
+      expect(compute({ stageProbability: 0 })).toMatchObject({
+        isClosed: true,
+        isClosedWon: false,
+        isClosedLost: true,
+        isOpen: false,
+        dealProbability: 0,
+      });
+      expect(compute({ stageProbability: null })).toMatchObject({
+        isOpen: true,
+        dealProbability: null,
+      });
+    });
+  });
+
+  describe('actualDuration', () => {
+    it('counts whole days from creation to Close Date once the deal is closed', () => {
+      expect(
+        compute({
+          stageProbability: 100,
+          createdAt: '2026-11-01T10:00:00.000Z',
+          closeDate: '2026-11-15T09:00:00.000Z',
+        }).actualDuration,
+      ).toBe(13);
+    });
+
+    it('is empty while the deal is open, even with a Close Date', () => {
+      expect(
+        compute({
+          stageProbability: 80,
+          createdAt: '2026-11-01T10:00:00.000Z',
+          closeDate: '2026-11-15T09:00:00.000Z',
+        }).actualDuration,
+      ).toBeNull();
+    });
+
+    it('is empty for a closed deal without a Close Date', () => {
+      expect(
+        compute({ stageProbability: 0, createdAt: '2026-11-01T10:00:00.000Z' })
+          .actualDuration,
+      ).toBeNull();
     });
   });
 });

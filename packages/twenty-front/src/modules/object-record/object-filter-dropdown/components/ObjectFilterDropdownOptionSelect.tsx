@@ -7,6 +7,8 @@ import { ObjectFilterDropdownComponentInstanceContext } from '@/object-record/ob
 import { fieldMetadataItemUsedInDropdownComponentSelector } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemUsedInDropdownComponentSelector';
 import { objectFilterDropdownCurrentRecordFilterComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownCurrentRecordFilterComponentState';
 import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
+import { useDealStageOptions } from '@/pipeline/stage-picker/hooks/useDealStageOptions';
+import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { SelectableList } from '@/ui/layout/selectable-list/components/SelectableList';
@@ -29,6 +31,8 @@ import { ListItem } from 'twenty-ui/primitives/navigation';
 import { z } from 'zod';
 
 export const EMPTY_FILTER_VALUE = '';
+
+const EMPTY_SELECT_OPTIONS: FieldMetadataItemOption[] = [];
 
 type SelectOptionForFilter = FieldMetadataItemOption & {
   isSelected: boolean;
@@ -90,9 +94,22 @@ export const ObjectFilterDropdownOptionSelect = ({
   const { selectOptions: sourceFieldSelectOptions } =
     useOptionsForSelect(fieldMetaDataId);
 
-  const selectOptions = isDefined(relationTargetFieldMetadataItem)
+  const metadataSelectOptions = isDefined(relationTargetFieldMetadataItem)
     ? relationTargetFieldMetadataItem.options
     : sourceFieldSelectOptions;
+
+  // Same-named stages from different pipelines need their pipeline name to be told apart
+  const dealStageSelectOptions = useDealStageOptions({
+    isDealStage: isDealStageFieldMetadataItem(
+      relationTargetFieldMetadataItem ?? fieldMetadataItemUsedInDropdown,
+    ),
+    options: metadataSelectOptions ?? EMPTY_SELECT_OPTIONS,
+    scope: { type: 'all' },
+  });
+
+  const selectOptions = isDefined(metadataSelectOptions)
+    ? dealStageSelectOptions
+    : metadataSelectOptions;
 
   const [selectableOptions, setSelectableOptions] = useState<
     SelectOptionForFilter[]

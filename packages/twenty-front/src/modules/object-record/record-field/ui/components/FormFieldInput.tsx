@@ -20,7 +20,6 @@ import { FormRawJsonFieldInput } from '@/object-record/record-field/ui/form-type
 import { FormRelationToOneFieldInput } from '@/object-record/record-field/ui/form-types/components/FormRelationToOneFieldInput';
 import { FormRecordRichTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormRecordRichTextFieldInput';
 import { FormRichTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormRichTextFieldInput';
-import { FormSelectFieldInput } from '@/object-record/record-field/ui/form-types/components/FormSelectFieldInput';
 import { FormTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormTextFieldInput';
 import { FormUuidFieldInput } from '@/object-record/record-field/ui/form-types/components/FormUuidFieldInput';
 import { type FormFieldInputSettings } from '@/object-record/record-field/ui/form-types/types/FormFieldInputSettings';
@@ -61,6 +60,8 @@ import { isFieldRichText } from '@/object-record/record-field/ui/types/guards/is
 import { isFieldSelect } from '@/object-record/record-field/ui/types/guards/isFieldSelect';
 import { isFieldText } from '@/object-record/record-field/ui/types/guards/isFieldText';
 import { isFieldUuid } from '@/object-record/record-field/ui/types/guards/isFieldUuid';
+import { FormDealAwareSelectFieldInput } from '@/pipeline/stage-picker/components/FormDealAwareSelectFieldInput';
+import { isDealStageField } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { type JsonValue } from 'type-fest';
 
@@ -124,7 +125,11 @@ export const FormFieldInput = ({
       placeholder={placeholder}
     />
   ) : isFieldSelect(field) ? (
-    <FormSelectFieldInput
+    <FormDealAwareSelectFieldInput
+      isDealStage={isDealStageField({
+        objectNameSingular: field.metadata.objectMetadataNameSingular,
+        fieldName: field.metadata.fieldName,
+      })}
       label={field.label}
       defaultValue={defaultValue as string | undefined}
       onChange={onChange}
