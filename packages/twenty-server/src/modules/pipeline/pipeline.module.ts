@@ -12,6 +12,7 @@ import { DealCloseDateListener } from 'src/modules/pipeline/listeners/deal-close
 import { PipelineConfigListener } from 'src/modules/pipeline/listeners/pipeline-config.listener';
 import { PIPELINE_QUERY_HOOKS } from 'src/modules/pipeline/query-hooks/pipeline-query-hooks.constant';
 import { PipelineResolver } from 'src/modules/pipeline/resolvers/pipeline.resolver';
+import { DealPipelineRulesService } from 'src/modules/pipeline/services/deal-pipeline-rules.service';
 import { DealPipelineIntegrityService } from 'src/modules/pipeline/services/deal-pipeline-integrity.service';
 import { PipelineAccessService } from 'src/modules/pipeline/services/pipeline-access.service';
 import { PipelineCloneService } from 'src/modules/pipeline/services/pipeline-clone.service';
@@ -35,6 +36,7 @@ import { PipelineWriteGuardService } from 'src/modules/pipeline/services/pipelin
     PipelineWriteGuardService,
     PipelineCloneService,
     DealPipelineIntegrityService,
+    DealPipelineRulesService,
     PipelineResolver,
     PipelineConfigListener,
     DealCloseDateListener,

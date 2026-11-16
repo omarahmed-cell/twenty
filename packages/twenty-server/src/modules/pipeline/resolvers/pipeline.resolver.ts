@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation } from '@nestjs/graphql';
+import { Args, Mutation, Query } from '@nestjs/graphql';
 
 import { isDefined } from 'twenty-shared/utils';
 
@@ -38,6 +38,22 @@ export class PipelineResolver {
     private readonly pipelineAccessService: PipelineAccessService,
     private readonly pipelineCloneService: PipelineCloneService,
   ) {}
+
+  // The front greys out what pipeline rules forbid, unless the viewer is an Admin
+  @Query(() => Boolean)
+  @UseGuards(NoPermissionGuard)
+  async isPipelineAdmin(
+    @AuthWorkspace() workspace: WorkspaceEntity,
+    @AuthUserWorkspaceId({ allowUndefined: true })
+    userWorkspaceId: string | undefined,
+    @AuthApiKey() apiKey: ApiKeyEntity | undefined,
+  ): Promise<boolean> {
+    return this.pipelineAccessService.canActorEditPipelines({
+      workspaceId: workspace.id,
+      userWorkspaceId,
+      apiKeyId: apiKey?.id,
+    });
+  }
 
   @Mutation(() => String)
   @UseGuards(NoPermissionGuard)

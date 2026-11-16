@@ -78,6 +78,8 @@ export const SelectInput = ({
             onSelect={() => onOptionSelected(option)}
             selected={option.value === value}
             closeOnSelect={false}
+            disabled={option.disabled === true}
+            title={option.disabled === true ? option.contextualText : undefined}
           >
             <Tag
               color={option.color ?? 'transparent'}

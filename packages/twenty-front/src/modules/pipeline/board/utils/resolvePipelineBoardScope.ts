@@ -20,5 +20,6 @@ export const resolvePipelineBoardScope = ({
   return {
     pipelineKey: pipeline.key,
     stageValues: pipeline.stages.map(({ value }) => value),
+    pipeline,
   };
 };

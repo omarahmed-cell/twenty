@@ -18,7 +18,7 @@ export class OpportunityCreateOnePreQueryHook implements WorkspacePreQueryHookIn
   ): Promise<CreateOneResolverArgs> {
     const [data] = await this.dealPipelineIntegrityService.prepareDealsToCreate(
       {
-        workspaceId: authContext.workspace.id,
+        authContext,
         records: [payload.data],
         isUpsert: payload.upsert === true,
       },

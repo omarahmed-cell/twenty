@@ -15,6 +15,7 @@ import { type WorkflowActionOutput } from 'src/modules/workflow/workflow-executo
 import { findStepOrThrow } from 'src/modules/workflow/workflow-executor/utils/find-step-or-throw.util';
 import { isWorkflowDeleteRecordAction } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/guards/is-workflow-delete-record-action.guard';
 import { type WorkflowDeleteRecordActionInput } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/types/workflow-record-crud-action-input.type';
+import { runAsWorkflowRecordWrite } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/utils/workflow-record-write-context.storage';
 
 @Injectable()
 export class DeleteRecordWorkflowAction implements WorkflowAction {
@@ -60,13 +61,15 @@ export class DeleteRecordWorkflowAction implements WorkflowAction {
     const executionContext =
       await this.workflowExecutionContextService.getExecutionContext(runInfo);
 
-    const toolOutput = await this.deleteRecordService.execute({
-      objectName: workflowActionInput.objectName,
-      objectRecordId: workflowActionInput.objectRecordId,
-      authContext: executionContext.authContext,
-      rolePermissionConfig: executionContext.rolePermissionConfig,
-      soft: true,
-    });
+    const toolOutput = await runAsWorkflowRecordWrite(() =>
+      this.deleteRecordService.execute({
+        objectName: workflowActionInput.objectName,
+        objectRecordId: workflowActionInput.objectRecordId,
+        authContext: executionContext.authContext,
+        rolePermissionConfig: executionContext.rolePermissionConfig,
+        soft: true,
+      }),
+    );
 
     if (!toolOutput.success) {
       return { error: toolOutput.error || toolOutput.message };

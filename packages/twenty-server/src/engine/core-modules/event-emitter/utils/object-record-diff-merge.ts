@@ -6,7 +6,8 @@ export function objectRecordDiffMerge(
   // oxlint-disable-next-line typescript/no-explicit-any
 ): Record<string, any> {
   // oxlint-disable-next-line typescript/no-explicit-any
-  const result: Record<string, any> = { diff: {} };
+  // Keeps notes written on the row, such as a pipeline rule override
+  const result: Record<string, any> = { ...oldRecord, diff: {} };
 
   Object.keys(oldRecord.diff ?? {}).forEach((key) => {
     if (newRecord.diff && newRecord.diff[key]) {

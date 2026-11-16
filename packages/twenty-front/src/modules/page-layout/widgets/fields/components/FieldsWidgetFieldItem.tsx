@@ -2,6 +2,7 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { formatFieldMetadataItemAsColumnDefinition } from '@/object-metadata/utils/formatFieldMetadataItemAsColumnDefinition';
 import { isRecordFieldReadOnly } from '@/object-record/read-only/utils/isRecordFieldReadOnly';
+import { useDealAdminOnlyFieldNames } from '@/pipeline/rules/hooks/useDealAdminOnlyFieldNames';
 import {
   FieldContext,
   type RecordUpdateHook,
@@ -42,6 +43,10 @@ export const FieldsWidgetFieldItem = ({
   instanceId,
   onMouseEnter,
 }: FieldsWidgetFieldItemProps) => {
+  const dealAdminOnlyFieldNames = useDealAdminOnlyFieldNames(
+    objectMetadataItem.nameSingular,
+  );
+
   const fieldDefinition = formatFieldMetadataItemAsColumnDefinition({
     field: fieldMetadataItem,
     position: globalIndex,
@@ -60,13 +65,15 @@ export const FieldsWidgetFieldItem = ({
         fieldDefinition,
         useUpdateRecord,
         isDisplayModeFixHeight: true,
-        isRecordFieldReadOnly: isRecordFieldReadOnly({
-          isRecordReadOnly,
-          objectMetadataId: objectMetadataItem.id,
-          fieldMetadataItem,
-          fieldDefinition,
-          objectPermissionsByObjectMetadataId,
-        }),
+        isRecordFieldReadOnly:
+          dealAdminOnlyFieldNames.includes(fieldMetadataItem.name) ||
+          isRecordFieldReadOnly({
+            isRecordReadOnly,
+            objectMetadataId: objectMetadataItem.id,
+            fieldMetadataItem,
+            fieldDefinition,
+            objectPermissionsByObjectMetadataId,
+          }),
         onMouseEnter,
         anchorId: `${getRecordFieldInputInstanceId({
           recordId,

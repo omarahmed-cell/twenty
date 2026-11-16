@@ -4,6 +4,7 @@ import { getPipelineBoardCreateRecordDefaults } from '@/pipeline/board/utils/get
 import { isPipelineBoardDropAllowed } from '@/pipeline/board/utils/isPipelineBoardDropAllowed';
 import { isPipelineBoardEligible } from '@/pipeline/board/utils/isPipelineBoardEligible';
 import { orderRecordGroupsForPipelineBoardScope } from '@/pipeline/board/utils/orderRecordGroupsForPipelineBoardScope';
+import { canCreateInPipelineBoardColumn } from '@/pipeline/board/utils/canCreateInPipelineBoardColumn';
 import { resolvePipelineBoardScope } from '@/pipeline/board/utils/resolvePipelineBoardScope';
 import { type PipelineConfig } from '@/pipeline/types/PipelineConfig';
 import { DEFAULT_PIPELINE_RULES } from 'twenty-shared/utils';
@@ -76,6 +77,7 @@ describe('resolvePipelineBoardScope', () => {
     ).toEqual({
       pipelineKey: 'PILOT_PIPELINE',
       stageValues: ['PILOT_DISCOVERY', 'PILOT_CLOSED_WON'],
+      pipeline: PILOT,
     });
   });
 
@@ -125,7 +127,7 @@ describe('orderRecordGroupsForPipelineBoardScope', () => {
     expect(
       orderRecordGroupsForPipelineBoardScope({
         recordGroups,
-        scope: scope ?? { pipelineKey: '', stageValues: [] },
+        scope: scope ?? { pipelineKey: '', stageValues: [], pipeline: SALES },
       }).map(({ id }) => id),
     ).toEqual(['g3', 'g5', 'g1']);
   });
@@ -135,6 +137,7 @@ describe('isPipelineBoardDropAllowed', () => {
   const scope = {
     pipelineKey: 'SALES_PIPELINE',
     stageValues: SALES.stages.map(({ value }) => value),
+    pipeline: SALES,
   };
 
   it("lets a card land only on the board pipeline's stages", () => {
@@ -165,6 +168,7 @@ describe('creating and querying from a pipeline board', () => {
       getPipelineBoardCreateRecordDefaults({
         pipelineKey: 'PILOT_PIPELINE',
         stageValues: [],
+        pipeline: PILOT,
       }),
     ).toEqual({ pipeline: 'PILOT_PIPELINE' });
     expect(getPipelineBoardCreateRecordDefaults(null)).toEqual({});
@@ -175,6 +179,7 @@ describe('creating and querying from a pipeline board', () => {
       buildPipelineBoardRecordFilter({
         pipelineKey: 'PILOT_PIPELINE',
         stageValues: [],
+        pipeline: PILOT,
       }),
     ).toEqual({ pipeline: { in: ['PILOT_PIPELINE'] } });
     expect(buildPipelineBoardRecordFilter(null)).toEqual({});
@@ -195,5 +200,44 @@ describe('buildPipelineBoardWeightedAmountByStageValue', () => {
         stageValues: ['SALES_DISCOVERY_STAGE', 'SALES_CLOSING'],
       }),
     ).toEqual({ SALES_DISCOVERY_STAGE: 0, SALES_CLOSING: 4000000000 });
+  });
+});
+
+describe('canCreateInPipelineBoardColumn', () => {
+  const scope = (rules: PipelineConfig['rules']) => ({
+    pipelineKey: SALES.key,
+    stageValues: SALES.stages.map(({ value }) => value),
+    pipeline: { ...SALES, rules },
+  });
+  const limited = {
+    ...SALES.rules,
+    limitCreationToStages: {
+      enabled: true,
+      stageValues: [SALES.stages[0].value],
+    },
+  };
+
+  it('hides the + on columns a new deal may not start in, for non-Admins only', () => {
+    expect(
+      canCreateInPipelineBoardColumn({
+        scope: scope(limited),
+        isAdmin: false,
+        stageValue: SALES.stages[0].value,
+      }),
+    ).toBe(true);
+    expect(
+      canCreateInPipelineBoardColumn({
+        scope: scope(limited),
+        isAdmin: false,
+        stageValue: SALES.stages[1].value,
+      }),
+    ).toBe(false);
+    expect(
+      canCreateInPipelineBoardColumn({
+        scope: scope(limited),
+        isAdmin: true,
+        stageValue: SALES.stages[1].value,
+      }),
+    ).toBe(true);
   });
 });

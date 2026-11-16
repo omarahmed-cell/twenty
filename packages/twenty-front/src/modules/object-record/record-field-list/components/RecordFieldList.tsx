@@ -4,6 +4,7 @@ import { formatFieldMetadataItemAsColumnDefinition } from '@/object-metadata/uti
 import { useObjectPermissions } from '@/object-record/hooks/useObjectPermissions';
 import { useIsRecordReadOnly } from '@/object-record/read-only/hooks/useIsRecordReadOnly';
 import { isRecordFieldReadOnly } from '@/object-record/read-only/utils/isRecordFieldReadOnly';
+import { useDealAdminOnlyFieldNames } from '@/pipeline/rules/hooks/useDealAdminOnlyFieldNames';
 import { RecordFieldListCellEditModePortal } from '@/object-record/record-field-list/anchored-portal/components/RecordFieldListCellEditModePortal';
 import { RecordFieldListCellHoveredPortal } from '@/object-record/record-field-list/anchored-portal/components/RecordFieldListCellHoveredPortal';
 import { useRecordFieldListNonRelationFieldMetadataItems } from '@/object-record/record-field-list/hooks/useRecordFieldListNonRelationFieldMetadataItems';
@@ -48,6 +49,10 @@ export const RecordFieldList = ({
     objectMetadataId: objectMetadataItem.id,
   });
 
+  const dealAdminOnlyFieldNames = useDealAdminOnlyFieldNames(
+    objectMetadataItem.nameSingular,
+  );
+
   const setRecordFieldListHoverPosition = useSetAtomComponentState(
     recordFieldListHoverPositionComponentState,
     instanceId,
@@ -87,13 +92,15 @@ export const RecordFieldList = ({
                   fieldDefinition,
                   useUpdateRecord: useUpdateOneObjectRecordMutation,
                   isDisplayModeFixHeight: true,
-                  isRecordFieldReadOnly: isRecordFieldReadOnly({
-                    isRecordReadOnly,
-                    objectMetadataId: objectMetadataItem.id,
-                    fieldMetadataItem,
-                    fieldDefinition,
-                    objectPermissionsByObjectMetadataId,
-                  }),
+                  isRecordFieldReadOnly:
+                    dealAdminOnlyFieldNames.includes(fieldMetadataItem.name) ||
+                    isRecordFieldReadOnly({
+                      isRecordReadOnly,
+                      objectMetadataId: objectMetadataItem.id,
+                      fieldMetadataItem,
+                      fieldDefinition,
+                      objectPermissionsByObjectMetadataId,
+                    }),
                   onMouseEnter: () => handleMouseEnter(index),
                   anchorId: `${getRecordFieldInputInstanceId({
                     recordId: objectRecordId,

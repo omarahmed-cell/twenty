@@ -17,6 +17,7 @@ import { convertStepObjectRecordTipTapToMarkdown } from 'src/modules/workflow/wo
 import { resolveActionExecutionDateFields } from 'src/modules/workflow/workflow-executor/utils/resolve-action-execution-date-fields.util';
 import { resolveRichTextMarkdownVariables } from 'src/modules/workflow/workflow-executor/utils/resolve-rich-text-markdown-variables.util';
 import { type WorkflowCreateRecordActionInput } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/types/workflow-record-crud-action-input.type';
+import { runAsWorkflowRecordWrite } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/utils/workflow-record-write-context.storage';
 
 @Injectable()
 export class CreateRecordWorkflowAction implements WorkflowAction {
@@ -85,13 +86,15 @@ export class CreateRecordWorkflowAction implements WorkflowAction {
 
     const createdBy = buildWorkflowActorMetadata(executionContext);
 
-    const toolOutput = await this.createRecordService.execute({
-      objectName: workflowActionInput.objectName,
-      objectRecord: filteredObjectRecord,
-      authContext: executionContext.authContext,
-      createdBy,
-      rolePermissionConfig: executionContext.rolePermissionConfig,
-    });
+    const toolOutput = await runAsWorkflowRecordWrite(() =>
+      this.createRecordService.execute({
+        objectName: workflowActionInput.objectName,
+        objectRecord: filteredObjectRecord,
+        authContext: executionContext.authContext,
+        createdBy,
+        rolePermissionConfig: executionContext.rolePermissionConfig,
+      }),
+    );
 
     if (!toolOutput.success) {
       return { error: toolOutput.error || toolOutput.message };

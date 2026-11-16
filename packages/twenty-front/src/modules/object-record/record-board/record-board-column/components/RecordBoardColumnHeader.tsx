@@ -38,6 +38,8 @@ import { IconDotsVertical, IconPlus } from 'twenty-ui/icon';
 
 import { PipelineBoardColumnWeightedAmount } from '@/pipeline/board/components/PipelineBoardColumnWeightedAmount';
 import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
+import { canCreateInPipelineBoardColumn } from '@/pipeline/board/utils/canCreateInPipelineBoardColumn';
+import { useIsPipelineAdmin } from '@/pipeline/rules/hooks/useIsPipelineAdmin';
 import { getPipelineBoardCreateRecordDefaults } from '@/pipeline/board/utils/getPipelineBoardCreateRecordDefaults';
 
 const StyledHeader = styled.div<{ isReadOnly: boolean }>`
@@ -206,6 +208,12 @@ export const RecordBoardColumnHeader = () => {
   );
 
   const pipelineBoardScope = usePipelineBoardScope();
+  const isPipelineAdmin = useIsPipelineAdmin();
+  const canCreateInColumn = canCreateInPipelineBoardColumn({
+    scope: pipelineBoardScope,
+    isAdmin: isPipelineAdmin,
+    stageValue: columnDefinition.value,
+  });
 
   const handleCreateNewRecordClick = async () => {
     await createNewIndexRecord({
@@ -293,15 +301,17 @@ export const RecordBoardColumnHeader = () => {
                 >
                   <IconDotsVertical />
                 </LightIconButton>
-                {canCreateRecords && !hasAnySoftDeleteFilterOnView && (
-                  <LightIconButton
-                    emphasis="subtle"
-                    aria-label={t`Add new`}
-                    onClick={handleCreateNewRecordClick}
-                  >
-                    <IconPlus />
-                  </LightIconButton>
-                )}
+                {canCreateRecords &&
+                  !hasAnySoftDeleteFilterOnView &&
+                  canCreateInColumn && (
+                    <LightIconButton
+                      emphasis="subtle"
+                      aria-label={t`Add new`}
+                      onClick={handleCreateNewRecordClick}
+                    >
+                      <IconPlus />
+                    </LightIconButton>
+                  )}
               </StyledHeaderActions>
             )}
           </StyledHeaderContainer>

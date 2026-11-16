@@ -266,6 +266,11 @@ export const Select = <TValue extends SelectValue>({
                         key={`${option.value}-${option.label}`}
                         value={getSelectOptionIdentifier(option.value)}
                         disabled={option.disabled}
+                        title={
+                          isColoredTag && option.disabled === true
+                            ? option.contextualText
+                            : undefined
+                        }
                         indicator={
                           isColoredTag || needIconCheck ? 'check' : 'none'
                         }

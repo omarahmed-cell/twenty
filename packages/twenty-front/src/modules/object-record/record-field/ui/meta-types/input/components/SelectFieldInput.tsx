@@ -6,6 +6,7 @@ import { useFilteredSelectOptionsFromRLSPredicates } from '@/object-record/recor
 import { useSelectField } from '@/object-record/record-field/ui/meta-types/hooks/useSelectField';
 import { FieldInputDropdown } from '@/object-record/record-field/ui/meta-types/input/components/FieldInputDropdown';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
+import { useDealStageRuleOptions } from '@/pipeline/rules/hooks/useDealStageRuleOptions';
 import { useDealStageOptions } from '@/pipeline/stage-picker/hooks/useDealStageOptions';
 import {
   DEAL_PIPELINE_FIELD_NAME,
@@ -46,14 +47,21 @@ export const SelectFieldInput = () => {
     { recordId, fieldName: DEAL_PIPELINE_FIELD_NAME },
   );
 
-  const visibleSelectOptions = useDealStageOptions({
+  const pipelineKey = isString(dealPipelineKey) ? dealPipelineKey : null;
+  const currentStageValue = isString(fieldValue) ? fieldValue : null;
+
+  const pipelineSelectOptions = useDealStageOptions({
     isDealStage,
     options: selectOptions,
-    scope: {
-      type: 'pipeline',
-      pipelineKey: isString(dealPipelineKey) ? dealPipelineKey : null,
-      currentStageValue: isString(fieldValue) ? fieldValue : null,
-    },
+    scope: { type: 'pipeline', pipelineKey, currentStageValue },
+  });
+
+  const visibleSelectOptions = useDealStageRuleOptions({
+    isDealStage,
+    options: pipelineSelectOptions,
+    pipelineKey,
+    currentStageValue,
+    isCreate: false,
   });
 
   const clearField = useClearField();

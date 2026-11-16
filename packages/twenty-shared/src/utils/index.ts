@@ -283,6 +283,15 @@ export {
   buildPipelineStageValue,
   PIPELINE_COPY_SUFFIX,
 } from './pipeline/pipeline-config';
+export type {
+  PipelineRuleStage,
+  DealStageMoveRefusal,
+} from './pipeline/pipeline-rules';
+export {
+  evaluateDealStageMove,
+  isDealCreationStageAllowed,
+  isDealStageLocked,
+} from './pipeline/pipeline-rules';
 export { removePropertiesFromRecord } from './removePropertiesFromRecord';
 export { removeUndefinedFields } from './removeUndefinedFields';
 export { safeParseRelativeDateFilterJsonStringified } from './safeParseRelativeDateFilterJsonStringified';

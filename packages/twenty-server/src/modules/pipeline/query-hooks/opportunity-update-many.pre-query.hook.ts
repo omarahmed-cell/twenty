@@ -19,7 +19,7 @@ export class OpportunityUpdateManyPreQueryHook implements WorkspacePreQueryHookI
     return {
       ...payload,
       data: await this.dealPipelineIntegrityService.prepareDealsUpdate({
-        workspaceId: authContext.workspace.id,
+        authContext,
         filter: payload.filter,
         data: payload.data,
       }),

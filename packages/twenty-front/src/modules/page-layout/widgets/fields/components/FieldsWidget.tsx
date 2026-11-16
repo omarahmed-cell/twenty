@@ -8,6 +8,7 @@ import { FieldsWidgetFieldList } from '@/page-layout/widgets/fields/components/F
 import { FieldsWidgetGroupContainer } from '@/page-layout/widgets/fields/components/FieldsWidgetGroupContainer';
 import { useFieldsWidgetGroupsForDisplay } from '@/page-layout/widgets/fields/hooks/useFieldsWidgetGroupsForDisplay';
 import { useFieldsWidgetHiddenFieldsForDisplay } from '@/page-layout/widgets/fields/hooks/useFieldsWidgetHiddenFieldsForDisplay';
+import { DealRecordLockNote } from '@/pipeline/rules/components/DealRecordLockNote';
 import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/AnimatedPlaceholder/AnimatedPlaceholder';
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { StyledWidgetScrollContainer } from '@/ui/layout/components/WidgetContentContainer';
@@ -122,6 +123,10 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
             instanceId,
           }}
         >
+          <DealRecordLockNote
+            objectNameSingular={targetRecord.targetObjectNameSingular}
+            recordId={targetRecord.id}
+          />
           {shouldDisplayGroupHeaders ? (
             groups.map((group) => (
               <FieldsWidgetGroupContainer key={group.id} title={group.name}>

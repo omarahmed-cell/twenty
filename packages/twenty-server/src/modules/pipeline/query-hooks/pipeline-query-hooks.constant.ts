@@ -22,6 +22,10 @@ import { OpportunityCreateOnePreQueryHook } from 'src/modules/pipeline/query-hoo
 import { OpportunityCreateManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-create-many.pre-query.hook';
 import { OpportunityUpdateOnePreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-update-one.pre-query.hook';
 import { OpportunityUpdateManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-update-many.pre-query.hook';
+import { OpportunityDeleteOnePreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-delete-one.pre-query.hook';
+import { OpportunityDestroyOnePreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-destroy-one.pre-query.hook';
+import { OpportunityDeleteManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-delete-many.pre-query.hook';
+import { OpportunityDestroyManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-destroy-many.pre-query.hook';
 
 export const PIPELINE_QUERY_HOOKS = [
   PipelineCreateOnePreQueryHook,
@@ -48,4 +52,8 @@ export const PIPELINE_QUERY_HOOKS = [
   OpportunityCreateManyPreQueryHook,
   OpportunityUpdateOnePreQueryHook,
   OpportunityUpdateManyPreQueryHook,
+  OpportunityDeleteOnePreQueryHook,
+  OpportunityDestroyOnePreQueryHook,
+  OpportunityDeleteManyPreQueryHook,
+  OpportunityDestroyManyPreQueryHook,
 ];

@@ -19,7 +19,7 @@ export class OpportunityCreateManyPreQueryHook implements WorkspacePreQueryHookI
     return {
       ...payload,
       data: await this.dealPipelineIntegrityService.prepareDealsToCreate({
-        workspaceId: authContext.workspace.id,
+        authContext,
         records: payload.data,
         isUpsert: payload.upsert === true,
       }),

@@ -2,10 +2,8 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
 import { type PipelineRules } from 'twenty-shared/utils';
-import { Callout } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
-import { IconInfoCircle } from 'twenty-ui/icon';
-import { Button, Switch } from 'twenty-ui/primitives/input';
+import { Switch } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { type PipelineConfig } from '@/pipeline/types/PipelineConfig';
@@ -55,11 +53,6 @@ const StyledStagesPickerContainer = styled.div`
   width: 220px;
 `;
 
-const StyledFooter = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
 type RuleDefinition =
   | {
       key: PipelineStageListRuleKey;
@@ -94,9 +87,12 @@ export const SettingsPipelineRulesSection = ({
   });
 
   const [draftRules, setDraftRules] = useState<PipelineRules>(savedRules);
-  const [isSaving, setIsSaving] = useState(false);
 
-  const isDirty = JSON.stringify(draftRules) !== JSON.stringify(savedRules);
+  // Rules take effect as soon as they change; the server enforces them on the next deal write
+  const applyRules = (nextRules: PipelineRules) => {
+    setDraftRules(nextRules);
+    void updatePipeline(pipeline.id, { rules: nextRules });
+  };
 
   const ruleDefinitions: RuleDefinition[] = [
     {
@@ -125,30 +121,13 @@ export const SettingsPipelineRulesSection = ({
     },
   ];
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    await updatePipeline(pipeline.id, { rules: draftRules });
-    setIsSaving(false);
-  };
-
   return (
     <Section.Root>
       <Section.Header
         title={t`Pipeline rules`}
-        description={t`Rules stored for this pipeline. They are all off by default.`}
+        description={t`Rules apply to deals in this pipeline as soon as you change them. Super Admins can always override them.`}
       />
       <StyledRules>
-        <Callout
-          status="info"
-          icon={
-            <IconInfoCircle
-              size={themeCssVariables.icon.size.md}
-              aria-hidden="true"
-            />
-          }
-          title={t`Not enforced yet`}
-          description={t`These settings are saved now and will be enforced in a later phase.`}
-        />
         {ruleDefinitions.map((rule) => {
           const enabled = isRuleEnabled(draftRules, rule);
 
@@ -159,7 +138,7 @@ export const SettingsPipelineRulesSection = ({
                 size="sm"
                 aria-label={rule.title}
                 onCheckedChange={(checked: boolean) =>
-                  setDraftRules(
+                  applyRules(
                     setPipelineRuleEnabled({
                       rules: draftRules,
                       ruleKey: rule.key,
@@ -182,7 +161,7 @@ export const SettingsPipelineRulesSection = ({
                     selectedStageValues={draftRules[rule.key].stageValues}
                     isDisabled={!enabled}
                     onToggleStage={(stageValue) =>
-                      setDraftRules(
+                      applyRules(
                         togglePipelineRuleStage({
                           rules: draftRules,
                           ruleKey: rule.key,
@@ -196,17 +175,6 @@ export const SettingsPipelineRulesSection = ({
             </StyledRuleRow>
           );
         })}
-        <StyledFooter>
-          <Button
-            size="sm"
-            variant="solid"
-            color="accent"
-            disabled={!isDirty || isSaving}
-            onClick={handleSave}
-          >
-            {t`Save rules`}
-          </Button>
-        </StyledFooter>
       </StyledRules>
     </Section.Root>
   );

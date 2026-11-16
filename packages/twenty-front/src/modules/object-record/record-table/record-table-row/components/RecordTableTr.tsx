@@ -1,5 +1,6 @@
 import { getBasePathToShowPage } from '@/object-metadata/utils/getBasePathToShowPage';
 import { useIsRecordDeleted } from '@/object-record/record-field/ui/hooks/useIsRecordDeleted';
+import { useDealRecordLock } from '@/pipeline/rules/hooks/useDealRecordLock';
 import { useRecordTableContextOrThrow } from '@/object-record/record-table/contexts/RecordTableContext';
 import { RecordTableRowContextProvider } from '@/object-record/record-table/contexts/RecordTableRowContext';
 import { RecordTableRowDiv } from '@/object-record/record-table/record-table-row/components/RecordTableRowDiv';
@@ -47,6 +48,10 @@ export const RecordTableTr = forwardRef<HTMLDivElement, RecordTableTrProps>(
     );
 
     const isRecordDeleted = useIsRecordDeleted({ recordId });
+    const { isLocked: isDealLocked } = useDealRecordLock({
+      objectNameSingular: objectMetadataItem.nameSingular,
+      recordId,
+    });
 
     return (
       <RecordTableRowContextProvider
@@ -59,7 +64,7 @@ export const RecordTableTr = forwardRef<HTMLDivElement, RecordTableTrProps>(
             }) + recordId,
           objectNameSingular: objectMetadataItem.nameSingular,
           isSelected: isRecordSelected,
-          isRecordReadOnly: isObjectReadOnly || isRecordDeleted,
+          isRecordReadOnly: isObjectReadOnly || isRecordDeleted || isDealLocked,
         }}
       >
         <RecordTableRowDiv

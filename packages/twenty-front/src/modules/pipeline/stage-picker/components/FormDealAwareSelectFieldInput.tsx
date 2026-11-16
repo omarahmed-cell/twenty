@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import { FormSelectFieldInput } from '@/object-record/record-field/ui/form-types/components/FormSelectFieldInput';
+import { useDealStageRuleOptions } from '@/pipeline/rules/hooks/useDealStageRuleOptions';
 import { DealStagePickerContext } from '@/pipeline/stage-picker/contexts/DealStagePickerContext';
 import { useDealStageOptions } from '@/pipeline/stage-picker/hooks/useDealStageOptions';
 import { type VariablePickerComponent } from '@/ui/input/types/VariablePickerComponent';
@@ -31,7 +32,7 @@ export const FormDealAwareSelectFieldInput = ({
 }: FormDealAwareSelectFieldInputProps) => {
   const dealStagePickerContext = useContext(DealStagePickerContext);
 
-  const visibleOptions = useDealStageOptions({
+  const pipelineOptions = useDealStageOptions({
     isDealStage,
     options,
     scope: isDefined(dealStagePickerContext)
@@ -39,14 +40,29 @@ export const FormDealAwareSelectFieldInput = ({
       : { type: 'all' },
   });
 
+  const visibleOptions = useDealStageRuleOptions({
+    isDealStage: isDealStage && dealStagePickerContext?.isCreate === true,
+    options: pipelineOptions,
+    pipelineKey: dealStagePickerContext?.pipelineKey,
+    currentStageValue: null,
+    isCreate: true,
+  });
+
+  const isDefaultValueSelectable = visibleOptions.some(
+    (option) => option.value === defaultValue && option.disabled !== true,
+  );
+
   const disabledReason = isDealStage
     ? dealStagePickerContext?.disabledReason
     : undefined;
 
   return (
     <FormSelectFieldInput
+      // Remounts when the form swaps a refused default stage for an allowed one
       key={
-        isDealStage ? (dealStagePickerContext?.pipelineKey ?? 'all') : undefined
+        isDealStage
+          ? `${dealStagePickerContext?.pipelineKey ?? 'all'}-${isDefaultValueSelectable}`
+          : undefined
       }
       label={label}
       hint={disabledReason}

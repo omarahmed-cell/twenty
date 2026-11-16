@@ -8,6 +8,8 @@ import { useCreateNewIndexRecord } from '@/object-record/record-table/hooks/useC
 import { RecordTableWidgetContext } from '@/object-record/record-table-widget/contexts/RecordTableWidgetContext';
 import { canCreateRecordsForObjectMetadataItem } from '@/object-record/utils/canCreateRecordsForObjectMetadataItem';
 import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
+import { canCreateInPipelineBoardColumn } from '@/pipeline/board/utils/canCreateInPipelineBoardColumn';
+import { useIsPipelineAdmin } from '@/pipeline/rules/hooks/useIsPipelineAdmin';
 import { getPipelineBoardCreateRecordDefaults } from '@/pipeline/board/utils/getPipelineBoardCreateRecordDefaults';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
@@ -59,6 +61,7 @@ export const RecordBoardColumnNewRecordButton = () => {
   });
 
   const pipelineBoardScope = usePipelineBoardScope();
+  const isPipelineAdmin = useIsPipelineAdmin();
 
   // Creating through a nested relation or junction needs a record picker only the table layout offers.
   const recordTableWidgetContext = useContext(RecordTableWidgetContext);
@@ -84,6 +87,16 @@ export const RecordBoardColumnNewRecordButton = () => {
   }
 
   if (hasAnySoftDeleteFilterOnView) {
+    return null;
+  }
+
+  if (
+    !canCreateInPipelineBoardColumn({
+      scope: pipelineBoardScope,
+      isAdmin: isPipelineAdmin,
+      stageValue: columnDefinition.value,
+    })
+  ) {
     return null;
   }
 

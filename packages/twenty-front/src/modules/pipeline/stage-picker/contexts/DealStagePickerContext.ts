@@ -4,6 +4,7 @@ import { createContext } from 'react';
 export type DealStagePickerContextValue = {
   pipelineKey: string | null | undefined;
   disabledReason?: string;
+  isCreate?: boolean;
 };
 
 export const DealStagePickerContext =

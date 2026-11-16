@@ -7,6 +7,8 @@ import { RecordFormFieldInputsEffect } from '@/object-record/record-form/compone
 import { getRecordFormCurrencyFieldDefaultValue } from '@/object-record/record-form/utils/getRecordFormCurrencyFieldDefaultValue';
 import { getRecordFormFieldPlaceholders } from '@/object-record/record-form/utils/getRecordFormFieldPlaceholders';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { DealCreationStageDefaultEffect } from '@/pipeline/rules/components/DealCreationStageDefaultEffect';
+import { findDealPipeline } from '@/pipeline/rules/utils/applyDealStageRules';
 import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
 import { DealStagePickerContext } from '@/pipeline/stage-picker/contexts/DealStagePickerContext';
 import {
@@ -21,6 +23,7 @@ import { type ValidationRuleViolation } from '@/validation-rules/types/Validatio
 import { styled } from '@linaria/react';
 import { isString } from '@sniptt/guards';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { type JsonValue } from 'type-fest';
 import { Field } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -61,6 +64,18 @@ export const RecordFormFieldInputs = ({
     ? draftRecord[DEAL_PIPELINE_FIELD_NAME]
     : pipelines[0]?.key;
 
+  const draftPipeline = isDealForm
+    ? findDealPipeline({
+        pipelines,
+        pipelineKey: draftPipelineKey,
+        stageValue: null,
+      })
+    : undefined;
+
+  const draftStageValue = isString(draftRecord[DEAL_STAGE_FIELD_NAME])
+    ? draftRecord[DEAL_STAGE_FIELD_NAME]
+    : null;
+
   const orderedFieldMetadataItems = isDealForm
     ? movePipelineFieldBeforeStageField(fieldMetadataItems)
     : fieldMetadataItems;
@@ -84,8 +99,19 @@ export const RecordFormFieldInputs = ({
 
   return (
     <DealStagePickerContext.Provider
-      value={isDealForm ? { pipelineKey: draftPipelineKey } : null}
+      value={
+        isDealForm ? { pipelineKey: draftPipelineKey, isCreate: true } : null
+      }
     >
+      {isDefined(draftPipeline) && (
+        <DealCreationStageDefaultEffect
+          pipeline={draftPipeline}
+          draftStageValue={draftStageValue}
+          onStageChange={(stageValue) =>
+            onFieldValueChange(DEAL_STAGE_FIELD_NAME, stageValue)
+          }
+        />
+      )}
       <RecordFormFieldInputsEffect
         fieldMetadataItems={fieldMetadataItems}
         draftRecord={draftRecord}

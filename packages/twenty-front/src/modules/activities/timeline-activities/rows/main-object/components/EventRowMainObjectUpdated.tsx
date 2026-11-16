@@ -1,4 +1,6 @@
 import { useLingui } from '@lingui/react/macro';
+import { isNonEmptyString } from '@sniptt/guards';
+import { isDefined } from 'twenty-shared/utils';
 import { useState } from 'react';
 
 import { EventCard } from '@/activities/timeline-activities/rows/components/EventCard';
@@ -39,6 +41,25 @@ export const EventRowMainObjectUpdated = ({
   const [isOpen, setIsOpen] = useState(true);
 
   const diffEntries = Object.entries(diff);
+  const pipelineRuleOverride = isNonEmptyString(
+    event.properties.pipelineRuleOverride,
+  )
+    ? event.properties.pipelineRuleOverride
+    : undefined;
+
+  if (isDefined(pipelineRuleOverride) && diffEntries.length === 0) {
+    return (
+      <StyledEventRow>
+        <StyledEventRowContainer>
+          <StyledEventRowContent>
+            <EventRowItem>{pipelineRuleOverride}</EventRowItem>
+          </StyledEventRowContent>
+          <EventRowDate happensAt={happensAt} />
+        </StyledEventRowContainer>
+      </StyledEventRow>
+    );
+  }
+
   if (diffEntries.length === 0) {
     return (
       <StyledEventRow>
@@ -86,6 +107,11 @@ export const EventRowMainObjectUpdated = ({
         </StyledEventRowContent>
         <EventRowDate happensAt={happensAt} />
       </StyledEventRowContainer>
+      {isDefined(pipelineRuleOverride) && (
+        <StyledEventRowContent>
+          <EventRowItem>{pipelineRuleOverride}</EventRowItem>
+        </StyledEventRowContent>
+      )}
       {diffEntries.length > 1 && !hasRenderer && (
         <EventCard isOpen={isOpen}>
           {diffEntries.map(([diffKey, diffValue]) => (

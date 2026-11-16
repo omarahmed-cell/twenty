@@ -22,6 +22,7 @@ import { resolveActionExecutionDateFields } from 'src/modules/workflow/workflow-
 import { resolveRichTextMarkdownVariables } from 'src/modules/workflow/workflow-executor/utils/resolve-rich-text-markdown-variables.util';
 import { isWorkflowUpdateRecordAction } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/guards/is-workflow-update-record-action.guard';
 import { type WorkflowUpdateRecordActionInput } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/types/workflow-record-crud-action-input.type';
+import { runAsWorkflowRecordWrite } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/utils/workflow-record-write-context.storage';
 
 @Injectable()
 export class UpdateRecordWorkflowAction implements WorkflowAction {
@@ -125,15 +126,17 @@ export class UpdateRecordWorkflowAction implements WorkflowAction {
 
     const updatedBy = buildWorkflowActorMetadata(executionContext);
 
-    const toolOutput = await this.updateRecordService.execute({
-      objectName: workflowActionInput.objectName,
-      objectRecordId: workflowActionInput.objectRecordId,
-      objectRecord: filteredObjectRecord,
-      fieldsToUpdate: filteredFieldsToUpdate,
-      authContext: executionContext.authContext,
-      updatedBy,
-      rolePermissionConfig: executionContext.rolePermissionConfig,
-    });
+    const toolOutput = await runAsWorkflowRecordWrite(() =>
+      this.updateRecordService.execute({
+        objectName: workflowActionInput.objectName,
+        objectRecordId: workflowActionInput.objectRecordId,
+        objectRecord: filteredObjectRecord,
+        fieldsToUpdate: filteredFieldsToUpdate,
+        authContext: executionContext.authContext,
+        updatedBy,
+        rolePermissionConfig: executionContext.rolePermissionConfig,
+      }),
+    );
 
     if (!toolOutput.success) {
       return { error: toolOutput.error || toolOutput.message };

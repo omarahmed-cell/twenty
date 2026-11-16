@@ -3,6 +3,7 @@ import { formatFieldMetadataItemAsFieldDefinition } from '@/object-metadata/util
 import { useObjectPermissions } from '@/object-record/hooks/useObjectPermissions';
 import { useIsRecordReadOnly } from '@/object-record/read-only/hooks/useIsRecordReadOnly';
 import { isRecordFieldReadOnly } from '@/object-record/read-only/utils/isRecordFieldReadOnly';
+import { useDealAdminOnlyFieldNames } from '@/pipeline/rules/hooks/useDealAdminOnlyFieldNames';
 import { useMemo } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -43,8 +44,16 @@ export const useIsRecordFieldReadOnly = ({
     objectMetadataId,
   });
 
+  const dealAdminOnlyFieldNames = useDealAdminOnlyFieldNames(
+    objectMetadataItem.nameSingular,
+  );
+
   if (!isDefined(fieldMetadataItem)) {
     return false;
+  }
+
+  if (dealAdminOnlyFieldNames.includes(fieldMetadataItem.name)) {
+    return true;
   }
 
   return isRecordFieldReadOnly({

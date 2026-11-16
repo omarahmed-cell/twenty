@@ -1,6 +1,7 @@
 import { getObjectPermissionsForObject } from '@/object-metadata/utils/getObjectPermissionsForObject';
 import { isLabelIdentifierField } from '@/object-metadata/utils/isLabelIdentifierField';
 import { isRecordFieldReadOnly } from '@/object-record/read-only/utils/isRecordFieldReadOnly';
+import { useDealAdminOnlyFieldNames } from '@/pipeline/rules/hooks/useDealAdminOnlyFieldNames';
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { isFieldRelationManyToOne } from '@/object-record/record-field/ui/types/guards/isFieldRelationManyToOne';
@@ -46,6 +47,10 @@ export const RecordTableCellFieldContextGeneric = ({
     fieldMetadataItemByFieldMetadataItemId[recordField.fieldMetadataItemId];
 
   const updateRecord = useContext(RecordTableUpdateContext);
+
+  const dealAdminOnlyFieldNames = useDealAdminOnlyFieldNames(
+    objectMetadataItem.nameSingular,
+  );
 
   if (!isDefined(fieldMetadataItem)) {
     return null;
@@ -121,6 +126,7 @@ export const RecordTableCellFieldContextGeneric = ({
         isRecordFieldReadOnly:
           isRecordTableCellsNonEditable ||
           isInvalidJunctionRelation ||
+          dealAdminOnlyFieldNames.includes(fieldMetadataItem.name) ||
           isRecordFieldReadOnly({
             isRecordReadOnly: isRecordReadOnly ?? false,
             objectMetadataId: objectMetadataItem.id,

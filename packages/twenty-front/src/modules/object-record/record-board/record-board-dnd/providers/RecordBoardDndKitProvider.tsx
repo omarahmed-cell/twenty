@@ -9,6 +9,10 @@ import { recordGroupDefinitionFamilyState } from '@/object-record/record-group/s
 import { type RecordDragDropResult } from '@/object-record/record-drag/types/RecordDragDropResult';
 import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
 import { isPipelineBoardDropAllowed } from '@/pipeline/board/utils/isPipelineBoardDropAllowed';
+import { useIsPipelineAdmin } from '@/pipeline/rules/hooks/useIsPipelineAdmin';
+import { getDealStageDisabledReason } from '@/pipeline/rules/utils/getDealStageDisabledReason';
+import { isDefined } from 'twenty-shared/utils';
+import { useToast } from 'twenty-ui/components';
 import { useAtomComponentFamilyStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateCallbackState';
 
 type RecordBoardDndKitProviderProps = {
@@ -28,6 +32,8 @@ export const RecordBoardDndKitProvider = ({
   const { processBoardCardDrop } = useProcessBoardCardDrop();
 
   const pipelineBoardScope = usePipelineBoardScope();
+  const isPipelineAdmin = useIsPipelineAdmin();
+  const { enqueueToast } = useToast();
 
   const handleRecordDrop = (recordDragDropResult: RecordDragDropResult) => {
     const destinationRecordGroup = store.get(
@@ -42,6 +48,27 @@ export const RecordBoardDndKitProvider = ({
         targetStageValue: destinationRecordGroup?.value,
       })
     ) {
+      return;
+    }
+
+    const sourceRecordGroup = store.get(
+      recordGroupDefinitionFamilyState.atomFamily(
+        recordDragDropResult.sourceDroppableId,
+      ),
+    );
+    const ruleRefusal = isDefined(pipelineBoardScope)
+      ? getDealStageDisabledReason({
+          pipeline: pipelineBoardScope.pipeline,
+          isAdmin: isPipelineAdmin,
+          isCreate: false,
+          currentStageValue: sourceRecordGroup?.value,
+          targetStageValue: destinationRecordGroup?.value ?? '',
+        })
+      : null;
+
+    if (isDefined(ruleRefusal)) {
+      enqueueToast({ status: 'error', children: ruleRefusal });
+
       return;
     }
 

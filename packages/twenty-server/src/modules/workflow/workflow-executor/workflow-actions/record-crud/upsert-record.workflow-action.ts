@@ -21,6 +21,7 @@ import { resolveActionExecutionDateFields } from 'src/modules/workflow/workflow-
 import { resolveRichTextMarkdownVariables } from 'src/modules/workflow/workflow-executor/utils/resolve-rich-text-markdown-variables.util';
 import { isWorkflowUpsertRecordAction } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/guards/is-workflow-upsert-record-action.guard';
 import { type WorkflowUpsertRecordActionInput } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/types/workflow-record-crud-action-input.type';
+import { runAsWorkflowRecordWrite } from 'src/modules/workflow/workflow-executor/workflow-actions/record-crud/utils/workflow-record-write-context.storage';
 
 @Injectable()
 export class UpsertRecordWorkflowAction implements WorkflowAction {
@@ -101,12 +102,14 @@ export class UpsertRecordWorkflowAction implements WorkflowAction {
     const executionContext =
       await this.workflowExecutionContextService.getExecutionContext(runInfo);
 
-    const toolOutput = await this.upsertRecordService.execute({
-      objectName: workflowActionInput.objectName,
-      objectRecord: filteredObjectRecord,
-      authContext: executionContext.authContext,
-      rolePermissionConfig: executionContext.rolePermissionConfig,
-    });
+    const toolOutput = await runAsWorkflowRecordWrite(() =>
+      this.upsertRecordService.execute({
+        objectName: workflowActionInput.objectName,
+        objectRecord: filteredObjectRecord,
+        authContext: executionContext.authContext,
+        rolePermissionConfig: executionContext.rolePermissionConfig,
+      }),
+    );
 
     if (!toolOutput.success) {
       return { error: toolOutput.error || toolOutput.message };
