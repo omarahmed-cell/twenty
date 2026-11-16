@@ -1,6 +1,9 @@
 import { styled } from '@linaria/react';
 import { Link } from 'react-router-dom';
-import { countEnabledPipelineRules } from 'twenty-shared/utils';
+import {
+  countEnabledPipelineRules,
+  countStageCalculatedProperties,
+} from 'twenty-shared/utils';
 import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
 import { themeCssVariables } from 'twenty-ui/theme';
 
@@ -9,7 +12,6 @@ import { SettingsPipelineDragHandle } from '@/settings/data-model/pipelines/comp
 import { SettingsPipelineRowMenu } from '@/settings/data-model/pipelines/components/SettingsPipelineRowMenu';
 import { SETTINGS_PIPELINES_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineTableGridTemplateColumns';
 import { useSettingsPipelineDealCount } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineDealCount';
-import { countCalcPropsEnabledStages } from '@/settings/data-model/pipelines/utils/countCalcPropsEnabledStages';
 import { countPipelineConditionalLogicRules } from '@/settings/data-model/pipelines/utils/countPipelineConditionalLogicRules';
 import { getDealsInUseBlockedMessage } from '@/settings/data-model/pipelines/utils/getDealsInUseBlockedMessage';
 import { getSettingsPipelinePath } from '@/settings/data-model/pipelines/utils/getSettingsPipelinePath';
@@ -73,7 +75,7 @@ export const SettingsPipelineTableRow = ({
         </StyledSecondaryText>
       </TableCell>
       <TableCell align="right">
-        {countCalcPropsEnabledStages(pipeline.stages)}
+        {countStageCalculatedProperties(pipeline.stages)}
       </TableCell>
       <TableCell align="right">
         {countEnabledPipelineRules(pipeline.rules)}

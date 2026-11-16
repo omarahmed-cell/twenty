@@ -1437,4 +1437,102 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     }),
     writability: MetadataWritability.SYSTEM,
   },
+  stageHistory: {
+    // Stage changes are bookkeeping for the stage date fields, not something to browse on the deal
+    ...createStandardRelationFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        type: FieldMetadataType.RELATION,
+        morphId: null,
+        fieldName: 'stageHistory',
+        label: i18nLabel(
+          msg({ message: `Stage history`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Every stage change of the deal`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconTimelineEvent',
+        isNullable: true,
+        isUIEditable: false,
+        targetObjectName: 'opportunityStageHistory',
+        targetFieldName: 'opportunity',
+        settings: {
+          relationType: RelationType.ONE_TO_MANY,
+        },
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    isSystem: true,
+  },
+  dateEnteredCurrentStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'dateEnteredCurrentStage',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Date entered current stage`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the deal last entered its current stage`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarClock',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  timeInCurrentStage: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'timeInCurrentStage',
+        type: FieldMetadataType.NUMBER,
+        label: i18nLabel(
+          msg({
+            message: `Time in current stage`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Days in the current stage, including earlier stays in it`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconHourglass',
+        isUIEditable: false,
+        settings: {
+          dataType: NumberDataType.FLOAT,
+          decimals: 1,
+        },
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
 });

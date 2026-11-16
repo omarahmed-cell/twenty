@@ -8,6 +8,7 @@ import { v4 } from 'uuid';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { DealStageCalculatedPropertiesService } from 'src/modules/pipeline/services/deal-stage-calculated-properties.service';
 import { PipelineConfigService } from 'src/modules/pipeline/services/pipeline-config.service';
 import { buildPipelineClone } from 'src/modules/pipeline/utils/build-pipeline-clone.util';
 
@@ -18,6 +19,7 @@ export class PipelineCloneService {
     private readonly coreDataSource: DataSource,
     private readonly pipelineConfigService: PipelineConfigService,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly dealStageCalculatedPropertiesService: DealStageCalculatedPropertiesService,
   ) {}
 
   async clonePipeline({
@@ -77,6 +79,9 @@ export class PipelineCloneService {
         );
       }
     }, buildSystemAuthContext(workspaceId));
+
+    // Cloned stages keep their toggle, and these writes skip the query hooks that sync fields
+    await this.dealStageCalculatedPropertiesService.syncFields(workspaceId);
 
     return newPipelineId;
   }

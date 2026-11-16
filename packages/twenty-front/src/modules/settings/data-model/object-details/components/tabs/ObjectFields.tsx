@@ -8,12 +8,19 @@ import { SettingsObjectRelationsTable } from '@/settings/data-model/object-detai
 import { styled } from '@linaria/react';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
-import { FieldMetadataType, SettingsPath } from 'twenty-shared/types';
+import {
+  CoreObjectNameSingular,
+  FieldMetadataType,
+  SettingsPath,
+} from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { IconPlus } from 'twenty-ui/icon';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { SettingsObjectFieldTable } from '@/settings/data-model/object-details/components/SettingsObjectFieldTable';
+import { usePipelineConfigs } from '@/pipeline/hooks/usePipelineConfigs';
+import { getStageHistoryFieldNames } from '@/settings/data-model/pipelines/utils/getStageHistoryFieldNames';
+import { useMemo } from 'react';
 
 const StyledButtonContainer = styled.div`
   display: flex;
@@ -41,6 +48,20 @@ export const ObjectFields = ({ objectMetadataItem }: ObjectFieldsProps) => {
     }) || isDDLLocked;
 
   const objectLabelSingular = objectMetadataItem.labelSingular;
+
+  const isDealObject =
+    objectMetadataItem.nameSingular === CoreObjectNameSingular.Opportunity;
+
+  const { pipelines } = usePipelineConfigs({ skip: !isDealObject });
+
+  const stageHistoryFieldNames = useMemo(
+    () => getStageHistoryFieldNames(isDealObject ? pipelines : []),
+    [isDealObject, pipelines],
+  );
+
+  const hasStageHistoryFields = objectMetadataItem.fields.some((field) =>
+    stageHistoryFieldNames.has(field.name),
+  );
 
   const hasRelations = objectMetadataItem.fields.some(
     (field) =>
@@ -85,6 +106,11 @@ export const ObjectFields = ({ objectMetadataItem }: ObjectFieldsProps) => {
           objectMetadataItem={objectMetadataItem}
           mode="view"
           excludeRelations
+          isFieldNameIncluded={
+            hasStageHistoryFields
+              ? (fieldName) => !stageHistoryFieldNames.has(fieldName)
+              : undefined
+          }
         />
         <StyledButtonContainer>
           {!readonly && (
@@ -99,6 +125,23 @@ export const ObjectFields = ({ objectMetadataItem }: ObjectFieldsProps) => {
           )}
         </StyledButtonContainer>
       </Section.Root>
+      {hasStageHistoryFields && (
+        <Section.Root>
+          <Section.Header
+            title={t`Stage history`}
+            description={t`Server-written fields for the stages with stage calculated properties turned on. Turn a stage off in its pipeline settings to deactivate its fields.`}
+          />
+          <SettingsObjectFieldTable
+            objectMetadataItem={objectMetadataItem}
+            mode="view"
+            excludeRelations
+            isFieldNameIncluded={(fieldName) =>
+              stageHistoryFieldNames.has(fieldName)
+            }
+            instanceId="stage-history"
+          />
+        </Section.Root>
+      )}
     </StyledContentContainer>
   );
 };

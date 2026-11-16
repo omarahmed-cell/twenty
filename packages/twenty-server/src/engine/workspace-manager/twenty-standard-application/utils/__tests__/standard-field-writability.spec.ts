@@ -43,7 +43,7 @@ describe('Standard field writability', () => {
   const opportunityServerWrittenFieldUniversalIdentifiers = new Set(
     Object.entries(STANDARD_OBJECTS.opportunity.fields)
       .filter(([fieldName]) =>
-        /^(ownerAssignedDate|lastActivityDate|nextActivityDate|numberOf[A-Za-z]+|dealProbability|weightedAmount|isClosed|isClosedWon|isClosedLost|isOpen|actualDuration)$/.test(
+        /^(ownerAssignedDate|lastActivityDate|nextActivityDate|numberOf[A-Za-z]+|dealProbability|weightedAmount|isClosed|isClosedWon|isClosedLost|isOpen|actualDuration|dateEnteredCurrentStage|timeInCurrentStage)$/.test(
           fieldName,
         ),
       )
@@ -122,7 +122,7 @@ describe('Standard field writability', () => {
         ),
       );
 
-    expect(opportunityServerWrittenFlatFieldMetadatas).toHaveLength(12);
+    expect(opportunityServerWrittenFlatFieldMetadatas).toHaveLength(14);
     expect(
       opportunityServerWrittenFlatFieldMetadatas.every(
         (flatFieldMetadata) =>

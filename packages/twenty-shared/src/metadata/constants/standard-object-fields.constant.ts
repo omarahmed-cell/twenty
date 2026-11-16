@@ -1477,6 +1477,19 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: '8ac45b39-8324-4f14-a63e-685a87327f99',
     },
   },
+  opportunityStageHistory: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityStageHistory,
+    ),
+    opportunity: {
+      universalIdentifier: '20f805c2-e7d6-4be4-bb73-df34d7d8428d',
+    },
+    pipeline: { universalIdentifier: '73fa2a03-f9cb-4f06-9d52-a487527c3a0a' },
+    fromStage: { universalIdentifier: '8976f6ae-bdb9-4faa-b2d9-70cf7bd74b59' },
+    toStage: { universalIdentifier: '12854d71-673a-4ec5-834f-0c3b674b56d5' },
+    changedAt: { universalIdentifier: '60669d57-0b7c-414d-8e66-6bd6f9d003cb' },
+    changedBy: { universalIdentifier: '56a02e55-60bf-4adf-a354-9d51f9b68044' },
+  },
   pipeline: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipeline,
@@ -1920,6 +1933,15 @@ export const STANDARD_OBJECT_FIELDS = {
     isOpen: { universalIdentifier: '6c0bb04e-bb31-46a0-833d-da7ffcdbdde7' },
     actualDuration: {
       universalIdentifier: 'e6fa4b0f-5b2c-4ef7-8b1e-ec306df9aba4',
+    },
+    stageHistory: {
+      universalIdentifier: '11c45f4c-9798-41d7-8adf-dfdc069bb09d',
+    },
+    dateEnteredCurrentStage: {
+      universalIdentifier: 'b01e2618-fb30-486f-b651-59d55a1c1a68',
+    },
+    timeInCurrentStage: {
+      universalIdentifier: 'fdd5054b-3e80-4bf4-ad90-9a55ae1fa2c2',
     },
   },
   person: {

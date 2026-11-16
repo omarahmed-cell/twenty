@@ -34,6 +34,7 @@ export const STANDARD_OBJECT_ICONS = {
   opportunity: 'IconTargetArrow',
   opportunityContact: 'IconUser',
   opportunityCollaborator: 'IconUsers',
+  opportunityStageHistory: 'IconTimelineEvent',
   pipeline: 'IconTimelineEvent',
   pipelineStage: 'IconProgressCheck',
   person: 'IconUser',

@@ -50,6 +50,7 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   messageListMember: '27773d24-8ce3-40f8-aa6c-1f590f2c08d2',
   opportunityContact: 'e59d2afd-9a8e-4ac2-a0cf-ddd2d9133b77',
   opportunityCollaborator: '1af92b56-6879-4204-bad9-8f96af899b9f',
+  opportunityStageHistory: '3343a18d-e026-4196-bfaa-0e8acc4b93db',
   pipeline: '899a54d7-2b1e-4183-8b47-69751eed3454',
   pipelineStage: '9aa2663d-69b4-4816-9c98-d4d1edd59a03',
   messageCampaign: '238acb94-dd4c-4036-bc55-19b99d821efd',

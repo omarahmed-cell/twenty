@@ -31,6 +31,7 @@ const StyledFooter = styled.div`
 `;
 
 const DELETE_STAGE_DIALOG_ID = 'settings-delete-pipeline-stage-dialog';
+const ENABLE_CALC_PROPS_DIALOG_ID = 'settings-enable-stage-calc-props-dialog';
 
 type SettingsPipelineStagesSectionProps = {
   pipeline: PipelineConfig;
@@ -44,9 +45,50 @@ export const SettingsPipelineStagesSection = ({
   const {
     createPipelineStage,
     updatePipelineStage,
+    setPipelineStageCalcPropsEnabled,
     destroyPipelineStage,
     reorderPipelineStages,
   } = useSettingsPipelineActions();
+
+  const [stageToEnableCalcProps, setStageToEnableCalcProps] =
+    useState<PipelineStageConfig | null>(null);
+  const [calcPropsSavingStageId, setCalcPropsSavingStageId] = useState<
+    string | null
+  >(null);
+
+  const saveCalcPropsEnabled = async (
+    stageId: string,
+    calcPropsEnabled: boolean,
+  ) => {
+    setCalcPropsSavingStageId(stageId);
+    await setPipelineStageCalcPropsEnabled(stageId, calcPropsEnabled);
+    setCalcPropsSavingStageId(null);
+  };
+
+  const handleToggleCalcProps = (
+    stage: PipelineStageConfig,
+    isEnabled: boolean,
+  ) => {
+    if (!isEnabled) {
+      void saveCalcPropsEnabled(stage.id, false);
+
+      return;
+    }
+
+    setStageToEnableCalcProps(stage);
+    openDialog(ENABLE_CALC_PROPS_DIALOG_ID);
+  };
+
+  const handleConfirmEnableCalcProps = async () => {
+    if (!isDefined(stageToEnableCalcProps)) {
+      return;
+    }
+
+    const stageId = stageToEnableCalcProps.id;
+
+    setStageToEnableCalcProps(null);
+    await saveCalcPropsEnabled(stageId, true);
+  };
 
   const [stageToDelete, setStageToDelete] =
     useState<PipelineStageConfig | null>(null);
@@ -127,6 +169,10 @@ export const SettingsPipelineStagesSection = ({
                         setStageToDelete(stage);
                         openDialog(DELETE_STAGE_DIALOG_ID);
                       }}
+                      isCalcPropsSaving={calcPropsSavingStageId === stage.id}
+                      onToggleCalcProps={(isEnabled) =>
+                        handleToggleCalcProps(stage, isEnabled)
+                      }
                       onOpenConditionalLogic={({ isNewRule }) =>
                         setConditionalLogicTarget({
                           stageId: stage.id,
@@ -167,6 +213,15 @@ export const SettingsPipelineStagesSection = ({
           onClose={() => setConditionalLogicTarget(null)}
         />
       )}
+      <ConfirmationDialog
+        dialogId={ENABLE_CALC_PROPS_DIALOG_ID}
+        title={t`Turn on stage calculated properties`}
+        subtitle={t`Creates 4 fields for this stage.`}
+        onConfirmClick={handleConfirmEnableCalcProps}
+        onClose={() => setStageToEnableCalcProps(null)}
+        confirmButtonText={t`Turn on`}
+        confirmButtonColor="accent"
+      />
       <ConfirmationDialog
         dialogId={DELETE_STAGE_DIALOG_ID}
         title={t`Delete stage`}

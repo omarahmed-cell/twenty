@@ -5,6 +5,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { DataSource, In } from 'typeorm';
 
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
+import { DealStageHistoryService } from 'src/modules/deal-stage-history/services/deal-stage-history.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { COMPANY_ACTIVITY_DATE_SOURCES } from 'src/modules/company-calculated-fields/constants/company-activity-date-sources.constant';
@@ -33,6 +34,7 @@ export class OpportunityCalculatedFieldsService {
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly dealStageHistoryService: DealStageHistoryService,
   ) {}
 
   async resolveOpportunityIds({
@@ -152,8 +154,13 @@ export class OpportunityCalculatedFieldsService {
       workspaceId,
       opportunityIds: rows.map(({ id }) => id),
     });
+    const stageHistoryResult =
+      await this.dealStageHistoryService.recomputeDeals({ workspaceId });
 
-    return { opportunityCount: rows.length, updatedCount };
+    return {
+      opportunityCount: rows.length,
+      updatedCount: updatedCount + stageHistoryResult.updatedCount,
+    };
   }
 
   private async recomputeOpportunityBatch({

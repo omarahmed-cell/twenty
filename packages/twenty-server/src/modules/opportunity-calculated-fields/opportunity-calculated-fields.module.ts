@@ -1,3 +1,4 @@
+import { DealStageHistoryModule } from 'src/modules/deal-stage-history/deal-stage-history.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -15,6 +16,7 @@ import { OpportunityCalculationQueueService } from 'src/modules/opportunity-calc
   imports: [
     TypeOrmModule.forFeature([WorkspaceEntity]),
     WorkspaceIteratorModule,
+    DealStageHistoryModule,
   ],
   providers: [
     OpportunityCalculatedFieldsService,

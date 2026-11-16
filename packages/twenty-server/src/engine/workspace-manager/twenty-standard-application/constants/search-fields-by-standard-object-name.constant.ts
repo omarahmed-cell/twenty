@@ -39,6 +39,7 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
   messageListMember: [{ name: 'id', type: FieldMetadataType.UUID }],
   opportunityContact: [{ name: 'id', type: FieldMetadataType.UUID }],
   opportunityCollaborator: [{ name: 'id', type: FieldMetadataType.UUID }],
+  opportunityStageHistory: [{ name: 'id', type: FieldMetadataType.UUID }],
   pipeline: [{ name: 'name', type: FieldMetadataType.TEXT }],
   pipelineStage: [{ name: 'label', type: FieldMetadataType.TEXT }],
   messageParticipant: [{ name: 'handle', type: FieldMetadataType.TEXT }],

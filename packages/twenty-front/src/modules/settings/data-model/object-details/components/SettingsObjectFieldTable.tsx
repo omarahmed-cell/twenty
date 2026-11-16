@@ -23,6 +23,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useMemo, useState } from 'react';
 import { FieldMetadataType } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { SearchInput } from 'twenty-ui/components/input';
 import { Dropdown } from 'twenty-ui/components/navigation';
 import { SettingsRow } from 'twenty-ui/components/settings';
@@ -70,6 +71,9 @@ export type SettingsObjectFieldTableProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   mode: 'view' | 'new-field';
   excludeRelations?: boolean;
+  // Lets a page split one object's fields across sections; each table needs its own instance id
+  isFieldNameIncluded?: (fieldName: string) => boolean;
+  instanceId?: string;
 };
 
 // TODO: find another way than using mode which feels like it could be replaced by another pattern
@@ -77,6 +81,8 @@ export const SettingsObjectFieldTable = ({
   objectMetadataItem,
   mode,
   excludeRelations = false,
+  isFieldNameIncluded,
+  instanceId,
 }: SettingsObjectFieldTableProps) => {
   const { t } = useLingui();
   const [searchTerm, setSearchTerm] = useState('');
@@ -89,7 +95,16 @@ export const SettingsObjectFieldTable = ({
     skip: mode !== 'view',
   });
 
-  const tableMetadata = SETTINGS_OBJECT_FIELD_TABLE_METADATA;
+  const tableMetadata = useMemo(
+    () =>
+      !isDefined(instanceId)
+        ? SETTINGS_OBJECT_FIELD_TABLE_METADATA
+        : {
+            ...SETTINGS_OBJECT_FIELD_TABLE_METADATA,
+            tableId: `${SETTINGS_OBJECT_FIELD_TABLE_METADATA.tableId}-${instanceId}`,
+          },
+    [instanceId],
+  );
 
   const { mapFieldMetadataItemToSettingsObjectDetailTableItem } =
     useMapFieldMetadataItemToSettingsObjectDetailTableItem(objectMetadataItem);
@@ -114,13 +129,19 @@ export const SettingsObjectFieldTable = ({
           (fieldMetadataItem) => !isHiddenSystemField(fieldMetadataItem),
         );
 
-    const fieldsToDisplay = excludeRelations
+    const filteredByRelation = excludeRelations
       ? filteredBySystem?.filter(
           (fieldMetadataItem) =>
             fieldMetadataItem.type !== FieldMetadataType.RELATION &&
             fieldMetadataItem.type !== FieldMetadataType.MORPH_RELATION,
         )
       : filteredBySystem;
+
+    const fieldsToDisplay = !isDefined(isFieldNameIncluded)
+      ? filteredByRelation
+      : filteredByRelation?.filter((fieldMetadataItem) =>
+          isFieldNameIncluded(fieldMetadataItem.name),
+        );
 
     return (
       fieldsToDisplay?.map(
@@ -132,6 +153,7 @@ export const SettingsObjectFieldTable = ({
     mapFieldMetadataItemToSettingsObjectDetailTableItem,
     excludeRelations,
     showSystemFields,
+    isFieldNameIncluded,
   ]);
 
   const sortedAllObjectSettingsDetailItems = useSortedArray(
@@ -173,7 +195,11 @@ export const SettingsObjectFieldTable = ({
           onValueChange={setSearchTerm}
           actions={
             <DropdownRoot
-              dropdownId="settings-fields-filter-dropdown"
+              dropdownId={
+                !isDefined(instanceId)
+                  ? 'settings-fields-filter-dropdown'
+                  : `settings-fields-filter-dropdown-${instanceId}`
+              }
               type="panel"
             >
               <SettingsSearchFilterTrigger />

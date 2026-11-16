@@ -9,6 +9,7 @@ import { useHasPipelineObjects } from '@/pipeline/hooks/useHasPipelineObjects';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { SettingsPipelineAboutSection } from '@/settings/data-model/pipelines/components/SettingsPipelineAboutSection';
+import { SettingsPipelineCalcPropsSummary } from '@/settings/data-model/pipelines/components/SettingsPipelineCalcPropsSummary';
 import { SettingsPipelineRulesSection } from '@/settings/data-model/pipelines/components/SettingsPipelineRulesSection';
 import { SettingsPipelineStagesSection } from '@/settings/data-model/pipelines/components/SettingsPipelineStagesSection';
 import { PIPELINE_ENABLED_OBJECT_NAMES } from '@/settings/data-model/pipelines/constants/PipelineEnabledObjectNames';
@@ -62,6 +63,7 @@ const SettingsObjectPipelineDetailContent = () => {
       <SettingsPageContainer>
         {isDefined(pipeline) ? (
           <>
+            <SettingsPipelineCalcPropsSummary pipeline={pipeline} />
             <SettingsPipelineAboutSection
               key={pipeline.id}
               pipeline={pipeline}

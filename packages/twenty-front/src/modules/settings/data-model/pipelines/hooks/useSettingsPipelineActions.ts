@@ -11,6 +11,7 @@ import {
 import { useToast } from 'twenty-ui/components/feedback';
 
 import { getToastOptionsFromError } from '@/error-handler/utils/getToastOptionsFromError';
+import { useInvalidateMetadataStore } from '@/metadata-store/hooks/useInvalidateMetadataStore';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { useDestroyOneRecord } from '@/object-record/hooks/useDestroyOneRecord';
@@ -41,6 +42,7 @@ export const useSettingsPipelineActions = () => {
   const { t } = useLingui();
   const { enqueueToast } = useToast();
   const apolloCoreClient = useApolloCoreClient();
+  const { invalidateMetadataStore } = useInvalidateMetadataStore();
 
   const { createOneRecord: createOnePipeline } = useCreateOneRecord({
     objectNameSingular: CoreObjectNameSingular.Pipeline,
@@ -189,6 +191,23 @@ export const useSettingsPipelineActions = () => {
       return true;
     });
 
+  // The server creates or deactivates the stage's deal fields, so the object metadata is reloaded too
+  const setPipelineStageCalcPropsEnabled = (
+    pipelineStageId: string,
+    calcPropsEnabled: boolean,
+  ) =>
+    runSafely(async () => {
+      await updateOneRecord({
+        objectNameSingular: CoreObjectNameSingular.PipelineStage,
+        idToUpdate: pipelineStageId,
+        updateOneRecordInput: { calcPropsEnabled },
+      });
+      invalidateMetadataStore();
+      await refetchPipelineConfigs();
+
+      return true;
+    });
+
   const destroyPipelineStage = (pipelineStageId: string) =>
     runSafely(async () => {
       await destroyOnePipelineStage(pipelineStageId);
@@ -223,6 +242,7 @@ export const useSettingsPipelineActions = () => {
     clonePipeline,
     createPipelineStage,
     updatePipelineStage,
+    setPipelineStageCalcPropsEnabled,
     destroyPipelineStage,
     reorderPipelines: (positions: { id: string; position: number }[]) =>
       reorder({

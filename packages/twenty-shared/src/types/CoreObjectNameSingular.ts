@@ -32,6 +32,7 @@ export enum CoreObjectNameSingular {
   MessageThreadTarget = 'messageThreadTarget',
   OpportunityContact = 'opportunityContact',
   OpportunityCollaborator = 'opportunityCollaborator',
+  OpportunityStageHistory = 'opportunityStageHistory',
   Pipeline = 'pipeline',
   PipelineStage = 'pipelineStage',
   Note = 'note',

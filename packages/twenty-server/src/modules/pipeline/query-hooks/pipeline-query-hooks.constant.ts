@@ -27,6 +27,24 @@ import { OpportunityDestroyOnePreQueryHook } from 'src/modules/pipeline/query-ho
 import { OpportunityDeleteManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-delete-many.pre-query.hook';
 import { OpportunityDestroyManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-destroy-many.pre-query.hook';
 import { OpportunityCreateOnePostQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-create-one.post-query.hook';
+import { PipelineUpdateOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-update-one-stage-fields.post-query.hook';
+import { PipelineUpdateManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-update-many-stage-fields.post-query.hook';
+import { PipelineDeleteOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-delete-one-stage-fields.post-query.hook';
+import { PipelineDeleteManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-delete-many-stage-fields.post-query.hook';
+import { PipelineDestroyOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-destroy-one-stage-fields.post-query.hook';
+import { PipelineDestroyManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-destroy-many-stage-fields.post-query.hook';
+import { PipelineRestoreOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-restore-one-stage-fields.post-query.hook';
+import { PipelineRestoreManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-restore-many-stage-fields.post-query.hook';
+import { PipelineStageCreateOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-create-one-stage-fields.post-query.hook';
+import { PipelineStageCreateManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-create-many-stage-fields.post-query.hook';
+import { PipelineStageUpdateOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-update-one-stage-fields.post-query.hook';
+import { PipelineStageUpdateManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-update-many-stage-fields.post-query.hook';
+import { PipelineStageDeleteOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-delete-one-stage-fields.post-query.hook';
+import { PipelineStageDeleteManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-delete-many-stage-fields.post-query.hook';
+import { PipelineStageDestroyOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-destroy-one-stage-fields.post-query.hook';
+import { PipelineStageDestroyManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-destroy-many-stage-fields.post-query.hook';
+import { PipelineStageRestoreOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-restore-one-stage-fields.post-query.hook';
+import { PipelineStageRestoreManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-restore-many-stage-fields.post-query.hook';
 import { OpportunityCreateManyPostQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-create-many.post-query.hook';
 
 export const PIPELINE_QUERY_HOOKS = [
@@ -60,4 +78,22 @@ export const PIPELINE_QUERY_HOOKS = [
   OpportunityDestroyManyPreQueryHook,
   OpportunityCreateOnePostQueryHook,
   OpportunityCreateManyPostQueryHook,
+  PipelineUpdateOneStageFieldsPostQueryHook,
+  PipelineUpdateManyStageFieldsPostQueryHook,
+  PipelineDeleteOneStageFieldsPostQueryHook,
+  PipelineDeleteManyStageFieldsPostQueryHook,
+  PipelineDestroyOneStageFieldsPostQueryHook,
+  PipelineDestroyManyStageFieldsPostQueryHook,
+  PipelineRestoreOneStageFieldsPostQueryHook,
+  PipelineRestoreManyStageFieldsPostQueryHook,
+  PipelineStageCreateOneStageFieldsPostQueryHook,
+  PipelineStageCreateManyStageFieldsPostQueryHook,
+  PipelineStageUpdateOneStageFieldsPostQueryHook,
+  PipelineStageUpdateManyStageFieldsPostQueryHook,
+  PipelineStageDeleteOneStageFieldsPostQueryHook,
+  PipelineStageDeleteManyStageFieldsPostQueryHook,
+  PipelineStageDestroyOneStageFieldsPostQueryHook,
+  PipelineStageDestroyManyStageFieldsPostQueryHook,
+  PipelineStageRestoreOneStageFieldsPostQueryHook,
+  PipelineStageRestoreManyStageFieldsPostQueryHook,
 ];

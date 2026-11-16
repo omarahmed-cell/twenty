@@ -63,6 +63,8 @@ type SettingsPipelineStageRowProps = {
   ) => void;
   onDelete: () => void;
   onOpenConditionalLogic: (options: { isNewRule: boolean }) => void;
+  isCalcPropsSaving: boolean;
+  onToggleCalcProps: (isEnabled: boolean) => void;
 };
 
 export const SettingsPipelineStageRow = ({
@@ -72,6 +74,8 @@ export const SettingsPipelineStageRow = ({
   onUpdate,
   onDelete,
   onOpenConditionalLogic,
+  isCalcPropsSaving,
+  onToggleCalcProps,
 }: SettingsPipelineStageRowProps) => {
   const { t } = useLingui();
   const [labelDraft, setLabelDraft] = useState(stage.label);
@@ -85,8 +89,6 @@ export const SettingsPipelineStageRow = ({
   const deleteBlockedMessage = isOnlyStage
     ? t`A pipeline needs at least one stage.`
     : getDealsInUseBlockedMessage({ dealCount, kind: 'stage' });
-
-  const laterPhaseHint = t`Coming in a later phase`;
 
   const saveLabel = () => {
     const trimmedLabel = labelDraft.trim();
@@ -161,14 +163,13 @@ export const SettingsPipelineStageRow = ({
         {countPipelineRulesForStage(rules, stage.value)}
       </TableCell>
       <TableCell align="center">
-        <StyledDisabledHint title={laterPhaseHint}>
-          <Switch
-            checked={stage.calcPropsEnabled}
-            disabled
-            size="sm"
-            aria-label={t`Stage calculated properties`}
-          />
-        </StyledDisabledHint>
+        <Switch
+          checked={stage.calcPropsEnabled}
+          disabled={isCalcPropsSaving}
+          onCheckedChange={(isEnabled) => onToggleCalcProps(isEnabled)}
+          size="sm"
+          aria-label={t`Stage calculated properties`}
+        />
       </TableCell>
       <TableCell align="right" padding="0">
         <StyledDisabledHint title={deleteBlockedMessage ?? undefined}>

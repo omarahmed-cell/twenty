@@ -911,6 +911,30 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  opportunityStageHistory: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityStageHistory,
+    fields: STANDARD_OBJECT_FIELDS.opportunityStageHistory,
+    indexes: {
+      opportunityIdIndex: {
+        universalIdentifier: '1ba8bb01-8e95-4854-97ec-22e19fc14f0d',
+      },
+    },
+    views: {
+      allOpportunityStageHistories: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityStageHistory,
+        fields: STANDARD_OBJECT_FIELDS.opportunityStageHistory,
+        viewFieldNames: [
+          'changedAt',
+          'opportunity',
+          'fromStage',
+          'toStage',
+          'changedBy',
+        ],
+      }),
+    },
+  },
   pipeline: {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipeline,
     fields: STANDARD_OBJECT_FIELDS.pipeline,

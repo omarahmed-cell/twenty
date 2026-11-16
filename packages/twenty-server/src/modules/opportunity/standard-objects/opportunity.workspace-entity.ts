@@ -11,6 +11,7 @@ import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-obje
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type LineItemWorkspaceEntity } from 'src/modules/line-item/standard-objects/line-item.workspace-entity';
 import { type OpportunityCollaboratorWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity-collaborator.workspace-entity';
+import { type OpportunityStageHistoryWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity-stage-history.workspace-entity';
 import { type OpportunityContactWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity-contact.workspace-entity';
 import { type NoteTargetWorkspaceEntity } from 'src/modules/note/standard-objects/note-target.workspace-entity';
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
@@ -53,6 +54,9 @@ export class OpportunityWorkspaceEntity extends BaseWorkspaceEntity {
   lineItems: EntityRelation<LineItemWorkspaceEntity[]>;
   contacts: EntityRelation<OpportunityContactWorkspaceEntity[]>;
   dealCollaborators: EntityRelation<OpportunityCollaboratorWorkspaceEntity[]>;
+  stageHistory: EntityRelation<OpportunityStageHistoryWorkspaceEntity[]>;
+  dateEnteredCurrentStage: string | null;
+  timeInCurrentStage: number | null;
   /** @deprecated */
   probability: string;
   searchVector: string;

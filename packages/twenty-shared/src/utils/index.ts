@@ -315,6 +315,15 @@ export {
   isDealCreationStageAllowed,
   isDealStageLocked,
 } from './pipeline/pipeline-rules';
+export type { StageCalculatedPropertyKind } from './pipeline/stage-calculated-properties';
+export {
+  STAGE_CALCULATED_PROPERTY_KINDS,
+  STAGE_CALCULATED_PROPERTY_FIELD_COUNT_PER_STAGE,
+  buildStageCalculatedPropertyFieldName,
+  buildStageCalculatedPropertyFieldNames,
+  buildStageCalculatedPropertyLabel,
+  countStageCalculatedProperties,
+} from './pipeline/stage-calculated-properties';
 export { removePropertiesFromRecord } from './removePropertiesFromRecord';
 export { removeUndefinedFields } from './removeUndefinedFields';
 export { safeParseRelativeDateFilterJsonStringified } from './safeParseRelativeDateFilterJsonStringified';

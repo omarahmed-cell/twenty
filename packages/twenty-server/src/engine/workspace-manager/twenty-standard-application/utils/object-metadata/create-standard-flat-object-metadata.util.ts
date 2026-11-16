@@ -1271,6 +1271,52 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  opportunityStageHistory: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'opportunityStageHistory'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'opportunityStageHistory',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.opportunityStageHistory.universalIdentifier,
+        nameSingular: 'opportunityStageHistory',
+        namePlural: 'opportunityStageHistories',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Deal Stage Change`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Deal Stage Changes`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `One stage change of a deal, written by the server`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconTimelineEvent',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   pipeline: ({
     now,
     workspaceId,

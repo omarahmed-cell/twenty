@@ -8,7 +8,7 @@ import { OpportunityCalculatedFieldsService } from 'src/modules/opportunity-calc
 @Command({
   name: 'opportunity:recompute-calculated-fields',
   description:
-    'Fully recompute the calculated fields (Last Activity Date, Next Activity Date, Number of Associated Contacts, Number of Associated Line Items) of every deal. Run it after a data migration.',
+    'Fully recompute the calculated fields (Last Activity Date, Next Activity Date, Number of Associated Contacts, Number of Associated Line Items, Date entered current stage, Time in current stage) of every deal, and fill empty stage calculated properties from the stage history. Run it after a data migration.',
 })
 export class RecomputeOpportunityCalculatedFieldsCommand extends ProvisionedWorkspaceCommandRunner {
   constructor(

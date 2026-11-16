@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
+import { ViewFieldModule } from 'src/engine/metadata-modules/view-field/view-field.module';
+import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
+import { DealStageHistoryModule } from 'src/modules/deal-stage-history/deal-stage-history.module';
+import { DealStageCalculatedPropertiesService } from 'src/modules/pipeline/services/deal-stage-calculated-properties.service';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
@@ -25,6 +29,9 @@ import { PipelineWriteGuardService } from 'src/modules/pipeline/services/pipelin
   imports: [
     ApplicationModule,
     FieldMetadataModule,
+    ViewFieldModule,
+    WorkspaceMigrationModule,
+    DealStageHistoryModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
     WorkspaceCacheModule,
     CompanyCalculatedFieldsModule,
@@ -39,6 +46,7 @@ import { PipelineWriteGuardService } from 'src/modules/pipeline/services/pipelin
     DealPipelineIntegrityService,
     DealPipelineRulesService,
     DealStageEntryRulesService,
+    DealStageCalculatedPropertiesService,
     PipelineResolver,
     PipelineConfigListener,
     DealCloseDateListener,
