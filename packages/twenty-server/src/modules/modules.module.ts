@@ -16,6 +16,7 @@ import { AssignedDateTrackingModule } from 'src/modules/assigned-date-tracking/a
 import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
 import { CompanyHierarchyModule } from 'src/modules/company-hierarchy/company-hierarchy.module';
 import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calculated-fields/opportunity-calculated-fields.module';
+import { MeetingFieldsModule } from 'src/modules/meeting-fields/meeting-fields.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { StageDateTrackingModule } from 'src/modules/stage-date-tracking/stage-date-tracking.module';
@@ -75,6 +76,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     CompanyCalculatedFieldsModule,
     PersonCalculatedFieldsModule,
     OpportunityCalculatedFieldsModule,
+    MeetingFieldsModule,
     PipelineModule,
     CompanyHierarchyModule,
     StageDateTrackingModule,

@@ -4,6 +4,7 @@ import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  MetadataWritability,
   RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
@@ -563,29 +564,41 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
       options: [
         {
           id: '3d055c1e-258b-439a-be84-81adeec58364',
-          value: 'PHONE_CALL',
+          value: 'PHONE',
           label: i18nLabel(
-            msg({ message: `Phone-Call`, context: 'fieldMetadata.label' }),
+            msg({ message: `Phone call`, context: 'fieldMetadata.label' }),
           ),
           position: 0,
           color: 'blue',
         },
         {
           id: 'fc75e91f-3b32-4a16-8412-d4308e7d81f7',
-          value: 'IN_PERSON',
+          value: 'ADDRESS',
           label: i18nLabel(
-            msg({ message: `In-Person`, context: 'fieldMetadata.label' }),
+            msg({ message: `Address`, context: 'fieldMetadata.label' }),
           ),
           position: 1,
           color: 'green',
         },
         {
-          id: '6e65760e-1600-424e-b6f4-aa4fe0e8a755',
-          value: 'GOOGLE_MEET',
+          id: 'e2b1f9a4-6c3d-4f0e-9a7b-5d8c2e1f4a63',
+          value: 'CUSTOM',
           label: i18nLabel(
-            msg({ message: `Google Meet`, context: 'fieldMetadata.label' }),
+            msg({ message: `Custom`, context: 'fieldMetadata.label' }),
           ),
           position: 2,
+          color: 'gray',
+        },
+        {
+          id: '6e65760e-1600-424e-b6f4-aa4fe0e8a755',
+          value: 'VIDEO_CONFERENCE',
+          label: i18nLabel(
+            msg({
+              message: `Video Conference`,
+              context: 'fieldMetadata.label',
+            }),
+          ),
+          position: 3,
           color: 'turquoise',
         },
       ],
@@ -740,6 +753,246 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  hasMeetingTranscript: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'hasMeetingTranscript',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({
+            message: `Meeting transcript available`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Yes when the meeting has a transcript link, or HubSpot had a transcript at migration`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconFileText',
+        isNullable: true,
+        isUIEditable: false,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  hubspotHasTranscript: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'hubspotHasTranscript',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({
+            message: `Transcript in HubSpot`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Snapshot of HubSpot's 'Meeting transcript available' at migration time`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconFileText',
+        isNullable: true,
+        isUIEditable: false,
+        isSystem: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  meetingSource: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'meetingSource',
+        type: FieldMetadataType.SELECT,
+        label: i18nLabel(
+          msg({ message: `Meeting source`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `How the meeting was created, set once when it is created`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconSourceCode',
+        isNullable: true,
+        isUIEditable: false,
+        options: [
+          {
+            id: 'a24d8ba1-9182-421c-88a3-7f4bde6f074c',
+            value: 'CALENDAR_SYNC',
+            label: i18nLabel(
+              msg({ message: `Calendar sync`, context: 'fieldMetadata.label' }),
+            ),
+            position: 0,
+            color: 'sky',
+          },
+          {
+            id: 'a2b98654-bcbb-4cbd-9272-c967315be1f6',
+            value: 'LOGGED_IN_TWENTY',
+            label: i18nLabel(
+              msg({
+                message: `Logged in Twenty`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 1,
+            color: 'green',
+          },
+          {
+            id: 'd8412e33-77b2-4739-850b-ba70453b41a7',
+            value: 'API',
+            label: i18nLabel(
+              msg({ message: `API`, context: 'fieldMetadata.label' }),
+            ),
+            position: 2,
+            color: 'purple',
+          },
+          {
+            id: 'e9e155c8-8988-414d-aa96-f73c8799e39c',
+            value: 'WORKFLOW',
+            label: i18nLabel(
+              msg({ message: `Workflow`, context: 'fieldMetadata.label' }),
+            ),
+            position: 3,
+            color: 'orange',
+          },
+          {
+            id: '2de28753-b7d2-4291-b3d0-3ad16291c6ed',
+            value: 'IMPORT',
+            label: i18nLabel(
+              msg({ message: `Import`, context: 'fieldMetadata.label' }),
+            ),
+            position: 4,
+            color: 'gray',
+          },
+          {
+            id: 'c892808c-6dc8-42bd-9f5a-6c50430bd0a9',
+            value: 'CRM_UI',
+            label: i18nLabel(
+              msg({ message: `CRM UI`, context: 'fieldMetadata.label' }),
+            ),
+            position: 5,
+            color: 'blue',
+          },
+          {
+            id: '71adc5bd-2b75-44ff-8d99-c4626acadd75',
+            value: 'INTEGRATION',
+            label: i18nLabel(
+              msg({ message: `Integration`, context: 'fieldMetadata.label' }),
+            ),
+            position: 6,
+            color: 'turquoise',
+          },
+          {
+            id: 'e66aa749-dc79-40b1-a0f1-1c5c7d41a0bd',
+            value: 'AVAILABILITY_SCHEDULE',
+            label: i18nLabel(
+              msg({
+                message: `Meeting created from a proposed time`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 7,
+            color: 'yellow',
+          },
+          {
+            id: '43723b80-eb7d-4f63-86f7-fc5e71a9dd00',
+            value: 'BIDIRECTIONAL_API',
+            label: i18nLabel(
+              msg({
+                message: `Meeting created on calendar from CRM`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 8,
+            color: 'pink',
+          },
+          {
+            id: '7b88aecb-a908-4e48-941b-3c95e46d15c3',
+            value: 'BIDIRECTIONAL_SYNC',
+            label: i18nLabel(
+              msg({
+                message: `Meeting synced from calendar to CRM`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 9,
+            color: 'red',
+          },
+          {
+            id: 'c791c28d-e74c-428a-8104-52a249ac6017',
+            value: 'MEETINGS_EMBEDDED',
+            label: i18nLabel(
+              msg({
+                message: `Meetings (Embedded)`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 10,
+            color: 'amber',
+          },
+          {
+            id: '4eebb1d6-52d6-49e2-974e-28d744aad56a',
+            value: 'MEETINGS_PUBLIC',
+            label: i18nLabel(
+              msg({
+                message: `Meetings (Public)`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 11,
+            color: 'lime',
+          },
+          {
+            id: '3727ef21-415c-42dc-9faf-c40eec2c4c9a',
+            value: 'MANUAL_LOGGING_FROM_CALENDAR',
+            label: i18nLabel(
+              msg({
+                message: `Manual logging from calendar`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 12,
+            color: 'cyan',
+          },
+          {
+            id: 'b566cd02-87d5-4d68-96c9-23b69bc2c856',
+            value: 'ADHOC_NOTETAKER',
+            label: i18nLabel(
+              msg({
+                message: `Adhoc Notetaker`,
+                context: 'fieldMetadata.label',
+              }),
+            ),
+            position: 13,
+            color: 'violet',
+          },
+        ],
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
   calendarChannelEventAssociations: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

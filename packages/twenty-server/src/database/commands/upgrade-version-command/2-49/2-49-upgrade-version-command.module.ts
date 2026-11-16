@@ -22,6 +22,7 @@ import { ProvisionPersonFieldsCommand } from 'src/database/commands/upgrade-vers
 import { ProvisionDealFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794778290530-provision-deal-fields.command';
 import { ProvisionPipelinesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794785676065-provision-pipelines.command';
 import { ProvisionDealStageHistoryCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794840628348-provision-deal-stage-history.command';
+import { ProvisionMeetingSourceAndLocationTypesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794853579951-provision-meeting-source-and-location-types.command';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
@@ -63,6 +64,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionDealFieldsCommand,
     ProvisionPipelinesCommand,
     ProvisionDealStageHistoryCommand,
+    ProvisionMeetingSourceAndLocationTypesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

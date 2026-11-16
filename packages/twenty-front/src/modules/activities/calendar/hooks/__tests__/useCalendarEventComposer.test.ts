@@ -352,7 +352,7 @@ describe('useCalendarEventComposer', () => {
 
     act(() => {
       result.current.setTitle('Discovery call');
-      result.current.setCrmField('locationType', 'GOOGLE_MEET');
+      result.current.setCrmField('locationType', 'VIDEO_CONFERENCE');
       result.current.setCrmField('meetingType', 'VIRTUAL');
       result.current.setCrmField('assignedToId', 'workspace-member-id');
     });
@@ -368,7 +368,7 @@ describe('useCalendarEventComposer', () => {
       objectNameSingular: 'calendarEvent',
       idToUpdate: 'calendar-event-id',
       updateOneRecordInput: {
-        locationType: 'GOOGLE_MEET',
+        locationType: 'VIDEO_CONFERENCE',
         meetingType: 'VIRTUAL',
         meetingOutcome: 'SCHEDULED',
         assignedToId: 'workspace-member-id',

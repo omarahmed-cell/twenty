@@ -716,6 +716,15 @@ export const STANDARD_OBJECT_FIELDS = {
     assignedTo: {
       universalIdentifier: 'd95a25ce-08f6-471a-b0ff-028cdb8cb682',
     },
+    hasMeetingTranscript: {
+      universalIdentifier: 'ccf62e53-243c-4901-8c87-e28d7cf5292d',
+    },
+    hubspotHasTranscript: {
+      universalIdentifier: '356e5de7-fcfb-4701-8a3a-183ad6943735',
+    },
+    meetingSource: {
+      universalIdentifier: '2879185a-46ca-47ef-8ada-8f2890c4c28e',
+    },
     calendarChannelEventAssociations: {
       universalIdentifier: '20202020-bdf8-4572-a2cc-ecbb6bcc3a02',
     },

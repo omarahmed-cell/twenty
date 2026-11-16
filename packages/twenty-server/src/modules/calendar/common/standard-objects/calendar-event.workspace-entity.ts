@@ -27,6 +27,9 @@ export class CalendarEventWorkspaceEntity extends BaseWorkspaceEntity {
   meetingOutcome: string;
   assignedTo: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
   assignedToId: string | null;
+  hasMeetingTranscript: boolean | null;
+  hubspotHasTranscript: boolean | null;
+  meetingSource: string | null;
   calendarChannelEventAssociations: EntityRelation<
     CalendarChannelEventAssociationWorkspaceEntity[]
   >;
