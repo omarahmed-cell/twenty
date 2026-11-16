@@ -28,6 +28,7 @@ export const FIND_DEAL_PIPELINE_CONFIGS = gql`
           probability
           hubspotStageId
           calcPropsEnabled
+          conditionalRules
           deletedAt
         }
       }

@@ -13,6 +13,7 @@ import {
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { DealPipelineRulesService } from 'src/modules/pipeline/services/deal-pipeline-rules.service';
+import { DealStageEntryRulesService } from 'src/modules/pipeline/services/deal-stage-entry-rules.service';
 import { PipelineConfigService } from 'src/modules/pipeline/services/pipeline-config.service';
 import { type PipelineConfig } from 'src/modules/pipeline/types/pipeline-config.type';
 import { extractRecordIdsFromFilter } from 'src/modules/pipeline/utils/extract-record-ids-from-filter.util';
@@ -88,6 +89,7 @@ export class DealPipelineIntegrityService {
     private readonly coreDataSource: DataSource,
     private readonly pipelineConfigService: PipelineConfigService,
     private readonly dealPipelineRulesService: DealPipelineRulesService,
+    private readonly dealStageEntryRulesService: DealStageEntryRulesService,
   ) {}
 
   async prepareDealsToCreate({
@@ -131,6 +133,21 @@ export class DealPipelineIntegrityService {
         current,
         next: this.toNextValues(resolved, current),
         data: record,
+      });
+
+      await this.dealStageEntryRulesService.enforce({
+        workspaceId,
+        actorKind: isImportRecord(record) ? 'IMPORT' : actor.kind,
+        operation: isDefined(current) ? 'update' : 'create',
+        pipelines,
+        entries: [
+          {
+            recordId: record.id,
+            current,
+            next: this.toStageValues(resolved, current),
+            data: resolved,
+          },
+        ],
       });
 
       prepared.push(resolved);
@@ -204,15 +221,32 @@ export class DealPipelineIntegrityService {
         ? this.apply({ pipelines, record: data, current })
         : data;
 
+    const actor = await this.dealPipelineRulesService.resolveActor(authContext);
+
     await this.dealPipelineRulesService.enforce({
       workspaceId,
-      actor: await this.dealPipelineRulesService.resolveActor(authContext),
+      actor,
       operation: 'update',
       pipelines,
       recordId: id,
       current,
       next: this.toNextValues(resolved, current),
       data,
+    });
+
+    await this.dealStageEntryRulesService.enforce({
+      workspaceId,
+      actorKind: actor.kind,
+      operation: 'update',
+      pipelines,
+      entries: [
+        {
+          recordId: id,
+          current,
+          next: this.toStageValues(resolved, current),
+          data: resolved,
+        },
+      ],
     });
 
     return resolved;
@@ -289,6 +323,19 @@ export class DealPipelineIntegrityService {
       });
     }
 
+    await this.dealStageEntryRulesService.enforce({
+      workspaceId,
+      actorKind: actor.kind,
+      operation: 'update',
+      pipelines,
+      entries: [...currentById].map(([recordId, current]) => ({
+        recordId,
+        current,
+        next: this.toStageValues(resolved, current),
+        data: resolved,
+      })),
+    });
+
     return resolved;
   }
 
@@ -339,6 +386,15 @@ export class DealPipelineIntegrityService {
         current,
       });
     }
+  }
+
+  private toStageValues(
+    data: DealData,
+    current: DealPipelineStage | undefined,
+  ) {
+    const { pipeline, stage } = this.toNextValues(data, current);
+
+    return { pipeline, stage };
   }
 
   private toNextValues(

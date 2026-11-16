@@ -2,6 +2,7 @@ import { contextStoreNumberOfSelectedRecordsComponentState } from '@/context-sto
 import { UpdateMultipleRecordsFooter } from '@/object-record/record-update-multiple/components/UpdateMultipleRecordsFooter';
 import { UpdateMultipleRecordsForm } from '@/object-record/record-update-multiple/components/UpdateMultipleRecordsForm';
 import { useUpdateMultipleRecordsActions } from '@/object-record/record-update-multiple/hooks/useUpdateMultipleRecordsActions';
+import { useDealBulkEditStageEntryRefusal } from '@/pipeline/conditional-logic/hooks/useDealBulkEditStageEntryRefusal';
 import { useSidePanelMenu } from '@/side-panel/hooks/useSidePanelMenu';
 import { ConfirmationDialog } from '@/ui/layout/dialog/components/ConfirmationDialog';
 import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
@@ -11,6 +12,7 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 import { themeCssVariables } from 'twenty-ui/theme';
 
@@ -64,7 +66,19 @@ export const UpdateMultipleRecordsContainer = ({
     {},
   );
 
+  const { getBulkEditStageEntryRefusal } = useDealBulkEditStageEntryRefusal({
+    objectNameSingular,
+  });
+
   const handleUpdateClick = () => {
+    const stageEntryRefusal = getBulkEditStageEntryRefusal(fieldUpdates);
+
+    if (isDefined(stageEntryRefusal)) {
+      enqueueToast({ status: 'error', children: stageEntryRefusal });
+
+      return;
+    }
+
     openDialog(UPDATE_MULTIPLE_RECORDS_CONFIRMATION_MODAL_ID);
   };
 

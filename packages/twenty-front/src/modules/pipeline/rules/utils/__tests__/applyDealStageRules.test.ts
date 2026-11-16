@@ -28,6 +28,7 @@ const buildPipeline = (
     color: null,
     hubspotStageId: null,
     calcPropsEnabled: false,
+    conditionalRules: [],
   })),
 });
 

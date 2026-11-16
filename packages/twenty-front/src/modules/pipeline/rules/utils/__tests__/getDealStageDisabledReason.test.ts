@@ -31,6 +31,7 @@ const SALES: PipelineConfig = {
     color: null,
     hubspotStageId: null,
     calcPropsEnabled: false,
+    conditionalRules: [],
   })),
 };
 

@@ -30,6 +30,29 @@ export { evaluateConditionalAvailabilityExpression } from './command-menu-items/
 export { resolveObjectMetadataLabel } from './command-menu-items/resolveObjectMetadataLabel';
 export { safeGetNestedProperty } from './command-menu-items/safeGetNestedProperty';
 export { computeDiffBetweenObjects } from './compute-diff-between-objects';
+export {
+  getConditionalLogicOperators,
+  isConditionalLogicOperatorValueless,
+  isConditionalLogicListOperator,
+} from './conditional-logic/conditional-logic-operators';
+export type {
+  ConditionalLogicOperator,
+  ConditionalLogicConditionValue,
+  ConditionalLogicCondition,
+  ConditionalLogicConditionGroup,
+  ConditionalLogicProperty,
+  ConditionalLogicRule,
+  ConditionalLogicField,
+} from './conditional-logic/conditional-logic-types';
+export {
+  getConditionalLogicFieldValue,
+  isConditionalLogicValueEmpty,
+  evaluateConditionalLogicCondition,
+  evaluateConditionalLogicGroups,
+  resolveConditionalLogicProperties,
+  findMissingConditionalLogicProperties,
+} from './conditional-logic/evaluate-conditional-logic';
+export { normalizeConditionalLogicRules } from './conditional-logic/normalize-conditional-logic-rules';
 export { formatValueForCSV } from './csv/formatValueForCSV';
 export { sanitizeValueForCSVExport } from './csv/sanitizeValueForCSVExport';
 export { convertCurrencyAmountToCurrencyMicros } from './currency/convertCurrencyAmountToCurrencyMicros';

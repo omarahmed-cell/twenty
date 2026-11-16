@@ -3,6 +3,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useCallback } from 'react';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import {
+  type ConditionalLogicRule,
   DEFAULT_PIPELINE_RULES,
   isDefined,
   type PipelineRules,
@@ -33,6 +34,7 @@ type PipelineStageUpdateInput = Partial<{
   color: string | null;
   probability: number | null;
   position: number;
+  conditionalRules: ConditionalLogicRule[];
 }>;
 
 export const useSettingsPipelineActions = () => {

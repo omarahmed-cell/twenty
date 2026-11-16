@@ -7,6 +7,7 @@ import {
   buildPipelineKey,
   buildPipelineStageValue,
   isDefined,
+  normalizeConditionalLogicRules,
   normalizePipelineRules,
 } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
@@ -162,9 +163,9 @@ export class PipelineWriteGuardService {
         ...record,
         value,
         calcPropsEnabled: record.calcPropsEnabled === true,
-        conditionalRules: Array.isArray(record.conditionalRules)
-          ? record.conditionalRules
-          : [],
+        conditionalRules: normalizeConditionalLogicRules(
+          record.conditionalRules,
+        ),
       };
     });
   }
@@ -184,7 +185,14 @@ export class PipelineWriteGuardService {
 
     assertValidProbability(data);
 
-    return data;
+    return 'conditionalRules' in data
+      ? {
+          ...data,
+          conditionalRules: normalizeConditionalLogicRules(
+            data.conditionalRules,
+          ),
+        }
+      : data;
   }
 
   async assertPipelinesRemovable(

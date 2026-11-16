@@ -6,6 +6,7 @@ import { DROPDOWN_BOUNDARY_HORIZONTAL_PADDING } from '@/ui/layout/dropdown/const
 import { DROPDOWN_RESIZE_MIN_HEIGHT } from '@/ui/layout/dropdown/constants/DropdownResizeMinHeight';
 import { DROPDOWN_RESIZE_MIN_WIDTH } from '@/ui/layout/dropdown/constants/DropdownResizeMinWidth';
 import { DropdownComponentInstanceContext } from '@/ui/layout/dropdown/contexts/DropdownComponentInstanceContext';
+import { DropdownInModalContext } from '@/ui/layout/dropdown/contexts/DropdownInModalContext';
 import { useToggleDropdown } from '@/ui/layout/dropdown/hooks/useToggleDropdown';
 import { dropdownMaxHeightComponentState } from '@/ui/layout/dropdown/states/internal/dropdownMaxHeightComponentState';
 import { dropdownMaxWidthComponentState } from '@/ui/layout/dropdown/states/internal/dropdownMaxWidthComponentState';
@@ -28,6 +29,7 @@ import {
   type MouseEvent,
   type ReactNode,
   useCallback,
+  useContext,
   useLayoutEffect,
 } from 'react';
 import { flushSync } from 'react-dom';
@@ -89,10 +91,11 @@ export const Dropdown = ({
   onOpen,
   clickableComponentWidth = 'auto',
   excludedClickOutsideIds,
-  isDropdownInModal = false,
+  isDropdownInModal,
   disableClickForClickableComponent = false,
   middlewareBoundaryPadding = {},
 }: DropdownProps) => {
+  const isInModal = useContext(DropdownInModalContext);
   const isDropdownOpen = useAtomComponentStateValue(
     isDropdownOpenComponentState,
     dropdownId,
@@ -236,7 +239,7 @@ export const Dropdown = ({
           onClickOutside={onClickOutside}
           onHotkeyTriggered={onOpen}
           excludedClickOutsideIds={excludedClickOutsideIds}
-          isDropdownInModal={isDropdownInModal}
+          isDropdownInModal={isDropdownInModal ?? isInModal}
         />
       )}
       <DropdownOnToggleEffect

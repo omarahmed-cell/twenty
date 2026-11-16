@@ -37,6 +37,17 @@ const StyledConditionalLogic = styled.span`
   gap: ${themeCssVariables.spacing[1]};
 `;
 
+const StyledRuleCountButton = styled.button`
+  background: none;
+  border: none;
+  color: ${themeCssVariables.font.color.primary};
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+`;
+
 const StyledDisabledHint = styled.span`
   display: inline-flex;
 `;
@@ -51,6 +62,7 @@ type SettingsPipelineStageRowProps = {
     >,
   ) => void;
   onDelete: () => void;
+  onOpenConditionalLogic: (options: { isNewRule: boolean }) => void;
 };
 
 export const SettingsPipelineStageRow = ({
@@ -59,9 +71,11 @@ export const SettingsPipelineStageRow = ({
   isOnlyStage,
   onUpdate,
   onDelete,
+  onOpenConditionalLogic,
 }: SettingsPipelineStageRowProps) => {
   const { t } = useLingui();
   const [labelDraft, setLabelDraft] = useState(stage.label);
+  const conditionalRuleCount = stage.conditionalRules.length;
 
   const dealCount = useSettingsPipelineDealCount({
     fieldName: 'stage',
@@ -123,12 +137,24 @@ export const SettingsPipelineStageRow = ({
       </TableCell>
       <TableCell>
         <StyledConditionalLogic>
-          {'—'}
-          <StyledDisabledHint title={laterPhaseHint}>
-            <LightButton startIcon={<IconPlus />} disabled>
-              {t`Add rule`}
-            </LightButton>
-          </StyledDisabledHint>
+          {conditionalRuleCount === 0 ? (
+            '—'
+          ) : (
+            <StyledRuleCountButton
+              type="button"
+              onClick={() => onOpenConditionalLogic({ isNewRule: false })}
+            >
+              {conditionalRuleCount === 1
+                ? t`1 logic rule`
+                : t`${conditionalRuleCount} logic rules`}
+            </StyledRuleCountButton>
+          )}
+          <LightButton
+            startIcon={<IconPlus />}
+            onClick={() => onOpenConditionalLogic({ isNewRule: true })}
+          >
+            {t`Add rule`}
+          </LightButton>
         </StyledConditionalLogic>
       </TableCell>
       <TableCell align="right">

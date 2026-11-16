@@ -6,10 +6,12 @@ import { useFilteredSelectOptionsFromRLSPredicates } from '@/object-record/recor
 import { useSelectField } from '@/object-record/record-field/ui/meta-types/hooks/useSelectField';
 import { FieldInputDropdown } from '@/object-record/record-field/ui/meta-types/input/components/FieldInputDropdown';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
+import { useDealStageFieldChange } from '@/pipeline/conditional-logic/hooks/useDealStageFieldChange';
 import { useDealStageRuleOptions } from '@/pipeline/rules/hooks/useDealStageRuleOptions';
 import { useDealStageOptions } from '@/pipeline/stage-picker/hooks/useDealStageOptions';
 import {
   DEAL_PIPELINE_FIELD_NAME,
+  isDealPipelineField,
   isDealStageField,
 } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { SelectInput } from '@/ui/input/components/SelectInput';
@@ -41,6 +43,17 @@ export const SelectFieldInput = () => {
     objectNameSingular: fieldDefinition.metadata.objectMetadataNameSingular,
     fieldName: fieldDefinition.metadata.fieldName,
   });
+
+  const { isHandledByStageEntry, saveWithStageEntry } = useDealStageFieldChange(
+    {
+      recordId,
+      isDealStage,
+      isDealPipeline: isDealPipelineField({
+        objectNameSingular: fieldDefinition.metadata.objectMetadataNameSingular,
+        fieldName: fieldDefinition.metadata.fieldName,
+      }),
+    },
+  );
 
   const dealPipelineKey = useAtomFamilySelectorValue(
     recordStoreFamilySelector,
@@ -76,6 +89,13 @@ export const SelectFieldInput = () => {
   };
 
   const handleSubmit = (option: SelectOption) => {
+    if (isHandledByStageEntry(option.value)) {
+      onCancel?.();
+      void saveWithStageEntry(option.value);
+
+      return;
+    }
+
     onSubmit?.({ newValue: option.value });
   };
 

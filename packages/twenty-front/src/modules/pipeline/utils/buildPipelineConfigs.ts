@@ -3,7 +3,11 @@ import {
   type PipelineConfig,
   type PipelineStageConfig,
 } from '@/pipeline/types/PipelineConfig';
-import { isDefined, normalizePipelineRules } from 'twenty-shared/utils';
+import {
+  isDefined,
+  normalizeConditionalLogicRules,
+  normalizePipelineRules,
+} from 'twenty-shared/utils';
 
 const byPosition = (
   first: { position: number },
@@ -29,6 +33,7 @@ export const buildPipelineConfigs = ({
       probability: record.probability ?? null,
       hubspotStageId: record.hubspotStageId ?? null,
       calcPropsEnabled: record.calcPropsEnabled === true,
+      conditionalRules: normalizeConditionalLogicRules(record.conditionalRules),
     }));
 
   return pipelineRecords

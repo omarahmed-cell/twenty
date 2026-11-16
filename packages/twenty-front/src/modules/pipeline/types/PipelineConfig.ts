@@ -1,4 +1,7 @@
-import { type PipelineRules } from 'twenty-shared/utils';
+import {
+  type ConditionalLogicRule,
+  type PipelineRules,
+} from 'twenty-shared/utils';
 
 export type PipelineStageConfig = {
   id: string;
@@ -10,6 +13,7 @@ export type PipelineStageConfig = {
   probability: number | null;
   hubspotStageId: string | null;
   calcPropsEnabled: boolean;
+  conditionalRules: ConditionalLogicRule[];
 };
 
 export type PipelineConfig = {

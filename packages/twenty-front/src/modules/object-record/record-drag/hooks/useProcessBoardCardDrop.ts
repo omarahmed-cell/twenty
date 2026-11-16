@@ -52,12 +52,22 @@ export const useProcessBoardCardDrop = () => {
   );
 
   const processBoardCardDrop = useCallback(
-    ({
-      draggedRecordId,
-      sourceDroppableId,
-      destinationDroppableId,
-      destinationIndex,
-    }: RecordDragDropResult) => {
+    (
+      {
+        draggedRecordId,
+        sourceDroppableId,
+        destinationDroppableId,
+        destinationIndex,
+      }: RecordDragDropResult,
+      {
+        draggedRecordIds,
+        additionalUpdateInput,
+      }: {
+        // Captured at drop time when the drop is confirmed later, after the drag state is cleared
+        draggedRecordIds?: string[];
+        additionalUpdateInput?: Record<string, unknown>;
+      } = {},
+    ) => {
       if (!isDefined(selectFieldMetadataItem)) {
         return;
       }
@@ -89,7 +99,8 @@ export const useProcessBoardCardDrop = () => {
           ),
           destinationIndex,
           draggedRecordId,
-          draggedRecordIds: store.get(draggedRecordIdsCallbackState),
+          draggedRecordIds:
+            draggedRecordIds ?? store.get(draggedRecordIdsCallbackState),
           store,
         });
 
@@ -97,6 +108,7 @@ export const useProcessBoardCardDrop = () => {
           updateDroppedRecordOnBoard(
             { recordId: id, position: hasRecordSorts ? undefined : position },
             destinationRecordGroup.value,
+            additionalUpdateInput,
           );
         }
       } finally {

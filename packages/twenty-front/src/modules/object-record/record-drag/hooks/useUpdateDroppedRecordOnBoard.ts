@@ -42,6 +42,7 @@ export const useUpdateDroppedRecordOnBoard = () => {
         position?: number;
       },
       targetRecordGroupValue: RecordGroupDefinition['value'],
+      additionalUpdateInput: Record<string, unknown> = {},
     ) => {
       const initialRecord = store.get(
         recordStoreFamilyState.atomFamily(recordId),
@@ -168,6 +169,7 @@ export const useUpdateDroppedRecordOnBoard = () => {
             __typename:
               (initialRecord as { __typename?: string })?.__typename ??
               'Record',
+            ...additionalUpdateInput,
             [recordGroupColumnName]: targetRecordGroupValue,
             ...(isDefined(newPosition) && { position: newPosition }),
           } as ObjectRecord,
@@ -177,6 +179,7 @@ export const useUpdateDroppedRecordOnBoard = () => {
       updateOneRecord({
         idToUpdate: recordId,
         updateOneRecordInput: {
+          ...additionalUpdateInput,
           [recordGroupColumnName]: targetRecordGroupValue,
           ...(isDefined(newPosition) && { position: newPosition }),
         },

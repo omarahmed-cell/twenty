@@ -10,6 +10,7 @@ import { SettingsPipelineRowMenu } from '@/settings/data-model/pipelines/compone
 import { SETTINGS_PIPELINES_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineTableGridTemplateColumns';
 import { useSettingsPipelineDealCount } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineDealCount';
 import { countCalcPropsEnabledStages } from '@/settings/data-model/pipelines/utils/countCalcPropsEnabledStages';
+import { countPipelineConditionalLogicRules } from '@/settings/data-model/pipelines/utils/countPipelineConditionalLogicRules';
 import { getDealsInUseBlockedMessage } from '@/settings/data-model/pipelines/utils/getDealsInUseBlockedMessage';
 import { getSettingsPipelinePath } from '@/settings/data-model/pipelines/utils/getSettingsPipelinePath';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
@@ -76,6 +77,9 @@ export const SettingsPipelineTableRow = ({
       </TableCell>
       <TableCell align="right">
         {countEnabledPipelineRules(pipeline.rules)}
+      </TableCell>
+      <TableCell align="right">
+        {countPipelineConditionalLogicRules(pipeline.stages)}
       </TableCell>
       <TableCell align="right">{pipeline.stages.length}</TableCell>
       <TableCell minWidth="0">

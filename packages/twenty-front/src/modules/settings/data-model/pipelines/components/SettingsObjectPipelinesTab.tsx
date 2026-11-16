@@ -140,6 +140,7 @@ export const SettingsObjectPipelinesTab = ({
           <TableHeader>{t`Pipeline description`}</TableHeader>
           <TableHeader align="right">{t`Stage calculated properties`}</TableHeader>
           <TableHeader align="right">{t`Pipeline rules`}</TableHeader>
+          <TableHeader align="right">{t`Conditional logic rules`}</TableHeader>
           <TableHeader align="right">{t`Stages`}</TableHeader>
           <TableHeader>{t`Pipeline ID`}</TableHeader>
           <TableHeader />

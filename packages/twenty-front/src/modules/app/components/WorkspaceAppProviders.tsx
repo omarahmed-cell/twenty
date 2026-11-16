@@ -28,6 +28,7 @@ import { ApolloCoreProvider } from '@/object-metadata/components/ApolloCoreProvi
 import { CoreRecordReferenceFieldsContext } from '@/object-record/record-field/ui/contexts/CoreRecordReferenceFieldsContext';
 import { RecordCreationFormProvider } from '@/object-record/record-form/components/RecordCreationFormProvider';
 import { WelcomeOverlay } from '@/onboarding/components/WelcomeOverlay/WelcomeOverlay';
+import { DealStageEntryDialog } from '@/pipeline/conditional-logic/components/DealStageEntryDialog';
 import { CompanyEnrichmentOnboardingEffect } from '@/onboarding/effect-components/CompanyEnrichmentOnboardingEffect';
 import { ApolloAdminProvider } from '@/settings/admin-panel/apollo/components/ApolloAdminProvider';
 import { EndTrialAfterPaymentMethodGater } from '@/settings/billing/components/EndTrialAfterPaymentMethodGater';
@@ -83,6 +84,7 @@ export const WorkspaceAppProviders = () => {
                                 <Outlet />
                                 <GlobalFilePreviewModal />
                                 <CommandMenuConfirmationModalManager />
+                                <DealStageEntryDialog />
                                 <CommandRunner />
                               </RecordCreationFormProvider>
                             </CoreRecordReferenceFieldsContext.Provider>

@@ -1,7 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
-import { isDefined } from 'twenty-shared/utils';
+import { type ConditionalLogicRule, isDefined } from 'twenty-shared/utils';
 import { LightButton } from 'twenty-ui/components/input';
 import { Section } from 'twenty-ui/components/layout';
 import { IconPlus } from 'twenty-ui/icon';
@@ -12,6 +12,8 @@ import {
   type PipelineStageConfig,
 } from '@/pipeline/types/PipelineConfig';
 import { SettingsPipelineStageRow } from '@/settings/data-model/pipelines/components/SettingsPipelineStageRow';
+import { SettingsPipelineStageConditionalLogicModal } from '@/settings/data-model/pipelines/conditional-logic/components/SettingsPipelineStageConditionalLogicModal';
+import { createConditionalLogicRuleDraft } from '@/settings/data-model/pipelines/conditional-logic/utils/conditionalLogicRuleDraft';
 import { SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineStagesTableGridTemplateColumns';
 import { useSettingsPipelineActions } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineActions';
 import { computeReorderedPositions } from '@/settings/data-model/pipelines/utils/computeReorderedPositions';
@@ -48,6 +50,14 @@ export const SettingsPipelineStagesSection = ({
 
   const [stageToDelete, setStageToDelete] =
     useState<PipelineStageConfig | null>(null);
+  const [conditionalLogicTarget, setConditionalLogicTarget] = useState<{
+    stageId: string;
+    initialRuleDraft: ConditionalLogicRule | null;
+  } | null>(null);
+
+  const conditionalLogicStage = pipeline.stages.find(
+    (stage) => stage.id === conditionalLogicTarget?.stageId,
+  );
 
   const handleDragEnd = (result: {
     source: { index: number };
@@ -117,6 +127,14 @@ export const SettingsPipelineStagesSection = ({
                         setStageToDelete(stage);
                         openDialog(DELETE_STAGE_DIALOG_ID);
                       }}
+                      onOpenConditionalLogic={({ isNewRule }) =>
+                        setConditionalLogicTarget({
+                          stageId: stage.id,
+                          initialRuleDraft: isNewRule
+                            ? createConditionalLogicRuleDraft()
+                            : null,
+                        })
+                      }
                     />
                   }
                 />
@@ -139,6 +157,16 @@ export const SettingsPipelineStagesSection = ({
           {t`Add stage`}
         </LightButton>
       </StyledFooter>
+      {isDefined(conditionalLogicStage) && (
+        <SettingsPipelineStageConditionalLogicModal
+          key={conditionalLogicStage.id}
+          stage={conditionalLogicStage}
+          objectNameSingular={pipeline.objectNameSingular}
+          isOpen
+          initialRuleDraft={conditionalLogicTarget?.initialRuleDraft ?? null}
+          onClose={() => setConditionalLogicTarget(null)}
+        />
+      )}
       <ConfirmationDialog
         dialogId={DELETE_STAGE_DIALOG_ID}
         title={t`Delete stage`}

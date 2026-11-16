@@ -1,7 +1,4 @@
-import {
-  isClosedDealStageProbability,
-  isDefined,
-} from 'twenty-shared/utils';
+import { isClosedDealStageProbability, isDefined } from 'twenty-shared/utils';
 
 // Entering a won or lost stage dates the close; reopening the deal clears it. Imports bring their own dates.
 export const computeDealCloseDateUpdate = ({
