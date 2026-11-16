@@ -26,6 +26,8 @@ import { OpportunityDeleteOnePreQueryHook } from 'src/modules/pipeline/query-hoo
 import { OpportunityDestroyOnePreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-destroy-one.pre-query.hook';
 import { OpportunityDeleteManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-delete-many.pre-query.hook';
 import { OpportunityDestroyManyPreQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-destroy-many.pre-query.hook';
+import { OpportunityCreateOnePostQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-create-one.post-query.hook';
+import { OpportunityCreateManyPostQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-create-many.post-query.hook';
 
 export const PIPELINE_QUERY_HOOKS = [
   PipelineCreateOnePreQueryHook,
@@ -56,4 +58,6 @@ export const PIPELINE_QUERY_HOOKS = [
   OpportunityDestroyOnePreQueryHook,
   OpportunityDeleteManyPreQueryHook,
   OpportunityDestroyManyPreQueryHook,
+  OpportunityCreateOnePostQueryHook,
+  OpportunityCreateManyPostQueryHook,
 ];

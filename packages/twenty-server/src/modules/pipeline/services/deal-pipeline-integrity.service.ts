@@ -5,7 +5,6 @@ import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
-import { v4 } from 'uuid';
 
 import {
   CommonQueryRunnerException,
@@ -119,11 +118,7 @@ export class DealPipelineIntegrityService {
       const current = isNonEmptyString(record.id)
         ? existingById.get(record.id)
         : undefined;
-      // The id is set here so an Admin override can be traced on the new deal
-      const withId = isNonEmptyString(record.id)
-        ? record
-        : { ...record, id: v4() };
-      const resolved = this.apply({ pipelines, record: withId, current });
+      const resolved = this.apply({ pipelines, record, current });
 
       await this.dealPipelineRulesService.enforce({
         workspaceId,
@@ -131,7 +126,8 @@ export class DealPipelineIntegrityService {
         isImport: isImportRecord(record),
         operation: isDefined(current) ? 'update' : 'create',
         pipelines,
-        recordId: resolved.id,
+        // A new deal's override is traced by recordCreationOverrides once the row exists
+        recordId: isDefined(current) ? record.id : undefined,
         current,
         next: this.toNextValues(resolved, current),
         data: record,
@@ -141,6 +137,50 @@ export class DealPipelineIntegrityService {
     }
 
     return prepared;
+  }
+
+  async recordCreationOverrides({
+    authContext,
+    records,
+  }: {
+    authContext: WorkspaceAuthContext;
+    records: DealData[];
+  }): Promise<void> {
+    const actor = await this.dealPipelineRulesService.resolveActor(authContext);
+
+    if (actor.kind !== 'ADMIN') {
+      return;
+    }
+
+    const workspaceId = authContext.workspace.id;
+    const pipelines = await this.pipelineConfigService.getPipelines({
+      workspaceId,
+    });
+
+    for (const record of records) {
+      // An upsert that updated an existing deal was already traced before the write
+      const isNewRecord =
+        new Date(record.createdAt as string).getTime() ===
+        new Date(record.updatedAt as string).getTime();
+
+      if (
+        !isNewRecord ||
+        isImportRecord(record) ||
+        !isNonEmptyString(record.id)
+      ) {
+        continue;
+      }
+
+      await this.dealPipelineRulesService.enforce({
+        workspaceId,
+        actor,
+        operation: 'create',
+        pipelines,
+        recordId: record.id,
+        next: this.toNextValues(record, undefined),
+        data: record,
+      });
+    }
   }
 
   async prepareDealUpdate({
