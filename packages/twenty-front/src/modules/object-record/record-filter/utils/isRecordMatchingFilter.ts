@@ -504,14 +504,14 @@ export const isRecordMatchingFilter = ({
         if (isDefined(actorFilter.workspaceMemberId)) {
           return isMatchingUUIDFilter({
             uuidFilter: actorFilter.workspaceMemberId,
-            value: record[filterKey]?.workspaceMemberId,
+            value: record[filterKey]?.workspaceMemberId ?? null,
           });
         }
 
         if (isDefined(actorFilter.source)) {
           return isMatchingSelectFilter({
             selectFilter: actorFilter.source,
-            value: record[filterKey].source,
+            value: record[filterKey]?.source ?? null,
           });
         }
 

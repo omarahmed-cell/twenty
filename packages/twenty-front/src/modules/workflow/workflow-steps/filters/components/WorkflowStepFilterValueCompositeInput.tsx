@@ -1,3 +1,4 @@
+import { getActorSourceSelectOptions } from '@/object-record/object-filter-dropdown/utils/getActorSourceSelectOptions';
 import { FormCountryMultiSelectInput } from '@/object-record/record-field/ui/form-types/components/FormCountryMultiSelectInput';
 import { FormMultiSelectFieldInput } from '@/object-record/record-field/ui/form-types/components/FormMultiSelectFieldInput';
 import { FormNumberFieldInput } from '@/object-record/record-field/ui/form-types/components/FormNumberFieldInput';
@@ -11,20 +12,8 @@ import { useCurrencies } from '@/ui/input/components/internal/hooks/useCurrencie
 import { WorkflowStepFilterContext } from '@/workflow/workflow-steps/filters/states/context/WorkflowStepFilterContext';
 import { WorkflowVariablePicker } from '@/workflow/workflow-variables/components/WorkflowVariablePicker';
 import { useContext } from 'react';
-import {
-  CoreObjectNameSingular,
-  FieldActorSource,
-  type StepFilter,
-} from 'twenty-shared/types';
-import { type SelectOption } from 'twenty-ui/primitives/input';
+import { CoreObjectNameSingular, type StepFilter } from 'twenty-shared/types';
 import { type JsonValue } from 'type-fest';
-
-const ACTOR_SOURCE_OPTIONS: SelectOption[] = Object.values(
-  FieldActorSource,
-).map((source) => ({
-  label: source.charAt(0) + source.slice(1).toLowerCase(),
-  value: source,
-}));
 
 export const WorkflowStepFilterValueCompositeInput = ({
   stepFilter,
@@ -96,7 +85,7 @@ export const WorkflowStepFilterValueCompositeInput = ({
           <FormMultiSelectFieldInput
             defaultValue={stepFilter.value}
             onChange={onChange}
-            options={ACTOR_SOURCE_OPTIONS}
+            options={getActorSourceSelectOptions()}
             readonly={readonly}
             VariablePicker={WorkflowVariablePicker}
           />

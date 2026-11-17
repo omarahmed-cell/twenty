@@ -1122,6 +1122,211 @@ describe('turnRecordFilterIntoRecordGqlOperationFilter', () => {
       expect(json).not.toContain('[]');
       expect(json).not.toContain('{}');
     });
+
+    describe('name part', () => {
+      it('should only match the name on CONTAINS', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.CONTAINS,
+            'api',
+            'ACTOR',
+            'name',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({ actor: { name: { ilike: '%api%' } } });
+      });
+
+      it('should negate the name match on DOES_NOT_CONTAIN', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.DOES_NOT_CONTAIN,
+            'ana',
+            'ACTOR',
+            'name',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({
+          not: { actor: { name: { ilike: '%ana%' } } },
+        });
+      });
+
+      it('should match empty or null names on IS_EMPTY', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS_EMPTY,
+            '',
+            'ACTOR',
+            'name',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({
+          or: [
+            { actor: { name: { ilike: '' } } },
+            { actor: { name: { is: 'NULL' } } },
+          ],
+        });
+      });
+    });
+
+    describe('user part', () => {
+      const workspaceMemberId = '20202020-0000-4000-8000-000000000001';
+      const currentWorkspaceMemberId = '20202020-0000-4000-8000-000000000002';
+
+      it('should match selected members and the current member on IS', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies: {
+            ...filterValueDependencies,
+            currentWorkspaceMemberId,
+          },
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS,
+            JSON.stringify({
+              isCurrentWorkspaceMemberSelected: true,
+              selectedRecordIds: [workspaceMemberId],
+            }),
+            'ACTOR',
+            'workspaceMemberId',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({
+          actor: {
+            workspaceMemberId: {
+              in: [workspaceMemberId, currentWorkspaceMemberId],
+            },
+          },
+        });
+      });
+
+      it('should keep records without a member on IS_NOT', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS_NOT,
+            JSON.stringify({
+              isCurrentWorkspaceMemberSelected: false,
+              selectedRecordIds: [workspaceMemberId],
+            }),
+            'ACTOR',
+            'workspaceMemberId',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({
+          or: [
+            {
+              not: {
+                actor: { workspaceMemberId: { in: [workspaceMemberId] } },
+              },
+            },
+            { actor: { workspaceMemberId: { is: 'NULL' } } },
+          ],
+        });
+      });
+
+      it('should check the member id for null on IS_EMPTY and IS_NOT_EMPTY', () => {
+        const emptyResult = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS_EMPTY,
+            '',
+            'ACTOR',
+            'workspaceMemberId',
+          ),
+          fieldMetadataItemById,
+        });
+
+        const notEmptyResult = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS_NOT_EMPTY,
+            '',
+            'ACTOR',
+            'workspaceMemberId',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(emptyResult).toEqual({
+          actor: { workspaceMemberId: { is: 'NULL' } },
+        });
+        expect(notEmptyResult).toEqual({
+          not: { actor: { workspaceMemberId: { is: 'NULL' } } },
+        });
+      });
+    });
+
+    describe('source part', () => {
+      it('should match the selected sources on IS', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS,
+            JSON.stringify(['API', 'FORMS', 'DOCUMENT_APP']),
+            'ACTOR',
+            'source',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({
+          actor: { source: { in: ['API', 'FORMS', 'DOCUMENT_APP'] } },
+        });
+      });
+
+      it('should exclude the selected sources on IS_NOT', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS_NOT,
+            JSON.stringify(['IMPORT']),
+            'ACTOR',
+            'source',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toEqual({
+          not: { actor: { source: { in: ['IMPORT'] } } },
+        });
+      });
+
+      it('should skip the filter when no source is selected', () => {
+        const result = turnRecordFilterIntoRecordGqlOperationFilter({
+          filterValueDependencies,
+          recordFilter: makeFilter(
+            'f-actor',
+            RecordFilterOperand.IS,
+            '[]',
+            'ACTOR',
+            'source',
+          ),
+          fieldMetadataItemById,
+        });
+
+        expect(result).toBeUndefined();
+      });
+    });
   });
 
   describe('PHONES filter', () => {

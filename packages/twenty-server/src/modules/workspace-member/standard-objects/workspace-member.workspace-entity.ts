@@ -12,8 +12,12 @@ import { BaseWorkspaceEntity } from 'src/engine/twenty-orm/base.workspace-entity
 import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-objects/attachment.workspace-entity';
 import { type BlocklistWorkspaceEntity } from 'src/modules/blocklist/standard-objects/blocklist.workspace-entity';
 import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-participant.workspace-entity';
+import { type CallWorkspaceEntity } from 'src/modules/call/standard-objects/call.workspace-entity';
+import { type CommunicationWorkspaceEntity } from 'src/modules/communication/standard-objects/communication.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
+import { type EmailWorkspaceEntity } from 'src/modules/email/standard-objects/email.workspace-entity';
 import { type MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
+import { type NoteWorkspaceEntity } from 'src/modules/note/standard-objects/note.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
 import { type CalendarEventWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event.workspace-entity';
 import { type TaskWorkspaceEntity } from 'src/modules/task/standard-objects/task.workspace-entity';
@@ -90,6 +94,10 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   agentMessageReactions: Relation<AgentMessageReactionWorkspaceEntity[]>;
   ownedOpportunities: Relation<OpportunityWorkspaceEntity[]>;
   assignedCalendarEvents: Relation<CalendarEventWorkspaceEntity[]>;
+  assignedCalls: Relation<CallWorkspaceEntity[]>;
+  assignedNotes: Relation<NoteWorkspaceEntity[]>;
+  assignedEmails: Relation<EmailWorkspaceEntity[]>;
+  assignedCommunications: Relation<CommunicationWorkspaceEntity[]>;
   searchVector: string;
   numberFormat: string;
 }

@@ -1,5 +1,5 @@
-import { FieldActorSource } from 'twenty-shared/types';
 import { AdvancedFilterContext } from '@/object-record/advanced-filter/states/context/AdvancedFilterContext';
+import { getActorSourceSelectOptions } from '@/object-record/object-filter-dropdown/utils/getActorSourceSelectOptions';
 import { subFieldNameUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/subFieldNameUsedInDropdownComponentState';
 import { FormCountryMultiSelectInput } from '@/object-record/record-field/ui/form-types/components/FormCountryMultiSelectInput';
 import { FormMultiSelectFieldInput } from '@/object-record/record-field/ui/form-types/components/FormMultiSelectFieldInput';
@@ -11,15 +11,7 @@ import { type RecordFilter } from '@/object-record/record-filter/types/RecordFil
 import { useCurrencies } from '@/ui/input/components/internal/hooks/useCurrencies';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useContext } from 'react';
-import { type SelectOption } from 'twenty-ui/primitives/input';
 import { type JsonValue } from 'type-fest';
-
-const ACTOR_SOURCE_OPTIONS: SelectOption[] = Object.values(
-  FieldActorSource,
-).map((source) => ({
-  label: source.charAt(0) + source.slice(1).toLowerCase(),
-  value: source,
-}));
 
 export const AdvancedFilterSidePanelValueFormCompositeFieldInput = ({
   recordFilter,
@@ -98,7 +90,7 @@ export const AdvancedFilterSidePanelValueFormCompositeFieldInput = ({
           <FormMultiSelectFieldInput
             defaultValue={recordFilter.value}
             onChange={onChange}
-            options={ACTOR_SOURCE_OPTIONS}
+            options={getActorSourceSelectOptions()}
             readonly={readonly}
             VariablePicker={VariablePicker}
           />

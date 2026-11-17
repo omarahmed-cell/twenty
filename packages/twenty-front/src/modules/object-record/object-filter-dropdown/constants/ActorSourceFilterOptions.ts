@@ -1,94 +1,20 @@
-import { type MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
 import {
-  type IconComponent,
-  IconApi,
-  IconCsv,
-  IconFileText,
-  IconGmail,
-  IconGoogleCalendar,
-  IconListCheck,
-  IconRobot,
-  IconSettingsAutomation,
-  IconUserCircle,
-  IconWebhook,
-} from 'twenty-ui/icon';
-import { doNotTranslate } from 'twenty-shared/i18n';
+  ACTOR_SOURCE_FILTER_OPTION_CONFIGS,
+  type ActorSourceFilterOptionConfig,
+} from '@/object-record/object-filter-dropdown/constants/ActorSourceFilterOptionConfigs';
+import { RECORD_SOURCE_LABELS } from 'twenty-shared/constants';
+import { type FieldActorSource } from 'twenty-shared/types';
 
-// Source names are stored in saved filters; label descriptors provide localized display text.
-export const ACTOR_SOURCE_FILTER_OPTIONS: Array<{
-  id: string;
-  name: string;
-  label: MessageDescriptor;
-  AvatarIcon: IconComponent;
-  isIconInverted?: boolean;
-}> = [
+// `id` is the stored filter value; `name` is the untranslated label kept in saved display values.
+export const ACTOR_SOURCE_FILTER_OPTIONS: Array<
   {
-    id: 'MANUAL',
-    name: doNotTranslate('User'),
-    label: msg`User`,
-    AvatarIcon: IconUserCircle,
-    isIconInverted: true,
-  },
-  {
-    id: 'IMPORT',
-    name: doNotTranslate('Import'),
-    label: msg`Import`,
-    AvatarIcon: IconCsv,
-    isIconInverted: true,
-  },
-  {
-    id: 'API',
-    name: doNotTranslate('Api'),
-    label: msg`API`,
-    AvatarIcon: IconApi,
-    isIconInverted: true,
-  },
-  {
-    id: 'EMAIL',
-    name: doNotTranslate('Email'),
-    label: msg`Email`,
-    AvatarIcon: IconGmail,
-  },
-  {
-    id: 'CALENDAR',
-    name: doNotTranslate('Calendar'),
-    label: msg`Calendar`,
-    AvatarIcon: IconGoogleCalendar,
-  },
-  {
-    id: 'WORKFLOW',
-    name: doNotTranslate('Workflow'),
-    label: msg`Workflow`,
-    AvatarIcon: IconSettingsAutomation,
-    isIconInverted: true,
-  },
-  {
-    id: 'WEBHOOK',
-    name: doNotTranslate('Webhook'),
-    label: msg`Webhook`,
-    AvatarIcon: IconWebhook,
-    isIconInverted: true,
-  },
-  {
-    id: 'FORMS',
-    name: doNotTranslate('Forms'),
-    label: msg`Forms`,
-    AvatarIcon: IconListCheck,
-    isIconInverted: true,
-  },
-  {
-    id: 'DOCUMENT_APP',
-    name: doNotTranslate('Document app'),
-    label: msg`Document app`,
-    AvatarIcon: IconFileText,
-    isIconInverted: true,
-  },
-  {
-    id: 'SYSTEM',
-    name: doNotTranslate('System'),
-    label: msg`System`,
-    AvatarIcon: IconRobot,
-    isIconInverted: true,
-  },
-];
+    id: FieldActorSource;
+    name: string;
+  } & ActorSourceFilterOptionConfig
+> = (Object.keys(ACTOR_SOURCE_FILTER_OPTION_CONFIGS) as FieldActorSource[]).map(
+  (source) => ({
+    id: source,
+    name: RECORD_SOURCE_LABELS[source],
+    ...ACTOR_SOURCE_FILTER_OPTION_CONFIGS[source],
+  }),
+);

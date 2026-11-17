@@ -6,6 +6,11 @@ import { useSelectableList } from '@/ui/layout/selectable-list/hooks/useSelectab
 import { isSelectedItemIdComponentFamilyState } from '@/ui/layout/selectable-list/states/isSelectedItemIdComponentFamilyState';
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
 import { useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown } from '@/views/hooks/useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown';
+import { fieldMetadataItemIdUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemIdUsedInDropdownComponentState';
+import { objectFilterDropdownIsSelectingSubFieldComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownIsSelectingSubFieldComponentState';
+import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
+import { useSetAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useSetAtomComponentState';
+import { FieldMetadataType } from 'twenty-shared/types';
 import { useIcons } from 'twenty-ui/icon';
 
 export type ViewBarFilterDropdownFieldSelectMenuItemProps = {
@@ -29,8 +34,27 @@ export const ViewBarFilterDropdownFieldSelectMenuItem = ({
 
   const Icon = getIcon(fieldMetadataItemToSelect.icon);
 
+  const setFieldMetadataItemIdUsedInDropdown = useSetAtomComponentState(
+    fieldMetadataItemIdUsedInDropdownComponentState,
+  );
+
+  const setObjectFilterDropdownIsSelectingSubField = useSetAtomComponentState(
+    objectFilterDropdownIsSelectingSubFieldComponentState,
+  );
+
+  const setObjectFilterDropdownSearchInput = useSetAtomComponentState(
+    objectFilterDropdownSearchInputComponentState,
+  );
+
   const handleClick = () => {
     resetSelectedItem();
+
+    if (fieldMetadataItemToSelect.type === FieldMetadataType.ACTOR) {
+      setFieldMetadataItemIdUsedInDropdown(fieldMetadataItemToSelect.id);
+      setObjectFilterDropdownSearchInput('');
+      setObjectFilterDropdownIsSelectingSubField(true);
+      return;
+    }
 
     initializeFilterOnFieldMetataItemFromViewBarFilterDropdown(
       fieldMetadataItemToSelect,

@@ -5,6 +5,7 @@ import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migr
 import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-objects/attachment.workspace-entity';
 import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-objects/call-target.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
+import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 
 export class CallWorkspaceEntity extends BaseWorkspaceEntity {
   position: number;
@@ -14,6 +15,8 @@ export class CallWorkspaceEntity extends BaseWorkspaceEntity {
   outcome: string | null;
   createdBy: ActorMetadata;
   updatedBy: ActorMetadata;
+  assignedTo: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
+  assignedToId: string | null;
   callTargets: EntityRelation<CallTargetWorkspaceEntity[]>;
   attachments: EntityRelation<AttachmentWorkspaceEntity[]>;
   timelineActivities: EntityRelation<TimelineActivityWorkspaceEntity[]>;

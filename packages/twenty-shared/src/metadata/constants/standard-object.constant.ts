@@ -316,6 +316,9 @@ export const STANDARD_OBJECTS = {
       searchVectorGinIndex: {
         universalIdentifier: 'e4f82180-f1d1-4813-b6f1-577350523d07',
       },
+      assignedToIdIndex: {
+        universalIdentifier: '58bccf9b-9bfe-4d29-846b-d3a71c62107c',
+      },
     },
     views: {
       allCalls: buildStandardObjectIndexView({
@@ -326,6 +329,7 @@ export const STANDARD_OBJECTS = {
           'callTargets',
           'direction',
           'outcome',
+          'assignedTo',
           'bodyV2',
           'createdBy',
           'createdAt',
@@ -338,6 +342,7 @@ export const STANDARD_OBJECTS = {
           'callTargets',
           'direction',
           'outcome',
+          'assignedTo',
           'createdAt',
           'createdBy',
           'attachments',
@@ -409,6 +414,9 @@ export const STANDARD_OBJECTS = {
       searchVectorGinIndex: {
         universalIdentifier: 'eadec858-6de0-4770-a9d1-11436bcb1f73',
       },
+      assignedToIdIndex: {
+        universalIdentifier: 'b538d023-f78f-453d-8f31-72fe1da1dc36',
+      },
     },
     views: {
       allCommunications: buildStandardObjectIndexView({
@@ -420,6 +428,7 @@ export const STANDARD_OBJECTS = {
           'communicationTargets',
           'channelType',
           'direction',
+          'assignedTo',
           'bodyV2',
           'createdBy',
           'createdAt',
@@ -433,6 +442,7 @@ export const STANDARD_OBJECTS = {
           'communicationTargets',
           'channelType',
           'direction',
+          'assignedTo',
           'createdAt',
           'createdBy',
           'attachments',
@@ -451,6 +461,9 @@ export const STANDARD_OBJECTS = {
       searchVectorGinIndex: {
         universalIdentifier: '6de2e82c-1077-415f-8bb0-db097a20487a',
       },
+      assignedToIdIndex: {
+        universalIdentifier: '76a50e33-4864-48ae-a552-510d80aa8081',
+      },
     },
     views: {
       allEmails: buildStandardObjectIndexView({
@@ -464,6 +477,7 @@ export const STANDARD_OBJECTS = {
           'to',
           'sentAt',
           'status',
+          'assignedTo',
           'createdBy',
         ],
       }),
@@ -477,6 +491,7 @@ export const STANDARD_OBJECTS = {
           'to',
           'sentAt',
           'status',
+          'assignedTo',
           'hubspotId',
           'createdAt',
           'createdBy',
@@ -1279,6 +1294,9 @@ export const STANDARD_OBJECTS = {
       searchVectorGinIndex: {
         universalIdentifier: '8183c8d2-9114-4b6e-8c5d-12a3b14a5a13',
       },
+      assignedToIdIndex: {
+        universalIdentifier: 'e1b3a626-736b-4782-a44e-eb440315f897',
+      },
     },
     views: {
       allNotes: buildStandardObjectIndexView({
@@ -1287,6 +1305,7 @@ export const STANDARD_OBJECTS = {
         viewFieldNames: [
           'title',
           'noteTargets',
+          'assignedTo',
           'bodyV2',
           'createdBy',
           'createdAt',
@@ -1295,7 +1314,12 @@ export const STANDARD_OBJECTS = {
       noteRecordPageFields: buildStandardObjectRecordPageFieldsView({
         objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.note,
         fields: STANDARD_OBJECT_FIELDS.note,
-        viewFieldNames: ['noteTargets', 'attachments', 'timelineActivities'],
+        viewFieldNames: [
+          'noteTargets',
+          'assignedTo',
+          'attachments',
+          'timelineActivities',
+        ],
         viewFieldGroupNames: {
           general: 'General',
         },

@@ -5,6 +5,7 @@ import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migr
 import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-objects/attachment.workspace-entity';
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
+import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 
 export class CommunicationWorkspaceEntity extends BaseWorkspaceEntity {
   position: number;
@@ -13,6 +14,8 @@ export class CommunicationWorkspaceEntity extends BaseWorkspaceEntity {
   direction: string | null;
   createdBy: ActorMetadata;
   updatedBy: ActorMetadata;
+  assignedTo: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
+  assignedToId: string | null;
   communicationTargets: EntityRelation<CommunicationTargetWorkspaceEntity[]>;
   attachments: EntityRelation<AttachmentWorkspaceEntity[]>;
   timelineActivities: EntityRelation<TimelineActivityWorkspaceEntity[]>;

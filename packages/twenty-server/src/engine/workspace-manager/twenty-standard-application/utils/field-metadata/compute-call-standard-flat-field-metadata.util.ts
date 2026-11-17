@@ -4,6 +4,7 @@ import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
 
@@ -480,6 +481,40 @@ export const buildCallStandardFlatFieldMetadatas = ({
       targetFieldName: 'targetCall',
       settings: {
         relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assignedTo: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedTo',
+      label: i18nLabel(
+        msg({
+          message: `Activity assigned to`,
+          context: 'fieldMetadata.label',
+        }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Workspace member the call is assigned to`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUserCircle',
+      isNullable: true,
+      targetObjectName: 'workspaceMember',
+      targetFieldName: 'assignedCalls',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'assignedToId',
       },
     },
     standardObjectMetadataRelatedEntityIds,

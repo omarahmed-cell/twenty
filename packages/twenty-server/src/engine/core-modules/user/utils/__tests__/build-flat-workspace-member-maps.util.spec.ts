@@ -41,6 +41,10 @@ const buildWorkspaceMember = ({
   assignedAgentChatThreads: [],
   ownedOpportunities: [],
   assignedCalendarEvents: [],
+  assignedCalls: [],
+  assignedNotes: [],
+  assignedEmails: [],
+  assignedCommunications: [],
 });
 
 describe('buildFlatWorkspaceMemberMaps', () => {

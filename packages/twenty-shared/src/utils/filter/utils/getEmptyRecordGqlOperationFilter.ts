@@ -346,6 +346,18 @@ export const getEmptyRecordGqlOperationFilter = ({
             };
       break;
     case 'ACTOR':
+      if (
+        compositeFieldName === 'workspaceMemberId' ||
+        compositeFieldName === 'source'
+      ) {
+        emptyRecordFilter = {
+          [correspondingField.name]: {
+            [compositeFieldName]: { is: 'NULL' },
+          } as ActorFilter,
+        };
+        break;
+      }
+
       emptyRecordFilter = {
         or: [
           {

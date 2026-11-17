@@ -84,6 +84,20 @@ describe('getRecordFilterOperands', () => {
       expect(operands).toMatchSnapshot();
     });
 
+    it('returns text operands when subFieldName is name (actor name subField)', () => {
+      const operands = getRecordFilterOperands({
+        filterType: 'ACTOR',
+        subFieldName: 'name',
+      });
+
+      expect(operands).toEqual([
+        'CONTAINS',
+        'DOES_NOT_CONTAIN',
+        'IS_EMPTY',
+        'IS_NOT_EMPTY',
+      ]);
+    });
+
     it('returns ACTOR (text-like) operands when subFieldName is undefined', () => {
       const operands = getRecordFilterOperands({
         filterType: 'ACTOR',

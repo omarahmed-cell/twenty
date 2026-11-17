@@ -1,3 +1,8 @@
+import { ObjectFilterDropdownActorSelect } from '@/object-record/object-filter-dropdown/components/ObjectFilterDropdownActorSelect';
+import { ObjectFilterDropdownSourceSelect } from '@/object-record/object-filter-dropdown/components/ObjectFilterDropdownSourceSelect';
+import { subFieldNameUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/subFieldNameUsedInDropdownComponentState';
+import { isFilterOnActorSourceSubField } from '@/object-record/object-filter-dropdown/utils/isFilterOnActorSourceSubField';
+import { isFilterOnActorWorkspaceMemberSubField } from '@/object-record/object-filter-dropdown/utils/isFilterOnActorWorkspaceMemberSubField';
 import { ObjectFilterDropdownDateInput } from '@/object-record/object-filter-dropdown/components/ObjectFilterDropdownDateInput';
 import { ObjectFilterDropdownNumberInput } from '@/object-record/object-filter-dropdown/components/ObjectFilterDropdownNumberInput';
 import { ObjectFilterDropdownOptionSelect } from '@/object-record/object-filter-dropdown/components/ObjectFilterDropdownOptionSelect';
@@ -34,6 +39,10 @@ export const ObjectFilterDropdownFilterInput = ({
 
   const selectedOperandInDropdown = useAtomComponentStateValue(
     selectedOperandInDropdownComponentState,
+  );
+
+  const subFieldNameUsedInDropdown = useAtomComponentStateValue(
+    subFieldNameUsedInDropdownComponentState,
   );
 
   const isOperandWithFilterValue =
@@ -116,9 +125,26 @@ export const ObjectFilterDropdownFilterInput = ({
             />
           </>
         )}
-        {filterType === 'ACTOR' && (
-          <ObjectFilterDropdownTextInput filterDropdownId={filterDropdownId} />
-        )}
+        {filterType === 'ACTOR' &&
+          (isFilterOnActorSourceSubField(subFieldNameUsedInDropdown) ? (
+            <>
+              <ObjectFilterDropdownSearchInput />
+              <DropdownMenuSeparator />
+              <ObjectFilterDropdownSourceSelect dropdownId={filterDropdownId} />
+            </>
+          ) : isFilterOnActorWorkspaceMemberSubField(
+              subFieldNameUsedInDropdown,
+            ) ? (
+            <>
+              <ObjectFilterDropdownSearchInput />
+              <DropdownMenuSeparator />
+              <ObjectFilterDropdownActorSelect dropdownId={filterDropdownId} />
+            </>
+          ) : (
+            <ObjectFilterDropdownTextInput
+              filterDropdownId={filterDropdownId}
+            />
+          ))}
         {filterType === 'ADDRESS' && (
           <ObjectFilterDropdownTextInput filterDropdownId={filterDropdownId} />
         )}

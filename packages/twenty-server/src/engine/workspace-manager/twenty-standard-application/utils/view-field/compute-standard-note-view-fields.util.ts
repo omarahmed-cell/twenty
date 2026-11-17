@@ -110,5 +110,30 @@ export const computeStandardNoteViewFields = (
         },
       },
     ),
+    allNotesAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'note',
+      context: {
+        viewName: 'allNotes',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 1.5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    noteRecordPageFieldsAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'note',
+      context: {
+        viewName: 'noteRecordPageFields',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 1.5,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

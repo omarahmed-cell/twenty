@@ -5,6 +5,7 @@ import { useUpsertObjectFilterDropdownCurrentFilter } from '@/object-record/obje
 import { fieldMetadataItemUsedInDropdownComponentSelector } from '@/object-record/object-filter-dropdown/states/fieldMetadataItemUsedInDropdownComponentSelector';
 import { objectFilterDropdownCurrentRecordFilterComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownCurrentRecordFilterComponentState';
 import { selectedOperandInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/selectedOperandInDropdownComponentState';
+import { subFieldNameUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/subFieldNameUsedInDropdownComponentState';
 import { useCreateEmptyRecordFilterFromFieldMetadataItem } from '@/object-record/record-filter/hooks/useCreateEmptyRecordFilterFromFieldMetadataItem';
 import { useGetRelativeDateFilterWithUserTimezone } from '@/object-record/record-filter/hooks/useGetRelativeDateFilterWithUserTimezone';
 import { type RecordFilter } from '@/object-record/record-filter/types/RecordFilter';
@@ -38,6 +39,10 @@ export const useApplyObjectFilterDropdownOperand = () => {
 
   const fieldMetadataItemUsedInDropdown = useAtomComponentSelectorValue(
     fieldMetadataItemUsedInDropdownComponentSelector,
+  );
+
+  const subFieldNameUsedInDropdown = useAtomComponentStateValue(
+    subFieldNameUsedInDropdownComponentState,
   );
 
   const { upsertObjectFilterDropdownCurrentFilter } =
@@ -84,6 +89,11 @@ export const useApplyObjectFilterDropdownOperand = () => {
       recordFilterToUpsert = {
         ...emptyRecordFilter,
         operand: newOperand,
+        subFieldName:
+          emptyRecordFilter.type === 'ACTOR' &&
+          isDefined(subFieldNameUsedInDropdown)
+            ? subFieldNameUsedInDropdown
+            : emptyRecordFilter.subFieldName,
       } satisfies RecordFilter;
     }
 

@@ -1,10 +1,12 @@
 import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
+import { getActorFilterSubFieldLabel } from '@/object-record/object-filter-dropdown/utils/getActorFilterSubFieldLabel';
 import { getCompositeSubFieldLabel } from '@/object-record/object-filter-dropdown/utils/getCompositeSubFieldLabel';
 import { isCompositeFieldType } from '@/object-record/object-filter-dropdown/utils/isCompositeFieldType';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { isValidSubFieldName } from '@/settings/data-model/utils/isValidSubFieldName';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { isNonEmptyString } from '@sniptt/guards';
+import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { useIcons } from 'twenty-ui/icon';
 
@@ -32,14 +34,17 @@ export const useRecordFilterField = (recordFilterId: string) => {
 
   const subFieldLabel =
     isDefined(fieldMetadataItem) &&
-    isCompositeFieldType(fieldMetadataItem.type) &&
-    isNonEmptyString(recordFilter?.subFieldName) &&
-    isValidSubFieldName(recordFilter.subFieldName)
-      ? getCompositeSubFieldLabel(
-          fieldMetadataItem.type,
-          recordFilter.subFieldName,
-        )
-      : '';
+    fieldMetadataItem.type === FieldMetadataType.ACTOR
+      ? getActorFilterSubFieldLabel(recordFilter?.subFieldName)
+      : isDefined(fieldMetadataItem) &&
+          isCompositeFieldType(fieldMetadataItem.type) &&
+          isNonEmptyString(recordFilter?.subFieldName) &&
+          isValidSubFieldName(recordFilter.subFieldName)
+        ? getCompositeSubFieldLabel(
+            fieldMetadataItem.type,
+            recordFilter.subFieldName,
+          )
+        : '';
 
   const fieldLabel = fieldMetadataItem?.label ?? '';
 

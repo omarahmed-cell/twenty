@@ -1,5 +1,7 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useApplyAdvancedFilterCompositeSubField } from '@/object-record/advanced-filter/hooks/useApplyAdvancedFilterCompositeSubField';
+import { ACTOR_FILTER_SUB_FIELDS } from '@/object-record/object-filter-dropdown/constants/ActorFilterSubFields';
+import { getActorFilterSubFieldLabel } from '@/object-record/object-filter-dropdown/utils/getActorFilterSubFieldLabel';
 import { getCompositeSubFieldLabel } from '@/object-record/object-filter-dropdown/utils/getCompositeSubFieldLabel';
 import { isCompositeFilterableFieldType } from '@/object-record/object-filter-dropdown/utils/isCompositeFilterableFieldType';
 import { ICON_NAME_BY_SUB_FIELD } from '@/object-record/record-filter/constants/IconNameBySubField';
@@ -43,11 +45,13 @@ export const AdvancedFilterCompositeSubFieldSelectMenu = ({
     });
   };
 
-  const subFieldNames = SETTINGS_COMPOSITE_FIELD_TYPE_CONFIGS[
-    filterType
-  ].subFields
-    .filter((subField) => subField.isFilterable === true)
-    .map((subField) => subField.subFieldName);
+  const isActorFilter = filterType === 'ACTOR';
+
+  const subFieldNames: CompositeFieldSubFieldName[] = isActorFilter
+    ? ACTOR_FILTER_SUB_FIELDS.map((subField) => subField.subFieldName)
+    : SETTINGS_COMPOSITE_FIELD_TYPE_CONFIGS[filterType].subFields
+        .filter((subField) => subField.isFilterable === true)
+        .map((subField) => subField.subFieldName);
   const subFieldsAreFilterable = areCompositeTypeSubFieldsFilterable(
     fieldMetadataItem.type,
   );
@@ -86,7 +90,9 @@ export const AdvancedFilterCompositeSubFieldSelectMenu = ({
                 />
               }
             >
-              {getCompositeSubFieldLabel(filterType, subFieldName)}
+              {isActorFilter
+                ? getActorFilterSubFieldLabel(subFieldName)
+                : getCompositeSubFieldLabel(filterType, subFieldName)}
             </Dropdown.ActionItem>
           ))}
       </Dropdown.Section>

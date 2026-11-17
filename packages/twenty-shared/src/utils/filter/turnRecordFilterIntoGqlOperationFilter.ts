@@ -1432,6 +1432,34 @@ const buildDirectFieldGqlOperationFilter = ({
         }
       }
 
+      if (subFieldName === 'name') {
+        switch (recordFilter.operand) {
+          case RecordFilterOperand.CONTAINS:
+            return {
+              [fieldMetadataItem.name]: {
+                name: {
+                  ilike: `%${recordFilter.value}%`,
+                },
+              } satisfies ActorFilter,
+            };
+          case RecordFilterOperand.DOES_NOT_CONTAIN:
+            return {
+              not: {
+                [fieldMetadataItem.name]: {
+                  name: {
+                    ilike: `%${recordFilter.value}%`,
+                  },
+                } satisfies ActorFilter,
+              },
+            };
+          default: {
+            throw new Error(
+              `Unknown operand ${recordFilter.operand} for ${fieldMetadataItem.label} filter`,
+            );
+          }
+        }
+      }
+
       const matchingSourceValues = Object.values(FieldActorSource).filter(
         (actorSource) =>
           actorSource.toLowerCase().includes(recordFilter.value.toLowerCase()),

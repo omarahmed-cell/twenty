@@ -731,7 +731,10 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'assignedTo',
       label: i18nLabel(
-        msg({ message: `Assigned to`, context: 'fieldMetadata.label' }),
+        msg({
+          message: `Activity assigned to`,
+          context: 'fieldMetadata.label',
+        }),
       ),
       description: i18nLabel(
         msg({

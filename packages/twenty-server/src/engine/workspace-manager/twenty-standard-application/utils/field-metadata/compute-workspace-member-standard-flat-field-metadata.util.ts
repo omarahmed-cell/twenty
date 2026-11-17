@@ -1041,6 +1041,129 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  assignedCalls: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedCalls',
+      label: i18nLabel(
+        msg({ message: `Assigned calls`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Calls assigned to the workspace member`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconPhone',
+      isNullable: false,
+      isUIEditable: false,
+      targetObjectName: 'call',
+      targetFieldName: 'assignedTo',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assignedNotes: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedNotes',
+      label: i18nLabel(
+        msg({ message: `Assigned notes`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Notes assigned to the workspace member`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconNotes',
+      isNullable: false,
+      isUIEditable: false,
+      targetObjectName: 'note',
+      targetFieldName: 'assignedTo',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assignedEmails: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedEmails',
+      label: i18nLabel(
+        msg({ message: `Assigned emails`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Emails assigned to the workspace member`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMail',
+      isNullable: false,
+      isUIEditable: false,
+      targetObjectName: 'email',
+      targetFieldName: 'assignedTo',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assignedCommunications: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedCommunications',
+      label: i18nLabel(
+        msg({
+          message: `Assigned communications`,
+          context: 'fieldMetadata.label',
+        }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Communications assigned to the workspace member`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMessageCircle',
+      isNullable: false,
+      isUIEditable: false,
+      targetObjectName: 'communication',
+      targetFieldName: 'assignedTo',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   ownedOpportunities: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

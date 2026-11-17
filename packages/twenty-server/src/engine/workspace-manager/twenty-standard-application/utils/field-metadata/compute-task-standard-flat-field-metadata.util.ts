@@ -420,7 +420,10 @@ export const buildTaskStandardFlatFieldMetadatas = ({
       morphId: null,
       fieldName: 'assignee',
       label: i18nLabel(
-        msg({ message: `Assignee`, context: 'fieldMetadata.label' }),
+        msg({
+          message: `Activity assigned to`,
+          context: 'fieldMetadata.label',
+        }),
       ),
       description: i18nLabel(
         msg({ message: `Task assignee`, context: 'fieldMetadata.description' }),

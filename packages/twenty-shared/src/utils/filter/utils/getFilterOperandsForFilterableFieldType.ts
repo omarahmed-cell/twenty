@@ -6,7 +6,12 @@ import {
 import { COMPOSITE_FIELD_FILTER_OPERANDS_MAP } from './compositeFieldFilterOperandsMap';
 import { FILTER_OPERANDS_MAP } from './filterOperandsMap';
 
-const actorSubFieldOperands = [
+const actorSourceOperands = [
+  ViewFilterOperand.IS,
+  ViewFilterOperand.IS_NOT,
+] as const;
+
+const actorWorkspaceMemberOperands = [
   ViewFilterOperand.IS,
   ViewFilterOperand.IS_NOT,
   ViewFilterOperand.IS_EMPTY,
@@ -28,11 +33,12 @@ export const getFilterOperandsForFilterableFieldType = ({
     return COMPOSITE_FIELD_FILTER_OPERANDS_MAP.CURRENCY.amountMicros;
   }
 
-  if (
-    filterType === 'ACTOR' &&
-    (subFieldName === 'source' || subFieldName === 'workspaceMemberId')
-  ) {
-    return actorSubFieldOperands;
+  if (filterType === 'ACTOR' && subFieldName === 'source') {
+    return actorSourceOperands;
+  }
+
+  if (filterType === 'ACTOR' && subFieldName === 'workspaceMemberId') {
+    return actorWorkspaceMemberOperands;
   }
 
   return FILTER_OPERANDS_MAP[filterType];

@@ -248,5 +248,30 @@ export const computeStandardEmailViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
+    allEmailsAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'email',
+      context: {
+        viewName: 'allEmails',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 6.5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    emailRecordPageFieldsAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'email',
+      context: {
+        viewName: 'emailRecordPageFields',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 5.5,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

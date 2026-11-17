@@ -193,5 +193,31 @@ export const computeStandardCommunicationViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
+    allCommunicationsAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'communication',
+      context: {
+        viewName: 'allCommunications',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 6.5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    communicationRecordPageFieldsAssignedTo:
+      createStandardViewFieldFlatMetadata({
+        ...args,
+        objectName: 'communication',
+        context: {
+          viewName: 'communicationRecordPageFields',
+          viewFieldName: 'assignedTo',
+          fieldName: 'assignedTo',
+          position: 6.5,
+          isVisible: true,
+          size: 150,
+          viewFieldGroupName: 'general',
+        },
+      }),
   };
 };

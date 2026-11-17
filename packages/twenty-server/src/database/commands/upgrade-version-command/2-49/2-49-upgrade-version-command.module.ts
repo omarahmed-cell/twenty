@@ -27,6 +27,7 @@ import { ProvisionPropertiesModuleCommand } from 'src/database/commands/upgrade-
 import { AddActorSourceValuesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794924166804-add-actor-source-values.command';
 import { ProvisionServicesPipelineCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794924198517-provision-services-pipeline.command';
 import { ProvisionRecordSourceCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794924282319-provision-record-source.command';
+import { ProvisionActivityAssignedToCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794933094490-provision-activity-assigned-to.command';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
@@ -73,6 +74,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     AddActorSourceValuesCommand,
     ProvisionServicesPipelineCommand,
     ProvisionRecordSourceCommand,
+    ProvisionActivityAssignedToCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

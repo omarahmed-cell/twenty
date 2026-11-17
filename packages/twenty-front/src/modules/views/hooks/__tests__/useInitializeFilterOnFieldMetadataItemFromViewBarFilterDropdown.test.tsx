@@ -4,6 +4,8 @@ import { Provider as JotaiProvider } from 'jotai';
 
 import { objectFilterDropdownFilterIsSelectedComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownFilterIsSelectedComponentState';
 import { selectedOperandInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/selectedOperandInDropdownComponentState';
+import { subFieldNameUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/subFieldNameUsedInDropdownComponentState';
+import { ViewFilterOperand } from 'twenty-shared/types';
 import { useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown } from '@/views/hooks/useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown';
 
 import {
@@ -39,6 +41,10 @@ const personCityFieldMetadataItemMock =
   peopleObjectMetadataItemMock.fields.find((field) => field.name === 'city');
 const personCompanyFieldMetadataItemMock =
   peopleObjectMetadataItemMock.fields.find((field) => field.name === 'company');
+const personCreatedByFieldMetadataItemMock =
+  peopleObjectMetadataItemMock.fields.find(
+    (field) => field.name === 'createdBy',
+  );
 const personCreatedAtFieldMetadataItemMock =
   peopleObjectMetadataItemMock.fields.find(
     (field) => field.name === 'createdAt',
@@ -336,4 +342,51 @@ describe('useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown', () =
       result.current.objectFilterDropdownCurrentRecordFilter?.value,
     ).toBeDefined();
   });
+
+  it.each([
+    ['name', ViewFilterOperand.CONTAINS, false],
+    ['workspaceMemberId', ViewFilterOperand.IS, true],
+    ['source', ViewFilterOperand.IS, false],
+  ] as const)(
+    'should initialize an actor filter on its %s part',
+    (subFieldName, expectedOperand, shouldPushFocus) => {
+      const { result } = renderHook(
+        () => {
+          const { initializeFilterOnFieldMetataItemFromViewBarFilterDropdown } =
+            useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown();
+
+          const subFieldNameUsedInDropdown = useAtomComponentStateValue(
+            subFieldNameUsedInDropdownComponentState,
+          );
+          const selectedOperandInDropdown = useAtomComponentStateValue(
+            selectedOperandInDropdownComponentState,
+          );
+
+          return {
+            initializeFilterOnFieldMetataItemFromViewBarFilterDropdown,
+            subFieldNameUsedInDropdown,
+            selectedOperandInDropdown,
+          };
+        },
+        { wrapper },
+      );
+
+      if (!personCreatedByFieldMetadataItemMock) {
+        throw new Error('personCreatedByFieldMetadataItemMock is not defined');
+      }
+
+      act(() => {
+        result.current.initializeFilterOnFieldMetataItemFromViewBarFilterDropdown(
+          personCreatedByFieldMetadataItemMock,
+          subFieldName,
+        );
+      });
+
+      expect(result.current.subFieldNameUsedInDropdown).toBe(subFieldName);
+      expect(result.current.selectedOperandInDropdown).toBe(expectedOperand);
+      expect(mockPushFocusItemToFocusStack).toHaveBeenCalledTimes(
+        shouldPushFocus ? 1 : 0,
+      );
+    },
+  );
 });

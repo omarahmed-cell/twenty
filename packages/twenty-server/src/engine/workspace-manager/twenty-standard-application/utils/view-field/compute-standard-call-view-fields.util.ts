@@ -185,5 +185,30 @@ export const computeStandardCallViewFields = (
         viewFieldGroupName: 'general',
       },
     }),
+    allCallsAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'call',
+      context: {
+        viewName: 'allCalls',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 3.5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    callRecordPageFieldsAssignedTo: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'call',
+      context: {
+        viewName: 'callRecordPageFields',
+        viewFieldName: 'assignedTo',
+        fieldName: 'assignedTo',
+        position: 2.5,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
   };
 };

@@ -17,15 +17,24 @@ describe('getFilterOperandsForFilterableFieldType', () => {
     ]);
   });
 
-  it('should preserve actor source subfield operands', () => {
+  it('should return is and is not for the actor source subfield', () => {
     expect(
       getFilterOperandsForFilterableFieldType({
         filterType: 'ACTOR',
         subFieldName: 'source',
       }),
+    ).toEqual([ViewFilterOperand.IS, ViewFilterOperand.IS_NOT]);
+  });
+
+  it('should return text operands for the actor name subfield', () => {
+    expect(
+      getFilterOperandsForFilterableFieldType({
+        filterType: 'ACTOR',
+        subFieldName: 'name',
+      }),
     ).toEqual([
-      ViewFilterOperand.IS,
-      ViewFilterOperand.IS_NOT,
+      ViewFilterOperand.CONTAINS,
+      ViewFilterOperand.DOES_NOT_CONTAIN,
       ...emptyOperands,
     ]);
   });

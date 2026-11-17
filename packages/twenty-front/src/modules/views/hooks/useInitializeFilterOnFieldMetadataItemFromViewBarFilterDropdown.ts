@@ -5,12 +5,16 @@ import { fieldMetadataItemIdUsedInDropdownComponentState } from '@/object-record
 import { objectFilterDropdownCurrentRecordFilterComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownCurrentRecordFilterComponentState';
 import { objectFilterDropdownFilterIsSelectedComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownFilterIsSelectedComponentState';
 import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
+import { objectFilterDropdownIsSelectingSubFieldComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownIsSelectingSubFieldComponentState';
 import { selectedOperandInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/selectedOperandInDropdownComponentState';
+import { subFieldNameUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/subFieldNameUsedInDropdownComponentState';
+import { isFilterOnActorWorkspaceMemberSubField } from '@/object-record/object-filter-dropdown/utils/isFilterOnActorWorkspaceMemberSubField';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { type RecordFilter } from '@/object-record/record-filter/types/RecordFilter';
 import { findDuplicateRecordFilterInNonAdvancedRecordFilters } from '@/object-record/record-filter/utils/findDuplicateRecordFilterInNonAdvancedRecordFilters';
 
 import { getRecordFilterOperands } from '@/object-record/record-filter/utils/getRecordFilterOperands';
+import { type CompositeFieldSubFieldName } from '@/settings/data-model/types/CompositeFieldSubFieldName';
 import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePushFocusItemToFocusStack';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
 import { useAtomComponentStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateCallbackState';
@@ -52,6 +56,16 @@ export const useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown =
         objectFilterDropdownSearchInputComponentState,
       );
 
+    const subFieldNameUsedInDropdownCallbackState =
+      useAtomComponentStateCallbackState(
+        subFieldNameUsedInDropdownComponentState,
+      );
+
+    const objectFilterDropdownIsSelectingSubFieldCallbackState =
+      useAtomComponentStateCallbackState(
+        objectFilterDropdownIsSelectingSubFieldComponentState,
+      );
+
     const { upsertObjectFilterDropdownCurrentFilter } =
       useUpsertObjectFilterDropdownCurrentFilter();
 
@@ -65,10 +79,19 @@ export const useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown =
 
     const initializeFilterOnFieldMetataItemFromViewBarFilterDropdown =
       useCallback(
-        (fieldMetadataItem: FieldMetadataItem) => {
+        (
+          fieldMetadataItem: FieldMetadataItem,
+          subFieldName?: CompositeFieldSubFieldName | null,
+        ) => {
           store.set(
             fieldMetadataItemUsedInDropdownCallbackState,
             fieldMetadataItem.id,
+          );
+
+          store.set(subFieldNameUsedInDropdownCallbackState, subFieldName);
+          store.set(
+            objectFilterDropdownIsSelectingSubFieldCallbackState,
+            false,
           );
 
           const currentRecordFilters = store.get(
@@ -77,7 +100,15 @@ export const useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown =
 
           const filterType = getFilterTypeFromFieldType(fieldMetadataItem.type);
 
-          if (filterType === 'RELATION' || filterType === 'SELECT') {
+          const isActorWorkspaceMemberFilter =
+            filterType === 'ACTOR' &&
+            isFilterOnActorWorkspaceMemberSubField(subFieldName);
+
+          if (
+            filterType === 'RELATION' ||
+            filterType === 'SELECT' ||
+            isActorWorkspaceMemberFilter
+          ) {
             pushFocusItemToFocusStack({
               focusId: filterDropdownId,
               component: {
@@ -96,12 +127,14 @@ export const useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown =
 
           const defaultOperand = getRecordFilterOperands({
             filterType,
+            subFieldName,
           })[0];
 
           const duplicateFilterInCurrentRecordFilters =
             findDuplicateRecordFilterInNonAdvancedRecordFilters({
               recordFilters: currentRecordFilters,
               fieldMetadataItemId: fieldMetadataItem.id,
+              subFieldName,
             });
 
           const filterIsAlreadyInCurrentRecordFilters = isDefined(
@@ -150,6 +183,8 @@ export const useInitializeFilterOnFieldMetadataItemFromViewBarFilterDropdown =
           store,
           filterDropdownId,
           fieldMetadataItemUsedInDropdownCallbackState,
+          subFieldNameUsedInDropdownCallbackState,
+          objectFilterDropdownIsSelectingSubFieldCallbackState,
           currentRecordFiltersCallbackState,
           objectFilterDropdownFilterIsSelectedCallbackState,
           objectFilterDropdownSearchInputCallbackState,

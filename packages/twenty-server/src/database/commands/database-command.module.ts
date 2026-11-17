@@ -62,6 +62,7 @@ import { EmailingModule } from 'src/modules/emailing/emailing.module';
 import { FieldFormulaModule } from 'src/modules/field-formula/field-formula.module';
 import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calculated-fields/opportunity-calculated-fields.module';
 import { MeetingFieldsModule } from 'src/modules/meeting-fields/meeting-fields.module';
+import { ActorLinkModule } from 'src/modules/actor-link/actor-link.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
@@ -86,6 +87,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     PersonCalculatedFieldsModule,
     OpportunityCalculatedFieldsModule,
     MeetingFieldsModule,
+    ActorLinkModule,
     PipelineModule,
     AutomatedTriggerModule,
     PendingWakeUpModule,

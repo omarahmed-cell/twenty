@@ -819,6 +819,9 @@ export const STANDARD_OBJECT_FIELDS = {
     callTargets: {
       universalIdentifier: '844488f7-3e24-465c-9f3f-e33b1df0c0e0',
     },
+    assignedTo: {
+      universalIdentifier: '5cf29919-0eb9-4e6d-a9c8-a1d220e6ea0e',
+    },
     attachments: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -902,6 +905,9 @@ export const STANDARD_OBJECT_FIELDS = {
     communicationTargets: {
       universalIdentifier: '9daf74b5-c351-4c5f-ae8d-1f5ab3f5d838',
     },
+    assignedTo: {
+      universalIdentifier: '737a0c27-33c2-475d-b499-cda6f189c638',
+    },
     attachments: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -939,6 +945,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     emailTargets: {
       universalIdentifier: '4beb80e5-a610-4c8c-bf53-34ab7d21f3ac',
+    },
+    assignedTo: {
+      universalIdentifier: 'f6ee86d9-9040-4da2-9ccc-7dd36c5ac008',
     },
     attachments: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
@@ -1777,6 +1786,9 @@ export const STANDARD_OBJECT_FIELDS = {
     bodyV2: { universalIdentifier: '20202020-a7bb-4d94-be51-8f25181502c8' },
     noteTargets: {
       universalIdentifier: '20202020-1f25-43fe-8b00-af212fdde823',
+    },
+    assignedTo: {
+      universalIdentifier: '132f2237-653f-4513-8ca6-2d61cfe218f7',
     },
     attachments: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
@@ -2723,6 +2735,18 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     assignedCalendarEvents: {
       universalIdentifier: 'ba4eca98-bb20-48d1-a108-98653cd20d33',
+    },
+    assignedCalls: {
+      universalIdentifier: '5a13281a-85a6-44ac-a397-6a007b6474b3',
+    },
+    assignedNotes: {
+      universalIdentifier: '441850e5-86d7-4a49-be50-7dda95109f55',
+    },
+    assignedEmails: {
+      universalIdentifier: 'c2381be5-ff20-41c8-b7dd-33df7373e0f8',
+    },
+    assignedCommunications: {
+      universalIdentifier: '9c88c1c6-a269-4f88-ac0a-bd3a11aca394',
     },
     accountOwnerForCompanies: {
       universalIdentifier: '20202020-dc29-4bd4-a3c1-29eafa324bee',

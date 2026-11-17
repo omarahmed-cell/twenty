@@ -13,8 +13,6 @@ exports[`getRecordFilterOperands ACTOR returns IS/IS_NOT operands when subFieldN
 [
   "IS",
   "IS_NOT",
-  "IS_EMPTY",
-  "IS_NOT_EMPTY",
 ]
 `;
 

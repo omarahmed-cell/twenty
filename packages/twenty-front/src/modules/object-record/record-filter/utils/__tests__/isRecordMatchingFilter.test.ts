@@ -989,4 +989,71 @@ describe('isRecordMatchingFilter', () => {
       ).toBe(false);
     });
   });
+
+  describe('Actor Filters', () => {
+    const workspaceMemberId = '20202020-0687-4c41-b707-ed1bfca972a7';
+
+    const companyCreatedByMember = {
+      ...companiesMock[0],
+      createdBy: {
+        source: 'MANUAL',
+        workspaceMemberId,
+        name: 'Ana Silva',
+        context: {},
+      },
+    };
+
+    const companyCreatedByApi = {
+      ...companiesMock[0],
+      createdBy: {
+        source: 'API',
+        workspaceMemberId: null,
+        name: 'Integration key',
+        context: {},
+      },
+    };
+
+    const isMatching = (
+      record: Parameters<typeof isRecordMatchingFilter>[0]['record'],
+      filter: RecordGqlOperationFilter,
+    ) =>
+      isRecordMatchingFilter({
+        record,
+        filter,
+        objectMetadataItem: companyMockObjectMetadataItem,
+        objectMetadataItems,
+      });
+
+    it('matches the name part', () => {
+      const filter: RecordGqlOperationFilter = {
+        createdBy: { name: { ilike: '%ana%' } },
+      };
+
+      expect(isMatching(companyCreatedByMember, filter)).toBe(true);
+      expect(isMatching(companyCreatedByApi, filter)).toBe(false);
+    });
+
+    it('matches the user part, including records without a member', () => {
+      const isFilter: RecordGqlOperationFilter = {
+        createdBy: { workspaceMemberId: { in: [workspaceMemberId] } },
+      };
+      const isEmptyFilter: RecordGqlOperationFilter = {
+        createdBy: { workspaceMemberId: { is: 'NULL' } },
+      };
+
+      expect(isMatching(companyCreatedByMember, isFilter)).toBe(true);
+      expect(isMatching(companyCreatedByApi, isFilter)).toBe(false);
+      expect(isMatching(companyCreatedByApi, isEmptyFilter)).toBe(true);
+      expect(isMatching(companyCreatedByMember, isEmptyFilter)).toBe(false);
+    });
+
+    it('matches the source part', () => {
+      const filter: RecordGqlOperationFilter = {
+        not: { createdBy: { source: { in: ['API'] } } },
+      };
+
+      expect(isMatching(companyCreatedByMember, filter)).toBe(true);
+      expect(isMatching(companyCreatedByApi, filter)).toBe(false);
+    });
+  });
 });
