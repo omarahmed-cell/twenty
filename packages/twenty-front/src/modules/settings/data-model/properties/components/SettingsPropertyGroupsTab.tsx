@@ -58,11 +58,13 @@ const StyledEmptyState = styled.div`
 
 type SettingsPropertyGroupsTabProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
+  highlightedGroupId: string | null;
   onOpenGroup: (propertyGroupId: string) => void;
 };
 
 export const SettingsPropertyGroupsTab = ({
   objectMetadataItem,
+  highlightedGroupId,
   onOpenGroup,
 }: SettingsPropertyGroupsTabProps) => {
   const { t } = useLingui();
@@ -174,7 +176,11 @@ export const SettingsPropertyGroupsTab = ({
           <StyledEmptyState>{t`No groups yet`}</StyledEmptyState>
         )}
         {groups.map((group) => (
-          <TableRow key={group.id} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
+          <TableRow
+            key={group.id}
+            gridTemplateColumns={GRID_TEMPLATE_COLUMNS}
+            isSelected={group.id === highlightedGroupId}
+          >
             <TableCell minWidth="0">
               {renamingGroupId === group.id ? (
                 <SettingsTextInput

@@ -64,7 +64,11 @@ const ROWS = buildPropertyTableRows({
     field('usesAggregators', 'Uses Aggregators'),
   ],
   propertySettings: SETTINGS,
-  getTypeLabel: () => 'Text',
+  getTypeLabel: ({ name }) =>
+    name === 'uses3pls' ? 'Calculation · Number' : 'Text',
+  getTypeFilterLabel: ({ name }) =>
+    name === 'uses3pls' ? 'Calculation' : 'Text',
+  getAppLabel: ({ name }) => (name === 'name' ? 'Standard' : 'Custom'),
 });
 
 const labelOf = (row: PropertyTableRow) =>
@@ -78,6 +82,7 @@ const filter = (
     searchTerm: '',
     groupFilter: ALL_FILTER,
     typeFilter: ALL_FILTER,
+    appFilter: ALL_FILTER,
     createdByFilter: ALL_FILTER,
     getCreatedByLabel: labelOf,
     ...overrides,
@@ -101,5 +106,17 @@ describe('property table rows', () => {
   it('filters by creator and search', () => {
     expect(filter({ createdByFilter: 'API' })).toEqual(['uses3pls']);
     expect(filter({ searchTerm: 'aggreg' })).toEqual(['usesAggregators']);
+  });
+
+  it('filters calculated properties as one field type', () => {
+    expect(filter({ typeFilter: 'Calculation' })).toEqual(['uses3pls']);
+  });
+
+  it('filters by app', () => {
+    expect(filter({ appFilter: 'Standard' })).toEqual(['name']);
+    expect(filter({ appFilter: 'Custom' })).toEqual([
+      'uses3pls',
+      'usesAggregators',
+    ]);
   });
 });

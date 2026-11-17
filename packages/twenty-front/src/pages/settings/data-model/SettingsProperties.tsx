@@ -67,6 +67,9 @@ export const SettingsProperties = () => {
       )?.id,
   );
   const [groupFilter, setGroupFilter] = useState(ALL_FILTER);
+  const [highlightedGroupId, setHighlightedGroupId] = useState<string | null>(
+    null,
+  );
 
   const objectMetadataItem = selectableObjectMetadataItems.find(
     ({ id }) => id === objectMetadataId,
@@ -98,6 +101,15 @@ export const SettingsProperties = () => {
   const handleObjectChange = (nextObjectMetadataId: string) => {
     setObjectMetadataId(nextObjectMetadataId);
     setGroupFilter(ALL_FILTER);
+    setHighlightedGroupId(null);
+  };
+
+  const handleShowGroup = (propertyGroupId: string) => {
+    setHighlightedGroupId(propertyGroupId);
+    navigate({
+      search: searchParams.toString(),
+      hash: SETTINGS_PROPERTIES_TAB_IDS.groups,
+    });
   };
 
   const handleOpenGroup = (propertyGroupId: string) => {
@@ -126,6 +138,7 @@ export const SettingsProperties = () => {
           <SettingsPropertyGroupsTab
             key={objectMetadataItem.id}
             objectMetadataItem={objectMetadataItem}
+            highlightedGroupId={highlightedGroupId}
             onOpenGroup={handleOpenGroup}
           />
         );
@@ -136,6 +149,7 @@ export const SettingsProperties = () => {
             objectMetadataItem={objectMetadataItem}
             groupFilter={groupFilter}
             onGroupFilterChange={setGroupFilter}
+            onShowGroup={handleShowGroup}
           />
         );
     }

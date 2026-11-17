@@ -11,6 +11,8 @@ import { Button } from 'twenty-ui/primitives/input';
 import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
 import { themeCssVariables } from 'twenty-ui/theme';
 
+import { getApplicationDisplayName } from '@/applications/utils/getApplicationDisplayName';
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { isHiddenSystemField } from '@/object-metadata/utils/isHiddenSystemField';
@@ -39,7 +41,7 @@ import { Table } from '@/ui/layout/table/components/Table';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { UndecoratedLink } from '@/ui/navigation/link/components/UndecoratedLink/UndecoratedLink';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 
 const GRID_TEMPLATE_COLUMNS = '24px minmax(160px, 2fr) 1fr 1fr 1fr 110px 36px';
@@ -62,6 +64,17 @@ const StyledSecondaryText = styled.span`
   min-width: 0;
 `;
 
+const StyledGroupLink = styled.span`
+  color: ${themeCssVariables.font.color.tertiary};
+  cursor: pointer;
+  min-width: 0;
+
+  &:hover {
+    color: ${themeCssVariables.font.color.primary};
+    text-decoration: underline;
+  }
+`;
+
 const StyledEmptyState = styled.div`
   color: ${themeCssVariables.font.color.tertiary};
   padding: ${themeCssVariables.spacing[4]} 0;
@@ -71,16 +84,19 @@ type SettingsPropertiesTabProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   groupFilter: string;
   onGroupFilterChange: (groupFilter: string) => void;
+  onShowGroup: (propertyGroupId: string) => void;
 };
 
 export const SettingsPropertiesTab = ({
   objectMetadataItem,
   groupFilter,
   onGroupFilterChange,
+  onShowGroup,
 }: SettingsPropertiesTabProps) => {
   const { t, i18n } = useLingui();
   const navigate = useNavigate();
   const { propertySettings } = usePropertySettings();
+  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const { addToGroup, removeFromGroup, reorderGroupMembers } =
     useSettingsPropertyActions();
   const setPropertyCreationContext = useSetAtomState(
@@ -89,6 +105,7 @@ export const SettingsPropertiesTab = ({
 
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState(ALL_FILTER);
+  const [appFilter, setAppFilter] = useState(ALL_FILTER);
   const [createdByFilter, setCreatedByFilter] = useState(ALL_FILTER);
 
   const objectGroups = useMemo(
@@ -101,14 +118,31 @@ export const SettingsPropertiesTab = ({
 
   const selectedGroup = objectGroups.find(({ id }) => id === groupFilter);
 
+  const getTypeDisplay = (fieldMetadataItem: FieldMetadataItem) =>
+    getSettingsFieldDataTypeDisplay(fieldMetadataItem, (descriptor) =>
+      i18n._(descriptor),
+    );
+
   const getTypeLabel = (fieldMetadataItem: FieldMetadataItem) =>
     isUserFieldMetadataItem(fieldMetadataItem)
       ? t`User`
-      : getSettingsFieldDataTypeText(
-          getSettingsFieldDataTypeDisplay(fieldMetadataItem, (descriptor) =>
-            i18n._(descriptor),
-          ),
-        );
+      : getSettingsFieldDataTypeText(getTypeDisplay(fieldMetadataItem));
+
+  // Calculated and synced properties filter as one type each, whatever type they output
+  const getTypeFilterLabel = (fieldMetadataItem: FieldMetadataItem) =>
+    isUserFieldMetadataItem(fieldMetadataItem)
+      ? t`User`
+      : getTypeDisplay(fieldMetadataItem).label;
+
+  const getAppLabel = (fieldMetadataItem: FieldMetadataItem) => {
+    const application = currentWorkspace?.installedApplications.find(
+      ({ id }) => id === fieldMetadataItem.applicationId,
+    );
+
+    return isDefined(application)
+      ? getApplicationDisplayName({ application, currentWorkspace })
+      : t`Custom`;
+  };
 
   const rows = buildPropertyTableRows({
     fieldMetadataItems: objectMetadataItem.fields.filter(
@@ -116,6 +150,8 @@ export const SettingsPropertiesTab = ({
     ),
     propertySettings,
     getTypeLabel,
+    getTypeFilterLabel,
+    getAppLabel,
   });
 
   const getCreatedByLabel = (row: PropertyTableRow) =>
@@ -126,6 +162,7 @@ export const SettingsPropertiesTab = ({
     searchTerm,
     groupFilter: isDefined(selectedGroup) ? selectedGroup.id : groupFilter,
     typeFilter,
+    appFilter,
     createdByFilter,
     getCreatedByLabel,
   });
@@ -134,16 +171,22 @@ export const SettingsPropertiesTab = ({
     isDefined(selectedGroup) &&
     searchTerm.trim() === '' &&
     typeFilter === ALL_FILTER &&
+    appFilter === ALL_FILTER &&
     createdByFilter === ALL_FILTER;
 
-  const typeOptions = [...new Set(rows.map(({ typeLabel }) => typeLabel))]
-    .filter((typeLabel) => typeLabel !== '')
-    .sort()
-    .map((typeLabel) => ({ label: typeLabel, value: typeLabel }));
+  const toFilterOptions = (labels: string[]) =>
+    [...new Set(labels)]
+      .filter((label) => label !== '')
+      .sort()
+      .map((label) => ({ label, value: label }));
 
-  const createdByOptions = [...new Set(rows.map(getCreatedByLabel))]
-    .sort()
-    .map((label) => ({ label, value: label }));
+  const typeOptions = toFilterOptions(
+    rows.map(({ typeFilterLabel }) => typeFilterLabel),
+  );
+
+  const appOptions = toFilterOptions(rows.map(({ appLabel }) => appLabel));
+
+  const createdByOptions = toFilterOptions(rows.map(getCreatedByLabel));
 
   const groupOptions = [
     { label: t`No group`, value: NO_PROPERTY_GROUP_FILTER },
@@ -196,50 +239,68 @@ export const SettingsPropertiesTab = ({
   };
 
   const renderRow = (row: PropertyTableRow) => (
-    <UndecoratedLink to={getFieldPath(row.fieldMetadataItem)}>
-      <TableRow gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-        <TableCell padding="0">
-          {isOrderable && <SettingsPipelineDragHandle />}
-        </TableCell>
-        <TableCell minWidth="0">
-          <OverflowingTextWithTooltip text={row.fieldMetadataItem.label} />
-        </TableCell>
-        <TableCell minWidth="0">
-          <StyledSecondaryText>
-            <OverflowingTextWithTooltip text={row.groupName ?? t`No group`} />
-          </StyledSecondaryText>
-        </TableCell>
-        <TableCell minWidth="0">
-          <OverflowingTextWithTooltip text={row.typeLabel} />
-        </TableCell>
-        <TableCell minWidth="0">
-          <OverflowingTextWithTooltip text={getCreatedByLabel(row)} />
-        </TableCell>
-        <TableCell>
-          <StyledSecondaryText>
-            {new Date(row.fieldMetadataItem.createdAt).toLocaleDateString()}
-          </StyledSecondaryText>
-        </TableCell>
-        <TableCell align="right" padding="0">
-          {isDefined(selectedGroup) && isDefined(row.membershipId) && (
-            <LightIconButton
-              aria-label={t`Remove from group`}
-              emphasis="subtle"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
+    <TableRow
+      gridTemplateColumns={GRID_TEMPLATE_COLUMNS}
+      to={getFieldPath(row.fieldMetadataItem)}
+    >
+      <TableCell padding="0">
+        {isOrderable && <SettingsPipelineDragHandle />}
+      </TableCell>
+      <TableCell minWidth="0">
+        <OverflowingTextWithTooltip text={row.fieldMetadataItem.label} />
+      </TableCell>
+      <TableCell minWidth="0">
+        {isDefined(row.propertyGroupId) && isDefined(row.groupName) ? (
+          <StyledGroupLink
+            role="link"
+            tabIndex={0}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
 
-                if (isDefined(row.membershipId)) {
-                  removeFromGroup(row.membershipId);
-                }
-              }}
-            >
-              <IconX />
-            </LightIconButton>
-          )}
-        </TableCell>
-      </TableRow>
-    </UndecoratedLink>
+              if (isDefined(row.propertyGroupId)) {
+                onShowGroup(row.propertyGroupId);
+              }
+            }}
+          >
+            <OverflowingTextWithTooltip text={row.groupName} />
+          </StyledGroupLink>
+        ) : (
+          <StyledSecondaryText>
+            <OverflowingTextWithTooltip text={t`No group`} />
+          </StyledSecondaryText>
+        )}
+      </TableCell>
+      <TableCell minWidth="0">
+        <OverflowingTextWithTooltip text={row.typeLabel} />
+      </TableCell>
+      <TableCell minWidth="0">
+        <OverflowingTextWithTooltip text={getCreatedByLabel(row)} />
+      </TableCell>
+      <TableCell>
+        <StyledSecondaryText>
+          {new Date(row.fieldMetadataItem.createdAt).toLocaleDateString()}
+        </StyledSecondaryText>
+      </TableCell>
+      <TableCell align="right" padding="0">
+        {isDefined(selectedGroup) && isDefined(row.membershipId) && (
+          <LightIconButton
+            aria-label={t`Remove from group`}
+            emphasis="subtle"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              if (isDefined(row.membershipId)) {
+                removeFromGroup(row.membershipId);
+              }
+            }}
+          >
+            <IconX />
+          </LightIconButton>
+        )}
+      </TableCell>
+    </TableRow>
   );
 
   return (
@@ -264,7 +325,7 @@ export const SettingsPropertiesTab = ({
           dropdownId="settings-properties-group-filter"
           options={groupOptions}
           value={groupFilter}
-          emptyOption={{ label: t`All groups`, value: ALL_FILTER }}
+          pinnedOption={{ label: t`All groups`, value: ALL_FILTER }}
           withSearchInput
           onChange={onGroupFilterChange}
         />
@@ -272,15 +333,23 @@ export const SettingsPropertiesTab = ({
           dropdownId="settings-properties-type-filter"
           options={typeOptions}
           value={typeFilter}
-          emptyOption={{ label: t`All field types`, value: ALL_FILTER }}
+          pinnedOption={{ label: t`All field types`, value: ALL_FILTER }}
           withSearchInput
           onChange={setTypeFilter}
+        />
+        <Select
+          dropdownId="settings-properties-app-filter"
+          options={appOptions}
+          value={appFilter}
+          pinnedOption={{ label: t`All apps`, value: ALL_FILTER }}
+          withSearchInput
+          onChange={setAppFilter}
         />
         <Select
           dropdownId="settings-properties-created-by-filter"
           options={createdByOptions}
           value={createdByFilter}
-          emptyOption={{ label: t`All users`, value: ALL_FILTER }}
+          pinnedOption={{ label: t`All users`, value: ALL_FILTER }}
           withSearchInput
           onChange={setCreatedByFilter}
         />

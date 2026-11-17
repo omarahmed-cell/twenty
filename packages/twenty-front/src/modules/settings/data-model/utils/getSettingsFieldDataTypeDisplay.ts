@@ -1,21 +1,26 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
-import { getFieldFormulaSettings } from '@/settings/data-model/fields/forms/formula/utils/validateFormula';
+import { isCalculatedFieldMetadataItem } from '@/object-metadata/utils/isCalculatedFieldMetadataItem';
 import { getFieldSyncSettings } from '@/settings/data-model/fields/forms/sync/utils/getSyncFormValueFromField';
 import { type SettingsFieldType } from '@/settings/data-model/types/SettingsFieldType';
 import { getSettingsFieldTypeConfig } from '@/settings/data-model/utils/getSettingsFieldTypeConfig';
 import { type MessageDescriptor } from '@lingui/core';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
+import {
+  type IconComponent,
+  IllustrationIconCalculator,
+  IllustrationIconSync,
+} from 'twenty-ui/icon';
 
 export type SettingsFieldDataTypeDisplay = {
   label: string;
   labelDetail?: string;
-  iconName?: string;
+  Icon?: IconComponent;
 };
 
-// Display only: a calculated or synced field keeps its output type as its stored type.
 export const getSettingsFieldDataTypeDisplay = (
-  fieldMetadataItem: Pick<FieldMetadataItem, 'type' | 'settings'>,
+  fieldMetadataItem: Pick<FieldMetadataItem, 'name' | 'type' | 'settings'> &
+    Partial<Pick<FieldMetadataItem, 'isUIEditable'>>,
   translate: (descriptor: MessageDescriptor) => string,
 ): SettingsFieldDataTypeDisplay => {
   const fieldTypeConfig = getSettingsFieldTypeConfig(
@@ -31,11 +36,11 @@ export const getSettingsFieldDataTypeDisplay = (
     .filter((part) => part !== '')
     .join(' · ');
 
-  if (isDefined(getFieldFormulaSettings(fieldMetadataItem))) {
+  if (isCalculatedFieldMetadataItem(fieldMetadataItem)) {
     return {
       label: t`Calculation`,
       labelDetail: outputTypeDetail,
-      iconName: 'IconCalculator',
+      Icon: IllustrationIconCalculator,
     };
   }
 
@@ -43,7 +48,7 @@ export const getSettingsFieldDataTypeDisplay = (
     return {
       label: t`Sync`,
       labelDetail: outputTypeDetail,
-      iconName: 'IconRefresh',
+      Icon: IllustrationIconSync,
     };
   }
 

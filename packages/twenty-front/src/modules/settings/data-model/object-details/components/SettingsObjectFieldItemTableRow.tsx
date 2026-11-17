@@ -172,9 +172,7 @@ export const SettingsObjectFieldItemTableRow = ({
     fieldMetadataItem,
     (descriptor) => i18n._(descriptor),
   );
-  const DataTypeIcon = isDefined(dataTypeDisplay.iconName)
-    ? getIcon(dataTypeDisplay.iconName)
-    : RelationIcon;
+  const DataTypeIcon = dataTypeDisplay.Icon ?? RelationIcon;
 
   return (
     <TableRow
@@ -229,7 +227,7 @@ export const SettingsObjectFieldItemTableRow = ({
         <SettingsObjectFieldDataType
           Icon={DataTypeIcon}
           label={
-            isDefined(dataTypeDisplay.iconName) ? dataTypeDisplay.label : label
+            isDefined(dataTypeDisplay.Icon) ? dataTypeDisplay.label : label
           }
           labelDetail={dataTypeDisplay.labelDetail}
           to={

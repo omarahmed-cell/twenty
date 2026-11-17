@@ -50,6 +50,7 @@ type SettingsConditionalLogicPropertiesSectionProps = {
   fields: ConditionalLogicField[];
   // Entries that are not fields, such as property groups; their value is stored as the property name
   extraOptions?: { value: string; label: string }[];
+  unaddableFieldNames?: ReadonlySet<string>;
   onAdd: (fieldName: string) => void;
   onSetRequired: (fieldName: string, isRequired: boolean) => void;
   onRemove: (fieldName: string) => void;
@@ -61,6 +62,7 @@ export const SettingsConditionalLogicPropertiesSection = ({
   properties,
   fields,
   extraOptions = [],
+  unaddableFieldNames,
   onAdd,
   onSetRequired,
   onRemove,
@@ -73,7 +75,9 @@ export const SettingsConditionalLogicPropertiesSection = ({
   ]);
   const addableOptions = [
     ...extraOptions,
-    ...fields.map((field) => ({ label: field.label, value: field.name })),
+    ...fields
+      .filter((field) => unaddableFieldNames?.has(field.name) !== true)
+      .map((field) => ({ label: field.label, value: field.name })),
   ].filter(
     (option) =>
       !properties.some((property) => property.fieldName === option.value),

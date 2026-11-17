@@ -67,12 +67,7 @@ import {
 } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
-import {
-  IconArchive,
-  IconArchiveOff,
-  IconTrash,
-  useIcons,
-} from 'twenty-ui/icon';
+import { IconArchive, IconArchiveOff, IconTrash } from 'twenty-ui/icon';
 import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
@@ -95,7 +90,6 @@ export const SettingsObjectFieldEdit = () => {
   const navigateApp = useNavigateApp();
   const workspaceSurface = useWorkspaceSurface();
   const { t, i18n } = useLingui();
-  const { getIcon } = useIcons();
 
   const { openDialog, closeDialog } = useDialog();
   const { enqueueToast } = useToast();
@@ -483,9 +477,9 @@ export const SettingsObjectFieldEdit = () => {
         <SettingsPageLayout
           title={fieldMetadataItem?.label}
           tag={
-            isDefined(dataTypeDisplay.iconName) ? (
+            isDefined(dataTypeDisplay.Icon) ? (
               <SettingsObjectFieldDataType
-                Icon={getIcon(dataTypeDisplay.iconName)}
+                Icon={dataTypeDisplay.Icon}
                 label={dataTypeDisplay.label}
                 labelDetail={dataTypeDisplay.labelDetail}
                 value={fieldMetadataItem.type as SettingsFieldType}

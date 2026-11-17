@@ -11,6 +11,7 @@ import { themeCssVariables } from 'twenty-ui/theme';
 
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { isCalculatedFieldMetadataItem } from '@/object-metadata/utils/isCalculatedFieldMetadataItem';
 import { SettingsConditionalLogicConditionGroup } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicConditionGroup';
 import { SettingsConditionalLogicPreview } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicPreview';
 import { SettingsConditionalLogicPropertiesSection } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicPropertiesSection';
@@ -108,6 +109,11 @@ export const SettingsConditionalLogicRuleEditor = ({
   expandRule,
 }: SettingsConditionalLogicRuleEditorProps) => {
   const { t } = useLingui();
+  const calculatedFieldNames = new Set(
+    [...fieldMetadataItemByName.values()]
+      .filter(isCalculatedFieldMetadataItem)
+      .map(({ name }) => name),
+  );
 
   return (
     <>
@@ -210,6 +216,7 @@ export const SettingsConditionalLogicRuleEditor = ({
             properties={draft.properties}
             fields={fields}
             extraOptions={extraPropertyOptions}
+            unaddableFieldNames={calculatedFieldNames}
             onAdd={(fieldName) =>
               onChange(addConditionalLogicProperty(draft, fieldName))
             }

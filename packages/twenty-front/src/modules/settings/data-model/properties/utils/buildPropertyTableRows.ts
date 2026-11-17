@@ -14,6 +14,8 @@ export type PropertyTableRow = {
   groupName: string | null;
   positionInGroup: number;
   typeLabel: string;
+  typeFilterLabel: string;
+  appLabel: string;
   createdBy: Pick<ActorMetadata, 'source' | 'name'> | null;
 };
 
@@ -21,10 +23,14 @@ export const buildPropertyTableRows = ({
   fieldMetadataItems,
   propertySettings,
   getTypeLabel,
+  getTypeFilterLabel,
+  getAppLabel,
 }: {
   fieldMetadataItems: FieldMetadataItem[];
   propertySettings: PropertySettings | null;
   getTypeLabel: (fieldMetadataItem: FieldMetadataItem) => string;
+  getTypeFilterLabel: (fieldMetadataItem: FieldMetadataItem) => string;
+  getAppLabel: (fieldMetadataItem: FieldMetadataItem) => string;
 }): PropertyTableRow[] => {
   const groupNameById = new Map(
     (propertySettings?.groups ?? []).map(({ id, name }) => [id, name]),
@@ -57,6 +63,8 @@ export const buildPropertyTableRows = ({
       groupName,
       positionInGroup: membership?.position ?? 0,
       typeLabel: getTypeLabel(fieldMetadataItem),
+      typeFilterLabel: getTypeFilterLabel(fieldMetadataItem),
+      appLabel: getAppLabel(fieldMetadataItem),
       createdBy: creationByFieldId.get(fieldMetadataItem.id)?.createdBy ?? null,
     };
   });
@@ -67,6 +75,7 @@ export const filterPropertyTableRows = ({
   searchTerm,
   groupFilter,
   typeFilter,
+  appFilter,
   createdByFilter,
   getCreatedByLabel,
 }: {
@@ -74,6 +83,7 @@ export const filterPropertyTableRows = ({
   searchTerm: string;
   groupFilter: string;
   typeFilter: string;
+  appFilter: string;
   createdByFilter: string;
   getCreatedByLabel: (row: PropertyTableRow) => string;
 }): PropertyTableRow[] => {
@@ -88,7 +98,8 @@ export const filterPropertyTableRows = ({
         (groupFilter === NO_PROPERTY_GROUP_FILTER
           ? !isDefined(row.propertyGroupId)
           : row.propertyGroupId === groupFilter)) &&
-      (typeFilter === ALL_FILTER || row.typeLabel === typeFilter) &&
+      (typeFilter === ALL_FILTER || row.typeFilterLabel === typeFilter) &&
+      (appFilter === ALL_FILTER || row.appLabel === appFilter) &&
       (createdByFilter === ALL_FILTER ||
         getCreatedByLabel(row) === createdByFilter),
   );

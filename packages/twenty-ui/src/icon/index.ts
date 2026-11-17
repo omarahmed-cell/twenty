@@ -32,6 +32,7 @@ export { IconTrashXOff } from './components/IconTrashXOff';
 export { IconTwentyStar } from './components/IconTwentyStar';
 export { IconTwentyStarFilled } from './components/IconTwentyStarFilled';
 export { IllustrationIconArray } from './components/IllustrationIconArray';
+export { IllustrationIconCalculator } from './components/IllustrationIconCalculator';
 export { IllustrationIconCalendarEvent } from './components/IllustrationIconCalendarEvent';
 export { IllustrationIconCalendarTime } from './components/IllustrationIconCalendarTime';
 export { IllustrationIconCurrency } from './components/IllustrationIconCurrency';
@@ -47,6 +48,7 @@ export { IllustrationIconOneToOne } from './components/IllustrationIconOneToOne'
 export { IllustrationIconPhone } from './components/IllustrationIconPhone';
 export { IllustrationIconSetting } from './components/IllustrationIconSetting';
 export { IllustrationIconStar } from './components/IllustrationIconStar';
+export { IllustrationIconSync } from './components/IllustrationIconSync';
 export { IllustrationIconTag } from './components/IllustrationIconTag';
 export { IllustrationIconTags } from './components/IllustrationIconTags';
 export { IllustrationIconText } from './components/IllustrationIconText';

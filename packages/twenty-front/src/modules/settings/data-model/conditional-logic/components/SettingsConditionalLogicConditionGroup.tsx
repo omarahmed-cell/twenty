@@ -13,6 +13,7 @@ import { IconTrash, IconX } from 'twenty-ui/icon';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { isCalculatedFieldMetadataItem } from '@/object-metadata/utils/isCalculatedFieldMetadataItem';
 import { SettingsConditionalLogicConditionValueInput } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicConditionValueInput';
 import { getConditionalLogicOperatorLabel } from '@/settings/data-model/conditional-logic/utils/getConditionalLogicOperatorLabel';
 import { Select } from '@/ui/input/components/Select';
@@ -52,10 +53,9 @@ const StyledConditionRow = styled.div`
   align-items: flex-start;
   display: grid;
   gap: ${themeCssVariables.spacing[2]};
-  grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(
-      160px,
-      1.4fr
-    ) 24px;
+  grid-template-columns:
+    minmax(120px, 1fr) minmax(120px, 1fr) minmax(160px, 1.4fr)
+    24px;
 `;
 
 const StyledValueContainer = styled.div`
@@ -105,10 +105,20 @@ export const SettingsConditionalLogicConditionGroup = ({
 }: SettingsConditionalLogicConditionGroupProps) => {
   const { t } = useLingui();
   const fieldByName = new Map(fields.map((field) => [field.name, field]));
-  const fieldOptions = fields.map((field) => ({
-    label: field.label,
-    value: field.name,
-  }));
+  // Calculated fields are filled by the system, so a rule can never react to a user changing them
+  const fieldOptions = fields.map((field) => {
+    const fieldMetadataItem = fieldMetadataItemByName.get(field.name);
+    const isCalculated =
+      isDefined(fieldMetadataItem) &&
+      isCalculatedFieldMetadataItem(fieldMetadataItem);
+
+    return {
+      label: field.label,
+      value: field.name,
+      disabled: isCalculated,
+      contextualText: isCalculated ? t`Calculated` : undefined,
+    };
+  });
   const groupNumber = groupIndex + 1;
 
   return (
