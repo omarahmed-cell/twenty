@@ -54,4 +54,6 @@ export type ConditionalLogicField = {
   type: FieldMetadataType;
   // Set for many-to-one relations, whose value is the foreign key
   joinColumnName?: string;
+  // Select options, only used to word messages
+  options?: { value: string; label: string }[];
 };

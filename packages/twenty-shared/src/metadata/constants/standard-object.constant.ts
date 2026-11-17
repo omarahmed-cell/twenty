@@ -972,6 +972,28 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  propertyGroup: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyGroup,
+    fields: STANDARD_OBJECT_FIELDS.propertyGroup,
+    indexes: {},
+  },
+  propertyGroupMembership: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyGroupMembership,
+    fields: STANDARD_OBJECT_FIELDS.propertyGroupMembership,
+    indexes: {},
+  },
+  propertyLogicRule: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyLogicRule,
+    fields: STANDARD_OBJECT_FIELDS.propertyLogicRule,
+    indexes: {},
+  },
+  propertyCreation: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyCreation,
+    fields: STANDARD_OBJECT_FIELDS.propertyCreation,
+    indexes: {},
+  },
   messageChannelMessageAssociation: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

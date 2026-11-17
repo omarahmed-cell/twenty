@@ -25,6 +25,7 @@ import {
   IconDoorEnter,
   IconHelpCircle,
   IconHierarchy,
+  IconListSearch,
   IconMail,
   IconMessage,
   IconMessageCircle,
@@ -133,6 +134,15 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           path: SettingsPath.Objects,
           Icon: IconHierarchy,
           isHidden: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
+          subItems: [
+            {
+              label: t`Properties`,
+              path: SettingsPath.Properties,
+              Icon: IconListSearch,
+              isHidden: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
+              indentationLevel: 2,
+            },
+          ],
         },
         {
           label: t`Layout`,

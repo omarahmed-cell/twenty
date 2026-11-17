@@ -1359,6 +1359,189 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  propertyGroup: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'propertyGroup'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'propertyGroup',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier: STANDARD_OBJECTS.propertyGroup.universalIdentifier,
+        nameSingular: 'propertyGroup',
+        namePlural: 'propertyGroups',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Property Group`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Property Groups`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A named group of properties of one object`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconFolder',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'name',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  propertyGroupMembership: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'propertyGroupMembership'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'propertyGroupMembership',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.propertyGroupMembership.universalIdentifier,
+        nameSingular: 'propertyGroupMembership',
+        namePlural: 'propertyGroupMemberships',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Property Group Membership`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Property Group Memberships`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A property placed in a property group, with its order`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconFolderPlus',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  propertyLogicRule: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'propertyLogicRule'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'propertyLogicRule',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.propertyLogicRule.universalIdentifier,
+        nameSingular: 'propertyLogicRule',
+        namePlural: 'propertyLogicRules',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Property Logic Rule`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Property Logic Rules`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `A conditional logic rule that shows dependent properties`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconListCheck',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
+  propertyCreation: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'propertyCreation'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'propertyCreation',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.propertyCreation.universalIdentifier,
+        nameSingular: 'propertyCreation',
+        namePlural: 'propertyCreations',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Property Creation`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Property Creations`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Who created a property, recorded by the server`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconUserPlus',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   pipelineStage: ({
     now,
     workspaceId,

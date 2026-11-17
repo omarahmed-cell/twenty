@@ -8,7 +8,11 @@ import { FieldsWidgetFieldList } from '@/page-layout/widgets/fields/components/F
 import { FieldsWidgetGroupContainer } from '@/page-layout/widgets/fields/components/FieldsWidgetGroupContainer';
 import { useFieldsWidgetGroupsForDisplay } from '@/page-layout/widgets/fields/hooks/useFieldsWidgetGroupsForDisplay';
 import { useFieldsWidgetHiddenFieldsForDisplay } from '@/page-layout/widgets/fields/hooks/useFieldsWidgetHiddenFieldsForDisplay';
+import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
+import { hideFieldsWidgetFields } from '@/page-layout/widgets/fields/utils/hideFieldsWidgetFields';
 import { DealRecordLockNote } from '@/pipeline/rules/components/DealRecordLockNote';
+import { usePropertyLogicHiddenFieldNames } from '@/properties/hooks/usePropertyLogicHiddenFieldNames';
+import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { AnimatedPlaceholder } from '@/ui/feedback/empty-state/components/AnimatedPlaceholder/AnimatedPlaceholder';
 import { EmptyState } from '@/ui/feedback/empty-state/components/EmptyState';
 import { StyledWidgetScrollContainer } from '@/ui/layout/components/WidgetContentContainer';
@@ -60,16 +64,34 @@ export const FieldsWidget = ({ widget }: FieldsWidgetProps) => {
 
   const fieldsConfiguration = widget.configuration as FieldsConfiguration;
 
-  const { groups, displayMode } = useFieldsWidgetGroupsForDisplay({
-    widgetId: widget.id,
-    viewId: fieldsConfiguration.viewId ?? null,
-    objectNameSingular: targetRecord.targetObjectNameSingular,
+  const { groups: configuredGroups, displayMode } =
+    useFieldsWidgetGroupsForDisplay({
+      widgetId: widget.id,
+      viewId: fieldsConfiguration.viewId ?? null,
+      objectNameSingular: targetRecord.targetObjectNameSingular,
+    });
+
+  const { hiddenFields: configuredHiddenFields } =
+    useFieldsWidgetHiddenFieldsForDisplay({
+      widgetId: widget.id,
+      viewId: fieldsConfiguration.viewId ?? null,
+      objectNameSingular: targetRecord.targetObjectNameSingular,
+    });
+
+  const recordStore = useAtomFamilyStateValue(
+    recordStoreFamilyState,
+    targetRecord.id,
+  );
+
+  const propertyLogicHiddenFieldNames = usePropertyLogicHiddenFieldNames({
+    objectMetadataItem,
+    record: recordStore,
   });
 
-  const { hiddenFields } = useFieldsWidgetHiddenFieldsForDisplay({
-    widgetId: widget.id,
-    viewId: fieldsConfiguration.viewId ?? null,
-    objectNameSingular: targetRecord.targetObjectNameSingular,
+  const { groups, hiddenFields } = hideFieldsWidgetFields({
+    groups: configuredGroups,
+    hiddenFields: configuredHiddenFields,
+    hiddenFieldNames: propertyLogicHiddenFieldNames,
   });
 
   const shouldShowHiddenFields =

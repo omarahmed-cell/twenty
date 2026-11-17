@@ -49,6 +49,9 @@ import { type z } from 'zod';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
+import { SETTINGS_PROPERTIES_OBJECT_QUERY_PARAM } from '@/settings/data-model/properties/constants/SettingsPropertiesObjectQueryParam';
+import { useNewPropertyGroupAssignment } from '@/settings/data-model/properties/hooks/useNewPropertyGroupAssignment';
+import { Select } from '@/ui/input/components/Select';
 import { DEFAULT_ICONS_BY_FIELD_TYPE } from '~/pages/settings/data-model/constants/DefaultIconsByFieldType';
 
 type SettingsDataModelNewFieldFormValues = z.infer<
@@ -156,6 +159,17 @@ export const SettingsObjectNewFieldConfigure = () => {
 
   const [isSaving, setIsSaving] = useState(false);
 
+  const {
+    hasPropertyGroups,
+    groups: propertyGroups,
+    initialPropertyGroupId,
+    assignNewFieldToGroup,
+    consumePropertyCreationContext,
+  } = useNewPropertyGroupAssignment(activeObjectMetadataItem?.id ?? '');
+  const [propertyGroupId, setPropertyGroupId] = useState(
+    initialPropertyGroupId,
+  );
+
   const [syncFormValue, setSyncFormValue] =
     useState<SettingsDataModelFieldSyncFormValue>({});
 
@@ -222,13 +236,32 @@ export const SettingsObjectNewFieldConfigure = () => {
   ) => {
     setIsSaving(true);
 
-    const createCleanUp = (
+    const createCleanUp = async (
       creationResult: Awaited<ReturnType<typeof createMetadataField>>,
     ) => {
       if (creationResult.status === 'successful') {
-        navigate(SettingsPath.ObjectDetail, {
-          objectNamePlural,
-        });
+        try {
+          await assignNewFieldToGroup({
+            fieldMetadataId:
+              creationResult.response.data?.createOneField?.id ?? undefined,
+            propertyGroupId,
+          });
+        } catch {
+          enqueueToast({
+            status: 'error',
+            children: t`The property was created, but could not be added to its group.`,
+          });
+        }
+
+        if (consumePropertyCreationContext()) {
+          navigate(SettingsPath.Properties, undefined, {
+            [SETTINGS_PROPERTIES_OBJECT_QUERY_PARAM]: objectNamePlural,
+          });
+        } else {
+          navigate(SettingsPath.ObjectDetail, {
+            objectNamePlural,
+          });
+        }
       }
       setIsSaving(false);
     };
@@ -423,6 +456,25 @@ export const SettingsObjectNewFieldConfigure = () => {
               isCreationMode={true}
             />
           </Section.Root>
+          {hasPropertyGroups && (
+            <Section.Root>
+              <Section.Header
+                title={t`Group`}
+                description={t`The property group this field belongs to`}
+              />
+              <Select
+                dropdownId="settings-new-field-property-group"
+                options={propertyGroups.map(({ id, name }) => ({
+                  label: name,
+                  value: id,
+                }))}
+                value={propertyGroupId}
+                emptyOption={{ label: t`No group`, value: '' }}
+                withSearchInput
+                onChange={setPropertyGroupId}
+              />
+            </Section.Root>
+          )}
           {isUserMode ? (
             <Section.Root>
               <Section.Header

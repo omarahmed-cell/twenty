@@ -21,11 +21,19 @@ import { SettingsObjectFieldTable } from '@/settings/data-model/object-details/c
 import { usePipelineConfigs } from '@/pipeline/hooks/usePipelineConfigs';
 import { getStageHistoryFieldNames } from '@/settings/data-model/pipelines/utils/getStageHistoryFieldNames';
 import { useMemo } from 'react';
+import { SettingsTextLink } from '@/settings/components/SettingsTextLink';
+import { getSettingsPropertiesPath } from '@/settings/data-model/properties/utils/getSettingsPropertiesPath';
 
 const StyledButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   padding-top: ${themeCssVariables.spacing[2]};
+`;
+
+const StyledPropertiesLink = styled.div`
+  align-items: center;
+  display: flex;
+  margin-right: auto;
 `;
 
 const StyledContentContainer = styled.div`
@@ -113,6 +121,15 @@ export const ObjectFields = ({ objectMetadataItem }: ObjectFieldsProps) => {
           }
         />
         <StyledButtonContainer>
+          <StyledPropertiesLink>
+            <SettingsTextLink
+              to={getSettingsPropertiesPath({
+                objectNamePlural: objectMetadataItem.namePlural,
+              })}
+            >
+              {t`Manage properties, groups and conditional logic`}
+            </SettingsTextLink>
+          </StyledPropertiesLink>
           {!readonly && (
             <NavigationButton
               to={getSettingsPath(SettingsPath.ObjectNewFieldSelect, {

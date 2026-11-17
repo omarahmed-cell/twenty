@@ -163,6 +163,12 @@ const SettingsObjectOverview = lazy(() =>
   ),
 );
 
+const SettingsProperties = lazy(() =>
+  import('~/pages/settings/data-model/SettingsProperties').then((module) => ({
+    default: module.SettingsProperties,
+  })),
+);
+
 const SettingsDevelopersApiKeyDetail = lazy(() =>
   import('~/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail').then(
     (module) => ({
@@ -977,6 +983,11 @@ const createSettingsRouteElements = ({
       <Route
         path={SettingsPath.ObjectOverview}
         element={<SettingsObjectOverview />}
+        handle={EXPANDABLE_SETTINGS_ROUTE_HANDLE}
+      />
+      <Route
+        path={SettingsPath.Properties}
+        element={<SettingsProperties />}
         handle={EXPANDABLE_SETTINGS_ROUTE_HANDLE}
       />
       <Route

@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react/macro';
 import { useMemo } from 'react';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -5,20 +6,19 @@ import { isDefined } from 'twenty-shared/utils';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { useLazyFindOneRecord } from '@/object-record/hooks/useLazyFindOneRecord';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
-import { DEAL_STAGE_ENTRY_DIALOG_ID } from '@/pipeline/conditional-logic/constants/DealStageEntryDialogId';
-import {
-  dealStageEntryDialogRequestState,
-  type DealStageEntryValues,
-} from '@/pipeline/conditional-logic/states/dealStageEntryDialogRequestState';
-import { buildConditionalLogicFields } from '@/pipeline/conditional-logic/utils/buildConditionalLogicFields';
+import { useConditionalLogicFieldsDialog } from '@/conditional-logic/hooks/useConditionalLogicFieldsDialog';
+import { type ConditionalLogicFieldsDialogValues } from '@/conditional-logic/states/conditionalLogicFieldsDialogRequestState';
+import { buildConditionalLogicFields } from '@/conditional-logic/utils/buildConditionalLogicFields';
 import {
   type DealStageEntryRequirement,
   getDealStageEntryRequirement,
 } from '@/pipeline/conditional-logic/utils/getDealStageEntryRequirement';
 import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
-import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+import {
+  DEAL_PIPELINE_FIELD_NAME,
+  DEAL_STAGE_FIELD_NAME,
+} from '@/pipeline/stage-picker/utils/dealStageFields';
 
 export type DealStageEntryTarget = {
   targetStageValue: string | null | undefined;
@@ -28,15 +28,13 @@ export type DealStageEntryTarget = {
 export type DealStageEntryDecision =
   | { status: 'proceed' }
   | { status: 'cancelled' }
-  | { status: 'confirmed'; values: DealStageEntryValues };
+  | { status: 'confirmed'; values: ConditionalLogicFieldsDialogValues };
 
 export const useDealStageEntry = ({ enabled }: { enabled: boolean }) => {
   const pipelines = useDealStagePipelineConfigs({ enabled });
   const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
-  const setDealStageEntryDialogRequest = useSetAtomState(
-    dealStageEntryDialogRequestState,
-  );
-  const { openDialog } = useDialog();
+  const { t } = useLingui();
+  const { askForConditionalLogicValues } = useConditionalLogicFieldsDialog();
 
   // Views only load their visible columns, so the fields a rule reads are fetched fresh
   const { findOneRecord } = useLazyFindOneRecord({
@@ -103,11 +101,23 @@ export const useDealStageEntry = ({ enabled }: { enabled: boolean }) => {
   }: {
     requirement: DealStageEntryRequirement;
     record: Record<string, unknown>;
-  }) =>
-    new Promise<DealStageEntryValues | null>((resolve) => {
-      setDealStageEntryDialogRequest({ requirement, record, resolve });
-      openDialog(DEAL_STAGE_ENTRY_DIALOG_ID);
+  }) => {
+    const stageLabel = requirement.stage.label;
+
+    return askForConditionalLogicValues({
+      objectNameSingular: CoreObjectNameSingular.Opportunity,
+      title: t`Move to ${stageLabel}`,
+      confirmLabel: t`Move`,
+      hint: t`Fill the required fields to move this deal.`,
+      properties: requirement.properties,
+      rules: requirement.stage.conditionalRules,
+      record,
+      recordOverrides: {
+        [DEAL_STAGE_FIELD_NAME]: requirement.stage.value,
+        [DEAL_PIPELINE_FIELD_NAME]: requirement.pipeline.key,
+      },
     });
+  };
 
   const resolveStageEntry = async ({
     recordId,

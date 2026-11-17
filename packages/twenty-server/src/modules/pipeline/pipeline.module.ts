@@ -54,6 +54,6 @@ import { PipelineWriteGuardService } from 'src/modules/pipeline/services/pipelin
     DealCloseDateJob,
     ...PIPELINE_QUERY_HOOKS,
   ],
-  exports: [PipelineConfigService, PipelineSyncService],
+  exports: [PipelineConfigService, PipelineSyncService, PipelineAccessService],
 })
 export class PipelineModule {}

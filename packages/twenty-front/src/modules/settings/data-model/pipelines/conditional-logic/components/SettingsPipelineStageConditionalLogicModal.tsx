@@ -4,51 +4,21 @@ import { useMemo, useState } from 'react';
 import { type ConditionalLogicRule, isDefined } from 'twenty-shared/utils';
 import { LightButton, LightIconButton } from 'twenty-ui/components/input';
 import { IconPencil, IconPlus, IconTrash } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
-import { buildConditionalLogicFields } from '@/pipeline/conditional-logic/utils/buildConditionalLogicFields';
+import { buildConditionalLogicFields } from '@/conditional-logic/utils/buildConditionalLogicFields';
 import { type PipelineStageConfig } from '@/pipeline/types/PipelineConfig';
-import { SettingsConditionalLogicConditionGroup } from '@/settings/data-model/pipelines/conditional-logic/components/SettingsConditionalLogicConditionGroup';
-import { SettingsConditionalLogicPreview } from '@/settings/data-model/pipelines/conditional-logic/components/SettingsConditionalLogicPreview';
-import { SettingsConditionalLogicPropertiesSection } from '@/settings/data-model/pipelines/conditional-logic/components/SettingsConditionalLogicPropertiesSection';
-import { CONDITIONAL_LOGIC_EXCLUDED_FIELD_NAMES } from '@/settings/data-model/pipelines/conditional-logic/constants/ConditionalLogicExcludedFieldNames';
+import { SettingsConditionalLogicRuleEditor } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicRuleEditor';
+import { CONDITIONAL_LOGIC_EXCLUDED_FIELD_NAMES } from '@/settings/data-model/conditional-logic/constants/ConditionalLogicExcludedFieldNames';
 import {
-  addConditionalLogicCondition,
-  addConditionalLogicGroup,
-  addConditionalLogicProperty,
-  changeConditionalLogicConditionField,
-  changeConditionalLogicConditionOperator,
-  changeConditionalLogicConditionValue,
   createConditionalLogicRuleDraft,
-  isConditionalLogicRuleDraftValid,
-  moveConditionalLogicProperty,
-  removeConditionalLogicCondition,
-  removeConditionalLogicGroup,
-  removeConditionalLogicProperty,
   removeConditionalLogicRule,
-  setConditionalLogicPropertyRequired,
   upsertConditionalLogicRule,
-} from '@/settings/data-model/pipelines/conditional-logic/utils/conditionalLogicRuleDraft';
+} from '@/settings/data-model/conditional-logic/utils/conditionalLogicRuleDraft';
 import { useSettingsPipelineActions } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineActions';
 import { DropdownInModalContext } from '@/ui/layout/dropdown/contexts/DropdownInModalContext';
 import { useFullScreenModal } from '@/ui/layout/fullscreen/hooks/useFullScreenModal';
-
-const StyledToolbar = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${themeCssVariables.spacing[2]};
-  justify-content: flex-end;
-`;
-
-const StyledColumns = styled.div`
-  display: grid;
-  flex: 1;
-  gap: ${themeCssVariables.spacing[4]};
-  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-  min-height: 0;
-`;
 
 const StyledPanel = styled.div`
   background: ${themeCssVariables.background.primary};
@@ -69,18 +39,6 @@ const StyledSectionTitle = styled.div`
 
 const StyledSectionDescription = styled.div`
   color: ${themeCssVariables.font.color.tertiary};
-`;
-
-const StyledGroups = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${themeCssVariables.spacing[2]};
-`;
-
-const StyledOr = styled.div`
-  color: ${themeCssVariables.font.color.tertiary};
-  font-weight: ${themeCssVariables.font.weight.semiBold};
-  text-align: center;
 `;
 
 const StyledRuleCard = styled.div`
@@ -260,141 +218,21 @@ export const SettingsPipelineStageConditionalLogicModal = ({
     </StyledPanel>
   );
 
+  const stageLabel = stage.label;
+
   const renderEditor = (draft: ConditionalLogicRule) => (
-    <>
-      <StyledToolbar>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCancelDraft}
-          disabled={isSaving}
-        >
-          {t`Cancel`}
-        </Button>
-        <Button
-          variant="solid"
-          color="accent"
-          size="sm"
-          onClick={handleSaveDraft}
-          disabled={isSaving || !isConditionalLogicRuleDraftValid(draft)}
-        >
-          {t`Save`}
-        </Button>
-      </StyledToolbar>
-      <StyledColumns>
-        <StyledPanel>
-          <StyledSectionTitle>{t`Set conditions`}</StyledSectionTitle>
-          <StyledSectionDescription>
-            {t`All conditions in a group must be true. The rule applies when any group is true.`}
-          </StyledSectionDescription>
-          <StyledGroups>
-            {draft.conditionGroups.map((group, groupIndex) => (
-              <div key={group.id}>
-                {groupIndex > 0 && <StyledOr>{t`OR`}</StyledOr>}
-                <SettingsConditionalLogicConditionGroup
-                  group={group}
-                  groupIndex={groupIndex}
-                  stageLabel={stage.label}
-                  stageFieldLabel={stageFieldLabel}
-                  fields={fields}
-                  fieldMetadataItemByName={fieldMetadataItemByName}
-                  canRemove={draft.conditionGroups.length > 1}
-                  onAddCondition={(field) =>
-                    setRuleDraft(
-                      addConditionalLogicCondition(draft, group.id, field),
-                    )
-                  }
-                  onChangeConditionField={(conditionId, field) =>
-                    setRuleDraft(
-                      changeConditionalLogicConditionField(
-                        draft,
-                        group.id,
-                        conditionId,
-                        field,
-                      ),
-                    )
-                  }
-                  onChangeConditionOperator={(conditionId, operator) =>
-                    setRuleDraft(
-                      changeConditionalLogicConditionOperator(
-                        draft,
-                        group.id,
-                        conditionId,
-                        operator,
-                      ),
-                    )
-                  }
-                  onChangeConditionValue={(conditionId, value) =>
-                    setRuleDraft(
-                      changeConditionalLogicConditionValue(
-                        draft,
-                        group.id,
-                        conditionId,
-                        value,
-                      ),
-                    )
-                  }
-                  onRemoveCondition={(conditionId) =>
-                    setRuleDraft(
-                      removeConditionalLogicCondition(
-                        draft,
-                        group.id,
-                        conditionId,
-                      ),
-                    )
-                  }
-                  onRemove={() =>
-                    setRuleDraft(removeConditionalLogicGroup(draft, group.id))
-                  }
-                />
-              </div>
-            ))}
-          </StyledGroups>
-          <LightButton
-            startIcon={<IconPlus />}
-            onClick={() => setRuleDraft(addConditionalLogicGroup(draft))}
-          >
-            {t`Add group`}
-          </LightButton>
-          <StyledSectionTitle>{t`Show these properties`}</StyledSectionTitle>
-          <SettingsConditionalLogicPropertiesSection
-            ruleId={draft.id}
-            properties={draft.properties}
-            fields={fields}
-            onAdd={(fieldName) =>
-              setRuleDraft(addConditionalLogicProperty(draft, fieldName))
-            }
-            onSetRequired={(fieldName, isRequired) =>
-              setRuleDraft(
-                setConditionalLogicPropertyRequired(
-                  draft,
-                  fieldName,
-                  isRequired,
-                ),
-              )
-            }
-            onRemove={(fieldName) =>
-              setRuleDraft(removeConditionalLogicProperty(draft, fieldName))
-            }
-            onMove={(fromIndex, toIndex) =>
-              setRuleDraft(
-                moveConditionalLogicProperty(draft, fromIndex, toIndex),
-              )
-            }
-          />
-        </StyledPanel>
-        <StyledPanel>
-          <StyledSectionTitle>{t`Preview`}</StyledSectionTitle>
-          <SettingsConditionalLogicPreview
-            rule={draft}
-            stageLabel={stage.label}
-            fields={fields}
-            fieldMetadataItemByName={fieldMetadataItemByName}
-            objectMetadataItem={objectMetadataItem}
-          />
-        </StyledPanel>
-      </StyledColumns>
-    </>
+    <SettingsConditionalLogicRuleEditor
+      draft={draft}
+      onChange={setRuleDraft}
+      onCancel={handleCancelDraft}
+      onSave={handleSaveDraft}
+      isSaving={isSaving}
+      fields={fields}
+      fieldMetadataItemByName={fieldMetadataItemByName}
+      objectMetadataItem={objectMetadataItem}
+      previewHint={t`Pick values to see what a deal moving to ${stageLabel} would be asked for.`}
+      fixedConditionLabel={t`${stageFieldLabel} is equal to ${stageLabel}`}
+    />
   );
 
   return renderFullScreenModal(

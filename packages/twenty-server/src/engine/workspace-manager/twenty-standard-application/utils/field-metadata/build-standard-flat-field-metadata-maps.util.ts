@@ -37,6 +37,10 @@ import { buildOpportunityCollaboratorStandardFlatFieldMetadatas } from 'src/engi
 import { buildOpportunityStageHistoryStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-stage-history-standard-flat-field-metadata.util';
 import { buildPipelineStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-pipeline-standard-flat-field-metadata.util';
 import { buildPipelineStageStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-pipeline-stage-standard-flat-field-metadata.util';
+import { buildPropertyGroupStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-group-standard-flat-field-metadata.util';
+import { buildPropertyGroupMembershipStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-group-membership-standard-flat-field-metadata.util';
+import { buildPropertyLogicRuleStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-logic-rule-standard-flat-field-metadata.util';
+import { buildPropertyCreationStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-creation-standard-flat-field-metadata.util';
 import { buildMessageChannelMessageAssociationMessageFolderStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-channel-message-association-message-folder-standard-flat-field-metadata.util';
 import { buildMessageChannelMessageAssociationStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-channel-message-association-standard-flat-field-metadata.util';
 import { buildMessageParticipantStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-participant-standard-flat-field-metadata.util';
@@ -106,6 +110,11 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
     buildOpportunityStageHistoryStandardFlatFieldMetadatas,
   pipeline: buildPipelineStandardFlatFieldMetadatas,
   pipelineStage: buildPipelineStageStandardFlatFieldMetadatas,
+  propertyGroup: buildPropertyGroupStandardFlatFieldMetadatas,
+  propertyGroupMembership:
+    buildPropertyGroupMembershipStandardFlatFieldMetadatas,
+  propertyLogicRule: buildPropertyLogicRuleStandardFlatFieldMetadatas,
+  propertyCreation: buildPropertyCreationStandardFlatFieldMetadatas,
   message: buildMessageStandardFlatFieldMetadatas,
   messageChannelMessageAssociation:
     buildMessageChannelMessageAssociationStandardFlatFieldMetadatas,

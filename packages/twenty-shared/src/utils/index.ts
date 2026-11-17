@@ -53,6 +53,18 @@ export {
   findMissingConditionalLogicProperties,
 } from './conditional-logic/evaluate-conditional-logic';
 export { normalizeConditionalLogicRules } from './conditional-logic/normalize-conditional-logic-rules';
+export type { PropertyLogicRuleViolation } from './conditional-logic/property-logic';
+export {
+  toPropertyGroupReference,
+  getPropertyGroupIdFromReference,
+  expandPropertyLogicRule,
+  getPropertyLogicDependentFieldNames,
+  resolveHiddenPropertyFieldNames,
+  getPropertyLogicConditionFieldNames,
+  findPropertyLogicRuleViolations,
+  describePropertyLogicTrigger,
+  formatPropertyLogicViolationMessage,
+} from './conditional-logic/property-logic';
 export { formatValueForCSV } from './csv/formatValueForCSV';
 export { sanitizeValueForCSVExport } from './csv/sanitizeValueForCSVExport';
 export { convertCurrencyAmountToCurrencyMicros } from './currency/convertCurrencyAmountToCurrencyMicros';

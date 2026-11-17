@@ -26,6 +26,8 @@ import { isFieldRawJsonValue } from '@/object-record/record-field/ui/types/guard
 import { isFieldSelect } from '@/object-record/record-field/ui/types/guards/isFieldSelect';
 import { isFieldSelectValue } from '@/object-record/record-field/ui/types/guards/isFieldSelectValue';
 import { recordStoreFamilySelector } from '@/object-record/record-store/states/selectors/recordStoreFamilySelector';
+import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
+import { usePropertyLogicFieldChange } from '@/properties/hooks/usePropertyLogicFieldChange';
 
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -87,6 +89,8 @@ export const usePersistField = ({
 
   const store = useStore();
   const { upsertRecordsInStore } = useUpsertRecordsInStore();
+  const { resolvePropertyLogicChange } =
+    usePropertyLogicFieldChange(objectMetadataItem);
 
   const persistField = useCallback(
     async ({
@@ -283,6 +287,22 @@ export const usePersistField = ({
           return;
         }
 
+        const propertyLogicDecision = await resolvePropertyLogicChange({
+          recordId,
+          fallbackRecord:
+            store.get(recordStoreFamilyState.atomFamily(recordId)) ?? {},
+          changes: { [fieldName]: valueToPersist },
+        });
+
+        if (propertyLogicDecision.status === 'cancelled') {
+          return;
+        }
+
+        const propertyLogicValues =
+          propertyLogicDecision.status === 'confirmed'
+            ? propertyLogicDecision.values
+            : {};
+
         // A deal that changes pipeline starts again at the new pipeline's first stage
         const firstStageOfNewPipeline =
           isDealPipelineField({
@@ -299,6 +319,7 @@ export const usePersistField = ({
           objectNameSingular: objectMetadataItem.nameSingular,
           idToUpdate: recordId,
           updateOneRecordInput: {
+            ...propertyLogicValues,
             [fieldName]: valueToPersist,
             ...(isDefined(firstStageOfNewPipeline)
               ? { [DEAL_STAGE_FIELD_NAME]: firstStageOfNewPipeline }
@@ -310,6 +331,18 @@ export const usePersistField = ({
           recordStoreFamilySelector.selectorFamily({ recordId, fieldName }),
           valueToPersist,
         );
+
+        for (const [filledFieldName, filledValue] of Object.entries(
+          propertyLogicValues,
+        )) {
+          store.set(
+            recordStoreFamilySelector.selectorFamily({
+              recordId,
+              fieldName: filledFieldName,
+            }),
+            filledValue,
+          );
+        }
 
         if (isDefined(firstStageOfNewPipeline)) {
           store.set(
@@ -336,6 +369,7 @@ export const usePersistField = ({
       objectMetadataItem?.nameSingular,
       objectMetadataItems,
       pipelines,
+      resolvePropertyLogicChange,
       store,
       updateOneRecord,
       upsertRecordsInStore,

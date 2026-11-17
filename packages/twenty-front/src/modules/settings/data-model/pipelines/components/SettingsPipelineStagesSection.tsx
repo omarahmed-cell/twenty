@@ -13,7 +13,7 @@ import {
 } from '@/pipeline/types/PipelineConfig';
 import { SettingsPipelineStageRow } from '@/settings/data-model/pipelines/components/SettingsPipelineStageRow';
 import { SettingsPipelineStageConditionalLogicModal } from '@/settings/data-model/pipelines/conditional-logic/components/SettingsPipelineStageConditionalLogicModal';
-import { createConditionalLogicRuleDraft } from '@/settings/data-model/pipelines/conditional-logic/utils/conditionalLogicRuleDraft';
+import { createConditionalLogicRuleDraft } from '@/settings/data-model/conditional-logic/utils/conditionalLogicRuleDraft';
 import { SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineStagesTableGridTemplateColumns';
 import { useSettingsPipelineActions } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineActions';
 import { computeReorderedPositions } from '@/settings/data-model/pipelines/utils/computeReorderedPositions';

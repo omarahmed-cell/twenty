@@ -28,6 +28,7 @@ import { type JsonValue } from 'type-fest';
 import { Field } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
 
+import { usePropertyLogicHiddenFieldNames } from '@/properties/hooks/usePropertyLogicHiddenFieldNames';
 const StyledFieldList = styled.div`
   display: flex;
   flex-direction: column;
@@ -76,9 +77,18 @@ export const RecordFormFieldInputs = ({
     ? draftRecord[DEAL_STAGE_FIELD_NAME]
     : null;
 
+  const propertyLogicHiddenFieldNames = usePropertyLogicHiddenFieldNames({
+    objectMetadataItem,
+    record: draftRecord,
+  });
+
+  const shownFieldMetadataItems = fieldMetadataItems.filter(
+    ({ name }) => !propertyLogicHiddenFieldNames.has(name),
+  );
+
   const orderedFieldMetadataItems = isDealForm
-    ? movePipelineFieldBeforeStageField(fieldMetadataItems)
-    : fieldMetadataItems;
+    ? movePipelineFieldBeforeStageField(shownFieldMetadataItems)
+    : shownFieldMetadataItems;
 
   const handleFieldValueChange = (gqlFieldName: string, value: JsonValue) => {
     onFieldValueChange(gqlFieldName, value);

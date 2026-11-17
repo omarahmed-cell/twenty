@@ -1538,6 +1538,54 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: '190eee8a-1faf-4e0e-97ec-ab225e2f216f',
     },
   },
+  propertyGroup: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyGroup,
+    ),
+    name: { universalIdentifier: '69daee0d-7e6c-413b-b938-61c8b8e0c98c' },
+    objectMetadataId: {
+      universalIdentifier: 'c0f56daa-4303-4ddb-b152-f186537802af',
+    },
+  },
+  propertyGroupMembership: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyGroupMembership,
+    ),
+    propertyGroupId: {
+      universalIdentifier: 'd80abef7-09a9-4c5b-896a-6a28e49408bb',
+    },
+    fieldMetadataId: {
+      universalIdentifier: '846ac739-6894-4a0c-8223-0bd89f71955b',
+    },
+    objectMetadataId: {
+      universalIdentifier: '268ef415-d879-4f0e-8767-94918a2e3e0f',
+    },
+  },
+  propertyLogicRule: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyLogicRule,
+    ),
+    objectMetadataId: {
+      universalIdentifier: '1fc8b6b1-22da-4d10-a756-46bf4c9b3d92',
+    },
+    conditionGroups: {
+      universalIdentifier: 'b0a4f821-88e4-4916-b269-8d182bced150',
+    },
+    properties: {
+      universalIdentifier: '027c3177-201e-40f6-aded-e698c9a30800',
+    },
+  },
+  propertyCreation: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyCreation,
+    ),
+    fieldMetadataId: {
+      universalIdentifier: '2cf21478-75c2-4e5f-b515-6fea0aae959b',
+    },
+    objectMetadataId: {
+      universalIdentifier: 'ac1dbdf2-ff6e-429d-8df5-855cae248d73',
+    },
+  },
   messageChannelMessageAssociation: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

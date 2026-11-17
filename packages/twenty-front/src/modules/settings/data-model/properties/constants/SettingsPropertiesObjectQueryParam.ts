@@ -1,0 +1,1 @@
+export const SETTINGS_PROPERTIES_OBJECT_QUERY_PARAM = 'object';

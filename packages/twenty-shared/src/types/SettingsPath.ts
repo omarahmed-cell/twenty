@@ -32,6 +32,7 @@ export enum SettingsPath {
   ObjectIndexes = 'objects/:objectNamePlural/object-indexes',
   ObjectFieldTranslations = 'objects/:objectNamePlural/:fieldName/translations',
   NewObject = 'objects/new',
+  Properties = 'properties',
   Layout = 'layout',
   WorkspaceMembersPage = 'members',
   WorkspaceMemberPage = 'members/:workspaceMemberId',
