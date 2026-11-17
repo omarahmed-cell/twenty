@@ -1,9 +1,10 @@
 import { useLingui } from '@lingui/react/macro';
 import { useParams } from 'react-router-dom';
-import { SettingsPath } from 'twenty-shared/types';
+import { CoreObjectNameSingular, SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
+import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { usePipelineConfigs } from '@/pipeline/hooks/usePipelineConfigs';
 import { useHasPipelineObjects } from '@/pipeline/hooks/useHasPipelineObjects';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
@@ -11,9 +12,11 @@ import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLay
 import { SettingsPipelineAboutSection } from '@/settings/data-model/pipelines/components/SettingsPipelineAboutSection';
 import { SettingsPipelineCalcPropsSummary } from '@/settings/data-model/pipelines/components/SettingsPipelineCalcPropsSummary';
 import { SettingsPipelineRulesSection } from '@/settings/data-model/pipelines/components/SettingsPipelineRulesSection';
+import { SettingsPipelineStageCalculatedPropertyKindsSection } from '@/settings/data-model/pipelines/components/SettingsPipelineStageCalculatedPropertyKindsSection';
 import { SettingsPipelineStagesSection } from '@/settings/data-model/pipelines/components/SettingsPipelineStagesSection';
 import { PIPELINE_ENABLED_OBJECT_NAMES } from '@/settings/data-model/pipelines/constants/PipelineEnabledObjectNames';
 import { WorkspaceRouteUnavailable } from '@/ui/layout/page/components/WorkspaceRouteUnavailable';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
 const SettingsObjectPipelineDetailContent = () => {
   const { t } = useLingui();
@@ -34,6 +37,15 @@ const SettingsObjectPipelineDetailContent = () => {
   });
 
   const pipeline = pipelines.find(({ id }) => id === pipelineId);
+
+  const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
+
+  // Workspaces not yet upgraded have no field to save the setting to
+  const hasStageCalculatedPropertyKindsField = objectMetadataItems.some(
+    ({ nameSingular, fields }) =>
+      nameSingular === CoreObjectNameSingular.Pipeline &&
+      fields.some(({ name }) => name === 'stageCalculatedPropertyKinds'),
+  );
 
   if (!isDefined(objectMetadataItem) || !isPipelineEnabled) {
     return <WorkspaceRouteUnavailable />;
@@ -64,6 +76,11 @@ const SettingsObjectPipelineDetailContent = () => {
         {isDefined(pipeline) ? (
           <>
             <SettingsPipelineCalcPropsSummary pipeline={pipeline} />
+            {hasStageCalculatedPropertyKindsField && (
+              <SettingsPipelineStageCalculatedPropertyKindsSection
+                pipeline={pipeline}
+              />
+            )}
             <SettingsPipelineAboutSection
               key={pipeline.id}
               pipeline={pipeline}

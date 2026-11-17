@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { isNonEmptyString } from '@sniptt/guards';
 import { type ObjectRecordBaseEvent } from 'twenty-shared/database-events';
+import {
+  isPipelineObjectNameSingular,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 
 import { OnDatabaseBatchEvent } from 'src/engine/api/graphql/graphql-query-runner/decorators/on-database-batch-event.decorator';
 import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
@@ -18,7 +22,7 @@ type PipelineEventBatch = WorkspaceEventBatch<
   ObjectRecordBaseEvent<Record<string, unknown>>
 >;
 
-const PIPELINE_OBJECT_NAMES = new Set(['pipeline', 'pipelineStage']);
+const PIPELINE_CONFIG_OBJECT_NAMES = new Set(['pipeline', 'pipelineStage']);
 // Several Settings edits in a row share one sync
 const SYNC_DELAY_MILLISECONDS = 1_000;
 
@@ -64,21 +68,26 @@ export class PipelineConfigListener {
   private async handleBatch(batch: PipelineEventBatch, isUpdate: boolean) {
     const objectNameSingular = batch.objectMetadata?.nameSingular;
 
-    if (!PIPELINE_OBJECT_NAMES.has(objectNameSingular)) {
+    if (!PIPELINE_CONFIG_OBJECT_NAMES.has(objectNameSingular)) {
       return;
     }
 
-    await this.messageQueueService.add<PipelineSyncJobData>(
-      PIPELINE_SYNC_JOB_NAME,
-      { workspaceId: batch.workspaceId },
-      {
-        delay: SYNC_DELAY_MILLISECONDS,
-        deduplication: {
-          id: `pipeline-sync-${batch.workspaceId}`,
-          keepLastIfActive: true,
+    for (const pipelineObjectNameSingular of this.getSyncedObjectNames(batch)) {
+      await this.messageQueueService.add<PipelineSyncJobData>(
+        PIPELINE_SYNC_JOB_NAME,
+        {
+          workspaceId: batch.workspaceId,
+          objectNameSingular: pipelineObjectNameSingular,
         },
-      },
-    );
+        {
+          delay: SYNC_DELAY_MILLISECONDS,
+          deduplication: {
+            id: `pipeline-sync-${batch.workspaceId}-${pipelineObjectNameSingular ?? 'all'}`,
+            keepLastIfActive: true,
+          },
+        },
+      );
+    }
 
     if (objectNameSingular !== 'pipelineStage') {
       return;
@@ -110,5 +119,27 @@ export class PipelineConfigListener {
       workspaceId: batch.workspaceId,
       references,
     });
+  }
+
+  // A stage event does not carry its pipeline's object, so it syncs every pipeline object
+  private getSyncedObjectNames(
+    batch: PipelineEventBatch,
+  ): (PipelineObjectNameSingular | undefined)[] {
+    if (batch.objectMetadata?.nameSingular !== 'pipeline') {
+      return [undefined];
+    }
+
+    const objectNames = new Set(
+      batch.events
+        .flatMap((event) => [
+          event.properties?.before?.objectNameSingular,
+          event.properties?.after?.objectNameSingular,
+        ])
+        .filter((objectName): objectName is PipelineObjectNameSingular =>
+          isPipelineObjectNameSingular(objectName as string | undefined),
+        ),
+    );
+
+    return objectNames.size > 0 ? [...objectNames] : [undefined];
   }
 }

@@ -6,6 +6,7 @@ import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-object
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
 import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-objects/email-target.workspace-entity';
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
+import { type ServiceStageHistoryWorkspaceEntity } from 'src/modules/deal-stage-history/standard-objects/service-stage-history.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type MessageThreadTargetWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-thread-target.workspace-entity';
 import { type NoteTargetWorkspaceEntity } from 'src/modules/note/standard-objects/note-target.workspace-entity';
@@ -25,6 +26,10 @@ export class ServiceWorkspaceEntity extends BaseWorkspaceEntity {
   pointOfContactId: string | null;
   opportunity: EntityRelation<OpportunityWorkspaceEntity> | null;
   opportunityId: string | null;
+  pipeline: string;
+  stage: string;
+  stageHistory: EntityRelation<ServiceStageHistoryWorkspaceEntity[]>;
+  recordSource: string | null;
   noteTargets: EntityRelation<NoteTargetWorkspaceEntity[]>;
   taskTargets: EntityRelation<TaskTargetWorkspaceEntity[]>;
   callTargets: EntityRelation<CallTargetWorkspaceEntity[]>;

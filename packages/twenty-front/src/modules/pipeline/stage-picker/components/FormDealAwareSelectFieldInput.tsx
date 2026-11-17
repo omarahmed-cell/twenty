@@ -10,6 +10,7 @@ import { type SelectOption } from 'twenty-ui/primitives/input';
 
 type FormDealAwareSelectFieldInputProps = {
   isDealStage: boolean;
+  objectNameSingular?: string;
   label?: string;
   defaultValue: string | undefined;
   onChange: (value: string | null) => void;
@@ -22,6 +23,7 @@ type FormDealAwareSelectFieldInputProps = {
 // A deal form scopes the stage to its pipeline; workflows and other forms get every stage under its pipeline name
 export const FormDealAwareSelectFieldInput = ({
   isDealStage,
+  objectNameSingular,
   label,
   defaultValue,
   onChange,
@@ -34,6 +36,7 @@ export const FormDealAwareSelectFieldInput = ({
 
   const pipelineOptions = useDealStageOptions({
     isDealStage,
+    objectNameSingular,
     options,
     scope: isDefined(dealStagePickerContext)
       ? { type: 'pipeline', pipelineKey: dealStagePickerContext.pipelineKey }
@@ -42,6 +45,7 @@ export const FormDealAwareSelectFieldInput = ({
 
   const visibleOptions = useDealStageRuleOptions({
     isDealStage: isDealStage && dealStagePickerContext?.isCreate === true,
+    objectNameSingular,
     options: pipelineOptions,
     pipelineKey: dealStagePickerContext?.pipelineKey,
     currentStageValue: null,

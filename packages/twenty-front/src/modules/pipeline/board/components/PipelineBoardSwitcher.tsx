@@ -22,14 +22,18 @@ const StyledLabel = styled.span`
 
 type PipelineBoardSwitcherProps = {
   recordBoardId: string;
+  objectNameSingular: string;
 };
 
 export const PipelineBoardSwitcher = ({
   recordBoardId,
+  objectNameSingular,
 }: PipelineBoardSwitcherProps) => {
-  const { pipelines } = usePipelineConfigs();
+  const { pipelines } = usePipelineConfigs({ objectNameSingular });
   const pipelineBoardScope = usePipelineBoardScope();
-  const { rememberPipelineKey } = usePipelineBoardRememberedPipelineKey();
+  const { rememberPipelineKey } = usePipelineBoardRememberedPipelineKey({
+    objectNameSingular,
+  });
 
   if (pipelines.length === 0) {
     return null;

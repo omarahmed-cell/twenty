@@ -16,17 +16,22 @@ export type DealStageOptionsScope =
     }
   | { type: 'all' };
 
-// Leaves options untouched unless the field is the Deal Stage
+// Leaves options untouched unless the field is a pipeline Stage
 export const useDealStageOptions = <TOption extends StageOption>({
   isDealStage,
+  objectNameSingular,
   options,
   scope,
 }: {
   isDealStage: boolean;
+  objectNameSingular?: string | null;
   options: TOption[];
   scope: DealStageOptionsScope;
 }): TOption[] => {
-  const pipelines = useDealStagePipelineConfigs({ enabled: isDealStage });
+  const pipelines = useDealStagePipelineConfigs({
+    enabled: isDealStage,
+    objectNameSingular: objectNameSingular ?? undefined,
+  });
 
   const pipelineKey = scope.type === 'pipeline' ? scope.pipelineKey : null;
   const currentStageValue =

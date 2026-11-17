@@ -3,8 +3,10 @@ import { ConnectedAccountProvider } from 'twenty-shared/types';
 import {
   IconApi,
   IconCalendar,
+  IconFileText,
   IconGmail,
   IconGoogleCalendar,
+  IconListCheck,
   IconMail,
   IconMicrosoftCalendar,
   IconMicrosoftOutlook,
@@ -63,6 +65,10 @@ export const getActorSourceIcon = ({
       return IconWebhook;
     case 'APPLICATION':
       return IconPlug;
+    case 'FORMS':
+      return IconListCheck;
+    case 'DOCUMENT_APP':
+      return IconFileText;
     default:
       return undefined;
   }

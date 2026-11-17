@@ -21,6 +21,7 @@ export class PipelineStageUpdateManyPreQueryHook implements WorkspacePreQueryHoo
       data: await this.pipelineWriteGuardService.preparePipelineStageUpdate(
         authContext,
         payload.data,
+        { filter: payload.filter },
       ),
     };
   }

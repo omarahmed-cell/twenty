@@ -1,4 +1,7 @@
-import { type PipelineRules } from 'twenty-shared/utils';
+import {
+  type PipelineRules,
+  type StageCalculatedPropertyKind,
+} from 'twenty-shared/utils';
 
 export type PipelineStageConfig = {
   id: string;
@@ -22,5 +25,7 @@ export type PipelineConfig = {
   objectNameSingular: string;
   hubspotPipelineId: string | null;
   rules: PipelineRules;
+  // Absent on hand-built configs; normalizeStageCalculatedPropertyKinds reads it as every kind
+  stageCalculatedPropertyKinds?: StageCalculatedPropertyKind[];
   stages: PipelineStageConfig[];
 };

@@ -1,4 +1,5 @@
 import { type PipelineConfig } from '@/pipeline/types/PipelineConfig';
+import { countPipelineStageCalculatedProperties } from '@/settings/data-model/pipelines/utils/countPipelineStageCalculatedProperties';
 import { computeReorderedPositions } from '@/settings/data-model/pipelines/utils/computeReorderedPositions';
 import { filterPipelinesBySearch } from '@/settings/data-model/pipelines/utils/filterPipelinesBySearch';
 import { formatPipelineStageProbability } from '@/settings/data-model/pipelines/utils/formatPipelineStageProbability';
@@ -20,6 +21,12 @@ const buildPipeline = (name: string): PipelineConfig => ({
   description: null,
   position: 0,
   objectNameSingular: 'opportunity',
+  stageCalculatedPropertyKinds: [
+    'dateEntered',
+    'dateExited',
+    'cumulativeTimeIn',
+    'latestTimeIn',
+  ],
   rules: DEFAULT_PIPELINE_RULES,
   stages: [],
 });
@@ -203,5 +210,48 @@ describe('getSettingsPipelinePath', () => {
     expect(getSettingsPipelinePath({ objectNamePlural: 'opportunities' })).toBe(
       '/settings/objects/opportunities/pipelines/new',
     );
+  });
+});
+
+describe('countPipelineStageCalculatedProperties', () => {
+  const stages = [
+    { calcPropsEnabled: true },
+    { calcPropsEnabled: false },
+    { calcPropsEnabled: true },
+  ] as PipelineConfig['stages'];
+
+  it('counts every kind on each enabled stage when all four are checked', () => {
+    expect(
+      countPipelineStageCalculatedProperties({
+        stages,
+        stageCalculatedPropertyKinds: [
+          'dateEntered',
+          'dateExited',
+          'cumulativeTimeIn',
+          'latestTimeIn',
+        ],
+      }),
+    ).toBe(8);
+  });
+
+  it('counts only the checked kinds', () => {
+    expect(
+      countPipelineStageCalculatedProperties({
+        stages,
+        stageCalculatedPropertyKinds: ['dateEntered', 'dateExited'],
+      }),
+    ).toBe(4);
+  });
+});
+
+describe('getDealsInUseBlockedMessage for services', () => {
+  it('speaks of records instead of deals', () => {
+    expect(
+      getDealsInUseBlockedMessage({
+        dealCount: 2,
+        kind: 'stage',
+        isDealPipeline: false,
+      }),
+    ).toBe('2 records are in this stage. Move them to another stage first.');
   });
 });

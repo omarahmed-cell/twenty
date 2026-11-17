@@ -46,6 +46,16 @@ import { PipelineStageDestroyManyStageFieldsPostQueryHook } from 'src/modules/pi
 import { PipelineStageRestoreOneStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-restore-one-stage-fields.post-query.hook';
 import { PipelineStageRestoreManyStageFieldsPostQueryHook } from 'src/modules/pipeline/query-hooks/pipeline-stage-restore-many-stage-fields.post-query.hook';
 import { OpportunityCreateManyPostQueryHook } from 'src/modules/pipeline/query-hooks/opportunity-create-many.post-query.hook';
+import { ServiceCreateOnePreQueryHook } from 'src/modules/pipeline/query-hooks/service-create-one.pre-query.hook';
+import { ServiceCreateManyPreQueryHook } from 'src/modules/pipeline/query-hooks/service-create-many.pre-query.hook';
+import { ServiceUpdateOnePreQueryHook } from 'src/modules/pipeline/query-hooks/service-update-one.pre-query.hook';
+import { ServiceUpdateManyPreQueryHook } from 'src/modules/pipeline/query-hooks/service-update-many.pre-query.hook';
+import { ServiceDeleteOnePreQueryHook } from 'src/modules/pipeline/query-hooks/service-delete-one.pre-query.hook';
+import { ServiceDeleteManyPreQueryHook } from 'src/modules/pipeline/query-hooks/service-delete-many.pre-query.hook';
+import { ServiceDestroyOnePreQueryHook } from 'src/modules/pipeline/query-hooks/service-destroy-one.pre-query.hook';
+import { ServiceDestroyManyPreQueryHook } from 'src/modules/pipeline/query-hooks/service-destroy-many.pre-query.hook';
+import { ServiceCreateOnePostQueryHook } from 'src/modules/pipeline/query-hooks/service-create-one.post-query.hook';
+import { ServiceCreateManyPostQueryHook } from 'src/modules/pipeline/query-hooks/service-create-many.post-query.hook';
 
 export const PIPELINE_QUERY_HOOKS = [
   PipelineCreateOnePreQueryHook,
@@ -78,6 +88,16 @@ export const PIPELINE_QUERY_HOOKS = [
   OpportunityDestroyManyPreQueryHook,
   OpportunityCreateOnePostQueryHook,
   OpportunityCreateManyPostQueryHook,
+  ServiceCreateOnePreQueryHook,
+  ServiceCreateManyPreQueryHook,
+  ServiceUpdateOnePreQueryHook,
+  ServiceUpdateManyPreQueryHook,
+  ServiceDeleteOnePreQueryHook,
+  ServiceDeleteManyPreQueryHook,
+  ServiceDestroyOnePreQueryHook,
+  ServiceDestroyManyPreQueryHook,
+  ServiceCreateOnePostQueryHook,
+  ServiceCreateManyPostQueryHook,
   PipelineUpdateOneStageFieldsPostQueryHook,
   PipelineUpdateManyStageFieldsPostQueryHook,
   PipelineDeleteOneStageFieldsPostQueryHook,

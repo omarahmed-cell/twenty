@@ -20,6 +20,7 @@ import {
   createStandardFieldFlatMetadata,
 } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-field-flat-metadata.util';
 import { createStandardRelationFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-relation-field-flat-metadata.util';
+import { createStandardRecordSourceFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-record-source-field-flat-metadata.util';
 const SEEDED_PIPELINE_SELECT_OPTIONS = buildPipelineSelectOptions({
   pipelines: PIPELINE_SEED.map((pipeline) => ({
     key: pipeline.key,
@@ -1535,4 +1536,12 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     }),
     writability: MetadataWritability.SYSTEM,
   },
+  recordSource: createStandardRecordSourceFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

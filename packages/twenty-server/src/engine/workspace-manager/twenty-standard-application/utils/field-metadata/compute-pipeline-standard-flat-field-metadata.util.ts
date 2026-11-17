@@ -353,6 +353,32 @@ export const buildPipelineStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  stageCalculatedPropertyKinds: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'stageCalculatedPropertyKinds',
+      type: FieldMetadataType.RAW_JSON,
+      label: i18nLabel(
+        msg({
+          message: `Stage fields to generate`,
+          context: 'fieldMetadata.label',
+        }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Which stage fields a stage's calculated properties toggle creates, empty for all`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalculator',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   stages: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

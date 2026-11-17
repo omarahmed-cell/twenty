@@ -1,6 +1,7 @@
 import {
   type ConditionalLogicRule,
   type PipelineRules,
+  type StageCalculatedPropertyKind,
 } from 'twenty-shared/utils';
 
 export type PipelineStageConfig = {
@@ -24,5 +25,6 @@ export type PipelineConfig = {
   position: number;
   objectNameSingular: string;
   rules: PipelineRules;
+  stageCalculatedPropertyKinds: StageCalculatedPropertyKind[];
   stages: PipelineStageConfig[];
 };

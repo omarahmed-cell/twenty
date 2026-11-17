@@ -30,20 +30,29 @@ export type DealStageEntryDecision =
   | { status: 'cancelled' }
   | { status: 'confirmed'; values: ConditionalLogicFieldsDialogValues };
 
-export const useDealStageEntry = ({ enabled }: { enabled: boolean }) => {
-  const pipelines = useDealStagePipelineConfigs({ enabled });
+export const useDealStageEntry = ({
+  enabled,
+  objectNameSingular = CoreObjectNameSingular.Opportunity,
+}: {
+  enabled: boolean;
+  objectNameSingular?: string;
+}) => {
+  const pipelines = useDealStagePipelineConfigs({
+    enabled,
+    objectNameSingular,
+  });
   const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
   const { t } = useLingui();
   const { askForConditionalLogicValues } = useConditionalLogicFieldsDialog();
 
   // Views only load their visible columns, so the fields a rule reads are fetched fresh
   const { findOneRecord } = useLazyFindOneRecord({
-    objectNameSingular: CoreObjectNameSingular.Opportunity,
+    objectNameSingular,
     fetchPolicy: 'network-only',
   });
 
   const dealFieldMetadataItems = objectMetadataItems.find(
-    ({ nameSingular }) => nameSingular === CoreObjectNameSingular.Opportunity,
+    ({ nameSingular }) => nameSingular === objectNameSingular,
   )?.fields;
 
   const fields = useMemo(
@@ -105,10 +114,13 @@ export const useDealStageEntry = ({ enabled }: { enabled: boolean }) => {
     const stageLabel = requirement.stage.label;
 
     return askForConditionalLogicValues({
-      objectNameSingular: CoreObjectNameSingular.Opportunity,
+      objectNameSingular,
       title: t`Move to ${stageLabel}`,
       confirmLabel: t`Move`,
-      hint: t`Fill the required fields to move this deal.`,
+      hint:
+        objectNameSingular === CoreObjectNameSingular.Opportunity
+          ? t`Fill the required fields to move this deal.`
+          : t`Fill the required fields to move this record.`,
       properties: requirement.properties,
       rules: requirement.stage.conditionalRules,
       record,

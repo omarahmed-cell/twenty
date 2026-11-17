@@ -2,9 +2,26 @@ import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMembe
 import { pipelineBoardSelectedPipelineKeyByWorkspaceMemberIdState } from '@/pipeline/board/states/pipelineBoardSelectedPipelineKeyByWorkspaceMemberIdState';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
-export const usePipelineBoardRememberedPipelineKey = () => {
+// Deal choices keep their original key so choices saved before services had boards survive
+const buildRememberedPipelineStorageKey = ({
+  workspaceMemberId,
+  objectNameSingular,
+}: {
+  workspaceMemberId: string;
+  objectNameSingular: string;
+}) =>
+  objectNameSingular === CoreObjectNameSingular.Opportunity
+    ? workspaceMemberId
+    : `${workspaceMemberId}:${objectNameSingular}`;
+
+export const usePipelineBoardRememberedPipelineKey = ({
+  objectNameSingular,
+}: {
+  objectNameSingular: string;
+}) => {
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
 
   const [
@@ -14,18 +31,25 @@ export const usePipelineBoardRememberedPipelineKey = () => {
 
   const workspaceMemberId = currentWorkspaceMember?.id;
 
-  const rememberedPipelineKey = isDefined(workspaceMemberId)
-    ? pipelineBoardSelectedPipelineKeyByWorkspaceMemberId[workspaceMemberId]
+  const storageKey = isDefined(workspaceMemberId)
+    ? buildRememberedPipelineStorageKey({
+        workspaceMemberId,
+        objectNameSingular,
+      })
+    : undefined;
+
+  const rememberedPipelineKey = isDefined(storageKey)
+    ? pipelineBoardSelectedPipelineKeyByWorkspaceMemberId[storageKey]
     : undefined;
 
   const rememberPipelineKey = (pipelineKey: string) => {
-    if (!isDefined(workspaceMemberId)) {
+    if (!isDefined(storageKey)) {
       return;
     }
 
     setPipelineBoardSelectedPipelineKeyByWorkspaceMemberId((previous) => ({
       ...previous,
-      [workspaceMemberId]: pipelineKey,
+      [storageKey]: pipelineKey,
     }));
   };
 

@@ -9,6 +9,7 @@ export class PipelineWorkspaceEntity extends BaseWorkspaceEntity {
   objectNameSingular: string;
   hubspotPipelineId: string | null;
   rules: object | null;
+  stageCalculatedPropertyKinds: string[] | null;
   position: number;
   stages: EntityRelation<PipelineStageWorkspaceEntity[]>;
   searchVector: string;

@@ -117,4 +117,71 @@ describe('PipelineWriteGuardService', () => {
       service.preparePipelineStageUpdate(AUTH_CONTEXT, { probability: null }),
     ).resolves.toEqual({ probability: null });
   });
+
+  it('accepts service pipelines and refuses objects without pipelines', async () => {
+    const { service } = buildService({});
+
+    await expect(
+      service.preparePipelinesToCreate(AUTH_CONTEXT, [
+        { name: 'Onboarding', objectNameSingular: 'service' },
+      ]),
+    ).resolves.toEqual([
+      expect.objectContaining({ objectNameSingular: 'service' }),
+    ]);
+    await expect(
+      service.preparePipelinesToCreate(AUTH_CONTEXT, [
+        { name: 'Hiring', objectNameSingular: 'person' },
+      ]),
+    ).rejects.toThrow('Pipelines are not available on person');
+  });
+
+  it('only accepts known stage calculated property kinds', async () => {
+    const { service } = buildService({});
+
+    await expect(
+      service.preparePipelineUpdate(AUTH_CONTEXT, {
+        stageCalculatedPropertyKinds: ['dateEntered', 'dateExited'],
+      }),
+    ).resolves.toEqual({
+      stageCalculatedPropertyKinds: ['dateEntered', 'dateExited'],
+    });
+    await expect(
+      service.preparePipelineUpdate(AUTH_CONTEXT, {
+        stageCalculatedPropertyKinds: ['dateEntered', 'amount'],
+      }),
+    ).rejects.toThrow('Invalid stage calculated property kinds');
+  });
+
+  it('refuses a probability on a stage of a service pipeline', async () => {
+    const { service } = buildService({
+      rows: [
+        {
+          id: 'onboarding-id',
+          key: 'ONBOARDING_PIPELINE',
+          value: 'ONBOARDING_KICK_OFF',
+          objectNameSingular: 'service',
+        },
+      ],
+    });
+
+    await expect(
+      service.preparePipelineStagesToCreate(AUTH_CONTEXT, [
+        { pipelineId: 'onboarding-id', label: 'Live', probability: 50 },
+      ]),
+    ).rejects.toThrow('Stages of a service pipeline have no probability');
+    await expect(
+      service.preparePipelineStageUpdate(
+        AUTH_CONTEXT,
+        { probability: 50 },
+        { id: 'stage-id' },
+      ),
+    ).rejects.toThrow('Stages of a service pipeline have no probability');
+    await expect(
+      service.preparePipelineStageUpdate(
+        AUTH_CONTEXT,
+        { probability: null },
+        { id: 'stage-id' },
+      ),
+    ).resolves.toEqual({ probability: null });
+  });
 });

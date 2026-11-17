@@ -3,6 +3,7 @@ import {
   buildPipelineStageValue,
   PIPELINE_COPY_SUFFIX,
   type PipelineRules,
+  type StageCalculatedPropertyKind,
 } from 'twenty-shared/utils';
 
 import { type PipelineConfig } from 'src/modules/pipeline/types/pipeline-config.type';
@@ -15,6 +16,7 @@ export type PipelineClone = {
     objectNameSingular: string;
     position: number;
     rules: PipelineRules;
+    stageCalculatedPropertyKinds?: StageCalculatedPropertyKind[];
   };
   stages: {
     label: string;
@@ -77,6 +79,13 @@ export const buildPipelineClone = ({
       key,
       objectNameSingular: source.objectNameSingular,
       position,
+      ...(source.stageCalculatedPropertyKinds !== undefined
+        ? {
+            stageCalculatedPropertyKinds: [
+              ...source.stageCalculatedPropertyKinds,
+            ],
+          }
+        : {}),
       rules: {
         limitCreationToStages: {
           enabled: source.rules.limitCreationToStages.enabled,

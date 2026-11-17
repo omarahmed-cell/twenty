@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { type ObjectRecordBaseEvent } from 'twenty-shared/database-events';
+import { type PipelineObjectNameSingular } from 'twenty-shared/utils';
 
 import { OnDatabaseBatchEvent } from 'src/engine/api/graphql/graphql-query-runner/decorators/on-database-batch-event.decorator';
 import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
@@ -28,15 +29,29 @@ export class DealStageHistoryListener {
 
   @OnDatabaseBatchEvent('opportunity', DatabaseEventAction.CREATED)
   async handleCreated(batch: DealEventBatch) {
-    await this.handleBatch(batch, false);
+    await this.handleBatch(batch, false, 'opportunity');
   }
 
   @OnDatabaseBatchEvent('opportunity', DatabaseEventAction.UPDATED)
   async handleUpdated(batch: DealEventBatch) {
-    await this.handleBatch(batch, true);
+    await this.handleBatch(batch, true, 'opportunity');
   }
 
-  private async handleBatch(batch: DealEventBatch, isUpdate: boolean) {
+  @OnDatabaseBatchEvent('service', DatabaseEventAction.CREATED)
+  async handleServiceCreated(batch: DealEventBatch) {
+    await this.handleBatch(batch, false, 'service');
+  }
+
+  @OnDatabaseBatchEvent('service', DatabaseEventAction.UPDATED)
+  async handleServiceUpdated(batch: DealEventBatch) {
+    await this.handleBatch(batch, true, 'service');
+  }
+
+  private async handleBatch(
+    batch: DealEventBatch,
+    isUpdate: boolean,
+    objectNameSingular: PipelineObjectNameSingular,
+  ) {
     const changes = buildDealStageChanges({
       events: batch.events,
       isUpdate,
@@ -51,7 +66,7 @@ export class DealStageHistoryListener {
 
     await this.messageQueueService.add<DealStageHistoryJobData>(
       DEAL_STAGE_HISTORY_JOB_NAME,
-      { workspaceId: batch.workspaceId, changes },
+      { workspaceId: batch.workspaceId, changes, objectNameSingular },
     );
   }
 }

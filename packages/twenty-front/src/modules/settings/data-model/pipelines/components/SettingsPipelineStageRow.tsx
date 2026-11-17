@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import {
   countPipelineRulesForStage,
   type PipelineRules,
@@ -15,6 +16,7 @@ import { SettingsPipelineDragHandle } from '@/settings/data-model/pipelines/comp
 import { SettingsPipelineStageColorPicker } from '@/settings/data-model/pipelines/components/SettingsPipelineStageColorPicker';
 import { SettingsPipelineStageProbabilityPicker } from '@/settings/data-model/pipelines/components/SettingsPipelineStageProbabilityPicker';
 import { SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineStagesTableGridTemplateColumns';
+import { SETTINGS_PIPELINE_STAGES_WITHOUT_PROBABILITY_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineStagesWithoutProbabilityTableGridTemplateColumns';
 import { useSettingsPipelineDealCount } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineDealCount';
 import { getDealsInUseBlockedMessage } from '@/settings/data-model/pipelines/utils/getDealsInUseBlockedMessage';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
@@ -54,6 +56,8 @@ const StyledDisabledHint = styled.span`
 
 type SettingsPipelineStageRowProps = {
   stage: PipelineStageConfig;
+  objectNameSingular: string;
+  hasStageProbability: boolean;
   rules: PipelineRules;
   isOnlyStage: boolean;
   onUpdate: (
@@ -69,6 +73,8 @@ type SettingsPipelineStageRowProps = {
 
 export const SettingsPipelineStageRow = ({
   stage,
+  objectNameSingular,
+  hasStageProbability,
   rules,
   isOnlyStage,
   onUpdate,
@@ -82,13 +88,19 @@ export const SettingsPipelineStageRow = ({
   const conditionalRuleCount = stage.conditionalRules.length;
 
   const dealCount = useSettingsPipelineDealCount({
+    objectNameSingular,
     fieldName: 'stage',
     value: stage.value,
   });
 
   const deleteBlockedMessage = isOnlyStage
     ? t`A pipeline needs at least one stage.`
-    : getDealsInUseBlockedMessage({ dealCount, kind: 'stage' });
+    : getDealsInUseBlockedMessage({
+        dealCount,
+        kind: 'stage',
+        isDealPipeline:
+          objectNameSingular === CoreObjectNameSingular.Opportunity,
+      });
 
   const saveLabel = () => {
     const trimmedLabel = labelDraft.trim();
@@ -106,7 +118,11 @@ export const SettingsPipelineStageRow = ({
 
   return (
     <TableRow
-      gridTemplateColumns={SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS}
+      gridTemplateColumns={
+        hasStageProbability
+          ? SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS
+          : SETTINGS_PIPELINE_STAGES_WITHOUT_PROBABILITY_TABLE_GRID_TEMPLATE_COLUMNS
+      }
     >
       <TableCell padding="0">
         <SettingsPipelineDragHandle />
@@ -130,13 +146,15 @@ export const SettingsPipelineStageRow = ({
           />
         </StyledLabelInputContainer>
       </TableCell>
-      <TableCell>
-        <SettingsPipelineStageProbabilityPicker
-          stageId={stage.id}
-          probability={stage.probability}
-          onChange={(probability) => onUpdate({ probability })}
-        />
-      </TableCell>
+      {hasStageProbability && (
+        <TableCell>
+          <SettingsPipelineStageProbabilityPicker
+            stageId={stage.id}
+            probability={stage.probability}
+            onChange={(probability) => onUpdate({ probability })}
+          />
+        </TableCell>
+      )}
       <TableCell>
         <StyledConditionalLogic>
           {conditionalRuleCount === 0 ? (

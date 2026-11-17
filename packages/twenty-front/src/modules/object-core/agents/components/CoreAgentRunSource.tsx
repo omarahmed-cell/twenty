@@ -6,6 +6,8 @@ import {
   IconApi,
   IconApps,
   IconBolt,
+  IconFileText,
+  IconListCheck,
   IconSettingsAutomation,
   IconUsers,
 } from 'twenty-ui/icon';
@@ -26,6 +28,8 @@ const SOURCE_ICONS: Partial<Record<string, typeof IconApps>> = {
   [FieldActorSource.API]: IconApi,
   [FieldActorSource.MANUAL]: IconUsers,
   [FieldActorSource.AGENT]: IconBolt,
+  [FieldActorSource.FORMS]: IconListCheck,
+  [FieldActorSource.DOCUMENT_APP]: IconFileText,
 };
 
 type CoreAgentRunSourceProps = {

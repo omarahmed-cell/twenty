@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
-import { buildPipelineSelectOptions, isDefined } from 'twenty-shared/utils';
+import {
+  buildPipelineSelectOptions,
+  isDefined,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
 import { FieldMetadataService } from 'src/engine/metadata-modules/field-metadata/services/field-metadata.service';
@@ -18,7 +22,19 @@ type SelectOption = {
   color: string;
 };
 
-const OPPORTUNITY_FIELDS = STANDARD_OBJECTS.opportunity.fields;
+const SELECT_FIELD_UNIVERSAL_IDENTIFIERS: Record<
+  PipelineObjectNameSingular,
+  { pipeline: string; stage: string }
+> = {
+  opportunity: {
+    pipeline: STANDARD_OBJECTS.opportunity.fields.pipeline.universalIdentifier,
+    stage: STANDARD_OBJECTS.opportunity.fields.stage.universalIdentifier,
+  },
+  service: {
+    pipeline: STANDARD_OBJECTS.service.fields.pipeline.universalIdentifier,
+    stage: STANDARD_OBJECTS.service.fields.stage.universalIdentifier,
+  },
+};
 
 const toComparableOptions = (options: unknown) =>
   JSON.stringify(
@@ -36,7 +52,7 @@ const toComparableOptions = (options: unknown) =>
 const toDefaultValue = (value: string | null) =>
   isDefined(value) ? `'${value}'` : null;
 
-// The pipeline config is the source of truth for the Pipeline and Deal Stage options
+// The pipeline config is the source of truth for each pipeline object's Pipeline and Stage options
 @Injectable()
 export class PipelineSyncService {
   private readonly logger = new Logger(PipelineSyncService.name);
@@ -49,8 +65,18 @@ export class PipelineSyncService {
   ) {}
 
   async syncOpportunitySelectFields(workspaceId: string): Promise<boolean> {
+    return this.syncSelectFields(workspaceId, 'opportunity');
+  }
+
+  async syncSelectFields(
+    workspaceId: string,
+    objectNameSingular: PipelineObjectNameSingular,
+  ): Promise<boolean> {
+    const universalIdentifiers =
+      SELECT_FIELD_UNIVERSAL_IDENTIFIERS[objectNameSingular];
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
 
     if (pipelines.length === 0) {
@@ -65,11 +91,11 @@ export class PipelineSyncService {
     const pipelineField =
       findFlatEntityByUniversalIdentifier<FlatFieldMetadata>({
         flatEntityMaps: flatFieldMetadataMaps,
-        universalIdentifier: OPPORTUNITY_FIELDS.pipeline.universalIdentifier,
+        universalIdentifier: universalIdentifiers.pipeline,
       });
     const stageField = findFlatEntityByUniversalIdentifier<FlatFieldMetadata>({
       flatEntityMaps: flatFieldMetadataMaps,
-      universalIdentifier: OPPORTUNITY_FIELDS.stage.universalIdentifier,
+      universalIdentifier: universalIdentifiers.stage,
     });
 
     if (!isDefined(pipelineField) || !isDefined(stageField)) {
@@ -86,10 +112,8 @@ export class PipelineSyncService {
           color,
         })),
       })),
-      pipelineFieldUniversalIdentifier:
-        OPPORTUNITY_FIELDS.pipeline.universalIdentifier,
-      stageFieldUniversalIdentifier:
-        OPPORTUNITY_FIELDS.stage.universalIdentifier,
+      pipelineFieldUniversalIdentifier: universalIdentifiers.pipeline,
+      stageFieldUniversalIdentifier: universalIdentifiers.stage,
       existingPipelineOptions: (pipelineField.options ?? []) as SelectOption[],
       existingStageOptions: (stageField.options ?? []) as SelectOption[],
     });
@@ -135,7 +159,7 @@ export class PipelineSyncService {
 
     if (hasChanged) {
       this.logger.log(
-        `Workspace ${workspaceId}: synced ${built.pipelineOptions.length} pipeline and ${built.stageOptions.length} stage options`,
+        `Workspace ${workspaceId}: synced ${objectNameSingular} ${built.pipelineOptions.length} pipeline and ${built.stageOptions.length} stage options`,
       );
     }
 

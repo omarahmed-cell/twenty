@@ -3,7 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { FieldMetadataType, RelationType } from 'twenty-shared/types';
-import { type ConditionalLogicField, isDefined } from 'twenty-shared/utils';
+import {
+  type ConditionalLogicField,
+  isDefined,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 import { In } from 'typeorm';
 
 import { getFlatFieldsFromFlatObjectMetadata } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-flat-fields-for-flat-object-metadata.util';
@@ -34,12 +38,18 @@ export type DealStageEntry = {
   data: Record<string, unknown>;
 };
 
-const toRefusal = ({
-  operation,
-  stageLabel,
-  missingFieldLabels,
-}: DealStageEntryViolation) => {
+const toRefusal = (
+  { operation, stageLabel, missingFieldLabels }: DealStageEntryViolation,
+  objectNameSingular: PipelineObjectNameSingular,
+) => {
   const fieldLabels = missingFieldLabels.join(', ');
+
+  if (operation === 'create' && objectNameSingular !== 'opportunity') {
+    return {
+      message: `To create a record in ${stageLabel}, fill: ${fieldLabels}.`,
+      userFriendlyMessage: msg`To create a record in ${stageLabel}, fill: ${fieldLabels}.`,
+    };
+  }
 
   return operation === 'create'
     ? {
@@ -58,12 +68,14 @@ export class DealStageEntryRulesService {
 
   async enforce({
     workspaceId,
+    objectNameSingular = 'opportunity',
     actorKind,
     operation,
     pipelines,
     entries,
   }: {
     workspaceId: string;
+    objectNameSingular?: PipelineObjectNameSingular;
     actorKind: DealRuleActorKind;
     operation: 'create' | 'update';
     pipelines: PipelineConfig[];
@@ -90,8 +102,9 @@ export class DealStageEntryRulesService {
     }
 
     await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
-      const fields = this.getDealFields();
-      const storedById = await this.findStoredDeals(
+      const fields = this.getRecordFields(objectNameSingular);
+      const storedById = await this.findStoredRecords(
+        objectNameSingular,
         operation === 'update'
           ? checkedEntries
               .map(({ recordId }) => recordId)
@@ -114,7 +127,10 @@ export class DealStageEntryRulesService {
         });
 
         if (isDefined(violation)) {
-          const { message, userFriendlyMessage } = toRefusal(violation);
+          const { message, userFriendlyMessage } = toRefusal(
+            violation,
+            objectNameSingular,
+          );
 
           throw new CommonQueryRunnerException(
             message,
@@ -126,23 +142,25 @@ export class DealStageEntryRulesService {
     }, buildSystemAuthContext(workspaceId));
   }
 
-  private getDealFields(): ConditionalLogicField[] {
+  private getRecordFields(
+    objectNameSingular: PipelineObjectNameSingular,
+  ): ConditionalLogicField[] {
     const {
       flatObjectMetadataMaps,
       flatFieldMetadataMaps,
       objectIdByNameSingular,
     } = getWorkspaceContext();
-    const dealObjectMetadata = findFlatEntityByIdInFlatEntityMaps({
-      flatEntityId: objectIdByNameSingular['opportunity'],
+    const objectMetadata = findFlatEntityByIdInFlatEntityMaps({
+      flatEntityId: objectIdByNameSingular[objectNameSingular],
       flatEntityMaps: flatObjectMetadataMaps,
     });
 
-    if (!isDefined(dealObjectMetadata)) {
+    if (!isDefined(objectMetadata)) {
       return [];
     }
 
     return getFlatFieldsFromFlatObjectMetadata(
-      dealObjectMetadata,
+      objectMetadata,
       flatFieldMetadataMaps,
     ).flatMap((field): ConditionalLogicField[] => {
       if (!isMorphOrRelationFlatFieldMetadata(field)) {
@@ -169,16 +187,19 @@ export class DealStageEntryRulesService {
     });
   }
 
-  private async findStoredDeals(ids: string[]) {
+  private async findStoredRecords(
+    objectNameSingular: PipelineObjectNameSingular,
+    ids: string[],
+  ) {
     if (ids.length === 0) {
       return new Map<string, Record<string, unknown>>();
     }
 
-    const dealRepository = this.workspaceOrmManager.getRepository<
+    const repository = this.workspaceOrmManager.getRepository<
       Record<string, unknown> & { id: string }
-    >('opportunity', { shouldBypassPermissionChecks: true });
-    const deals = await dealRepository.find({ where: { id: In(ids) } });
+    >(objectNameSingular, { shouldBypassPermissionChecks: true });
+    const records = await repository.find({ where: { id: In(ids) } });
 
-    return new Map(deals.map((deal) => [deal.id, deal]));
+    return new Map(records.map((record) => [record.id, record]));
   }
 }

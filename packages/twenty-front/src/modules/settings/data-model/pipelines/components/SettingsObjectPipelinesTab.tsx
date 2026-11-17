@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { SearchInput } from 'twenty-ui/components/input';
 import { Section } from 'twenty-ui/components/layout';
@@ -102,12 +103,17 @@ export const SettingsObjectPipelinesTab = ({
   };
 
   const pipelineToDeleteName = pipelineToDelete?.name ?? '';
+  const objectLabelPlural = objectMetadataItem.labelPlural.toLowerCase();
 
   return (
     <Section.Root>
       <Section.Header
         title={t`Pipelines`}
-        description={t`Set up the pipelines and stages your deals move through.`}
+        description={
+          objectMetadataItem.nameSingular === CoreObjectNameSingular.Opportunity
+            ? t`Set up the pipelines and stages your deals move through.`
+            : t`Set up the pipelines and stages your ${objectLabelPlural} move through.`
+        }
       />
       <StyledToolbar>
         <StyledSearchContainer>

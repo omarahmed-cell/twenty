@@ -1,6 +1,5 @@
 import { isString } from '@sniptt/guards';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isPipelineObjectNameSingular } from 'twenty-shared/utils';
 
 import { isUpdateRecordValueEmpty } from '@/object-record/record-update-multiple/utils/isUpdateRecordValueEmpty';
 import { useDealStageEntry } from '@/pipeline/conditional-logic/hooks/useDealStageEntry';
@@ -16,9 +15,11 @@ export const useDealBulkEditStageEntryRefusal = ({
 }: {
   objectNameSingular: string;
 }) => {
-  const isDealObject =
-    objectNameSingular === CoreObjectNameSingular.Opportunity;
-  const { pipelines, fields } = useDealStageEntry({ enabled: isDealObject });
+  const isDealObject = isPipelineObjectNameSingular(objectNameSingular);
+  const { pipelines, fields } = useDealStageEntry({
+    enabled: isDealObject,
+    objectNameSingular,
+  });
 
   const getBulkEditStageEntryRefusal = (
     fieldUpdates: Record<string, unknown>,
@@ -45,6 +46,7 @@ export const useDealBulkEditStageEntryRefusal = ({
 
     return getDealBulkEditStageEntryRefusal({
       stage,
+      isDealPipeline: objectNameSingular === 'opportunity',
       fields,
       providedFieldNames: Object.entries(fieldUpdates)
         .filter(([, value]) => !isUpdateRecordValueEmpty(value))

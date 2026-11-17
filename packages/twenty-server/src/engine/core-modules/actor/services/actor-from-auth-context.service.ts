@@ -3,7 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { type ActorMetadata } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
+import { applyRecordSourceFromCreatedBy } from 'src/engine/core-modules/actor/utils/apply-record-source-from-created-by.util';
+import { assertRecordSourceNotWritten } from 'src/engine/core-modules/actor/utils/assert-record-source-not-written.util';
 import { buildActorMetadataFromAuthContext } from 'src/engine/core-modules/actor/utils/build-actor-metadata-from-auth-context.util';
+import { isRecordSourceObjectName } from 'src/engine/core-modules/actor/utils/is-record-source-object-name.util';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
 import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/utils/find-flat-entity-by-id-in-flat-entity-maps.util';
@@ -42,6 +45,13 @@ export class ActorFromAuthContextService {
     objectMetadataNameSingular,
     authContext,
   }: InjectActorParams): Promise<RecordInput[]> {
+    assertRecordSourceNotWritten({
+      records,
+      objectMetadataNameSingular,
+      authContext,
+      isUpdate: false,
+    });
+
     const recordsWithCreatedBy = await this.injectActorField({
       records,
       objectMetadataNameSingular,
@@ -49,11 +59,30 @@ export class ActorFromAuthContextService {
       fieldName: 'createdBy',
     });
 
-    return await this.injectActorField({
+    const recordsWithActors = await this.injectActorField({
       records: recordsWithCreatedBy,
       objectMetadataNameSingular,
       authContext,
       fieldName: 'updatedBy',
+    });
+
+    if (!isRecordSourceObjectName(objectMetadataNameSingular)) {
+      return recordsWithActors;
+    }
+
+    const fieldIdByName = await this.getFieldIdByName({
+      workspaceId: authContext.workspace.id,
+      objectMetadataNameSingular,
+    });
+
+    // Workspaces that have not run the record source upgrade yet lack the column
+    if (!isDefined(fieldIdByName.recordSource)) {
+      return recordsWithActors;
+    }
+
+    return applyRecordSourceFromCreatedBy({
+      records: recordsWithActors,
+      authContext,
     });
   }
 
@@ -62,6 +91,13 @@ export class ActorFromAuthContextService {
     objectMetadataNameSingular,
     authContext,
   }: InjectActorParams): Promise<RecordInput[]> {
+    assertRecordSourceNotWritten({
+      records,
+      objectMetadataNameSingular,
+      authContext,
+      isUpdate: true,
+    });
+
     return this.injectActorField({
       records,
       objectMetadataNameSingular,
@@ -78,12 +114,37 @@ export class ActorFromAuthContextService {
   }: InjectActorParams & { fieldName: 'createdBy' | 'updatedBy' }): Promise<
     RecordInput[]
   > {
-    const workspace = authContext.workspace;
+    const fieldIdByName = await this.getFieldIdByName({
+      workspaceId: authContext.workspace.id,
+      objectMetadataNameSingular,
+    });
 
+    if (!isDefined(fieldIdByName[fieldName])) {
+      return records;
+    }
+
+    const clonedRecords = structuredClone(records);
+
+    const actorMetadata = buildActorMetadataFromAuthContext(authContext);
+
+    for (const record of clonedRecords) {
+      this.injectActorToRecord(actorMetadata, record, fieldName);
+    }
+
+    return clonedRecords;
+  }
+
+  private async getFieldIdByName({
+    workspaceId,
+    objectMetadataNameSingular,
+  }: {
+    workspaceId: string;
+    objectMetadataNameSingular: string;
+  }): Promise<Record<string, string>> {
     const { flatObjectMetadataMaps, flatFieldMetadataMaps } =
       await this.flatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
         {
-          workspaceId: workspace.id,
+          workspaceId,
           flatMapsKeys: ['flatObjectMetadataMaps', 'flatFieldMetadataMaps'],
         },
       );
@@ -99,26 +160,12 @@ export class ActorFromAuthContextService {
         })
       : undefined;
 
-    const fieldIdByName = objectMetadata
+    return objectMetadata
       ? buildFieldMapsFromFlatObjectMetadata(
           flatFieldMetadataMaps,
           objectMetadata,
         ).fieldIdByName
       : {};
-
-    if (!isDefined(fieldIdByName[fieldName])) {
-      return records;
-    }
-
-    const clonedRecords = structuredClone(records);
-
-    const actorMetadata = buildActorMetadataFromAuthContext(authContext);
-
-    for (const record of clonedRecords) {
-      this.injectActorToRecord(actorMetadata, record, fieldName);
-    }
-
-    return clonedRecords;
   }
 
   private injectActorToRecord(

@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { type PipelineRules } from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { Switch } from 'twenty-ui/primitives/input';
@@ -94,29 +95,42 @@ export const SettingsPipelineRulesSection = ({
     void updatePipeline(pipeline.id, { rules: nextRules });
   };
 
+  const isDealPipeline =
+    pipeline.objectNameSingular === CoreObjectNameSingular.Opportunity;
+
   const ruleDefinitions: RuleDefinition[] = [
     {
       key: 'limitCreationToStages',
-      title: t`Limit deal creation to stages`,
-      description: t`New deals can only be created in the chosen stages.`,
+      title: isDealPipeline
+        ? t`Limit deal creation to stages`
+        : t`Limit record creation to stages`,
+      description: isDealPipeline
+        ? t`New deals can only be created in the chosen stages.`
+        : t`New records can only be created in the chosen stages.`,
       takesStages: true,
     },
     {
       key: 'restrictSkipping',
       title: t`Restrict skipping stages`,
-      description: t`Deals must move through every stage in order.`,
+      description: isDealPipeline
+        ? t`Deals must move through every stage in order.`
+        : t`Records must move through every stage in order.`,
       takesStages: false,
     },
     {
       key: 'restrictBackward',
       title: t`Restrict moving backward`,
-      description: t`Deals cannot move back to an earlier stage.`,
+      description: isDealPipeline
+        ? t`Deals cannot move back to an earlier stage.`
+        : t`Records cannot move back to an earlier stage.`,
       takesStages: false,
     },
     {
       key: 'lockEditingInStages',
       title: t`Lock editing in stages`,
-      description: t`Deals in the chosen stages cannot be edited.`,
+      description: isDealPipeline
+        ? t`Deals in the chosen stages cannot be edited.`
+        : t`Records in the chosen stages cannot be edited.`,
       takesStages: true,
     },
   ];
@@ -125,7 +139,11 @@ export const SettingsPipelineRulesSection = ({
     <Section.Root>
       <Section.Header
         title={t`Pipeline rules`}
-        description={t`Rules apply to deals in this pipeline as soon as you change them. Super Admins can always override them.`}
+        description={
+          isDealPipeline
+            ? t`Rules apply to deals in this pipeline as soon as you change them. Super Admins can always override them.`
+            : t`Rules apply to records in this pipeline as soon as you change them. Super Admins can always override them.`
+        }
       />
       <StyledRules>
         {ruleDefinitions.map((rule) => {

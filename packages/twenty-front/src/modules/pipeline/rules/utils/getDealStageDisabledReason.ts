@@ -1,4 +1,5 @@
 import { t } from '@lingui/core/macro';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import {
   evaluateDealStageMove,
   isDealCreationStageAllowed,
@@ -26,13 +27,18 @@ export const getDealStageDisabledReason = ({
     return null;
   }
 
+  const isDealPipeline =
+    pipeline.objectNameSingular === CoreObjectNameSingular.Opportunity;
+
   if (isCreate) {
     return isDealCreationStageAllowed({
       rules: pipeline.rules,
       stageValue: targetStageValue,
     })
       ? null
-      : t`New deals in this pipeline can't start in this stage`;
+      : isDealPipeline
+        ? t`New deals in this pipeline can't start in this stage`
+        : t`New records in this pipeline can't start in this stage`;
   }
 
   if (
@@ -42,9 +48,13 @@ export const getDealStageDisabledReason = ({
       pipeline.stages.find(({ value }) => value === currentStageValue)?.label ??
       '';
 
-    return targetStageValue === currentStageValue
-      ? null
-      : t`Deals in ${currentLabel} can only be edited by Super Admins`;
+    if (targetStageValue === currentStageValue) {
+      return null;
+    }
+
+    return isDealPipeline
+      ? t`Deals in ${currentLabel} can only be edited by Super Admins`
+      : t`Records in ${currentLabel} can only be edited by Super Admins`;
   }
 
   const refusal = evaluateDealStageMove({
@@ -64,12 +74,16 @@ export const getDealStageDisabledReason = ({
     case 'SKIP': {
       const nextAllowedLabel = refusal.nextAllowedLabel ?? '';
 
-      return t`Can't skip from ${fromLabel} to ${toLabel}. Next allowed: ${nextAllowedLabel}, or a lost stage`;
+      return isDealPipeline
+        ? t`Can't skip from ${fromLabel} to ${toLabel}. Next allowed: ${nextAllowedLabel}, or a lost stage`
+        : t`Can't skip from ${fromLabel} to ${toLabel}. Next allowed: ${nextAllowedLabel}`;
     }
     case 'BACKWARD':
       return t`Can't move backward from ${fromLabel}. Only Super Admins can`;
     case 'OUT_OF_CLOSED_STAGE':
-      return t`Deals in ${fromLabel} can't change stage. Only Super Admins can`;
+      return isDealPipeline
+        ? t`Deals in ${fromLabel} can't change stage. Only Super Admins can`
+        : t`Records in ${fromLabel} can't change stage. Only Super Admins can`;
   }
 };
 

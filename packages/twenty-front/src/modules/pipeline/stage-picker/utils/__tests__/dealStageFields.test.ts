@@ -1,4 +1,5 @@
 import {
+  getStageFieldPipelineObjectNameSingular,
   isDealPipelineField,
   isDealStageField,
   isDealStageFieldMetadataItem,
@@ -41,5 +42,29 @@ describe('deal stage field detection', () => {
       false,
     );
     expect(isDealStageFieldMetadataItem(undefined)).toBe(false);
+  });
+
+  it('also matches the service Stage and Pipeline fields', () => {
+    expect(
+      isDealStageField({ objectNameSingular: 'service', fieldName: 'stage' }),
+    ).toBe(true);
+    expect(
+      isDealPipelineField({
+        objectNameSingular: 'service',
+        fieldName: 'pipeline',
+      }),
+    ).toBe(true);
+    expect(
+      getStageFieldPipelineObjectNameSingular({
+        universalIdentifier:
+          STANDARD_OBJECTS.service.fields.stage.universalIdentifier,
+      }),
+    ).toBe('service');
+    expect(
+      getStageFieldPipelineObjectNameSingular({
+        universalIdentifier:
+          STANDARD_OBJECTS.opportunity.fields.stage.universalIdentifier,
+      }),
+    ).toBe('opportunity');
   });
 });

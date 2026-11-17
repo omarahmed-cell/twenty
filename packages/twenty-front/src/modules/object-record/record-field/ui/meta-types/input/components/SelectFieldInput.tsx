@@ -39,17 +39,21 @@ export const SelectFieldInput = () => {
       options: fieldDefinition.metadata.options,
     });
 
+  const objectNameSingular =
+    fieldDefinition.metadata.objectMetadataNameSingular;
+
   const isDealStage = isDealStageField({
-    objectNameSingular: fieldDefinition.metadata.objectMetadataNameSingular,
+    objectNameSingular,
     fieldName: fieldDefinition.metadata.fieldName,
   });
 
   const { isHandledByStageEntry, saveWithStageEntry } = useDealStageFieldChange(
     {
       recordId,
+      objectNameSingular,
       isDealStage,
       isDealPipeline: isDealPipelineField({
-        objectNameSingular: fieldDefinition.metadata.objectMetadataNameSingular,
+        objectNameSingular,
         fieldName: fieldDefinition.metadata.fieldName,
       }),
     },
@@ -65,12 +69,14 @@ export const SelectFieldInput = () => {
 
   const pipelineSelectOptions = useDealStageOptions({
     isDealStage,
+    objectNameSingular,
     options: selectOptions,
     scope: { type: 'pipeline', pipelineKey, currentStageValue },
   });
 
   const visibleSelectOptions = useDealStageRuleOptions({
     isDealStage,
+    objectNameSingular,
     options: pipelineSelectOptions,
     pipelineKey,
     currentStageValue,

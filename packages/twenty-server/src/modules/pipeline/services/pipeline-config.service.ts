@@ -1,13 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
-import { normalizePipelineRules } from 'twenty-shared/utils';
+import {
+  isDefined,
+  normalizePipelineRules,
+  normalizeStageCalculatedPropertyKinds,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 import { DataSource, type EntityManager } from 'typeorm';
 
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { type PipelineConfig } from 'src/modules/pipeline/types/pipeline-config.type';
 
 const UNDEFINED_TABLE_ERROR_CODE = '42P01';
+const UNDEFINED_COLUMN_ERROR_CODE = '42703';
+
+const PIPELINE_COLUMNS = `"id", "key", "name", "description", "position", "objectNameSingular", "hubspotPipelineId", "rules"`;
 
 type PipelineRow = {
   id: string;
@@ -18,6 +26,7 @@ type PipelineRow = {
   objectNameSingular: string;
   hubspotPipelineId: string | null;
   rules: unknown;
+  stageCalculatedPropertyKinds?: unknown;
 };
 
 type PipelineStageRow = {
@@ -46,29 +55,41 @@ export class PipelineConfigService {
     manager,
   }: {
     workspaceId: string;
-    objectNameSingular?: string;
+    objectNameSingular?: PipelineObjectNameSingular;
     manager?: EntityManager;
   }): Promise<PipelineConfig[]> {
     const runner = manager ?? this.coreDataSource;
     const schema = `"${getWorkspaceSchemaName(workspaceId)}"`;
 
-    let pipelines: PipelineRow[];
-
-    try {
-      pipelines = await runner.query(
-        `SELECT "id", "key", "name", "description", "position", "objectNameSingular", "hubspotPipelineId", "rules"
+    const selectPipelines = (columns: string): Promise<PipelineRow[]> =>
+      runner.query(
+        `SELECT ${columns}
         FROM ${schema}."pipeline"
         WHERE "deletedAt" IS NULL AND "objectNameSingular" = $1
         ORDER BY "position" ASC, "createdAt" ASC`,
         [objectNameSingular],
       );
+
+    let pipelines: PipelineRow[];
+
+    try {
+      pipelines = await selectPipelines(
+        `${PIPELINE_COLUMNS}, "stageCalculatedPropertyKinds"`,
+      );
     } catch (error) {
+      const code = (error as { code?: string }).code;
+
       // Until the upgrade provisions pipelines, the workspace behaves as if it had none
-      if ((error as { code?: string }).code === UNDEFINED_TABLE_ERROR_CODE) {
+      if (code === UNDEFINED_TABLE_ERROR_CODE) {
         return [];
       }
 
-      throw error;
+      // Before the upgrade adds the column, every pipeline generates all kinds
+      if (code !== UNDEFINED_COLUMN_ERROR_CODE || isDefined(manager)) {
+        throw error;
+      }
+
+      pipelines = await selectPipelines(PIPELINE_COLUMNS);
     }
 
     if (pipelines.length === 0) {
@@ -88,6 +109,9 @@ export class PipelineConfigService {
       ...pipeline,
       position: Number(pipeline.position),
       rules: normalizePipelineRules(pipeline.rules),
+      stageCalculatedPropertyKinds: normalizeStageCalculatedPropertyKinds(
+        pipeline.stageCalculatedPropertyKinds,
+      ),
       stages: stages
         .filter((stage) => stage.pipelineId === pipeline.id)
         .map((stage) => ({
@@ -101,10 +125,12 @@ export class PipelineConfigService {
 
   async countDealsUsing({
     workspaceId,
+    objectNameSingular = 'opportunity',
     pipelineKeys = [],
     stageValues = [],
   }: {
     workspaceId: string;
+    objectNameSingular?: PipelineObjectNameSingular;
     pipelineKeys?: string[];
     stageValues?: string[];
   }): Promise<number> {
@@ -112,9 +138,9 @@ export class PipelineConfigService {
       return 0;
     }
 
-    // Trashed deals still hold the value, and removing the option would break them
+    // Trashed records still hold the value, and removing the option would break them
     const [{ count }]: { count: string }[] = await this.coreDataSource.query(
-      `SELECT count(*) FROM "${getWorkspaceSchemaName(workspaceId)}"."opportunity"
+      `SELECT count(*) FROM "${getWorkspaceSchemaName(workspaceId)}"."${objectNameSingular}"
       WHERE "pipeline"::text = ANY($1::text[]) OR "stage"::text = ANY($2::text[])`,
       [pipelineKeys, stageValues],
     );

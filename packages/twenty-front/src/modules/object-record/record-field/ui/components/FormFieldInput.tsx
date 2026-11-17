@@ -130,6 +130,7 @@ export const FormFieldInput = ({
         objectNameSingular: field.metadata.objectMetadataNameSingular,
         fieldName: field.metadata.fieldName,
       })}
+      objectNameSingular={field.metadata.objectMetadataNameSingular}
       label={field.label}
       defaultValue={defaultValue as string | undefined}
       onChange={onChange}

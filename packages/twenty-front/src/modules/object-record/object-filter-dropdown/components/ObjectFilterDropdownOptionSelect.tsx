@@ -8,7 +8,7 @@ import { fieldMetadataItemUsedInDropdownComponentSelector } from '@/object-recor
 import { objectFilterDropdownCurrentRecordFilterComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownCurrentRecordFilterComponentState';
 import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
 import { useDealStageOptions } from '@/pipeline/stage-picker/hooks/useDealStageOptions';
-import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
+import { getStageFieldPipelineObjectNameSingular } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { SelectableList } from '@/ui/layout/selectable-list/components/SelectableList';
@@ -99,10 +99,14 @@ export const ObjectFilterDropdownOptionSelect = ({
     : sourceFieldSelectOptions;
 
   // Same-named stages from different pipelines need their pipeline name to be told apart
-  const dealStageSelectOptions = useDealStageOptions({
-    isDealStage: isDealStageFieldMetadataItem(
+  const stagePipelineObjectNameSingular =
+    getStageFieldPipelineObjectNameSingular(
       relationTargetFieldMetadataItem ?? fieldMetadataItemUsedInDropdown,
-    ),
+    );
+
+  const dealStageSelectOptions = useDealStageOptions({
+    isDealStage: isDefined(stagePipelineObjectNameSingular),
+    objectNameSingular: stagePipelineObjectNameSingular,
     options: metadataSelectOptions ?? EMPTY_SELECT_OPTIONS,
     scope: { type: 'all' },
   });

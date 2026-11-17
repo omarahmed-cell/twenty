@@ -15,10 +15,8 @@ import {
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { isString } from '@sniptt/guards';
-import {
-  CoreObjectNameSingular,
-  type RecordGqlOperationFilter,
-} from 'twenty-shared/types';
+import { type RecordGqlOperationFilter } from 'twenty-shared/types';
+import { isPipelineObjectNameSingular } from 'twenty-shared/utils';
 
 // Two one-row reads tell a single pipeline from several without loading the whole selection
 export const useDealStageSelectionPipeline = ({
@@ -33,7 +31,7 @@ export const useDealStageSelectionPipeline = ({
   });
 
   const isDealSelection =
-    objectNameSingular === CoreObjectNameSingular.Opportunity &&
+    isPipelineObjectNameSingular(objectNameSingular) &&
     objectMetadataItem.fields.some(
       ({ name }) => name === DEAL_PIPELINE_FIELD_NAME,
     );

@@ -7,6 +7,7 @@ import {
   DEFAULT_PIPELINE_RULES,
   isDefined,
   type PipelineRules,
+  type StageCalculatedPropertyKind,
 } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 
@@ -137,6 +138,23 @@ export const useSettingsPipelineActions = () => {
       return true;
     });
 
+  // The server adds or deactivates the generated stage fields, so the object metadata is reloaded too
+  const setPipelineStageCalculatedPropertyKinds = (
+    pipelineId: string,
+    stageCalculatedPropertyKinds: StageCalculatedPropertyKind[],
+  ) =>
+    runSafely(async () => {
+      await updateOneRecord({
+        objectNameSingular: CoreObjectNameSingular.Pipeline,
+        idToUpdate: pipelineId,
+        updateOneRecordInput: { stageCalculatedPropertyKinds },
+      });
+      invalidateMetadataStore();
+      await refetchPipelineConfigs();
+
+      return true;
+    });
+
   const destroyPipeline = (pipelineId: string) =>
     runSafely(async () => {
       await destroyOnePipeline(pipelineId);
@@ -238,6 +256,7 @@ export const useSettingsPipelineActions = () => {
   return {
     createPipeline,
     updatePipeline,
+    setPipelineStageCalculatedPropertyKinds,
     destroyPipeline,
     clonePipeline,
     createPipelineStage,

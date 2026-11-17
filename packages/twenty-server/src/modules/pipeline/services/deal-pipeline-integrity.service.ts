@@ -3,7 +3,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 
 import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
-import { isDefined } from 'twenty-shared/utils';
+import {
+  isDefined,
+  PIPELINE_OBJECT_DEFINITIONS,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
 import {
@@ -42,8 +46,12 @@ const pickInput = (data: DealData) => ({
 const isImportRecord = (record: DealData) =>
   (record.createdBy as { source?: string } | undefined)?.source === 'IMPORT';
 
+const isDeal = (objectNameSingular: PipelineObjectNameSingular) =>
+  objectNameSingular === 'opportunity';
+
 const toException = (
   resolution: Extract<DealPipelineStageResolution, { status: 'refused' }>,
+  objectNameSingular: PipelineObjectNameSingular,
 ) => {
   const { pipelineName = '', stageLabel = '', value = '' } = resolution;
 
@@ -53,12 +61,14 @@ const toException = (
         `Stage ${stageLabel} is not in pipeline ${pipelineName}`,
         CommonQueryRunnerExceptionCode.BAD_REQUEST,
         {
-          userFriendlyMessage: msg`Deal Stage "${stageLabel}" is not a stage of the ${pipelineName} pipeline.`,
+          userFriendlyMessage: isDeal(objectNameSingular)
+            ? msg`Deal Stage "${stageLabel}" is not a stage of the ${pipelineName} pipeline.`
+            : msg`Stage "${stageLabel}" is not a stage of the ${pipelineName} pipeline.`,
         },
       );
     case 'UNKNOWN_STAGE':
       return new CommonQueryRunnerException(
-        `Unknown deal stage ${value}`,
+        `Unknown ${isDeal(objectNameSingular) ? 'deal' : objectNameSingular} stage ${value}`,
         CommonQueryRunnerExceptionCode.BAD_REQUEST,
         {
           userFriendlyMessage: msg`"${value}" is not a stage of any pipeline.`,
@@ -81,7 +91,7 @@ const toException = (
   }
 };
 
-// Runs before every deal write the query runners handle: UI, API, workflows and imports
+// Runs before every deal or service write the query runners handle: UI, API, workflows and imports
 @Injectable()
 export class DealPipelineIntegrityService {
   constructor(
@@ -96,20 +106,24 @@ export class DealPipelineIntegrityService {
     authContext,
     records,
     isUpsert,
+    objectNameSingular = 'opportunity',
   }: {
     authContext: WorkspaceAuthContext;
     records: DealData[];
     isUpsert: boolean;
+    objectNameSingular?: PipelineObjectNameSingular;
   }): Promise<DealData[]> {
     const workspaceId = authContext.workspace.id;
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
     const actor = await this.dealPipelineRulesService.resolveActor(authContext);
 
     const existingById = isUpsert
       ? await this.getCurrentValues(
           workspaceId,
+          objectNameSingular,
           records.map(({ id }) => id).filter(isNonEmptyString),
         )
       : new Map<string, DealPipelineStage>();
@@ -120,10 +134,16 @@ export class DealPipelineIntegrityService {
       const current = isNonEmptyString(record.id)
         ? existingById.get(record.id)
         : undefined;
-      const resolved = this.apply({ pipelines, record, current });
+      const resolved = this.apply({
+        pipelines,
+        record,
+        current,
+        objectNameSingular,
+      });
 
       await this.dealPipelineRulesService.enforce({
         workspaceId,
+        objectNameSingular,
         actor,
         isImport: isImportRecord(record),
         operation: isDefined(current) ? 'update' : 'create',
@@ -131,12 +151,13 @@ export class DealPipelineIntegrityService {
         // A new deal's override is traced by recordCreationOverrides once the row exists
         recordId: isDefined(current) ? record.id : undefined,
         current,
-        next: this.toNextValues(resolved, current),
+        next: this.toNextValues(resolved, current, objectNameSingular),
         data: record,
       });
 
       await this.dealStageEntryRulesService.enforce({
         workspaceId,
+        objectNameSingular,
         actorKind: isImportRecord(record) ? 'IMPORT' : actor.kind,
         operation: isDefined(current) ? 'update' : 'create',
         pipelines,
@@ -159,9 +180,11 @@ export class DealPipelineIntegrityService {
   async recordCreationOverrides({
     authContext,
     records,
+    objectNameSingular = 'opportunity',
   }: {
     authContext: WorkspaceAuthContext;
     records: DealData[];
+    objectNameSingular?: PipelineObjectNameSingular;
   }): Promise<void> {
     const actor = await this.dealPipelineRulesService.resolveActor(authContext);
 
@@ -172,6 +195,7 @@ export class DealPipelineIntegrityService {
     const workspaceId = authContext.workspace.id;
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
 
     for (const record of records) {
@@ -190,11 +214,12 @@ export class DealPipelineIntegrityService {
 
       await this.dealPipelineRulesService.enforce({
         workspaceId,
+        objectNameSingular,
         actor,
         operation: 'create',
         pipelines,
         recordId: record.id,
-        next: this.toNextValues(record, undefined),
+        next: this.toNextValues(record, undefined, objectNameSingular),
         data: record,
       });
     }
@@ -204,38 +229,43 @@ export class DealPipelineIntegrityService {
     authContext,
     id,
     data,
+    objectNameSingular = 'opportunity',
   }: {
     authContext: WorkspaceAuthContext;
     id: string;
     data: DealData;
+    objectNameSingular?: PipelineObjectNameSingular;
   }): Promise<DealData> {
     const workspaceId = authContext.workspace.id;
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
-    const current = (await this.getCurrentValues(workspaceId, [id])).get(
-      id,
-    ) ?? { pipeline: null, stage: null };
+    const current = (
+      await this.getCurrentValues(workspaceId, objectNameSingular, [id])
+    ).get(id) ?? { pipeline: null, stage: null };
     const resolved =
       'pipeline' in data || 'stage' in data
-        ? this.apply({ pipelines, record: data, current })
+        ? this.apply({ pipelines, record: data, current, objectNameSingular })
         : data;
 
     const actor = await this.dealPipelineRulesService.resolveActor(authContext);
 
     await this.dealPipelineRulesService.enforce({
       workspaceId,
+      objectNameSingular,
       actor,
       operation: 'update',
       pipelines,
       recordId: id,
       current,
-      next: this.toNextValues(resolved, current),
+      next: this.toNextValues(resolved, current, objectNameSingular),
       data,
     });
 
     await this.dealStageEntryRulesService.enforce({
       workspaceId,
+      objectNameSingular,
       actorKind: actor.kind,
       operation: 'update',
       pipelines,
@@ -256,10 +286,12 @@ export class DealPipelineIntegrityService {
     authContext,
     filter,
     data,
+    objectNameSingular = 'opportunity',
   }: {
     authContext: WorkspaceAuthContext;
     filter: unknown;
     data: DealData;
+    objectNameSingular?: PipelineObjectNameSingular;
   }): Promise<DealData> {
     const workspaceId = authContext.workspace.id;
     const ids = extractRecordIdsFromFilter(filter);
@@ -269,10 +301,12 @@ export class DealPipelineIntegrityService {
     if (!isDefined(ids)) {
       if (touchesPipelineOrStage || actor.kind === 'MEMBER') {
         throw new CommonQueryRunnerException(
-          'Bulk deal updates must select deals by id',
+          'Bulk updates must select records by id',
           CommonQueryRunnerExceptionCode.BAD_REQUEST,
           {
-            userFriendlyMessage: msg`Select the deals to change, then edit them.`,
+            userFriendlyMessage: isDeal(objectNameSingular)
+              ? msg`Select the deals to change, then edit them.`
+              : msg`Select the records to change, then edit them.`,
           },
         );
       }
@@ -282,8 +316,13 @@ export class DealPipelineIntegrityService {
 
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
-    const currentById = await this.getCurrentValues(workspaceId, ids);
+    const currentById = await this.getCurrentValues(
+      workspaceId,
+      objectNameSingular,
+      ids,
+    );
 
     if (touchesPipelineOrStage && !('pipeline' in data)) {
       const currentPipelines = new Set(
@@ -292,10 +331,12 @@ export class DealPipelineIntegrityService {
 
       if (currentPipelines.size > 1) {
         throw new CommonQueryRunnerException(
-          'Selected deals are in different pipelines',
+          'Selected records are in different pipelines',
           CommonQueryRunnerExceptionCode.BAD_REQUEST,
           {
-            userFriendlyMessage: msg`Selected deals are in different pipelines.`,
+            userFriendlyMessage: isDeal(objectNameSingular)
+              ? msg`Selected deals are in different pipelines.`
+              : msg`Selected records are in different pipelines.`,
           },
         );
       }
@@ -307,24 +348,27 @@ export class DealPipelineIntegrityService {
           pipelines,
           record: data,
           current: first ?? { pipeline: null, stage: null },
+          objectNameSingular,
         })
       : data;
 
     for (const [id, current] of currentById) {
       await this.dealPipelineRulesService.enforce({
         workspaceId,
+        objectNameSingular,
         actor,
         operation: 'update',
         pipelines,
         recordId: id,
         current,
-        next: this.toNextValues(resolved, current),
+        next: this.toNextValues(resolved, current, objectNameSingular),
         data,
       });
     }
 
     await this.dealStageEntryRulesService.enforce({
       workspaceId,
+      objectNameSingular,
       actorKind: actor.kind,
       operation: 'update',
       pipelines,
@@ -343,10 +387,12 @@ export class DealPipelineIntegrityService {
     authContext,
     id,
     filter,
+    objectNameSingular = 'opportunity',
   }: {
     authContext: WorkspaceAuthContext;
     id?: string;
     filter?: unknown;
+    objectNameSingular?: PipelineObjectNameSingular;
   }): Promise<void> {
     const workspaceId = authContext.workspace.id;
     const actor = await this.dealPipelineRulesService.resolveActor(authContext);
@@ -362,9 +408,13 @@ export class DealPipelineIntegrityService {
     if (!isDefined(ids)) {
       if (actor.kind === 'MEMBER') {
         throw new CommonQueryRunnerException(
-          'Bulk deal deletes must select deals by id',
+          'Bulk deletes must select records by id',
           CommonQueryRunnerExceptionCode.BAD_REQUEST,
-          { userFriendlyMessage: msg`Select the deals to delete.` },
+          {
+            userFriendlyMessage: isDeal(objectNameSingular)
+              ? msg`Select the deals to delete.`
+              : msg`Select the records to delete.`,
+          },
         );
       }
 
@@ -373,12 +423,18 @@ export class DealPipelineIntegrityService {
 
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
-    const currentById = await this.getCurrentValues(workspaceId, ids);
+    const currentById = await this.getCurrentValues(
+      workspaceId,
+      objectNameSingular,
+      ids,
+    );
 
     for (const [recordId, current] of currentById) {
       await this.dealPipelineRulesService.enforce({
         workspaceId,
+        objectNameSingular,
         actor,
         operation: 'delete',
         pipelines,
@@ -392,14 +448,19 @@ export class DealPipelineIntegrityService {
     data: DealData,
     current: DealPipelineStage | undefined,
   ) {
-    const { pipeline, stage } = this.toNextValues(data, current);
-
-    return { pipeline, stage };
+    return {
+      pipeline:
+        'pipeline' in data
+          ? (data.pipeline ?? null)
+          : (current?.pipeline ?? null),
+      stage: 'stage' in data ? (data.stage ?? null) : (current?.stage ?? null),
+    };
   }
 
   private toNextValues(
     data: DealData,
     current: DealPipelineStage | undefined,
+    objectNameSingular: PipelineObjectNameSingular,
   ): DealPipelineStage {
     return {
       pipeline:
@@ -407,7 +468,8 @@ export class DealPipelineIntegrityService {
           ? (data.pipeline ?? null)
           : (current?.pipeline ?? null),
       stage: 'stage' in data ? (data.stage ?? null) : (current?.stage ?? null),
-      ...('closeDate' in data
+      ...(PIPELINE_OBJECT_DEFINITIONS[objectNameSingular]
+        .hasCloseDateAutomation && 'closeDate' in data
         ? { closeDate: data.closeDate as string | null }
         : {}),
     };
@@ -417,10 +479,12 @@ export class DealPipelineIntegrityService {
     pipelines,
     record,
     current,
+    objectNameSingular,
   }: {
     pipelines: PipelineConfig[];
     record: DealData;
     current: DealPipelineStage | undefined;
+    objectNameSingular: PipelineObjectNameSingular;
   }): DealData {
     const resolution = resolveDealPipelineStage({
       pipelines,
@@ -438,22 +502,27 @@ export class DealPipelineIntegrityService {
           stage: resolution.stage,
         };
       case 'refused':
-        throw toException(resolution);
+        throw toException(resolution, objectNameSingular);
     }
   }
 
   private async getCurrentValues(
     workspaceId: string,
+    objectNameSingular: PipelineObjectNameSingular,
     ids: string[],
   ): Promise<Map<string, DealPipelineStage>> {
     if (ids.length === 0) {
       return new Map();
     }
 
+    const closeDateColumn = PIPELINE_OBJECT_DEFINITIONS[objectNameSingular]
+      .hasCloseDateAutomation
+      ? ', "closeDate"'
+      : '';
     const rows: (DealPipelineStage & { id: string })[] =
       await this.coreDataSource.query(
-        `SELECT "id", "pipeline"::text AS "pipeline", "stage"::text AS "stage", "closeDate"
-        FROM "${getWorkspaceSchemaName(workspaceId)}"."opportunity" WHERE "id" = ANY($1::uuid[])`,
+        `SELECT "id", "pipeline"::text AS "pipeline", "stage"::text AS "stage"${closeDateColumn}
+        FROM "${getWorkspaceSchemaName(workspaceId)}"."${objectNameSingular}" WHERE "id" = ANY($1::uuid[])`,
         [ids],
       );
 

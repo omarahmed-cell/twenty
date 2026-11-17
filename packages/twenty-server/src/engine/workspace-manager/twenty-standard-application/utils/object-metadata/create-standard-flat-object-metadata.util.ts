@@ -1317,6 +1317,52 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  serviceStageHistory: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'serviceStageHistory'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'serviceStageHistory',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.serviceStageHistory.universalIdentifier,
+        nameSingular: 'serviceStageHistory',
+        namePlural: 'serviceStageHistories',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Service Stage Change`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Service Stage Changes`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `One stage change of a service, written by the server`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconTimelineEvent',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   pipeline: ({
     now,
     workspaceId,

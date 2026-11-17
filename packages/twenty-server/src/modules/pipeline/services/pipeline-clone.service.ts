@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isPipelineObjectNameSingular } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 import { v4 } from 'uuid';
 
@@ -29,8 +29,21 @@ export class PipelineCloneService {
     workspaceId: string;
     pipelineId: string;
   }): Promise<string | null> {
+    const schema = `"${getWorkspaceSchemaName(workspaceId)}"`;
+    const [sourceRow]: { objectNameSingular: string }[] =
+      await this.coreDataSource.query(
+        `SELECT "objectNameSingular" FROM ${schema}."pipeline" WHERE "id" = $1 AND "deletedAt" IS NULL`,
+        [pipelineId],
+      );
+    const objectNameSingular = sourceRow?.objectNameSingular;
+
+    if (!isPipelineObjectNameSingular(objectNameSingular)) {
+      return null;
+    }
+
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
     const source = pipelines.find((pipeline) => pipeline.id === pipelineId);
 
@@ -38,7 +51,6 @@ export class PipelineCloneService {
       return null;
     }
 
-    const schema = `"${getWorkspaceSchemaName(workspaceId)}"`;
     const [keys, values]: { value: string }[][] = await Promise.all([
       this.coreDataSource.query(
         `SELECT "key" AS "value" FROM ${schema}."pipeline"`,
@@ -81,7 +93,10 @@ export class PipelineCloneService {
     }, buildSystemAuthContext(workspaceId));
 
     // Cloned stages keep their toggle, and these writes skip the query hooks that sync fields
-    await this.dealStageCalculatedPropertiesService.syncFields(workspaceId);
+    await this.dealStageCalculatedPropertiesService.syncFields(
+      workspaceId,
+      objectNameSingular,
+    );
 
     return newPipelineId;
   }

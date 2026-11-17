@@ -64,8 +64,7 @@ import {
 } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { getFirstStageValueOfPipeline } from '@/pipeline/stage-picker/utils/getStageOptionsForPipeline';
 import { isString } from '@sniptt/guards';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isPipelineObjectNameSingular } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
 import { isDeeplyEqual } from '~/utils/isDeeplyEqual';
 
@@ -83,8 +82,8 @@ export const usePersistField = ({
   const { updateOneRecord } = useUpdateOneRecord();
 
   const pipelines = useDealStagePipelineConfigs({
-    enabled:
-      objectMetadataItem?.nameSingular === CoreObjectNameSingular.Opportunity,
+    enabled: isPipelineObjectNameSingular(objectMetadataItem?.nameSingular),
+    objectNameSingular: objectMetadataItem?.nameSingular,
   });
 
   const store = useStore();
@@ -303,7 +302,7 @@ export const usePersistField = ({
             ? propertyLogicDecision.values
             : {};
 
-        // A deal that changes pipeline starts again at the new pipeline's first stage
+        // A deal or service that changes pipeline starts again at the new pipeline's first stage
         const firstStageOfNewPipeline =
           isDealPipelineField({
             objectNameSingular: objectMetadataItem.nameSingular,

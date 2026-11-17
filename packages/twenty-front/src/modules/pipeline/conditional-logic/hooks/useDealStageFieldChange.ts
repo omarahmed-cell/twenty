@@ -15,10 +15,12 @@ import { getFirstStageValueOfPipeline } from '@/pipeline/stage-picker/utils/getS
 // A pipeline change puts the deal in the new pipeline's first stage, so it is checked as entering that stage
 export const useDealStageFieldChange = ({
   recordId,
+  objectNameSingular = CoreObjectNameSingular.Opportunity,
   isDealStage,
   isDealPipeline,
 }: {
   recordId: string;
+  objectNameSingular?: string;
   isDealStage: boolean;
   isDealPipeline: boolean;
 }) => {
@@ -26,6 +28,7 @@ export const useDealStageFieldChange = ({
   const isEnabled = isDealStage || isDealPipeline;
   const { pipelines, hasStageRules, resolveStageEntry } = useDealStageEntry({
     enabled: isEnabled,
+    objectNameSingular,
   });
   const { updateOneRecord } = useUpdateOneRecord();
 
@@ -60,7 +63,7 @@ export const useDealStageFieldChange = ({
     }
 
     await updateOneRecord({
-      objectNameSingular: CoreObjectNameSingular.Opportunity,
+      objectNameSingular,
       idToUpdate: recordId,
       updateOneRecordInput: {
         ...(isDealStage

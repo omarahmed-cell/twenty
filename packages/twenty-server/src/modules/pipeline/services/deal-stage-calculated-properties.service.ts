@@ -2,7 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { FieldMetadataType } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import {
+  isDefined,
+  normalizeStageCalculatedPropertyKinds,
+  PIPELINE_OBJECT_NAMES,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 
 import { getFlatFieldsFromFlatObjectMetadata } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-flat-fields-for-flat-object-metadata.util';
 import { ApplicationService } from 'src/engine/core-modules/application/application.service';
@@ -22,21 +27,24 @@ import {
   type StageCalculatedPropertyFieldSpec,
 } from 'src/modules/pipeline/utils/plan-deal-stage-calculated-property-fields.util';
 
-const FIXED_DEAL_FIELD_NAMES = new Set(
-  Object.keys(STANDARD_OBJECTS.opportunity.fields),
-);
+type StageCalculatedPropertyKind = StageCalculatedPropertyFieldSpec['kind'];
 
-const DESCRIPTION_BY_KIND: Record<
-  StageCalculatedPropertyFieldSpec['kind'],
-  string
-> = {
+const DEAL_DESCRIPTION_BY_KIND: Record<StageCalculatedPropertyKind, string> = {
   dateEntered: 'The latest time the deal entered this stage',
   dateExited: 'The latest time the deal left this stage',
   cumulativeTimeIn: 'Days in this stage over all completed stays',
   latestTimeIn: 'Days of the most recent completed stay in this stage',
 };
 
-// Keeps the deal's per-stage fields in line with the stages' "Stage calculated properties" toggles
+const RECORD_DESCRIPTION_BY_KIND: Record<StageCalculatedPropertyKind, string> =
+  {
+    ...DEAL_DESCRIPTION_BY_KIND,
+    dateEntered: 'The latest time the record entered this stage',
+    dateExited: 'The latest time the record left this stage',
+  };
+
+// Keeps each pipeline object's per-stage fields in line with the stages' "Stage calculated properties"
+// toggles and the kinds checked on their pipeline
 @Injectable()
 export class DealStageCalculatedPropertiesService {
   private readonly logger = new Logger(
@@ -53,42 +61,72 @@ export class DealStageCalculatedPropertiesService {
     private readonly workspaceMigrationValidateBuildAndRunService: WorkspaceMigrationValidateBuildAndRunService,
   ) {}
 
-  async syncFields(workspaceId: string): Promise<void> {
+  async syncFields(
+    workspaceId: string,
+    objectNameSingular?: PipelineObjectNameSingular,
+  ): Promise<void> {
+    for (const pipelineObjectNameSingular of isDefined(objectNameSingular)
+      ? [objectNameSingular]
+      : PIPELINE_OBJECT_NAMES) {
+      await this.syncObjectFields(workspaceId, pipelineObjectNameSingular);
+    }
+  }
+
+  private async syncObjectFields(
+    workspaceId: string,
+    objectNameSingular: PipelineObjectNameSingular,
+  ): Promise<void> {
     const { twentyStandardFlatApplication } =
       await this.applicationService.findWorkspaceTwentyStandardAndCustomApplicationOrThrow(
         { workspaceId },
       );
-    const dealObject = await this.findDealObject(workspaceId);
+    const pipelineObject = await this.findPipelineObject(
+      workspaceId,
+      objectNameSingular,
+    );
 
-    if (!isDefined(dealObject)) {
+    if (!isDefined(pipelineObject)) {
       return;
     }
 
+    const fixedFieldNames = new Set(
+      Object.keys(STANDARD_OBJECTS[objectNameSingular].fields),
+    );
+    const descriptionByKind =
+      objectNameSingular === 'opportunity'
+        ? DEAL_DESCRIPTION_BY_KIND
+        : RECORD_DESCRIPTION_BY_KIND;
     const pipelines = await this.pipelineConfigService.getPipelines({
       workspaceId,
+      objectNameSingular,
     });
     const { flatFieldMetadataMaps } =
       await this.flatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
         { workspaceId, flatMapsKeys: ['flatFieldMetadataMaps'] },
       );
     const existingFields = getFlatFieldsFromFlatObjectMetadata(
-      dealObject,
+      pipelineObject,
       flatFieldMetadataMaps,
     ).filter(
       (field) =>
         field.applicationId === twentyStandardFlatApplication.id &&
-        isStageCalculatedPropertyFieldName(field.name, FIXED_DEAL_FIELD_NAMES),
+        isStageCalculatedPropertyFieldName(field.name, fixedFieldNames),
     );
 
     const plan = planDealStageCalculatedPropertyFields({
-      stages: pipelines.flatMap((pipeline) =>
-        pipeline.stages.map((stage) => ({
+      stages: pipelines.flatMap((pipeline) => {
+        const kinds = normalizeStageCalculatedPropertyKinds(
+          pipeline.stageCalculatedPropertyKinds,
+        );
+
+        return pipeline.stages.map((stage) => ({
           value: stage.value,
           label: stage.label,
           pipelineName: pipeline.name,
           calcPropsEnabled: stage.calcPropsEnabled,
-        })),
-      ),
+          kinds,
+        }));
+      }),
       existingFields: existingFields.map(({ id, name, label, isActive }) => ({
         id,
         name,
@@ -103,11 +141,11 @@ export class DealStageCalculatedPropertiesService {
         ownerFlatApplication: twentyStandardFlatApplication,
         isSystemBuild: true,
         createFieldInputs: plan.toCreate.map((spec) => ({
-          objectMetadataId: dealObject.id,
+          objectMetadataId: pipelineObject.id,
           name: spec.name,
           label: spec.label,
           type: spec.type,
-          description: DESCRIPTION_BY_KIND[spec.kind],
+          description: descriptionByKind[spec.kind],
           icon:
             spec.type === FieldMetadataType.DATE_TIME
               ? 'IconCalendarEvent'
@@ -121,7 +159,7 @@ export class DealStageCalculatedPropertiesService {
         })),
       });
 
-      await this.hideInDealViews({
+      await this.hideInViews({
         workspaceId,
         fieldMetadataIds: created.map(({ id }) => id),
       });
@@ -162,7 +200,10 @@ export class DealStageCalculatedPropertiesService {
     }
 
     if (plan.stageValuesToBackfill.length > 0) {
-      await this.dealStageHistoryService.recomputeDeals({ workspaceId });
+      await this.dealStageHistoryService.recomputeRecords({
+        workspaceId,
+        objectNameSingular,
+      });
     }
 
     const changeCount =
@@ -170,7 +211,7 @@ export class DealStageCalculatedPropertiesService {
 
     if (changeCount > 0) {
       this.logger.log(
-        `Workspace ${workspaceId}: stage calculated properties created ${plan.toCreate.length}, updated ${plan.toUpdate.length}, deleted ${plan.toDelete.length}`,
+        `Workspace ${workspaceId}: ${objectNameSingular} stage calculated properties created ${plan.toCreate.length}, updated ${plan.toUpdate.length}, deleted ${plan.toDelete.length}`,
       );
     }
   }
@@ -222,8 +263,9 @@ export class DealStageCalculatedPropertiesService {
     }
   }
 
-  private async findDealObject(
+  private async findPipelineObject(
     workspaceId: string,
+    objectNameSingular: PipelineObjectNameSingular,
   ): Promise<FlatObjectMetadata | undefined> {
     const { flatObjectMetadataMaps } =
       await this.flatEntityMapsCacheService.getOrRecomputeManyOrAllFlatEntityMaps(
@@ -233,14 +275,15 @@ export class DealStageCalculatedPropertiesService {
     return (
       findFlatEntityByUniversalIdentifier<FlatObjectMetadata>({
         flatEntityMaps: flatObjectMetadataMaps,
-        universalIdentifier: STANDARD_OBJECTS.opportunity.universalIdentifier,
+        universalIdentifier:
+          STANDARD_OBJECTS[objectNameSingular].universalIdentifier,
       }) ?? undefined
     );
   }
 
-  // New fields land visible in the deal table and record page; hiding them keeps those clean while
+  // New fields land visible in the object's table and record page; hiding them keeps those clean while
   // leaving the fields available in filters, columns, sorting and reports
-  private async hideInDealViews({
+  private async hideInViews({
     workspaceId,
     fieldMetadataIds,
   }: {

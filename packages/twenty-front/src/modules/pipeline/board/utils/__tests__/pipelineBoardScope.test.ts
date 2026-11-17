@@ -20,6 +20,12 @@ const buildPipeline = (
   description: null,
   position,
   objectNameSingular: 'opportunity',
+  stageCalculatedPropertyKinds: [
+    'dateEntered',
+    'dateExited',
+    'cumulativeTimeIn',
+    'latestTimeIn',
+  ],
   rules: DEFAULT_PIPELINE_RULES,
   stages: stageValues.map((value, index) => ({
     id: `${value}-id`,
@@ -63,6 +69,21 @@ describe('isPipelineBoardEligible', () => {
       isPipelineBoardEligible({
         objectNameSingular: 'task',
         groupFieldName: 'stage',
+      }),
+    ).toBe(false);
+  });
+
+  it('applies to service boards grouped by the service Stage', () => {
+    expect(
+      isPipelineBoardEligible({
+        objectNameSingular: 'service',
+        groupFieldName: 'stage',
+      }),
+    ).toBe(true);
+    expect(
+      isPipelineBoardEligible({
+        objectNameSingular: 'service',
+        groupFieldName: 'pipeline',
       }),
     ).toBe(false);
   });

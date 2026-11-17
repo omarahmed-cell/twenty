@@ -13,7 +13,7 @@ import { type RecordDragDropResult } from '@/object-record/record-drag/types/Rec
 import { usePipelineBoardScope } from '@/pipeline/board/hooks/usePipelineBoardScope';
 import { useDealStageEntry } from '@/pipeline/conditional-logic/hooks/useDealStageEntry';
 import { getDealBulkStageEntryRefusal } from '@/pipeline/conditional-logic/utils/getDealBulkStageEntryRefusal';
-import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
+import { getStageFieldPipelineObjectNameSingular } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { isPipelineBoardDropAllowed } from '@/pipeline/board/utils/isPipelineBoardDropAllowed';
 import { useIsPipelineAdmin } from '@/pipeline/rules/hooks/useIsPipelineAdmin';
 import { getDealStageDisabledReason } from '@/pipeline/rules/utils/getDealStageDisabledReason';
@@ -43,11 +43,14 @@ export const RecordBoardDndKitProvider = ({
   const { processBoardCardDrop } = useProcessBoardCardDrop();
 
   const { selectFieldMetadataItem } = useContext(RecordBoardContext);
-  const isDealStageBoard = isDealStageFieldMetadataItem(
-    selectFieldMetadataItem,
-  );
+  const stagePipelineObjectNameSingular =
+    getStageFieldPipelineObjectNameSingular(selectFieldMetadataItem);
+  const isDealStageBoard = isDefined(stagePipelineObjectNameSingular);
   const { hasStageRules, loadDealRecord, getRequirement, resolveStageEntry } =
-    useDealStageEntry({ enabled: isDealStageBoard });
+    useDealStageEntry({
+      enabled: isDealStageBoard,
+      objectNameSingular: stagePipelineObjectNameSingular,
+    });
 
   const pipelineBoardScope = usePipelineBoardScope();
   const isPipelineAdmin = useIsPipelineAdmin();

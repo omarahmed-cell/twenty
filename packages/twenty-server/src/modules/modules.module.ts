@@ -21,6 +21,7 @@ import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { StageDateTrackingModule } from 'src/modules/stage-date-tracking/stage-date-tracking.module';
 import { DealStageHistoryModule } from 'src/modules/deal-stage-history/deal-stage-history.module';
+import { RecordSourceModule } from 'src/modules/record-source/record-source.module';
 import { PropertiesModule } from 'src/modules/properties/properties.module';
 import { FieldSyncModule } from 'src/modules/field-sync/field-sync.module';
 import { SegmentModule } from 'src/modules/segment/segment.module';
@@ -82,6 +83,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     CompanyHierarchyModule,
     StageDateTrackingModule,
     DealStageHistoryModule,
+    RecordSourceModule,
     PropertiesModule,
     SegmentModule,
     CommunicationQueryHookModule,

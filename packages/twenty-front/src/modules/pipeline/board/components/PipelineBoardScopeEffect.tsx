@@ -7,9 +7,17 @@ import { usePipelineConfigs } from '@/pipeline/hooks/usePipelineConfigs';
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
 
 // Mirrors the live pipeline config into the board scope, and drops the scope when the board unmounts
-export const PipelineBoardScopeEffect = () => {
-  const { pipelines, loading } = usePipelineConfigs();
-  const { rememberedPipelineKey } = usePipelineBoardRememberedPipelineKey();
+type PipelineBoardScopeEffectProps = {
+  objectNameSingular: string;
+};
+
+export const PipelineBoardScopeEffect = ({
+  objectNameSingular,
+}: PipelineBoardScopeEffectProps) => {
+  const { pipelines, loading } = usePipelineConfigs({ objectNameSingular });
+  const { rememberedPipelineKey } = usePipelineBoardRememberedPipelineKey({
+    objectNameSingular,
+  });
 
   const [pipelineBoardScope, setPipelineBoardScope] = useAtomComponentState(
     pipelineBoardScopeComponentState,

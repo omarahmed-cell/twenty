@@ -21,6 +21,7 @@ export class PipelineStageUpdateOnePreQueryHook implements WorkspacePreQueryHook
       data: await this.pipelineWriteGuardService.preparePipelineStageUpdate(
         authContext,
         payload.data,
+        { id: payload.id },
       ),
     };
   }

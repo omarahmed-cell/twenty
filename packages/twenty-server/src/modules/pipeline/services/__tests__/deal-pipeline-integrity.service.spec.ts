@@ -136,3 +136,129 @@ describe('DealPipelineIntegrityService stage entry rules', () => {
     );
   });
 });
+
+const ONBOARDING: PipelineConfig = {
+  ...SALES,
+  id: 'onboarding',
+  key: 'ONBOARDING_PIPELINE',
+  name: 'Onboarding Pipeline',
+  objectNameSingular: 'service',
+  stageCalculatedPropertyKinds: ['dateEntered', 'dateExited'],
+  stages: ['ONBOARDING_KICK_OFF', 'ONBOARDING_LIVE'].map((value, position) => ({
+    ...SALES.stages[0],
+    id: value,
+    pipelineId: 'onboarding',
+    label: value,
+    value,
+    position,
+  })),
+};
+
+const RENEWALS: PipelineConfig = {
+  ...ONBOARDING,
+  id: 'renewals',
+  key: 'RENEWALS_PIPELINE',
+  name: 'Renewals Pipeline',
+  stages: [
+    {
+      ...ONBOARDING.stages[0],
+      id: 'RENEWALS_OPEN',
+      pipelineId: 'renewals',
+      label: 'Open',
+      value: 'RENEWALS_OPEN',
+    },
+  ],
+};
+
+const buildServiceForServices = () => {
+  const query = jest.fn().mockResolvedValue([
+    {
+      id: 'service-record',
+      pipeline: 'ONBOARDING_PIPELINE',
+      stage: 'ONBOARDING_KICK_OFF',
+    },
+  ]);
+  const getPipelines = jest.fn().mockResolvedValue([ONBOARDING, RENEWALS]);
+  const service = new DealPipelineIntegrityService(
+    { query } as unknown as DataSource,
+    { getPipelines } as unknown as PipelineConfigService,
+    {
+      resolveActor: jest
+        .fn()
+        .mockResolvedValue({ kind: 'MEMBER', name: 'Ana' }),
+      enforce: jest.fn(),
+    } as unknown as DealPipelineRulesService,
+    { enforce: jest.fn() } as unknown as DealStageEntryRulesService,
+  );
+
+  return { service, query, getPipelines };
+};
+
+describe('DealPipelineIntegrityService on services', () => {
+  it('reads the service pipelines and the service table', async () => {
+    const { service, query, getPipelines } = buildServiceForServices();
+
+    await service.prepareDealUpdate({
+      authContext: AUTH_CONTEXT,
+      id: 'service-record',
+      data: { stage: 'ONBOARDING_LIVE' },
+      objectNameSingular: 'service',
+    });
+
+    expect(getPipelines).toHaveBeenCalledWith(
+      expect.objectContaining({ objectNameSingular: 'service' }),
+    );
+    expect(query.mock.calls[0][0]).toContain('."service"');
+    expect(query.mock.calls[0][0]).not.toContain('closeDate');
+  });
+
+  it('refuses a stage of another pipeline without naming deals', async () => {
+    const { service } = buildServiceForServices();
+
+    await expect(
+      service.prepareDealUpdate({
+        authContext: AUTH_CONTEXT,
+        id: 'service-record',
+        data: { pipeline: 'ONBOARDING_PIPELINE', stage: 'RENEWALS_OPEN' },
+        objectNameSingular: 'service',
+      }),
+    ).rejects.toMatchObject({
+      message: 'Stage Open is not in pipeline Onboarding Pipeline',
+      userFriendlyMessage: expect.objectContaining({
+        message: expect.stringMatching(/^Stage "/),
+      }),
+    });
+  });
+
+  it('refuses an unknown stage', async () => {
+    const { service } = buildServiceForServices();
+
+    await expect(
+      service.prepareDealUpdate({
+        authContext: AUTH_CONTEXT,
+        id: 'service-record',
+        data: { stage: 'NOT_A_STAGE' },
+        objectNameSingular: 'service',
+      }),
+    ).rejects.toThrow('Unknown service stage NOT_A_STAGE');
+  });
+
+  it('puts a new service in the first pipeline at its first stage', async () => {
+    const { service } = buildServiceForServices();
+
+    await expect(
+      service.prepareDealsToCreate({
+        authContext: AUTH_CONTEXT,
+        isUpsert: false,
+        records: [{ name: 'Acme onboarding' }],
+        objectNameSingular: 'service',
+      }),
+    ).resolves.toEqual([
+      {
+        name: 'Acme onboarding',
+        pipeline: 'ONBOARDING_PIPELINE',
+        stage: 'ONBOARDING_KICK_OFF',
+      },
+    ]);
+  });
+});

@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { type ConditionalLogicRule, isDefined } from 'twenty-shared/utils';
 import { LightButton, LightIconButton } from 'twenty-ui/components/input';
 import { IconPencil, IconPlus, IconTrash } from 'twenty-ui/icon';
@@ -110,6 +111,10 @@ export const SettingsPipelineStageConditionalLogicModal = ({
   const stageFieldLabel =
     fieldMetadataItemByName.get('stage')?.label ?? t`Stage`;
 
+  const isDealObject =
+    objectNameSingular === CoreObjectNameSingular.Opportunity;
+  const recordLabel = objectMetadataItem.labelSingular.toLowerCase();
+
   const fieldLabelOf = (fieldName: string) =>
     fieldMetadataItemByName.get(fieldName)?.label ?? fieldName;
 
@@ -157,7 +162,9 @@ export const SettingsPipelineStageConditionalLogicModal = ({
     <StyledPanel>
       <StyledSectionTitle>{t`Rules for ${stage.label}`}</StyledSectionTitle>
       <StyledSectionDescription>
-        {t`When a deal enters this stage and a rule's conditions are true, its properties are shown and required ones must be filled.`}
+        {isDealObject
+          ? t`When a deal enters this stage and a rule's conditions are true, its properties are shown and required ones must be filled.`
+          : t`When a ${recordLabel} enters this stage and a rule's conditions are true, its properties are shown and required ones must be filled.`}
       </StyledSectionDescription>
       {stage.conditionalRules.map((rule, index) => {
         const ruleNumber = index + 1;
@@ -178,7 +185,9 @@ export const SettingsPipelineStageConditionalLogicModal = ({
               <StyledRuleTitle>{t`Rule ${ruleNumber}`}</StyledRuleTitle>
               <StyledSectionDescription>
                 {groupCount === 0
-                  ? t`Applies to every deal entering ${stage.label}`
+                  ? isDealObject
+                    ? t`Applies to every deal entering ${stage.label}`
+                    : t`Applies to every ${recordLabel} entering ${stage.label}`
                   : t`Applies when one of ${groupCount} condition groups is true`}
               </StyledSectionDescription>
               <StyledSectionDescription>
@@ -230,7 +239,11 @@ export const SettingsPipelineStageConditionalLogicModal = ({
       fields={fields}
       fieldMetadataItemByName={fieldMetadataItemByName}
       objectMetadataItem={objectMetadataItem}
-      previewHint={t`Pick values to see what a deal moving to ${stageLabel} would be asked for.`}
+      previewHint={
+        isDealObject
+          ? t`Pick values to see what a deal moving to ${stageLabel} would be asked for.`
+          : t`Pick values to see what a ${recordLabel} moving to ${stageLabel} would be asked for.`
+      }
       fixedConditionLabel={t`${stageFieldLabel} is equal to ${stageLabel}`}
     />
   );

@@ -51,6 +51,7 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   opportunityContact: 'e59d2afd-9a8e-4ac2-a0cf-ddd2d9133b77',
   opportunityCollaborator: '1af92b56-6879-4204-bad9-8f96af899b9f',
   opportunityStageHistory: '3343a18d-e026-4196-bfaa-0e8acc4b93db',
+  serviceStageHistory: 'dd307d83-d696-459c-a336-df16b8cb3c4c',
   pipeline: '899a54d7-2b1e-4183-8b47-69751eed3454',
   pipelineStage: '9aa2663d-69b4-4816-9c98-d4d1edd59a03',
   propertyGroup: 'f982adf4-7d9a-4edc-a189-03d4b49bfa0a',

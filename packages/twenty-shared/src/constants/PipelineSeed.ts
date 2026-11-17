@@ -1,14 +1,18 @@
+import { type StageCalculatedPropertyKind } from '@/utils/pipeline/stage-calculated-properties';
+
 export type PipelineSeedStage = {
   value: string;
   label: string;
   probability: number | null;
   hubspotStageId: string;
+  calcPropsEnabled?: boolean;
 };
 
 export type PipelineSeed = {
   key: string;
   name: string;
   hubspotPipelineId: string;
+  stageCalculatedPropertyKinds?: StageCalculatedPropertyKind[];
   stages: PipelineSeedStage[];
 };
 

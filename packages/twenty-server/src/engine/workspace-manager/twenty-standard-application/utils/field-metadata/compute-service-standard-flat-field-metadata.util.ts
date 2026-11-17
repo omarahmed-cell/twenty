@@ -1,5 +1,8 @@
 import { msg } from '@lingui/core/macro';
 import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-application/utils/i18n-label.util';
+import { SERVICE_PIPELINE_SEED } from 'twenty-shared/constants';
+import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
+import { buildPipelineSelectOptions } from 'twenty-shared/utils';
 import {
   DateDisplayFormat,
   FieldMetadataType,
@@ -14,7 +17,24 @@ import {
   type CreateStandardFieldArgs,
   createStandardFieldFlatMetadata,
 } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-field-flat-metadata.util';
+import { createStandardRecordSourceFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-record-source-field-flat-metadata.util';
 import { createStandardRelationFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-relation-field-flat-metadata.util';
+const SEEDED_PIPELINE_SELECT_OPTIONS = buildPipelineSelectOptions({
+  pipelines: SERVICE_PIPELINE_SEED.map((pipeline) => ({
+    key: pipeline.key,
+    name: pipeline.name,
+    stages: pipeline.stages.map(({ value, label }) => ({
+      value,
+      label,
+      color: null,
+    })),
+  })),
+  pipelineFieldUniversalIdentifier:
+    STANDARD_OBJECTS.service.fields.pipeline.universalIdentifier,
+  stageFieldUniversalIdentifier:
+    STANDARD_OBJECTS.service.fields.stage.universalIdentifier,
+});
+
 export const buildServiceStandardFlatFieldMetadatas = ({
   now,
   objectName,
@@ -594,6 +614,97 @@ export const buildServiceStandardFlatFieldMetadatas = ({
         relationType: RelationType.ONE_TO_MANY,
       },
     },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  pipeline: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'pipeline',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Pipeline`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The pipeline the service moves through`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconTimelineEvent',
+      isNullable: false,
+      defaultValue: `'${SEEDED_PIPELINE_SELECT_OPTIONS.defaultPipelineValue}'`,
+      options: SEEDED_PIPELINE_SELECT_OPTIONS.pipelineOptions,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  stage: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'stage',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Stage`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Service stage`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconProgressCheck',
+      isNullable: false,
+      defaultValue: `'${SEEDED_PIPELINE_SELECT_OPTIONS.defaultStageValue}'`,
+      options: SEEDED_PIPELINE_SELECT_OPTIONS.stageOptions,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  stageHistory: {
+    ...createStandardRelationFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        type: FieldMetadataType.RELATION,
+        morphId: null,
+        fieldName: 'stageHistory',
+        label: i18nLabel(
+          msg({ message: `Stage history`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Every stage change of the service`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconTimelineEvent',
+        isNullable: true,
+        isUIEditable: false,
+        targetObjectName: 'serviceStageHistory',
+        targetFieldName: 'service',
+        settings: {
+          relationType: RelationType.ONE_TO_MANY,
+        },
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    isSystem: true,
+  },
+  recordSource: createStandardRecordSourceFieldFlatMetadata({
+    objectName,
+    workspaceId,
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,
     twentyStandardApplicationId,

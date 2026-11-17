@@ -51,6 +51,7 @@ import { RecordSharingMode } from 'src/engine/core-modules/record-share/enums/re
 import { ShareWithService } from 'src/engine/core-modules/record-share/services/share-with.service';
 import { type ShareWithInput } from 'src/engine/core-modules/record-share/types/share-with-input.type';
 import { resolveObjectSharing } from 'src/engine/core-modules/record-share/utils/resolve-object-sharing.util';
+import { isRecordSourceObjectName } from 'src/engine/core-modules/actor/utils/is-record-source-object-name.util';
 import { resolveShareWithToWrite } from 'src/engine/core-modules/record-share/utils/resolve-share-with-to-write.util';
 import { WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace-repository';
 import { RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config.type';
@@ -534,6 +535,9 @@ export class CommonCreateManyQueryRunnerService extends CommonBaseQueryRunnerSer
           flatFieldMetadataMaps,
         ),
       )
+      .map((record) =>
+        this.getRecordWithoutRecordSource(record, flatObjectMetadata),
+      )
       .map((record) => ({
         id: record.id,
         data: { ...record, deletedAt: null },
@@ -804,6 +808,20 @@ export class CommonCreateManyQueryRunnerService extends CommonBaseQueryRunnerSer
     }
 
     return recordWithoutCreatedByUpdate;
+  }
+
+  // The record source is set when a record is created, so an upsert that updates keeps it
+  private getRecordWithoutRecordSource<
+    TRecord extends Omit<PartialObjectRecordWithId, 'createdBy'>,
+  >(record: TRecord, flatObjectMetadata: FlatObjectMetadata): TRecord {
+    if (!isRecordSourceObjectName(flatObjectMetadata.nameSingular)) {
+      return record;
+    }
+
+    const { recordSource: _recordSource, ...recordWithoutRecordSource } =
+      record;
+
+    return recordWithoutRecordSource as TRecord;
   }
 
   protected override computeQueryComplexityV2(

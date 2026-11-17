@@ -33,6 +33,7 @@ import { buildMessageListMemberStandardFlatIndexMetadatas } from 'src/engine/wor
 import { buildOpportunityContactStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-opportunity-contact-standard-flat-index-metadata.util';
 import { buildOpportunityCollaboratorStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-opportunity-collaborator-standard-flat-index-metadata.util';
 import { buildOpportunityStageHistoryStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-opportunity-stage-history-standard-flat-index-metadata.util';
+import { buildServiceStageHistoryStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-service-stage-history-standard-flat-index-metadata.util';
 import { buildPipelineStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-pipeline-standard-flat-index-metadata.util';
 import { buildPipelineStageStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-pipeline-stage-standard-flat-index-metadata.util';
 import { buildMessageChannelMessageAssociationMessageFolderStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-message-channel-message-association-message-folder-standard-flat-index-metadata.util';
@@ -101,6 +102,7 @@ const STANDARD_FLAT_INDEX_METADATA_BUILDERS_BY_OBJECT_NAME = {
     buildOpportunityCollaboratorStandardFlatIndexMetadatas,
   opportunityStageHistory:
     buildOpportunityStageHistoryStandardFlatIndexMetadatas,
+  serviceStageHistory: buildServiceStageHistoryStandardFlatIndexMetadatas,
   pipeline: buildPipelineStandardFlatIndexMetadatas,
   pipelineStage: buildPipelineStageStandardFlatIndexMetadatas,
   message: buildMessageStandardFlatIndexMetadatas,

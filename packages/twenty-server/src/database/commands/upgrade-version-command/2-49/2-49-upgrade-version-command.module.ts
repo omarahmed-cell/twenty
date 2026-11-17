@@ -24,6 +24,9 @@ import { ProvisionPipelinesCommand } from 'src/database/commands/upgrade-version
 import { ProvisionDealStageHistoryCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794840628348-provision-deal-stage-history.command';
 import { ProvisionMeetingSourceAndLocationTypesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794853579951-provision-meeting-source-and-location-types.command';
 import { ProvisionPropertiesModuleCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794880490836-provision-properties-module.command';
+import { AddActorSourceValuesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794924166804-add-actor-source-values.command';
+import { ProvisionServicesPipelineCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794924198517-provision-services-pipeline.command';
+import { ProvisionRecordSourceCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794924282319-provision-record-source.command';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
@@ -67,6 +70,9 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionDealStageHistoryCommand,
     ProvisionMeetingSourceAndLocationTypesCommand,
     ProvisionPropertiesModuleCommand,
+    AddActorSourceValuesCommand,
+    ProvisionServicesPipelineCommand,
+    ProvisionRecordSourceCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

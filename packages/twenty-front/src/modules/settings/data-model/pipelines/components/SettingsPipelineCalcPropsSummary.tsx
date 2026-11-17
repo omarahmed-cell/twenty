@@ -1,9 +1,9 @@
 import { styled } from '@linaria/react';
 import { plural } from '@lingui/core/macro';
-import { countStageCalculatedProperties } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 import { type PipelineConfig } from '@/pipeline/types/PipelineConfig';
+import { countPipelineStageCalculatedProperties } from '@/settings/data-model/pipelines/utils/countPipelineStageCalculatedProperties';
 
 const StyledSummary = styled.div`
   color: ${themeCssVariables.font.color.tertiary};
@@ -17,7 +17,7 @@ type SettingsPipelineCalcPropsSummaryProps = {
 export const SettingsPipelineCalcPropsSummary = ({
   pipeline,
 }: SettingsPipelineCalcPropsSummaryProps) => {
-  const enabledCount = countStageCalculatedProperties(pipeline.stages);
+  const enabledCount = countPipelineStageCalculatedProperties(pipeline);
 
   return (
     <StyledSummary>

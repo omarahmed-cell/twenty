@@ -8,6 +8,54 @@ export const computeStandardServiceViewFields = (
   args: Omit<CreateStandardViewFieldArgs<'service'>, 'context'>,
 ): Record<string, FlatViewField> => {
   return {
+    servicesBoardName: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'servicesBoard',
+        viewFieldName: 'name',
+        fieldName: 'name',
+        position: 0,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    servicesBoardCompany: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'servicesBoard',
+        viewFieldName: 'company',
+        fieldName: 'company',
+        position: 1,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    servicesBoardCreatedBy: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'servicesBoard',
+        viewFieldName: 'createdBy',
+        fieldName: 'createdBy',
+        position: 2,
+        isVisible: true,
+        size: 150,
+      },
+    }),
+    servicesBoardCreatedAt: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'service',
+      context: {
+        viewName: 'servicesBoard',
+        viewFieldName: 'createdAt',
+        fieldName: 'createdAt',
+        position: 3,
+        isVisible: true,
+        size: 150,
+      },
+    }),
     allServicesName: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'service',

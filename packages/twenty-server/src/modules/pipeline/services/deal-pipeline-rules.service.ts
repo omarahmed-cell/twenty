@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { msg } from '@lingui/core/macro';
-import { isDefined } from 'twenty-shared/utils';
+import {
+  isDefined,
+  PIPELINE_OBJECT_DEFINITIONS,
+  type PipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 
 import {
   CommonQueryRunnerException,
@@ -35,7 +39,7 @@ type DealValues = {
   closeDate?: string | Date | null;
 };
 
-// The standard "updated" entry, so the override shows like any other change on the deal
+// The standard "updated" entry, so the override shows like any other change on the record
 const RECORD_UPDATED_TIMELINE_ACTIVITY_TYPE_UNIVERSAL_IDENTIFIER =
   '20202020-0d1a-4f0e-8a55-1c0a2f0a2c02';
 
@@ -48,7 +52,7 @@ const IGNORED_FIELD_NAMES = new Set([
   'position',
 ]);
 
-const toRefusal = (violation: DealRuleViolation) => {
+const toDealRefusal = (violation: DealRuleViolation) => {
   switch (violation.kind) {
     case 'STAGE_MOVE': {
       const { refusal } = violation;
@@ -115,6 +119,73 @@ const toRefusal = (violation: DealRuleViolation) => {
   }
 };
 
+// Same rules as deals, worded without the object so they read right on any pipeline object
+const toRecordRefusal = (violation: DealRuleViolation) => {
+  switch (violation.kind) {
+    case 'STAGE_MOVE': {
+      const { refusal } = violation;
+
+      switch (refusal.reason) {
+        case 'SKIP': {
+          const { fromLabel, toLabel } = refusal;
+          const nextAllowedLabel = refusal.nextAllowedLabel ?? '';
+
+          return {
+            message: `Can't skip from ${fromLabel} to ${toLabel}. Next allowed: ${nextAllowedLabel}.`,
+            userFriendlyMessage: msg`Can't skip from ${fromLabel} to ${toLabel}. Next allowed: ${nextAllowedLabel}.`,
+          };
+        }
+        case 'BACKWARD': {
+          const { fromLabel, toLabel } = refusal;
+
+          return {
+            message: `Can't move backward from ${fromLabel} to ${toLabel}. Only Super Admins can.`,
+            userFriendlyMessage: msg`Can't move backward from ${fromLabel} to ${toLabel}. Only Super Admins can.`,
+          };
+        }
+        case 'OUT_OF_CLOSED_STAGE': {
+          const { fromLabel, toLabel } = refusal;
+
+          return {
+            message: `Records in ${fromLabel} can't move to ${toLabel}. Only Super Admins can.`,
+            userFriendlyMessage: msg`Records in ${fromLabel} can't move to ${toLabel}. Only Super Admins can.`,
+          };
+        }
+      }
+    }
+    case 'CREATION_STAGE': {
+      const { pipelineName, stageLabel } = violation;
+      const allowedLabels = violation.allowedLabels.join(', ');
+
+      return {
+        message: `New records in ${pipelineName} can't start in ${stageLabel}. Allowed: ${allowedLabels}.`,
+        userFriendlyMessage: msg`New records in ${pipelineName} can't start in ${stageLabel}. Allowed: ${allowedLabels}.`,
+      };
+    }
+    case 'PIPELINE_CHANGE': {
+      const { pipelineName, stageLabel } = violation;
+
+      return {
+        message: `Only Super Admins can move a record into the ${pipelineName} pipeline at ${stageLabel}.`,
+        userFriendlyMessage: msg`Only Super Admins can move a record into the ${pipelineName} pipeline at ${stageLabel}.`,
+      };
+    }
+    case 'LOCKED': {
+      const { stageLabel } = violation;
+
+      return {
+        message: `Records in ${stageLabel} can only be edited by Super Admins.`,
+        userFriendlyMessage: msg`Records in ${stageLabel} can only be edited by Super Admins.`,
+      };
+    }
+    case 'CLOSE_DATE':
+      return {
+        message: 'Only Super Admins can change Close Date.',
+        userFriendlyMessage: msg`Only Super Admins can change Close Date.`,
+      };
+  }
+};
+
 const buildActorName = (authContext: WorkspaceAuthContext) => {
   if (authContext.type === 'user') {
     const { firstName, lastName } = authContext.workspaceMember.name ?? {};
@@ -130,7 +201,7 @@ const buildActorName = (authContext: WorkspaceAuthContext) => {
   return 'Twenty';
 };
 
-// The pipeline rules a non-Admin must follow on every deal write the query runners handle
+// The pipeline rules a non-Admin must follow on every pipeline record write the query runners handle
 @Injectable()
 export class DealPipelineRulesService {
   private readonly logger = new Logger(DealPipelineRulesService.name);
@@ -167,6 +238,7 @@ export class DealPipelineRulesService {
 
   async enforce({
     workspaceId,
+    objectNameSingular = 'opportunity',
     actor,
     isImport = false,
     operation,
@@ -177,6 +249,7 @@ export class DealPipelineRulesService {
     data,
   }: {
     workspaceId: string;
+    objectNameSingular?: PipelineObjectNameSingular;
     actor: DealRuleActor;
     isImport?: boolean;
     operation: 'create' | 'update' | 'delete';
@@ -198,7 +271,10 @@ export class DealPipelineRulesService {
     });
 
     if (evaluation.status === 'refused') {
-      const { message, userFriendlyMessage } = toRefusal(evaluation.violation);
+      const { message, userFriendlyMessage } =
+        objectNameSingular === 'opportunity'
+          ? toDealRefusal(evaluation.violation)
+          : toRecordRefusal(evaluation.violation);
 
       throw new CommonQueryRunnerException(
         message,
@@ -210,6 +286,7 @@ export class DealPipelineRulesService {
     if (evaluation.status === 'overridden' && isDefined(recordId)) {
       await this.recordOverrides({
         workspaceId,
+        objectNameSingular,
         recordId,
         actor,
         violations: evaluation.violations,
@@ -219,16 +296,20 @@ export class DealPipelineRulesService {
 
   private async recordOverrides({
     workspaceId,
+    objectNameSingular,
     recordId,
     actor,
     violations,
   }: {
     workspaceId: string;
+    objectNameSingular: PipelineObjectNameSingular;
     recordId: string;
     actor: DealRuleActor;
     violations: DealRuleViolation[];
   }) {
     const happensAt = new Date().toISOString();
+    const { timelineActivityTargetFieldName } =
+      PIPELINE_OBJECT_DEFINITIONS[objectNameSingular];
 
     try {
       const { flatTimelineActivityTypeMaps } =
@@ -256,7 +337,7 @@ export class DealPipelineRulesService {
             timelineActivityTypeId: resolvedType?.id ?? null,
             timelineActivityTypeSnapshot: resolvedType?.snapshot ?? null,
             workspaceMemberId: actor.workspaceMemberId,
-            targetOpportunityId: recordId,
+            [`${timelineActivityTargetFieldName}Id`]: recordId,
             properties: {
               pipelineRuleOverride: describeDealRuleOverride({
                 violation,
@@ -269,7 +350,7 @@ export class DealPipelineRulesService {
     } catch (error) {
       // The write the Admin asked for still goes through; only its trace is lost
       this.logger.error(
-        `Could not record a pipeline rule override on deal ${recordId}: ${error}`,
+        `Could not record a pipeline rule override on ${objectNameSingular} ${recordId}: ${error}`,
       );
     }
   }

@@ -7,8 +7,12 @@ import {
   buildPipelineKey,
   buildPipelineStageValue,
   isDefined,
+  isPipelineObjectNameSingular,
   normalizeConditionalLogicRules,
   normalizePipelineRules,
+  PIPELINE_OBJECT_DEFINITIONS,
+  type PipelineObjectNameSingular,
+  STAGE_CALCULATED_PROPERTY_KINDS,
 } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
@@ -34,6 +38,32 @@ const badRequest = (
     { userFriendlyMessage },
   );
 
+const toPipelineObjectNameSingular = (
+  objectNameSingular: unknown,
+): PipelineObjectNameSingular =>
+  isPipelineObjectNameSingular(objectNameSingular as string | undefined)
+    ? (objectNameSingular as PipelineObjectNameSingular)
+    : 'opportunity';
+
+const groupByObject = <TRow extends { objectNameSingular?: string }>(
+  rows: TRow[],
+): Map<PipelineObjectNameSingular, TRow[]> => {
+  const rowsByObject = new Map<PipelineObjectNameSingular, TRow[]>();
+
+  for (const row of rows) {
+    const objectNameSingular = toPipelineObjectNameSingular(
+      row.objectNameSingular,
+    );
+
+    rowsByObject.set(objectNameSingular, [
+      ...(rowsByObject.get(objectNameSingular) ?? []),
+      row,
+    ]);
+  }
+
+  return rowsByObject;
+};
+
 const assertValidProbability = (data: RecordData) => {
   if (!('probability' in data)) {
     return;
@@ -54,6 +84,46 @@ const assertValidProbability = (data: RecordData) => {
   throw badRequest(
     `Invalid stage probability ${String(probability)}`,
     msg`A stage probability is a whole number from 0 to 100, or blank.`,
+  );
+};
+
+const assertValidStageCalculatedPropertyKinds = (data: RecordData) => {
+  if (!('stageCalculatedPropertyKinds' in data)) {
+    return;
+  }
+
+  const kinds = data.stageCalculatedPropertyKinds;
+
+  if (
+    kinds === null ||
+    (Array.isArray(kinds) &&
+      kinds.every((kind) =>
+        (STAGE_CALCULATED_PROPERTY_KINDS as readonly unknown[]).includes(kind),
+      ))
+  ) {
+    return;
+  }
+
+  throw badRequest(
+    `Invalid stage calculated property kinds ${JSON.stringify(kinds)}`,
+    msg`Stage calculated properties must be a list of known kinds.`,
+  );
+};
+
+const assertProbabilityAllowed = (
+  data: RecordData,
+  objectNameSingular: PipelineObjectNameSingular,
+) => {
+  if (
+    !isDefined(data.probability) ||
+    PIPELINE_OBJECT_DEFINITIONS[objectNameSingular].hasStageProbability
+  ) {
+    return;
+  }
+
+  throw badRequest(
+    `Stages of a ${objectNameSingular} pipeline have no probability`,
+    msg`Stages of this pipeline have no probability. Leave it blank.`,
   );
 };
 
@@ -84,6 +154,18 @@ export class PipelineWriteGuardService {
     );
 
     return records.map((record) => {
+      if (
+        isNonEmptyString(record.objectNameSingular) &&
+        !isPipelineObjectNameSingular(record.objectNameSingular)
+      ) {
+        throw badRequest(
+          `Pipelines are not available on ${String(record.objectNameSingular)}`,
+          msg`Pipelines are only available on deals and services.`,
+        );
+      }
+
+      assertValidStageCalculatedPropertyKinds(record);
+
       const key = buildPipelineKey(
         isNonEmptyString(record.name) ? record.name : 'New pipeline',
         takenKeys,
@@ -94,9 +176,9 @@ export class PipelineWriteGuardService {
       return {
         ...record,
         key,
-        objectNameSingular: isNonEmptyString(record.objectNameSingular)
-          ? record.objectNameSingular
-          : 'opportunity',
+        objectNameSingular: toPipelineObjectNameSingular(
+          record.objectNameSingular,
+        ),
         rules: normalizePipelineRules(record.rules),
       };
     });
@@ -115,6 +197,8 @@ export class PipelineWriteGuardService {
       );
     }
 
+    assertValidStageCalculatedPropertyKinds(data);
+
     return 'rules' in data
       ? { ...data, rules: normalizePipelineRules(data.rules) }
       : data;
@@ -132,7 +216,7 @@ export class PipelineWriteGuardService {
       'pipelineStage',
       'value',
     );
-    const pipelineKeyById = await this.getPipelineKeyById(
+    const pipelineById = await this.getPipelineById(
       workspaceId,
       records.map((record) => record.pipelineId).filter(isNonEmptyString),
     );
@@ -140,19 +224,21 @@ export class PipelineWriteGuardService {
     return records.map((record) => {
       assertValidProbability(record);
 
-      const pipelineKey = isNonEmptyString(record.pipelineId)
-        ? pipelineKeyById.get(record.pipelineId)
+      const pipeline = isNonEmptyString(record.pipelineId)
+        ? pipelineById.get(record.pipelineId)
         : undefined;
 
-      if (!isDefined(pipelineKey)) {
+      if (!isDefined(pipeline)) {
         throw badRequest(
           'A stage needs an existing pipeline',
           msg`A stage must belong to an existing pipeline.`,
         );
       }
 
+      assertProbabilityAllowed(record, pipeline.objectNameSingular);
+
       const value = buildPipelineStageValue({
-        pipelineKey,
+        pipelineKey: pipeline.key,
         label: isNonEmptyString(record.label) ? record.label : 'New stage',
         existingValues: takenValues,
       });
@@ -173,6 +259,7 @@ export class PipelineWriteGuardService {
   async preparePipelineStageUpdate(
     authContext: WorkspaceAuthContext,
     data: RecordData,
+    target?: { id?: string; filter?: unknown },
   ): Promise<RecordData> {
     await this.assertCanEdit(authContext);
 
@@ -184,6 +271,20 @@ export class PipelineWriteGuardService {
     }
 
     assertValidProbability(data);
+
+    const stageId = target?.id;
+    const stageIds = isNonEmptyString(stageId)
+      ? [stageId]
+      : extractRecordIdsFromFilter(target?.filter);
+
+    if (isDefined(data.probability) && isDefined(stageIds)) {
+      for (const objectNameSingular of await this.getStageObjectNames(
+        authContext.workspace.id,
+        stageIds,
+      )) {
+        assertProbabilityAllowed(data, objectNameSingular);
+      }
+    }
 
     return 'conditionalRules' in data
       ? {
@@ -203,20 +304,32 @@ export class PipelineWriteGuardService {
 
     const workspaceId = authContext.workspace.id;
     const ids = this.resolveIds(filterOrId);
-    const keys: { key: string }[] = await this.coreDataSource.query(
-      `SELECT "key" FROM "${getWorkspaceSchemaName(workspaceId)}"."pipeline" WHERE "id" = ANY($1::uuid[])`,
-      [ids],
-    );
-    const dealCount = await this.pipelineConfigService.countDealsUsing({
-      workspaceId,
-      pipelineKeys: keys.map(({ key }) => key),
-    });
-
-    if (dealCount > 0) {
-      throw badRequest(
-        `${dealCount} deals use this pipeline`,
-        msg`${dealCount} deal(s) use this pipeline. Move them to another pipeline before deleting it.`,
+    const keys: { key: string; objectNameSingular?: string }[] =
+      await this.coreDataSource.query(
+        `SELECT "key", "objectNameSingular" FROM "${getWorkspaceSchemaName(workspaceId)}"."pipeline" WHERE "id" = ANY($1::uuid[])`,
+        [ids],
       );
+
+    for (const [objectNameSingular, rows] of groupByObject(keys)) {
+      const recordCount = await this.pipelineConfigService.countDealsUsing({
+        workspaceId,
+        objectNameSingular,
+        pipelineKeys: rows.map(({ key }) => key),
+      });
+
+      if (recordCount === 0) {
+        continue;
+      }
+
+      throw objectNameSingular === 'opportunity'
+        ? badRequest(
+            `${recordCount} deals use this pipeline`,
+            msg`${recordCount} deal(s) use this pipeline. Move them to another pipeline before deleting it.`,
+          )
+        : badRequest(
+            `${recordCount} records use this pipeline`,
+            msg`${recordCount} record(s) use this pipeline. Move them to another pipeline before deleting it.`,
+          );
     }
   }
 
@@ -228,20 +341,36 @@ export class PipelineWriteGuardService {
 
     const workspaceId = authContext.workspace.id;
     const ids = this.resolveIds(filterOrId);
-    const values: { value: string }[] = await this.coreDataSource.query(
-      `SELECT "value" FROM "${getWorkspaceSchemaName(workspaceId)}"."pipelineStage" WHERE "id" = ANY($1::uuid[])`,
-      [ids],
-    );
-    const dealCount = await this.pipelineConfigService.countDealsUsing({
-      workspaceId,
-      stageValues: values.map(({ value }) => value),
-    });
-
-    if (dealCount > 0) {
-      throw badRequest(
-        `${dealCount} deals are in this stage`,
-        msg`${dealCount} deal(s) are in this stage. Move them to another stage before deleting it.`,
+    const schema = getWorkspaceSchemaName(workspaceId);
+    const values: { value: string; objectNameSingular?: string }[] =
+      await this.coreDataSource.query(
+        `SELECT "stage"."value", "pipeline"."objectNameSingular"
+        FROM "${schema}"."pipelineStage" "stage"
+        LEFT JOIN "${schema}"."pipeline" "pipeline" ON "pipeline"."id" = "stage"."pipelineId"
+        WHERE "stage"."id" = ANY($1::uuid[])`,
+        [ids],
       );
+
+    for (const [objectNameSingular, rows] of groupByObject(values)) {
+      const recordCount = await this.pipelineConfigService.countDealsUsing({
+        workspaceId,
+        objectNameSingular,
+        stageValues: rows.map(({ value }) => value),
+      });
+
+      if (recordCount === 0) {
+        continue;
+      }
+
+      throw objectNameSingular === 'opportunity'
+        ? badRequest(
+            `${recordCount} deals are in this stage`,
+            msg`${recordCount} deal(s) are in this stage. Move them to another stage before deleting it.`,
+          )
+        : badRequest(
+            `${recordCount} records are in this stage`,
+            msg`${recordCount} record(s) are in this stage. Move them to another stage before deleting it.`,
+          );
     }
   }
 
@@ -274,17 +403,48 @@ export class PipelineWriteGuardService {
     return rows.map((row) => row[columnName]);
   }
 
-  private async getPipelineKeyById(workspaceId: string, ids: string[]) {
+  private async getPipelineById(workspaceId: string, ids: string[]) {
     if (ids.length === 0) {
-      return new Map<string, string>();
+      return new Map<
+        string,
+        { key: string; objectNameSingular: PipelineObjectNameSingular }
+      >();
     }
 
-    const rows: { id: string; key: string }[] = await this.coreDataSource.query(
-      `SELECT "id", "key" FROM "${getWorkspaceSchemaName(workspaceId)}"."pipeline"
-      WHERE "id" = ANY($1::uuid[]) AND "deletedAt" IS NULL`,
-      [ids],
-    );
+    const rows: { id: string; key: string; objectNameSingular?: string }[] =
+      await this.coreDataSource.query(
+        `SELECT "id", "key", "objectNameSingular" FROM "${getWorkspaceSchemaName(workspaceId)}"."pipeline"
+        WHERE "id" = ANY($1::uuid[]) AND "deletedAt" IS NULL`,
+        [ids],
+      );
 
-    return new Map(rows.map(({ id, key }) => [id, key]));
+    return new Map(
+      rows.map(({ id, key, objectNameSingular }) => [
+        id,
+        {
+          key,
+          objectNameSingular: toPipelineObjectNameSingular(objectNameSingular),
+        },
+      ]),
+    );
+  }
+
+  private async getStageObjectNames(
+    workspaceId: string,
+    stageIds: string[],
+  ): Promise<PipelineObjectNameSingular[]> {
+    const schema = getWorkspaceSchemaName(workspaceId);
+    const rows: { objectNameSingular?: string }[] =
+      await this.coreDataSource.query(
+        `SELECT DISTINCT "pipeline"."objectNameSingular"
+        FROM "${schema}"."pipelineStage" "stage"
+        JOIN "${schema}"."pipeline" "pipeline" ON "pipeline"."id" = "stage"."pipelineId"
+        WHERE "stage"."id" = ANY($1::uuid[])`,
+        [stageIds],
+      );
+
+    return rows.map(({ objectNameSingular }) =>
+      toPipelineObjectNameSingular(objectNameSingular),
+    );
   }
 }

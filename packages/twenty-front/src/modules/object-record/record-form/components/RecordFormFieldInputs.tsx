@@ -22,8 +22,7 @@ import {
 import { type ValidationRuleViolation } from '@/validation-rules/types/ValidationRuleViolation';
 import { styled } from '@linaria/react';
 import { isString } from '@sniptt/guards';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isPipelineObjectNameSingular } from 'twenty-shared/utils';
 import { type JsonValue } from 'type-fest';
 import { Field } from 'twenty-ui/primitives/input';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -55,12 +54,16 @@ export const RecordFormFieldInputs = ({
   onFieldValueChange,
   onFieldValueClear,
 }: RecordFormFieldInputsProps) => {
-  const isDealForm =
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.Opportunity;
+  const isDealForm = isPipelineObjectNameSingular(
+    objectMetadataItem.nameSingular,
+  );
 
-  const pipelines = useDealStagePipelineConfigs({ enabled: isDealForm });
+  const pipelines = useDealStagePipelineConfigs({
+    enabled: isDealForm,
+    objectNameSingular: objectMetadataItem.nameSingular,
+  });
 
-  // A deal created without a pipeline lands in the first one, so its stages show until another is picked
+  // A deal or service created without a pipeline lands in the first one, so its stages show until another is picked
   const draftPipelineKey = isString(draftRecord[DEAL_PIPELINE_FIELD_NAME])
     ? draftRecord[DEAL_PIPELINE_FIELD_NAME]
     : pipelines[0]?.key;

@@ -99,8 +99,11 @@ export const RecordBoardContainer = ({
       >
         {isPipelineBoard ? (
           <StyledPipelineBoardContainer>
-            <PipelineBoardScopeEffect />
-            <PipelineBoardSwitcher recordBoardId={recordBoardId} />
+            <PipelineBoardScopeEffect objectNameSingular={objectNameSingular} />
+            <PipelineBoardSwitcher
+              recordBoardId={recordBoardId}
+              objectNameSingular={objectNameSingular}
+            />
             <StyledPipelineBoardContent>
               <RecordBoard />
             </StyledPipelineBoardContent>

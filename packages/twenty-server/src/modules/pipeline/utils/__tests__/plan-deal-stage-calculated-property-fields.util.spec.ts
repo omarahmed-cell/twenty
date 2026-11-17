@@ -1,3 +1,5 @@
+import { type StageCalculatedPropertyKind } from 'twenty-shared/utils';
+
 import {
   buildStageCalculatedPropertyFieldSpecs,
   isStageCalculatedPropertyFieldName,
@@ -127,5 +129,65 @@ describe('planDealStageCalculatedPropertyFields', () => {
     expect(
       isStageCalculatedPropertyFieldName('dateEnteredSalesClosing', new Set()),
     ).toBe(true);
+  });
+});
+
+describe('planDealStageCalculatedPropertyFields per pipeline kinds', () => {
+  const kickOff = (kinds?: StageCalculatedPropertyKind[]) => ({
+    value: 'ONBOARDING_KICK_OFF',
+    label: 'Kick-off',
+    pipelineName: 'Onboarding Pipeline',
+    calcPropsEnabled: true,
+    kinds,
+  });
+
+  it('generates only the kinds checked on the pipeline', () => {
+    const plan = planDealStageCalculatedPropertyFields({
+      stages: [kickOff(['dateEntered', 'dateExited'])],
+      existingFields: [],
+    });
+
+    expect(plan.toCreate.map(({ name }) => name)).toEqual([
+      'dateEnteredOnboardingKickOff',
+      'dateExitedOnboardingKickOff',
+    ]);
+  });
+
+  it('removes the fields of a kind unchecked on the pipeline', () => {
+    const existingFields = buildStageCalculatedPropertyFieldSpecs({
+      stageValue: 'ONBOARDING_KICK_OFF',
+      stageLabel: 'Kick-off',
+      pipelineName: 'Onboarding Pipeline',
+      kinds: ['dateEntered', 'dateExited'],
+    }).map((spec, index) => ({
+      id: `field-${index}`,
+      name: spec.name,
+      label: spec.label,
+      isActive: true,
+    }));
+
+    const plan = planDealStageCalculatedPropertyFields({
+      stages: [kickOff(['dateEntered'])],
+      existingFields,
+    });
+
+    expect(plan.toCreate).toEqual([]);
+    expect(plan.toDelete.map(({ name }) => name)).toEqual([
+      'dateExitedOnboardingKickOff',
+    ]);
+  });
+
+  it('keeps generating all four kinds for a pipeline without the setting, like deals', () => {
+    const plan = planDealStageCalculatedPropertyFields({
+      stages: [discovery()],
+      existingFields: [],
+    });
+
+    expect(plan.toCreate.map(({ kind }) => kind)).toEqual([
+      'dateEntered',
+      'dateExited',
+      'cumulativeTimeIn',
+      'latestTimeIn',
+    ]);
   });
 });

@@ -35,6 +35,7 @@ import { buildMessageListMemberStandardFlatFieldMetadatas } from 'src/engine/wor
 import { buildOpportunityContactStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-contact-standard-flat-field-metadata.util';
 import { buildOpportunityCollaboratorStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-collaborator-standard-flat-field-metadata.util';
 import { buildOpportunityStageHistoryStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-opportunity-stage-history-standard-flat-field-metadata.util';
+import { buildServiceStageHistoryStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-service-stage-history-standard-flat-field-metadata.util';
 import { buildPipelineStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-pipeline-standard-flat-field-metadata.util';
 import { buildPipelineStageStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-pipeline-stage-standard-flat-field-metadata.util';
 import { buildPropertyGroupStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-group-standard-flat-field-metadata.util';
@@ -108,6 +109,7 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
     buildOpportunityCollaboratorStandardFlatFieldMetadatas,
   opportunityStageHistory:
     buildOpportunityStageHistoryStandardFlatFieldMetadatas,
+  serviceStageHistory: buildServiceStageHistoryStandardFlatFieldMetadatas,
   pipeline: buildPipelineStandardFlatFieldMetadatas,
   pipelineStage: buildPipelineStageStandardFlatFieldMetadatas,
   propertyGroup: buildPropertyGroupStandardFlatFieldMetadatas,

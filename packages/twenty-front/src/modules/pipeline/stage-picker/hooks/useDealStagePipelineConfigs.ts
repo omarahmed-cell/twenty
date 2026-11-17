@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 
 import { ApolloCoreClientContext } from '@/object-metadata/contexts/ApolloCoreClientContext';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
@@ -19,7 +19,7 @@ const REFRESH_INTERVAL_MILLISECONDS = 15_000;
 let lastLoadStartedAt = 0;
 
 // Safe anywhere: it reads nothing until the pipeline objects exist, so other objects and older workspaces are untouched
-export const useDealStagePipelineConfigs = ({
+export const useAllStagePipelineConfigs = ({
   enabled,
 }: {
   enabled: boolean;
@@ -63,10 +63,7 @@ export const useDealStagePipelineConfigs = ({
               data?.pipelines?.edges.map(({ node }) => node) ?? [],
             pipelineStageRecords:
               data?.pipelineStages?.edges.map(({ node }) => node) ?? [],
-          }).filter(
-            ({ objectNameSingular }) =>
-              objectNameSingular === CoreObjectNameSingular.Opportunity,
-          ),
+          }),
         );
       })
       .catch(() => {
@@ -75,4 +72,22 @@ export const useDealStagePipelineConfigs = ({
   }, [canLoad, apolloCoreClient, setDealPipelineConfigs]);
 
   return dealPipelineConfigs;
+};
+
+export const useDealStagePipelineConfigs = ({
+  enabled,
+  objectNameSingular = CoreObjectNameSingular.Opportunity,
+}: {
+  enabled: boolean;
+  objectNameSingular?: string;
+}) => {
+  const allPipelineConfigs = useAllStagePipelineConfigs({ enabled });
+
+  return useMemo(
+    () =>
+      allPipelineConfigs.filter(
+        (pipeline) => pipeline.objectNameSingular === objectNameSingular,
+      ),
+    [allPipelineConfigs, objectNameSingular],
+  );
 };

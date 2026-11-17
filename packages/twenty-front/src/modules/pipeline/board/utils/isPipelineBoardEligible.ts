@@ -1,8 +1,8 @@
-import { CoreObjectNameSingular } from 'twenty-shared/types';
+import { isPipelineObjectNameSingular } from 'twenty-shared/utils';
 
 export const PIPELINE_BOARD_GROUP_FIELD_NAME = 'stage';
 
-// Only deal boards grouped by Deal Stage get the pipeline switcher
+// Only deal and service boards grouped by their Stage get the pipeline switcher
 export const isPipelineBoardEligible = ({
   objectNameSingular,
   groupFieldName,
@@ -10,5 +10,5 @@ export const isPipelineBoardEligible = ({
   objectNameSingular: string | undefined;
   groupFieldName: string | undefined;
 }) =>
-  objectNameSingular === CoreObjectNameSingular.Opportunity &&
+  isPipelineObjectNameSingular(objectNameSingular) &&
   groupFieldName === PIPELINE_BOARD_GROUP_FIELD_NAME;

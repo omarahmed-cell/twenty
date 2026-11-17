@@ -10,8 +10,8 @@ import { getRelationConnectSubFieldKey } from '@/object-record/spreadsheet-impor
 import { getCompositeSubFieldKey } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetCompositeSubFieldKey';
 import { getCompositeSubFieldLabelWithFieldLabel } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetCompositeSubFieldLabelWithFieldLabel';
 import { getRelationConnectSubFieldLabel } from '@/object-record/spreadsheet-import/utils/spreadsheetImportGetRelationConnectSubFieldLabel';
-import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
-import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
+import { useAllStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
+import { getStageFieldPipelineObjectNameSingular } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { getStageOptionsWithPipelineLabels } from '@/pipeline/stage-picker/utils/getStageOptionsForPipeline';
 import { SETTINGS_COMPOSITE_FIELD_TYPE_CONFIGS } from '@/settings/data-model/constants/SettingsCompositeFieldTypeConfigs';
 import { type CompositeFieldType } from '@/settings/data-model/types/CompositeFieldType';
@@ -41,7 +41,22 @@ const getSourceLocaleAlternateMatches = ({
 export const useBuildSpreadsheetImportFields = () => {
   const { getIcon } = useIcons();
   const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
-  const pipelines = useDealStagePipelineConfigs({ enabled: true });
+  const allPipelines = useAllStagePipelineConfigs({ enabled: true });
+
+  const getStageOptionsWithLabels = (fieldMetadataItem: FieldMetadataItem) => {
+    const stagePipelineObjectNameSingular =
+      getStageFieldPipelineObjectNameSingular(fieldMetadataItem);
+
+    return isDefined(stagePipelineObjectNameSingular)
+      ? getStageOptionsWithPipelineLabels({
+          options: fieldMetadataItem.options ?? [],
+          pipelines: allPipelines.filter(
+            ({ objectNameSingular }) =>
+              objectNameSingular === stagePipelineObjectNameSingular,
+          ),
+        })
+      : fieldMetadataItem.options;
+  };
 
   const buildSpreadsheetImportFields = (
     fieldMetadataItems: FieldMetadataItem[],
@@ -257,13 +272,7 @@ export const useBuildSpreadsheetImportFields = () => {
       fieldType: {
         type: isMulti ? 'multiSelect' : 'select',
         options:
-          (isDealStageFieldMetadataItem(fieldMetadataItem)
-            ? getStageOptionsWithPipelineLabels({
-                options: fieldMetadataItem.options ?? [],
-                pipelines,
-              })
-            : fieldMetadataItem.options
-          )?.map((option) => ({
+          getStageOptionsWithLabels(fieldMetadataItem)?.map((option) => ({
             label: option.label,
             value: option.value,
             color: option.color,

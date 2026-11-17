@@ -7,6 +7,7 @@ import {
   isDefined,
   normalizeConditionalLogicRules,
   normalizePipelineRules,
+  normalizeStageCalculatedPropertyKinds,
 } from 'twenty-shared/utils';
 
 const byPosition = (
@@ -46,6 +47,9 @@ export const buildPipelineConfigs = ({
       position: record.position ?? 0,
       objectNameSingular: record.objectNameSingular ?? 'opportunity',
       rules: normalizePipelineRules(record.rules),
+      stageCalculatedPropertyKinds: normalizeStageCalculatedPropertyKinds(
+        record.stageCalculatedPropertyKinds,
+      ),
       stages: stages
         .filter((stage) => stage.pipelineId === record.id)
         .sort(byPosition),

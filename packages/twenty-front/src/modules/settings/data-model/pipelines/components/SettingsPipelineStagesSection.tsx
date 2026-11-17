@@ -1,7 +1,13 @@
 import { styled } from '@linaria/react';
+import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
-import { type ConditionalLogicRule, isDefined } from 'twenty-shared/utils';
+import {
+  type ConditionalLogicRule,
+  isDefined,
+  isPipelineObjectNameSingular,
+  PIPELINE_OBJECT_DEFINITIONS,
+} from 'twenty-shared/utils';
 import { LightButton } from 'twenty-ui/components/input';
 import { Section } from 'twenty-ui/components/layout';
 import { IconPlus } from 'twenty-ui/icon';
@@ -15,6 +21,8 @@ import { SettingsPipelineStageRow } from '@/settings/data-model/pipelines/compon
 import { SettingsPipelineStageConditionalLogicModal } from '@/settings/data-model/pipelines/conditional-logic/components/SettingsPipelineStageConditionalLogicModal';
 import { createConditionalLogicRuleDraft } from '@/settings/data-model/conditional-logic/utils/conditionalLogicRuleDraft';
 import { SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineStagesTableGridTemplateColumns';
+import { SETTINGS_PIPELINE_STAGES_WITHOUT_PROBABILITY_TABLE_GRID_TEMPLATE_COLUMNS } from '@/settings/data-model/pipelines/constants/SettingsPipelineStagesWithoutProbabilityTableGridTemplateColumns';
+import { STAGE_CALCULATED_PROPERTY_KIND_LABELS } from '@/settings/data-model/pipelines/constants/StageCalculatedPropertyKindLabels';
 import { useSettingsPipelineActions } from '@/settings/data-model/pipelines/hooks/useSettingsPipelineActions';
 import { computeReorderedPositions } from '@/settings/data-model/pipelines/utils/computeReorderedPositions';
 import { getNextPipelinePosition } from '@/settings/data-model/pipelines/utils/getNextPipelinePosition';
@@ -129,22 +137,40 @@ export const SettingsPipelineStagesSection = ({
 
   const stageToDeleteLabel = stageToDelete?.label ?? '';
 
+  const hasStageProbability = isPipelineObjectNameSingular(
+    pipeline.objectNameSingular,
+  )
+    ? PIPELINE_OBJECT_DEFINITIONS[pipeline.objectNameSingular]
+        .hasStageProbability
+    : true;
+
+  const calcPropsFieldCount = pipeline.stageCalculatedPropertyKinds.length;
+  const calcPropsKindLabels = pipeline.stageCalculatedPropertyKinds
+    .map((kind) => t(STAGE_CALCULATED_PROPERTY_KIND_LABELS[kind]))
+    .join(', ');
+
   return (
     <Section.Root>
       <Section.Header
         title={t`Stages`}
-        description={t`Drag stages to reorder them. 100% probability means won, 0% means lost.`}
+        description={
+          hasStageProbability
+            ? t`Drag stages to reorder them. 100% probability means won, 0% means lost.`
+            : t`Drag stages to reorder them.`
+        }
       />
       <Table>
         <TableRow
           gridTemplateColumns={
-            SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS
+            hasStageProbability
+              ? SETTINGS_PIPELINE_STAGES_TABLE_GRID_TEMPLATE_COLUMNS
+              : SETTINGS_PIPELINE_STAGES_WITHOUT_PROBABILITY_TABLE_GRID_TEMPLATE_COLUMNS
           }
         >
           <TableHeader />
           <TableHeader />
           <TableHeader>{t`Stage name`}</TableHeader>
-          <TableHeader>{t`Probability`}</TableHeader>
+          {hasStageProbability && <TableHeader>{t`Probability`}</TableHeader>}
           <TableHeader>{t`Conditional logic`}</TableHeader>
           <TableHeader align="right">{t`Pipeline rules`}</TableHeader>
           <TableHeader align="center">{t`Stage calculated properties`}</TableHeader>
@@ -162,6 +188,8 @@ export const SettingsPipelineStagesSection = ({
                   itemComponent={
                     <SettingsPipelineStageRow
                       stage={stage}
+                      objectNameSingular={pipeline.objectNameSingular}
+                      hasStageProbability={hasStageProbability}
                       rules={pipeline.rules}
                       isOnlyStage={pipeline.stages.length === 1}
                       onUpdate={(input) => updatePipelineStage(stage.id, input)}
@@ -216,7 +244,10 @@ export const SettingsPipelineStagesSection = ({
       <ConfirmationDialog
         dialogId={ENABLE_CALC_PROPS_DIALOG_ID}
         title={t`Turn on stage calculated properties`}
-        subtitle={t`Creates 4 fields for this stage.`}
+        subtitle={plural(calcPropsFieldCount, {
+          one: `Creates # field for this stage: ${calcPropsKindLabels}.`,
+          other: `Creates # fields for this stage: ${calcPropsKindLabels}.`,
+        })}
         onConfirmClick={handleConfirmEnableCalcProps}
         onClose={() => setStageToEnableCalcProps(null)}
         confirmButtonText={t`Turn on`}

@@ -319,6 +319,16 @@ export {
   PIPELINE_COPY_SUFFIX,
 } from './pipeline/pipeline-config';
 export type {
+  PipelineObjectNameSingular,
+  PipelineObjectDefinition,
+} from './pipeline/pipeline-objects';
+export {
+  PIPELINE_OBJECT_DEFINITIONS,
+  PIPELINE_OBJECT_NAMES,
+  isPipelineObjectNameSingular,
+  normalizeStageCalculatedPropertyKinds,
+} from './pipeline/pipeline-objects';
+export type {
   PipelineRuleStage,
   DealStageMoveRefusal,
 } from './pipeline/pipeline-rules';

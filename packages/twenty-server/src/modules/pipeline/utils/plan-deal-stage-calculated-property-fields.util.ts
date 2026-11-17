@@ -47,31 +47,36 @@ export const buildStageCalculatedPropertyFieldSpecs = ({
   stageValue,
   stageLabel,
   pipelineName,
+  kinds = STAGE_CALCULATED_PROPERTY_KINDS,
 }: {
   stageValue: string;
   stageLabel: string;
   pipelineName: string;
+  kinds?: readonly StageCalculatedPropertyKind[];
 }): StageCalculatedPropertyFieldSpec[] =>
-  STAGE_CALCULATED_PROPERTY_KINDS.map((kind) => ({
-    name: buildStageCalculatedPropertyFieldName(kind, stageValue),
-    label: buildStageCalculatedPropertyLabel({
+  STAGE_CALCULATED_PROPERTY_KINDS.filter((kind) => kinds.includes(kind)).map(
+    (kind) => ({
+      name: buildStageCalculatedPropertyFieldName(kind, stageValue),
+      label: buildStageCalculatedPropertyLabel({
+        kind,
+        stageLabel,
+        pipelineName,
+      }),
+      type:
+        kind === 'dateEntered' || kind === 'dateExited'
+          ? FieldMetadataType.DATE_TIME
+          : FieldMetadataType.NUMBER,
       kind,
-      stageLabel,
-      pipelineName,
+      stageValue,
+      universalIdentifier: v5(
+        `${stageValue}:${kind}`,
+        STAGE_CALCULATED_PROPERTY_NAMESPACE,
+      ),
     }),
-    type:
-      kind === 'dateEntered' || kind === 'dateExited'
-        ? FieldMetadataType.DATE_TIME
-        : FieldMetadataType.NUMBER,
-    kind,
-    stageValue,
-    universalIdentifier: v5(
-      `${stageValue}:${kind}`,
-      STAGE_CALCULATED_PROPERTY_NAMESPACE,
-    ),
-  }));
+  );
 
-// Toggle ON creates or reactivates, OFF deactivates and keeps data, a removed stage loses its fields
+// Toggle ON creates or reactivates, OFF deactivates and keeps data; a removed stage or an unchecked
+// kind loses its fields. Stages without kinds generate every kind
 export const planDealStageCalculatedPropertyFields = ({
   stages,
   existingFields,
@@ -81,6 +86,7 @@ export const planDealStageCalculatedPropertyFields = ({
     label: string;
     pipelineName: string;
     calcPropsEnabled: boolean;
+    kinds?: readonly StageCalculatedPropertyKind[];
   }[];
   existingFields: ExistingStageCalculatedPropertyField[];
 }): DealStageCalculatedPropertyFieldsPlan => {
@@ -102,6 +108,7 @@ export const planDealStageCalculatedPropertyFields = ({
       stageValue: stage.value,
       stageLabel: stage.label,
       pipelineName: stage.pipelineName,
+      kinds: stage.kinds,
     })) {
       const existing = existingByName.get(spec.name);
 

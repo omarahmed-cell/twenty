@@ -15,19 +15,24 @@ type StageOption = {
 
 export const useDealStageRuleOptions = <TOption extends StageOption>({
   isDealStage,
+  objectNameSingular,
   options,
   pipelineKey,
   currentStageValue,
   isCreate,
 }: {
   isDealStage: boolean;
+  objectNameSingular?: string | null;
   options: TOption[];
   pipelineKey: string | null | undefined;
   currentStageValue: string | null | undefined;
   isCreate: boolean;
 }): TOption[] => {
   const isAdmin = useIsPipelineAdmin({ skip: !isDealStage });
-  const pipelines = useDealStagePipelineConfigs({ enabled: isDealStage });
+  const pipelines = useDealStagePipelineConfigs({
+    enabled: isDealStage,
+    objectNameSingular: objectNameSingular ?? undefined,
+  });
 
   return useMemo(() => {
     if (!isDealStage || isAdmin) {

@@ -12,6 +12,7 @@ import {
 } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
+import { isPipelineObjectNameSingular } from 'twenty-shared/utils';
 
 // A deal in a locked stage is read-only for everyone but Admins; activities on it stay open
 export const useDealRecordLock = ({
@@ -21,10 +22,13 @@ export const useDealRecordLock = ({
   objectNameSingular: string | undefined;
   recordId: string;
 }): { isLocked: boolean; lockReason: string | null } => {
-  const isDeal = objectNameSingular === CoreObjectNameSingular.Opportunity;
+  const isDeal = isPipelineObjectNameSingular(objectNameSingular);
 
   const isAdmin = useIsPipelineAdmin({ skip: !isDeal });
-  const pipelines = useDealStagePipelineConfigs({ enabled: isDeal });
+  const pipelines = useDealStagePipelineConfigs({
+    enabled: isDeal,
+    objectNameSingular: objectNameSingular ?? undefined,
+  });
 
   const stageValue = useAtomFamilySelectorValue(recordStoreFamilySelector, {
     recordId,
@@ -55,6 +59,9 @@ export const useDealRecordLock = ({
 
   return {
     isLocked: true,
-    lockReason: t`Deals in ${stageLabel} can only be edited by Super Admins`,
+    lockReason:
+      objectNameSingular === CoreObjectNameSingular.Opportunity
+        ? t`Deals in ${stageLabel} can only be edited by Super Admins`
+        : t`Records in ${stageLabel} can only be edited by Super Admins`,
   };
 };

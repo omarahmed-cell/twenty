@@ -4,6 +4,8 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import {
   buildStageCalculatedPropertyFieldNames,
   isDefined,
+  PIPELINE_OBJECT_DEFINITIONS,
+  type PipelineObjectNameSingular,
 } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
@@ -30,18 +32,38 @@ export type DealStageChange = DealStageMove & {
   changedBy: DealStageChangeActor;
 };
 
+// Only deals have the current stage columns; the writes skip columns an object lacks
 type DealRow = Record<string, unknown> & {
   id: string;
   stage: string | null;
-  dateEnteredCurrentStage: Date | string | null;
-  timeInCurrentStage: number | string | null;
+  dateEnteredCurrentStage?: Date | string | null;
+  timeInCurrentStage?: number | string | null;
 };
 
 type HistoryRow = {
-  opportunityId: string;
+  recordId: string;
   fromStage: string | null;
   toStage: string | null;
   changedAt: Date;
+};
+
+type StageHistoryTables = {
+  recordTable: PipelineObjectNameSingular;
+  historyTable: string;
+  recordIdColumn: string;
+};
+
+const getStageHistoryTables = (
+  objectNameSingular: PipelineObjectNameSingular,
+): StageHistoryTables => {
+  const { stageHistoryObjectNameSingular, stageHistoryRecordFieldName } =
+    PIPELINE_OBJECT_DEFINITIONS[objectNameSingular];
+
+  return {
+    recordTable: objectNameSingular,
+    historyTable: stageHistoryObjectNameSingular,
+    recordIdColumn: `${stageHistoryRecordFieldName}Id`,
+  };
 };
 
 const PROP_KEYS = [
@@ -82,11 +104,20 @@ export class DealStageHistoryService {
   async recordStageChanges({
     workspaceId,
     changes,
+    objectNameSingular = 'opportunity',
   }: {
     workspaceId: string;
     changes: DealStageChange[];
+    objectNameSingular?: PipelineObjectNameSingular;
   }): Promise<void> {
     if (changes.length === 0) {
+      return;
+    }
+
+    const tables = getStageHistoryTables(objectNameSingular);
+
+    // Service writes can land before the upgrade creates their history table
+    if (!(await this.hasHistoryTable(workspaceId, tables))) {
       return;
     }
 
@@ -94,8 +125,8 @@ export class DealStageHistoryService {
 
     for (const change of changes) {
       await this.coreDataSource.query(
-        `INSERT INTO ${schema}."opportunityStageHistory"
-          ("opportunityId", "pipeline", "fromStage", "toStage", "changedAt",
+        `INSERT INTO ${schema}.${quote(tables.historyTable)}
+          (${quote(tables.recordIdColumn)}, "pipeline", "fromStage", "toStage", "changedAt",
            "changedBySource", "changedByName", "changedByWorkspaceMemberId")
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
@@ -111,10 +142,11 @@ export class DealStageHistoryService {
       );
     }
 
-    const columnNames = await this.getDealColumnNames(workspaceId);
+    const columnNames = await this.getRecordColumnNames(workspaceId, tables);
     const dealIds = [...new Set(changes.map(({ recordId }) => recordId))];
     const dealById = await this.findDeals({
       workspaceId,
+      tables,
       dealIds,
       columnNames,
     });
@@ -149,18 +181,21 @@ export class DealStageHistoryService {
 
       const lastChange = dealChanges[dealChanges.length - 1];
       const currentStage = lastChange?.toStage ?? null;
-      const currentCumulative = isDefined(currentStage)
-        ? await this.getCumulativeTimeIn({
-            workspaceId,
-            dealId,
-            stageValue: currentStage,
-            propsByStage,
-            columnNames,
-          })
-        : null;
+      const currentCumulative =
+        isDefined(currentStage) && columnNames.has('timeInCurrentStage')
+          ? await this.getCumulativeTimeIn({
+              workspaceId,
+              tables,
+              dealId,
+              stageValue: currentStage,
+              propsByStage,
+              columnNames,
+            })
+          : null;
 
       await this.writeDeal({
         workspaceId,
+        tables,
         deal,
         columnNames,
         values: {
@@ -180,7 +215,6 @@ export class DealStageHistoryService {
     }
   }
 
-  // Fills only empty stage values from history (never overwriting loaded values) and refreshes time in current stage
   async recomputeDeals({
     workspaceId,
     dealIds,
@@ -188,10 +222,30 @@ export class DealStageHistoryService {
     workspaceId: string;
     dealIds?: string[];
   }): Promise<{ dealCount: number; updatedCount: number }> {
-    const columnNames = await this.getDealColumnNames(workspaceId);
+    const { recordCount, updatedCount } = await this.recomputeRecords({
+      workspaceId,
+      objectNameSingular: 'opportunity',
+      recordIds: dealIds,
+    });
 
-    if (!(await this.hasHistoryTable(workspaceId))) {
-      return { dealCount: 0, updatedCount: 0 };
+    return { dealCount: recordCount, updatedCount };
+  }
+
+  // Fills only empty stage values from history (never overwriting loaded values) and refreshes time in current stage
+  async recomputeRecords({
+    workspaceId,
+    objectNameSingular,
+    recordIds: dealIds,
+  }: {
+    workspaceId: string;
+    objectNameSingular: PipelineObjectNameSingular;
+    recordIds?: string[];
+  }): Promise<{ recordCount: number; updatedCount: number }> {
+    const tables = getStageHistoryTables(objectNameSingular);
+    const columnNames = await this.getRecordColumnNames(workspaceId, tables);
+
+    if (!(await this.hasHistoryTable(workspaceId, tables))) {
+      return { recordCount: 0, updatedCount: 0 };
     }
 
     const schema = quote(getWorkspaceSchemaName(workspaceId));
@@ -206,7 +260,7 @@ export class DealStageHistoryService {
             .slice(dealCount, dealCount + RECOMPUTE_BATCH_SIZE)
             .map((id) => ({ id }))
         : await this.coreDataSource.query(
-            `SELECT "id" FROM ${schema}."opportunity"
+            `SELECT "id" FROM ${schema}.${quote(tables.recordTable)}
              WHERE "deletedAt" IS NULL AND "id" > $1 ORDER BY "id" LIMIT $2`,
             [lastId, RECOMPUTE_BATCH_SIZE],
           );
@@ -221,11 +275,13 @@ export class DealStageHistoryService {
       const batchIds = ids.map(({ id }) => id);
       const dealById = await this.findDeals({
         workspaceId,
+        tables,
         dealIds: batchIds,
         columnNames,
       });
       const historyByDealId = await this.findHistory({
         workspaceId,
+        tables,
         dealIds: batchIds,
       });
 
@@ -263,6 +319,7 @@ export class DealStageHistoryService {
 
         const hasChanged = await this.writeDeal({
           workspaceId,
+          tables,
           deal,
           columnNames,
           values: {
@@ -286,26 +343,32 @@ export class DealStageHistoryService {
       }
     }
 
-    return { dealCount, updatedCount };
+    return { recordCount: dealCount, updatedCount };
   }
 
-  private async hasHistoryTable(workspaceId: string): Promise<boolean> {
+  private async hasHistoryTable(
+    workspaceId: string,
+    tables: StageHistoryTables,
+  ): Promise<boolean> {
     const [{ exists }]: { exists: boolean }[] = await this.coreDataSource.query(
       `SELECT to_regclass($1) IS NOT NULL AS "exists"`,
       [
-        `${quote(getWorkspaceSchemaName(workspaceId))}."opportunityStageHistory"`,
+        `${quote(getWorkspaceSchemaName(workspaceId))}.${quote(tables.historyTable)}`,
       ],
     );
 
     return exists;
   }
 
-  private async getDealColumnNames(workspaceId: string): Promise<Set<string>> {
+  private async getRecordColumnNames(
+    workspaceId: string,
+    tables: StageHistoryTables,
+  ): Promise<Set<string>> {
     const schema = getWorkspaceSchemaName(workspaceId);
     const columns: { column_name: string }[] = await this.coreDataSource.query(
       `SELECT "column_name" FROM information_schema.columns
-       WHERE "table_schema" = $1 AND "table_name" = 'opportunity'`,
-      [schema],
+       WHERE "table_schema" = $1 AND "table_name" = $2`,
+      [schema, tables.recordTable],
     );
 
     // Columns, not active fields: a switched-off stage keeps its columns and keeps being updated
@@ -314,10 +377,12 @@ export class DealStageHistoryService {
 
   private async findDeals({
     workspaceId,
+    tables,
     dealIds,
     columnNames,
   }: {
     workspaceId: string;
+    tables: StageHistoryTables;
     dealIds: string[];
     columnNames: Set<string>;
   }): Promise<Map<string, DealRow>> {
@@ -345,7 +410,7 @@ export class DealStageHistoryService {
         columnName === 'stage' ? `"stage"::text AS "stage"` : quote(columnName),
       );
     const rows: DealRow[] = await this.coreDataSource.query(
-      `SELECT ${selected.join(', ')} FROM ${schema}."opportunity" WHERE "id" = ANY($1::uuid[])`,
+      `SELECT ${selected.join(', ')} FROM ${schema}.${quote(tables.recordTable)} WHERE "id" = ANY($1::uuid[])`,
       [dealIds],
     );
 
@@ -354,24 +419,27 @@ export class DealStageHistoryService {
 
   private async findHistory({
     workspaceId,
+    tables,
     dealIds,
   }: {
     workspaceId: string;
+    tables: StageHistoryTables;
     dealIds: string[];
   }): Promise<Map<string, DealStageMove[]>> {
     const schema = quote(getWorkspaceSchemaName(workspaceId));
+    const recordIdColumn = quote(tables.recordIdColumn);
     const rows: HistoryRow[] = await this.coreDataSource.query(
-      `SELECT "opportunityId", "fromStage", "toStage", "changedAt"
-       FROM ${schema}."opportunityStageHistory"
-       WHERE "deletedAt" IS NULL AND "opportunityId" = ANY($1::uuid[])
+      `SELECT ${recordIdColumn} AS "recordId", "fromStage", "toStage", "changedAt"
+       FROM ${schema}.${quote(tables.historyTable)}
+       WHERE "deletedAt" IS NULL AND ${recordIdColumn} = ANY($1::uuid[])
        ORDER BY "changedAt" ASC`,
       [dealIds],
     );
     const historyByDealId = new Map<string, DealStageMove[]>();
 
     for (const row of rows) {
-      historyByDealId.set(row.opportunityId, [
-        ...(historyByDealId.get(row.opportunityId) ?? []),
+      historyByDealId.set(row.recordId, [
+        ...(historyByDealId.get(row.recordId) ?? []),
         {
           fromStage: row.fromStage,
           toStage: row.toStage,
@@ -385,12 +453,14 @@ export class DealStageHistoryService {
 
   private async getCumulativeTimeIn({
     workspaceId,
+    tables,
     dealId,
     stageValue,
     propsByStage,
     columnNames,
   }: {
     workspaceId: string;
+    tables: StageHistoryTables;
     dealId: string;
     stageValue: string;
     propsByStage: Record<string, DealStageProps>;
@@ -403,7 +473,11 @@ export class DealStageHistoryService {
       return propsByStage[stageValue]?.cumulativeTimeIn ?? null;
     }
 
-    const history = await this.findHistory({ workspaceId, dealIds: [dealId] });
+    const history = await this.findHistory({
+      workspaceId,
+      tables,
+      dealIds: [dealId],
+    });
 
     return (
       replayDealStageHistory(history.get(dealId) ?? [])[stageValue]
@@ -456,11 +530,13 @@ export class DealStageHistoryService {
 
   private async writeDeal({
     workspaceId,
+    tables,
     deal,
     columnNames,
     values,
   }: {
     workspaceId: string;
+    tables: StageHistoryTables;
     deal: DealRow;
     columnNames: Set<string>;
     values: Record<string, unknown>;
@@ -477,7 +553,7 @@ export class DealStageHistoryService {
     const schema = quote(getWorkspaceSchemaName(workspaceId));
 
     await this.coreDataSource.query(
-      `UPDATE ${schema}."opportunity" SET ${changed
+      `UPDATE ${schema}.${quote(tables.recordTable)} SET ${changed
         .map(([columnName], index) => `${quote(columnName)} = $${index + 2}`)
         .join(', ')} WHERE "id" = $1`,
       [deal.id, ...changed.map(([, value]) => value)],

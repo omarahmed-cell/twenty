@@ -17,7 +17,10 @@ import { css } from '@linaria/core';
 import { t } from '@lingui/core/macro';
 import { isString } from '@sniptt/guards';
 import { CoreObjectNameSingular, FieldMetadataType } from 'twenty-shared/types';
-import { computeRelationGqlFieldJoinColumnName } from 'twenty-shared/utils';
+import {
+  computeRelationGqlFieldJoinColumnName,
+  isPipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { themeCssVariables } from 'twenty-ui/theme';
 
@@ -47,9 +50,12 @@ export const UpdateMultipleRecordsForm = ({
     objectNameSingular,
   });
 
-  const isDealForm = objectNameSingular === CoreObjectNameSingular.Opportunity;
+  const isDealForm = isPipelineObjectNameSingular(objectNameSingular);
 
-  const pipelines = useDealStagePipelineConfigs({ enabled: isDealForm });
+  const pipelines = useDealStagePipelineConfigs({
+    enabled: isDealForm,
+    objectNameSingular,
+  });
 
   const { result: selectionPipeline } = useDealStageSelectionPipeline({
     objectNameSingular,
@@ -67,7 +73,10 @@ export const UpdateMultipleRecordsForm = ({
         : selectionPipeline.status === 'mixed'
           ? {
               pipelineKey: null,
-              disabledReason: t`Selected deals are in different pipelines`,
+              disabledReason:
+                objectNameSingular === CoreObjectNameSingular.Opportunity
+                  ? t`Selected deals are in different pipelines`
+                  : t`Selected records are in different pipelines`,
             }
           : { pipelineKey: null };
 

@@ -11,6 +11,12 @@ const SALES: PipelineConfig = {
   description: null,
   position: 0,
   objectNameSingular: 'opportunity',
+  stageCalculatedPropertyKinds: [
+    'dateEntered',
+    'dateExited',
+    'cumulativeTimeIn',
+    'latestTimeIn',
+  ],
   rules: {
     limitCreationToStages: { enabled: true, stageValues: ['A'] },
     restrictSkipping: true,

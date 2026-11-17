@@ -12,8 +12,8 @@ import { isFilterOnActorSourceSubField } from '@/object-record/object-filter-dro
 import { type RecordFilter } from '@/object-record/record-filter/types/RecordFilter';
 import { RecordFilterOperand } from '@/object-record/record-filter/types/RecordFilterOperand';
 import { isRecordFilterConsideredEmpty } from '@/object-record/record-filter/utils/isRecordFilterConsideredEmpty';
-import { useDealStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
-import { isDealStageFieldMetadataItem } from '@/pipeline/stage-picker/utils/dealStageFields';
+import { useAllStagePipelineConfigs } from '@/pipeline/stage-picker/hooks/useDealStagePipelineConfigs';
+import { getStageFieldPipelineObjectNameSingular } from '@/pipeline/stage-picker/utils/dealStageFields';
 import { getStageOptionsWithPipelineLabels } from '@/pipeline/stage-picker/utils/getStageOptionsForPipeline';
 import { useUserTimezone } from '@/ui/input/components/internal/date/hooks/useUserTimezone';
 import { getTimezoneAbbreviationForZonedDateTime } from '@/ui/input/components/internal/date/utils/getTimeZoneAbbreviationForZonedDateTime';
@@ -42,7 +42,7 @@ export const useGetRecordFilterDisplayValue = () => {
 
   const currencies = useCurrencies();
 
-  const pipelines = useDealStagePipelineConfigs({ enabled: true });
+  const allPipelines = useAllStagePipelineConfigs({ enabled: true });
 
   const getRecordFilterDisplayValue = (
     recordFilter?: Nullable<RecordFilter>,
@@ -181,12 +181,18 @@ export const useGetRecordFilterDisplayValue = () => {
           recordFilter.fieldMetadataId,
       );
 
-      const fieldMetadataItemOptions = isDealStageFieldMetadataItem(
-        fieldMetadataItem,
+      const stagePipelineObjectNameSingular =
+        getStageFieldPipelineObjectNameSingular(fieldMetadataItem);
+
+      const fieldMetadataItemOptions = isDefined(
+        stagePipelineObjectNameSingular,
       )
         ? getStageOptionsWithPipelineLabels({
             options: fieldMetadataItem.options ?? [],
-            pipelines,
+            pipelines: allPipelines.filter(
+              ({ objectNameSingular }) =>
+                objectNameSingular === stagePipelineObjectNameSingular,
+            ),
           })
         : fieldMetadataItem.options;
 

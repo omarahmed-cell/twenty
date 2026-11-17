@@ -15,6 +15,7 @@ import {
   type CreateStandardFieldArgs,
   createStandardFieldFlatMetadata,
 } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-field-flat-metadata.util';
+import { createStandardRecordSourceFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-record-source-field-flat-metadata.util';
 import { createStandardRelationFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-relation-field-flat-metadata.util';
 export const buildCalendarEventStandardFlatFieldMetadatas = ({
   now,
@@ -1114,6 +1115,14 @@ export const buildCalendarEventStandardFlatFieldMetadatas = ({
         relationType: RelationType.ONE_TO_MANY,
       },
     },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  recordSource: createStandardRecordSourceFieldFlatMetadata({
+    objectName,
+    workspaceId,
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,
     twentyStandardApplicationId,

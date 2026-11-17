@@ -3,6 +3,8 @@ import { STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from '@/metadata/constants/stan
 import { buildStandardObjectIndexView } from '@/metadata/utils/internal/build-standard-object-index-view.util';
 import { buildStandardObjectRecordPageFieldsView } from '@/metadata/utils/internal/build-standard-object-record-page-fields-view.util';
 import { DEALS_BOARD_VIEW_GROUPS } from '@/metadata/constants/deals-board-view-groups.constant';
+import { SERVICES_BOARD_VIEW_GROUPS } from '@/metadata/constants/services-board-view-groups.constant';
+import { SERVICES_BOARD_VIEW_UNIVERSAL_IDENTIFIER } from '@/metadata/constants/services-board-view-universal-identifier.constant';
 
 // Never mutate an existing universal identifier, and delete one only rarely.
 // Group names passed to buildStandardObjectRecordPageFieldsView MUST match the server's standard view-field-group builders.
@@ -935,6 +937,29 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  serviceStageHistory: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.serviceStageHistory,
+    fields: STANDARD_OBJECT_FIELDS.serviceStageHistory,
+    indexes: {
+      serviceIdIndex: {
+        universalIdentifier: '2514f8c6-276f-4be6-a714-9d5571ef0c92',
+      },
+    },
+    views: {
+      allServiceStageHistories: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.serviceStageHistory,
+        fields: STANDARD_OBJECT_FIELDS.serviceStageHistory,
+        viewFieldNames: [
+          'changedAt',
+          'service',
+          'fromStage',
+          'toStage',
+          'changedBy',
+        ],
+      }),
+    },
+  },
   pipeline: {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.pipeline,
     fields: STANDARD_OBJECT_FIELDS.pipeline,
@@ -1552,6 +1577,24 @@ export const STANDARD_OBJECTS = {
       },
     },
     views: {
+      servicesBoard: {
+        universalIdentifier: SERVICES_BOARD_VIEW_UNIVERSAL_IDENTIFIER,
+        viewFields: {
+          name: {
+            universalIdentifier: 'e15fc24c-fcbb-4836-8804-6621523cdba2',
+          },
+          company: {
+            universalIdentifier: '860830ea-9753-4028-b0d6-284c02dee586',
+          },
+          createdBy: {
+            universalIdentifier: '7e571518-5513-4d7e-8583-61231e1cd398',
+          },
+          createdAt: {
+            universalIdentifier: '97ef441d-43d7-4ce2-9013-d54e58a83b2a',
+          },
+        },
+        viewGroups: SERVICES_BOARD_VIEW_GROUPS,
+      },
       allServices: buildStandardObjectIndexView({
         objectUniversalIdentifier:
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,

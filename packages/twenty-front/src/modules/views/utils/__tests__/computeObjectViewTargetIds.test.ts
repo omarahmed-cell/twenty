@@ -36,6 +36,27 @@ describe('computeObjectViewTargetIds', () => {
     expect(result.indexViewId).toBe('view-index');
   });
 
+  it('should land on a view positioned before the index view', () => {
+    const boardView = makeView('view-board', -1, null, ViewType.KANBAN);
+
+    const result = computeObjectViewTargetIds({
+      views: [indexView, boardView],
+      objectMetadataId: 'metadata-1',
+    });
+
+    expect(result.firstSelectableViewId).toBe('view-board');
+  });
+
+  it('should leave the index view as the only target when it is the only view', () => {
+    const result = computeObjectViewTargetIds({
+      views: [indexView],
+      objectMetadataId: 'metadata-1',
+    });
+
+    expect(result.firstSelectableViewId).toBeUndefined();
+    expect(result.indexViewId).toBe('view-index');
+  });
+
   it('should ignore fields widget views', () => {
     const result = computeObjectViewTargetIds({
       views: [indexView, widgetView],

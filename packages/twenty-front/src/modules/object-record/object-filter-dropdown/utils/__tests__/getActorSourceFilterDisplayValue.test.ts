@@ -36,4 +36,16 @@ describe('getActorSourceFilterDisplayValue', () => {
     ).toMatchObject({ name: 'Utilisateur', isSelected: true });
     expect(userOption?.name).toBe('User');
   });
+
+  it('should label the Forms and Document app sources', () => {
+    const options = getActorSourceMultiSelectOptions(['FORMS']);
+
+    expect(options.find((option) => option.id === 'FORMS')).toMatchObject({
+      name: 'Forms',
+      isSelected: true,
+    });
+    expect(
+      options.find((option) => option.id === 'DOCUMENT_APP'),
+    ).toMatchObject({ name: 'Document app', isSelected: false });
+  });
 });

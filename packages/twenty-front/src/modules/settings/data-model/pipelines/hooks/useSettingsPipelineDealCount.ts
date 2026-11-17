@@ -7,9 +7,11 @@ import {
 
 // Trashed deals still hold the value, so they count too
 export const useSettingsPipelineDealCount = ({
+  objectNameSingular = CoreObjectNameSingular.Opportunity,
   fieldName,
   value,
 }: {
+  objectNameSingular?: string;
   fieldName: 'pipeline' | 'stage';
   value: string;
 }): number | undefined => {
@@ -26,7 +28,7 @@ export const useSettingsPipelineDealCount = ({
   };
 
   const { data, loading } = useAggregateRecords<{ id: { COUNT: number } }>({
-    objectNameSingular: CoreObjectNameSingular.Opportunity,
+    objectNameSingular,
     filter,
     recordGqlFieldsAggregate: { id: [AggregateOperations.COUNT] },
   });

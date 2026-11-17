@@ -20,6 +20,12 @@ const buildPipeline = (
   description: null,
   position,
   objectNameSingular: 'opportunity',
+  stageCalculatedPropertyKinds: [
+    'dateEntered',
+    'dateExited',
+    'cumulativeTimeIn',
+    'latestTimeIn',
+  ],
   rules: DEFAULT_PIPELINE_RULES,
   stages: stages.map((stage, index) => ({
     id: `${stage.value}-id`,

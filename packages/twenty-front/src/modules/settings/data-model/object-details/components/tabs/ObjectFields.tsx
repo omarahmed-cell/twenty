@@ -8,12 +8,11 @@ import { SettingsObjectRelationsTable } from '@/settings/data-model/object-detai
 import { styled } from '@linaria/react';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
+import { FieldMetadataType, SettingsPath } from 'twenty-shared/types';
 import {
-  CoreObjectNameSingular,
-  FieldMetadataType,
-  SettingsPath,
-} from 'twenty-shared/types';
-import { getSettingsPath } from 'twenty-shared/utils';
+  getSettingsPath,
+  isPipelineObjectNameSingular,
+} from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { IconPlus } from 'twenty-ui/icon';
 import { themeCssVariables } from 'twenty-ui/theme';
@@ -57,10 +56,14 @@ export const ObjectFields = ({ objectMetadataItem }: ObjectFieldsProps) => {
 
   const objectLabelSingular = objectMetadataItem.labelSingular;
 
-  const isDealObject =
-    objectMetadataItem.nameSingular === CoreObjectNameSingular.Opportunity;
+  const isDealObject = isPipelineObjectNameSingular(
+    objectMetadataItem.nameSingular,
+  );
 
-  const { pipelines } = usePipelineConfigs({ skip: !isDealObject });
+  const { pipelines } = usePipelineConfigs({
+    objectNameSingular: objectMetadataItem.nameSingular,
+    skip: !isDealObject,
+  });
 
   const stageHistoryFieldNames = useMemo(
     () => getStageHistoryFieldNames(isDealObject ? pipelines : []),
