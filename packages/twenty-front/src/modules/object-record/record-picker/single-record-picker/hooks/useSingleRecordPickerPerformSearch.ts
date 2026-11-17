@@ -11,6 +11,9 @@ import { SingleRecordPickerComponentInstanceContext } from '@/object-record/reco
 import { singleRecordPickerSearchableObjectMetadataItemsComponentState } from '@/object-record/record-picker/single-record-picker/states/singleRecordPickerSearchableObjectMetadataItemsComponentState';
 import { type RecordPickerPickableMorphItem } from '@/object-record/record-picker/types/RecordPickerPickableMorphItem';
 import { getObjectPermissionsForObject } from '@/object-metadata/utils/getObjectPermissionsForObject';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { getWorkspaceMemberIdsExcludedFromPicker } from '@/workspace-member/utils/getWorkspaceMemberIdsExcludedFromPicker';
+import { deactivatedWorkspaceMemberIdsSelector } from '@/workspace-member/states/deactivatedWorkspaceMemberIdsSelector';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { CustomError, isDefined } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
@@ -40,6 +43,9 @@ export const useSingleRecordPickerPerformSearch = ({
   );
 
   const { objectMetadataItems } = useObjectMetadataItems();
+  const deactivatedWorkspaceMemberIds = useAtomStateValue(
+    deactivatedWorkspaceMemberIdsSelector,
+  );
   const { objectPermissionsByObjectMetadataId } = useObjectPermissions();
 
   const readableObjectNameSingulars = objectNameSingulars.filter(
@@ -88,7 +94,14 @@ export const useSingleRecordPickerPerformSearch = ({
     searchInput: searchFilter,
   });
 
-  const notFilterIds = [...selectedIds, ...excludedRecordIds];
+  const notFilterIds = [
+    ...selectedIds,
+    ...excludedRecordIds,
+    ...getWorkspaceMemberIdsExcludedFromPicker({
+      objectNameSingulars: readableObjectNameSingulars,
+      deactivatedWorkspaceMemberIds,
+    }),
+  ];
   const notFilter = notFilterIds.length
     ? { not: { id: { in: notFilterIds } } }
     : undefined;

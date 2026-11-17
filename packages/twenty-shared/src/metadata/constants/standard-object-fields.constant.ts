@@ -2805,5 +2805,11 @@ export const STANDARD_OBJECT_FIELDS = {
     collaboratingOpportunities: {
       universalIdentifier: '6c559b88-f7ff-4b5d-b4fb-30737b4918b7',
     },
+    memberStatus: {
+      universalIdentifier: '99afa2ca-4188-4aa1-bb58-d63d63968fac',
+    },
+    isPreCreated: {
+      universalIdentifier: 'd0f15bf5-fdbc-45a0-8c0d-e438c66a80c6',
+    },
   },
 } satisfies Record<string, Record<string, { universalIdentifier: string }>>;

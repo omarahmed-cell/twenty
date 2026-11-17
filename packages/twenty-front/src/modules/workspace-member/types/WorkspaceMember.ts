@@ -31,6 +31,8 @@ export type WorkspaceMember = {
   timeFormat?: WorkspaceMemberTimeFormatEnum | null;
   numberFormat?: WorkspaceMemberNumberFormatEnum | null;
   calendarStartDay?: number | null;
+  memberStatus?: string | null;
+  isPreCreated?: boolean | null;
 };
 
 export type WorkspaceInvitation = {

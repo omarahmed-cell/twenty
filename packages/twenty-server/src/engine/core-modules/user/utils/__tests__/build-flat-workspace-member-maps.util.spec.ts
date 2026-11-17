@@ -27,6 +27,8 @@ const buildWorkspaceMember = ({
   timeFormat: 'SYSTEM',
   searchVector: '',
   numberFormat: 'SYSTEM',
+  memberStatus: 'ACTIVE',
+  isPreCreated: false,
   assignedTasks: [],
   accountOwnerForCompanies: [],
   authoredAttachments: [],

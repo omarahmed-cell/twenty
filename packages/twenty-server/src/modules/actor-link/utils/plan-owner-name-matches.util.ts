@@ -44,19 +44,39 @@ export const buildOwnerNameIndex = ({
   };
 
   for (const [name, ownerIds] of ownerIdsByName) {
-    if (ownerIds.length > 1) {
+    const ownerResolutions = ownerIds.map(
+      (ownerId) => ownerResolutionByOwnerId[ownerId],
+    );
+
+    if (
+      ownerResolutions.some(
+        (ownerResolution) =>
+          !isDefined(ownerResolution) || !ownerResolution.isResolved,
+      )
+    ) {
+      if (ownerIds.length > 1) {
+        index.duplicateNames.push(name);
+      } else {
+        index.unresolvedNames.push(name);
+      }
+      continue;
+    }
+
+    const workspaceMemberIds = new Set(
+      ownerResolutions.map(
+        (ownerResolution) =>
+          (ownerResolution as Extract<OwnerResolution, { isResolved: true }>)
+            .workspaceMemberId,
+      ),
+    );
+
+    // Several HubSpot owner ids for one person share a name and resolve to one member
+    if (workspaceMemberIds.size > 1) {
       index.duplicateNames.push(name);
       continue;
     }
 
-    const ownerResolution = ownerResolutionByOwnerId[ownerIds[0]];
-
-    if (!isDefined(ownerResolution) || !ownerResolution.isResolved) {
-      index.unresolvedNames.push(name);
-      continue;
-    }
-
-    index.workspaceMemberIdByName.set(name, ownerResolution.workspaceMemberId);
+    index.workspaceMemberIdByName.set(name, [...workspaceMemberIds][0]);
   }
 
   return index;

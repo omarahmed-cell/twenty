@@ -10,6 +10,7 @@ import { TokenModule } from 'src/engine/core-modules/auth/token/token.module';
 import { WorkspaceDomainsModule } from 'src/engine/core-modules/domain/workspace-domains/workspace-domains.module';
 import { FileModule } from 'src/engine/core-modules/file/file.module';
 import { OnboardingModule } from 'src/engine/core-modules/onboarding/onboarding.module';
+import { WorkspaceMemberAccessService } from 'src/engine/core-modules/user-workspace/services/workspace-member-access.service';
 import { UserWorkspaceEntityCacheProviderService } from 'src/engine/core-modules/user-workspace/services/user-workspace-entity-cache-provider.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserWorkspaceService } from 'src/engine/core-modules/user-workspace/user-workspace.service';
@@ -39,10 +40,15 @@ import { UserRoleModule } from 'src/engine/metadata-modules/user-role/user-role.
     CoreEntityCacheModule,
     WorkflowRunRecordShareModule,
   ],
-  exports: [UserWorkspaceService, UserWorkspaceAuthContextService],
+  exports: [
+    UserWorkspaceService,
+    UserWorkspaceAuthContextService,
+    WorkspaceMemberAccessService,
+  ],
   providers: [
     UserWorkspaceAuthContextService,
     UserWorkspaceService,
+    WorkspaceMemberAccessService,
     UserWorkspaceEntityCacheProviderService,
     provideWorkspaceScopedRepository(RoleTargetEntity),
   ],

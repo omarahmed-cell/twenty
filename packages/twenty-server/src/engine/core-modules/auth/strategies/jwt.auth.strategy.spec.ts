@@ -1388,4 +1388,144 @@ describe('JwtAuthStrategy', () => {
       expect(result.userWorkspaceId).toBe(validUserWorkspaceId);
     });
   });
+
+  describe('Deactivated workspace member', () => {
+    const validUserId = 'valid-user-id';
+
+    const mockMemberAndUserWorkspace = ({
+      memberStatus,
+      userWorkspaceId,
+      workspaceId,
+    }: {
+      memberStatus: 'ACTIVE' | 'DEACTIVATED';
+      userWorkspaceId: string;
+      workspaceId: string;
+    }) => {
+      const workspace = new WorkspaceEntity();
+
+      workspace.id = workspaceId;
+      workspace.activationStatus = WorkspaceActivationStatus.ACTIVE;
+      workspaceStore[workspaceId] = workspace;
+      userStore[validUserId] = { id: validUserId };
+
+      coreEntityCacheService.get.mockImplementation(
+        async (keyName: string, entityId: string) => {
+          if (keyName === 'workspaceEntity') {
+            return workspaceStore[entityId] ?? null;
+          }
+
+          if (keyName === 'user') {
+            return userStore[entityId] ?? null;
+          }
+
+          if (keyName === 'userWorkspaceEntity') {
+            return { id: userWorkspaceId, workspaceId };
+          }
+
+          return null;
+        },
+      );
+
+      workspaceCacheService.getOrRecompute.mockImplementation(
+        async (cacheWorkspaceId: string, cacheKeys: string[]) => ({
+          flatWorkspaceMemberMaps: {
+            byId: {
+              'workspace-member-id': {
+                id: 'workspace-member-id',
+                userId: validUserId,
+                memberStatus,
+                deletedAt: null,
+              },
+            },
+            idByUserId: { [validUserId]: 'workspace-member-id' },
+          },
+          ...(cacheKeys.includes('flatApplicationMaps')
+            ? {
+                flatApplicationMaps: {
+                  byId: applicationStore[cacheWorkspaceId] ?? {},
+                },
+              }
+            : {}),
+        }),
+      );
+    };
+
+    it('rejects an access token of a deactivated member', async () => {
+      const userWorkspaceId = randomUUID();
+      const workspaceId = randomUUID();
+
+      mockMemberAndUserWorkspace({
+        memberStatus: 'DEACTIVATED',
+        userWorkspaceId,
+        workspaceId,
+      });
+
+      strategy = createStrategy();
+
+      await expect(
+        strategy.validate({
+          sub: validUserId,
+          type: JwtTokenTypeEnum.ACCESS,
+          userWorkspaceId,
+          workspaceId,
+        } as JwtPayload),
+      ).rejects.toMatchObject({
+        code: AuthExceptionCode.UNAUTHENTICATED,
+        message: 'This member has been deactivated',
+      });
+    });
+
+    it('accepts the same access token once the member is reactivated', async () => {
+      const userWorkspaceId = randomUUID();
+      const workspaceId = randomUUID();
+
+      mockMemberAndUserWorkspace({
+        memberStatus: 'ACTIVE',
+        userWorkspaceId,
+        workspaceId,
+      });
+
+      strategy = createStrategy();
+
+      const result = await strategy.validate({
+        sub: validUserId,
+        type: JwtTokenTypeEnum.ACCESS,
+        userWorkspaceId,
+        workspaceId,
+      } as JwtPayload);
+
+      expect(result.workspaceMember?.id).toBe('workspace-member-id');
+    });
+
+    it('rejects an application token acting for a deactivated member', async () => {
+      const applicationId = randomUUID();
+      const userWorkspaceId = randomUUID();
+      const workspaceId = randomUUID();
+
+      mockMemberAndUserWorkspace({
+        memberStatus: 'DEACTIVATED',
+        userWorkspaceId,
+        workspaceId,
+      });
+      applicationStore[workspaceId] = {
+        [applicationId]: { id: applicationId },
+      };
+
+      strategy = createStrategy();
+
+      await expect(
+        strategy.validate({
+          sub: applicationId,
+          type: JwtTokenTypeEnum.APPLICATION_ACCESS,
+          applicationId,
+          workspaceId,
+          userId: validUserId,
+          userWorkspaceId,
+        } as JwtPayload),
+      ).rejects.toMatchObject({
+        code: AuthExceptionCode.UNAUTHENTICATED,
+        message: 'This member has been deactivated',
+      });
+    });
+  });
 });

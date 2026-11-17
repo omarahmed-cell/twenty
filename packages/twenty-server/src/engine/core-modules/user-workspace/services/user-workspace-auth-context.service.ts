@@ -10,6 +10,7 @@ import {
   AuthException,
   AuthExceptionCode,
 } from 'src/engine/core-modules/auth/auth.exception';
+import { assertWorkspaceMemberIsNotDeactivated } from 'src/engine/core-modules/auth/utils/assert-workspace-member-is-not-deactivated.util';
 import { buildUserAuthContext } from 'src/engine/core-modules/auth/utils/build-user-auth-context.util';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { fromUserEntityToFlat } from 'src/engine/core-modules/user/utils/from-user-entity-to-flat.util';
@@ -125,6 +126,10 @@ export class UserWorkspaceAuthContextService {
         AuthExceptionCode.UNAUTHENTICATED,
       );
     }
+    assertWorkspaceMemberIsNotDeactivated(
+      workspaceMember,
+      AuthExceptionCode.UNAUTHENTICATED,
+    );
     const requestContext = workspaceAuthContextStorage.getStore();
     const matchingUserContext =
       isDefined(requestContext) &&

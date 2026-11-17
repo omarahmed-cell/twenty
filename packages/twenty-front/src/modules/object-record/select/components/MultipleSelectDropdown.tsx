@@ -3,6 +3,7 @@ import { Key } from 'ts-key-enum';
 
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
 import { DropdownMenuSkeletonItem } from '@/ui/input/relation-picker/components/skeletons/DropdownMenuSkeletonItem';
+import { DropdownMenuSectionLabel } from '@/ui/layout/dropdown/components/DropdownMenuSectionLabel';
 import { DropdownMenuItemsContainer } from '@/ui/layout/dropdown/components/DropdownMenuItemsContainer';
 import { useCloseDropdown } from '@/ui/layout/dropdown/hooks/useCloseDropdown';
 import { SelectableList } from '@/ui/layout/selectable-list/components/SelectableList';
@@ -21,6 +22,7 @@ export const MultipleSelectDropdown = ({
   filteredSelectedItems,
   onChange,
   searchFilter,
+  secondarySection,
 }: {
   selectableListId: string;
   focusId: string;
@@ -33,6 +35,10 @@ export const MultipleSelectDropdown = ({
     newSelectedValue: boolean,
   ) => void;
   loadingItems: boolean;
+  secondarySection?: {
+    label: string;
+    items: SelectableItem[];
+  };
 }) => {
   const { closeDropdown } = useCloseDropdown();
 
@@ -55,9 +61,16 @@ export const MultipleSelectDropdown = ({
     );
   };
 
-  const itemsInDropdown = [
+  const primaryItemsInDropdown = [
     ...(filteredSelectedItems ?? []),
     ...(itemsToSelect ?? []),
+  ];
+
+  const secondaryItemsInDropdown = secondarySection?.items ?? [];
+
+  const itemsInDropdown = [
+    ...primaryItemsInDropdown,
+    ...secondaryItemsInDropdown,
   ];
 
   useHotkeysOnFocusedElement({
@@ -72,6 +85,7 @@ export const MultipleSelectDropdown = ({
 
   const showNoResult =
     itemsToSelect?.length === 0 &&
+    secondaryItemsInDropdown.length === 0 &&
     searchFilter !== '' &&
     filteredSelectedItems?.length === 0 &&
     !loadingItems;
@@ -85,7 +99,7 @@ export const MultipleSelectDropdown = ({
       focusId={focusId}
     >
       <DropdownMenuItemsContainer isMultiSelect hasMaxHeight>
-        {itemsInDropdown.map((item) => (
+        {primaryItemsInDropdown.map((item) => (
           <MultipleSelectDropdownItem
             key={item.id}
             item={item}
@@ -93,6 +107,19 @@ export const MultipleSelectDropdown = ({
             onSelect={handleItemSelectChange}
           />
         ))}
+        {secondaryItemsInDropdown.length > 0 && (
+          <>
+            <DropdownMenuSectionLabel label={secondarySection?.label ?? ''} />
+            {secondaryItemsInDropdown.map((item) => (
+              <MultipleSelectDropdownItem
+                key={item.id}
+                item={item}
+                focused={item.id === selectedItemId}
+                onSelect={handleItemSelectChange}
+              />
+            ))}
+          </>
+        )}
         {showNoResult && <ListItem disabled>{t`No results`}</ListItem>}
         {loadingItems && <DropdownMenuSkeletonItem />}
       </DropdownMenuItemsContainer>

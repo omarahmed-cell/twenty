@@ -80,6 +80,14 @@ export class WorkspaceMemberDeleteOnePostQueryHook implements WorkspacePostQuery
       );
     }
 
+    if (workspaceMember.isPreCreated === true) {
+      await this.workspaceCacheService.invalidateAndRecompute(workspace.id, [
+        'flatWorkspaceMemberMaps',
+      ]);
+
+      return;
+    }
+
     const userWorkspace = await this.userWorkspaceRepository.findOne({
       where: {
         workspaceId: workspace.id,

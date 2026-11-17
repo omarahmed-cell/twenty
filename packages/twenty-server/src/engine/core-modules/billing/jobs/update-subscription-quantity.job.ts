@@ -9,6 +9,7 @@ import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queu
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
+import { isWorkspaceMemberBillable } from 'src/modules/workspace-member/utils/is-workspace-member-billable.util';
 export type UpdateSubscriptionQuantityJobData = { workspaceId: string };
 
 @Processor({
@@ -34,7 +35,9 @@ export class UpdateSubscriptionQuantityJob {
           { shouldBypassPermissionChecks: true },
         );
 
-      const workspaceMembersCount = await workspaceMemberRepository.count();
+      const workspaceMembersCount = (
+        await workspaceMemberRepository.find()
+      ).filter(isWorkspaceMemberBillable).length;
 
       if (!workspaceMembersCount || workspaceMembersCount <= 0) {
         return;

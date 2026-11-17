@@ -1,7 +1,10 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { getImageIdentifierFieldMetadataItem } from '@/object-metadata/utils/getImageIdentifierFieldMetadataItem';
 import { getLabelIdentifierFieldMetadataItem } from '@/object-metadata/utils/getLabelIdentifierFieldMetadataItem';
-import { type RecordGqlFields } from 'twenty-shared/types';
+import {
+  CoreObjectNameSingular,
+  type RecordGqlFields,
+} from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
 export const buildIdentifierGqlFields = (
@@ -18,6 +21,11 @@ export const buildIdentifierGqlFields = (
   const imageIdentifierField =
     getImageIdentifierFieldMetadataItem(objectMetadata);
 
+  // Chips label deactivated workspace members, so their status rides along with the identifier
+  const hasMemberStatusField =
+    objectMetadata.nameSingular === CoreObjectNameSingular.WorkspaceMember &&
+    objectMetadata.fields.some((field) => field.name === 'memberStatus');
+
   return {
     id: true,
     ...(isDefined(labelIdentifierField) && {
@@ -26,5 +34,6 @@ export const buildIdentifierGqlFields = (
     ...(isDefined(imageIdentifierField) && {
       [imageIdentifierField.name]: true,
     }),
+    ...(hasMemberStatusField && { memberStatus: true }),
   };
 };

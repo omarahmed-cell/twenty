@@ -111,6 +111,29 @@ describe('SidePanelAssignAiChatPage', () => {
     });
   });
 
+  it('does not offer deactivated members for a new assignment', () => {
+    jotaiStore.set(currentWorkspaceMembersState.atom, [
+      {
+        id: 'phil',
+        name: { firstName: 'Phil', lastName: 'Schiler' },
+        userEmail: 'phil@apple.dev',
+        memberStatus: 'DEACTIVATED',
+      },
+      {
+        id: 'jane',
+        name: { firstName: 'Jane', lastName: 'Austen' },
+        userEmail: 'jane@apple.dev',
+        memberStatus: 'ACTIVE',
+      },
+    ] as never);
+    setThreads([{ id: 'thread-1', assigneeId: null }]);
+
+    render(<SidePanelAssignAiChatPage />, { wrapper: Wrapper });
+
+    expect(screen.getByText('Jane Austen')).toBeInTheDocument();
+    expect(screen.queryByText(/Phil Schiler/)).not.toBeInTheDocument();
+  });
+
   it('narrows the members to the search', async () => {
     setThreads([{ id: 'thread-1', assigneeId: null }]);
 

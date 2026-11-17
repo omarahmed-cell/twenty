@@ -32,6 +32,8 @@ export const USER_QUERY_FRAGMENT = gql`
     }
     workspaceMembers {
       ...PartialWorkspaceMemberQueryFragment
+      memberStatus
+      isPreCreated
     }
     deletedWorkspaceMembers {
       ...DeletedWorkspaceMemberQueryFragment

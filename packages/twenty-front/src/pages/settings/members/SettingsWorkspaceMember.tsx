@@ -21,6 +21,11 @@ import { IconInfoCircle, IconLock } from 'twenty-ui/icon';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
 import { currentUserState } from '@/auth/states/currentUserState';
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { useUpdateWorkspaceMemberStatus } from '@/settings/members/hooks/useUpdateWorkspaceMemberStatus';
+import { type WorkspaceMemberStatus } from '@/workspace-member/types/WorkspaceMemberStatus';
+import { getWorkspaceMemberLabelWithStatus } from '@/workspace-member/utils/getWorkspaceMemberLabelWithStatus';
+import { isWorkspaceMemberDeactivated } from '@/workspace-member/utils/isWorkspaceMemberDeactivated';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { isImpersonatingState } from '@/auth/states/isImpersonatingState';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
@@ -44,6 +49,7 @@ const SETTINGS_WORKSPACE_MEMBER_TABS = {
 };
 
 const DELETE_MEMBER_MODAL_ID = 'workspace-member-delete-modal';
+const DEACTIVATE_MEMBER_MODAL_ID = 'workspace-member-deactivate-modal';
 
 export const SettingsWorkspaceMember = () => {
   const { workspaceMemberId = '' } = useParams();
@@ -51,6 +57,9 @@ export const SettingsWorkspaceMember = () => {
   const { enqueueToast } = useToast();
   const { openDialog, closeDialog } = useDialog();
   const currentUser = useAtomStateValue(currentUserState);
+  const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const { updateWorkspaceMemberStatus, loading: isUpdatingStatus } =
+    useUpdateWorkspaceMemberStatus();
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const { startImpersonating } = useImpersonationSession();
   const [impersonate] = useMutation(ImpersonateDocument);
@@ -66,7 +75,11 @@ export const SettingsWorkspaceMember = () => {
     loading: rolesLoading,
   } = useWorkspaceMemberRoles(workspaceMemberId);
 
-  const { record: member, loading } = useFindOneRecord<WorkspaceMember>({
+  const {
+    record: member,
+    loading,
+    refetch: refetchMember,
+  } = useFindOneRecord<WorkspaceMember>({
     objectNameSingular: CoreObjectNameSingular.WorkspaceMember,
     objectRecordId: workspaceMemberId,
     recordGqlFields: {
@@ -75,6 +88,8 @@ export const SettingsWorkspaceMember = () => {
       name: { firstName: true, lastName: true },
       avatarUrl: true,
       userEmail: true,
+      memberStatus: true,
+      isPreCreated: true,
     },
   });
 
@@ -143,6 +158,34 @@ export const SettingsWorkspaceMember = () => {
     }
   };
 
+  const handleUpdateMemberStatus = async (
+    memberStatus: WorkspaceMemberStatus,
+  ) => {
+    if (!member?.id) return;
+    try {
+      await updateWorkspaceMemberStatus({
+        workspaceMemberId: member.id,
+        memberStatus,
+      });
+      await refetchMember();
+      enqueueToast({
+        status: 'success',
+        children:
+          memberStatus === 'DEACTIVATED'
+            ? t`Member deactivated`
+            : t`Member reactivated`,
+      });
+    } catch (error) {
+      enqueueToast({
+        status: 'error',
+        children:
+          error instanceof Error
+            ? error.message
+            : t`Unable to update member status right now`,
+      });
+    }
+  };
+
   const handleImpersonate = async () => {
     if (!member?.userId || !currentWorkspace?.id) {
       enqueueToast({
@@ -185,12 +228,23 @@ export const SettingsWorkspaceMember = () => {
 
   const isLoading = loading || rolesLoading || !member;
 
+  const isCurrentWorkspaceMember =
+    isDefined(member) && member.id === currentWorkspaceMember?.id;
+  const isMemberDeactivated =
+    isDefined(member) && isWorkspaceMemberDeactivated(member);
+  const memberDisplayName = isDefined(member)
+    ? getWorkspaceMemberLabelWithStatus({
+        label: `${member.name.firstName} ${member.name.lastName}`,
+        memberStatus: member.memberStatus,
+      })
+    : '';
+
   return (
     <>
       <SettingsRolesQueryEffect />
       {isLoading ? null : (
         <SettingsPageLayout
-          title={`${member.name.firstName} ${member.name.lastName}`}
+          title={memberDisplayName}
           links={[
             {
               children: t`Workspace`,
@@ -201,7 +255,7 @@ export const SettingsWorkspaceMember = () => {
               href: getSettingsPath(SettingsPath.WorkspaceMembersPage),
             },
             {
-              children: `${member.name.firstName} ${member.name.lastName}`,
+              children: memberDisplayName,
             },
           ]}
           secondaryBar={
@@ -237,6 +291,16 @@ export const SettingsWorkspaceMember = () => {
                 }
                 onNameChange={debouncedUpdateName}
                 onDelete={() => openDialog(DELETE_MEMBER_MODAL_ID)}
+                onDeactivate={
+                  !isCurrentWorkspaceMember && !isMemberDeactivated
+                    ? () => openDialog(DEACTIVATE_MEMBER_MODAL_ID)
+                    : undefined
+                }
+                onReactivate={
+                  !isCurrentWorkspaceMember && isMemberDeactivated
+                    ? () => handleUpdateMemberStatus('ACTIVE')
+                    : undefined
+                }
                 twoFactorAuthenticationRecoveryUserId={
                   canManageTwoFactorAuthenticationRecovery &&
                   isDefined(member.userId) &&
@@ -265,6 +329,15 @@ export const SettingsWorkspaceMember = () => {
             onConfirmClick={handleDeleteMember}
             confirmButtonText={t`Remove member`}
             loading={isDeleting}
+          />
+
+          <ConfirmationDialog
+            dialogId={DEACTIVATE_MEMBER_MODAL_ID}
+            title={t`Deactivate member`}
+            subtitle={t`This member will no longer be able to sign in and won't be offered for new assignments. Records already assigned to them keep showing them.`}
+            onConfirmClick={() => handleUpdateMemberStatus('DEACTIVATED')}
+            confirmButtonText={t`Deactivate member`}
+            loading={isUpdatingStatus}
           />
         </SettingsPageLayout>
       )}

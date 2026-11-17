@@ -17,6 +17,8 @@ type MemberInfosTabProps = {
   onNameChange: (firstName: string, lastName: string) => void;
   onImpersonate?: () => void;
   onDelete: () => void;
+  onDeactivate?: () => void;
+  onReactivate?: () => void;
   twoFactorAuthenticationRecoveryUserId?: string;
 };
 
@@ -36,6 +38,8 @@ export const MemberInfosTab = ({
   onNameChange,
   onImpersonate,
   onDelete,
+  onDeactivate,
+  onReactivate,
   twoFactorAuthenticationRecoveryUserId,
 }: MemberInfosTabProps) => {
   const [firstName, setFirstName] = useState(member.name.firstName);
@@ -106,6 +110,20 @@ export const MemberInfosTab = ({
               onClick={onImpersonate}
               variant="outline"
             >{t`Impersonate`}</Button>
+          )}
+          {onDeactivate && (
+            <Button
+              size="sm"
+              onClick={onDeactivate}
+              variant="outline"
+            >{t`Deactivate`}</Button>
+          )}
+          {onReactivate && (
+            <Button
+              size="sm"
+              onClick={onReactivate}
+              variant="outline"
+            >{t`Reactivate`}</Button>
           )}
           <Button
             size="sm"

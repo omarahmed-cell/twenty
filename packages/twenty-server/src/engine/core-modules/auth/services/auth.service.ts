@@ -11,6 +11,7 @@ import { PasswordUpdateNotifyEmail, renderEmail } from 'twenty-emails';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { AppPath, ConnectedAccountProvider } from 'twenty-shared/types';
 import { assertIsDefinedOrThrow, isDefined } from 'twenty-shared/utils';
+import { isWorkspaceProvisioned } from 'twenty-shared/workspace';
 import { IsNull, Repository } from 'typeorm';
 
 import {
@@ -48,9 +49,12 @@ import { JwtTokenTypeEnum } from 'src/engine/core-modules/auth/types/jwt-token-t
 import {
   type AuthProviderWithPasswordType,
   type ExistingUserOrNewUser,
+  type SignInEmailVerification,
   type SignInUpBaseParams,
   type SignInUpNewUserPayload,
 } from 'src/engine/core-modules/auth/types/sign-in-up.type';
+import { buildWorkspaceMemberDeactivatedException } from 'src/engine/core-modules/auth/utils/assert-workspace-member-is-not-deactivated.util';
+import { isEmailVerifiedForSignIn } from 'src/engine/core-modules/auth/utils/is-email-verified-for-sign-in.util';
 import { assertIssuerIsPublishedOrThrow } from 'src/engine/core-modules/auth/utils/assert-issuer-is-published.util';
 import { assertUserPasswordIsValidOrThrow } from 'src/engine/core-modules/auth/utils/assert-user-password-is-valid-or-throw.util';
 import { validateRedirectUri } from 'src/engine/core-modules/auth/utils/validate-redirect-uri.util';
@@ -66,7 +70,9 @@ import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { UserSessionService } from 'src/engine/core-modules/user-session/services/user-session.service';
 import { UserSessionRevokedReason } from 'src/engine/core-modules/user-session/types/user-session-revoked-reason.type';
+import { WorkspaceMemberAccessService } from 'src/engine/core-modules/user-workspace/services/workspace-member-access.service';
 import { UserWorkspaceService } from 'src/engine/core-modules/user-workspace/user-workspace.service';
+import { isWorkspaceMemberDeactivated } from 'src/modules/workspace-member/utils/is-workspace-member-deactivated.util';
 import { UserService } from 'src/engine/core-modules/user/services/user.service';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { INVITATION_APP_TOKEN_TYPES } from 'src/engine/core-modules/workspace-invitation/constants/invitation-app-token-types';
@@ -109,6 +115,7 @@ export class AuthService {
     private readonly featureFlagService: FeatureFlagService,
     private readonly createSsoConnectedAccountService: CreateSsoConnectedAccountService,
     private readonly userSessionService: UserSessionService,
+    private readonly workspaceMemberAccessService: WorkspaceMemberAccessService,
   ) {}
 
   private async findUserByEmailOrThrow(email: string) {
@@ -212,6 +219,33 @@ export class AuthService {
     if (isWorkspaceMember) {
       await this.validatePasswordCredentialsOrThrow(user, input.password);
 
+      await this.assertUserIsNotDeactivatedInWorkspaceOrThrow(user, workspace);
+
+      return user;
+    }
+
+    const preCreatedWorkspaceMemberMatch = isWorkspaceProvisioned(workspace)
+      ? await this.workspaceMemberAccessService.findPreCreatedWorkspaceMemberMatch(
+          {
+            workspaceId: workspace.id,
+            email: user.email,
+            isEmailVerified: isEmailVerifiedForSignIn({
+              isUserEmailVerified: user.isEmailVerified,
+              isEmailVerifiedByAuthProvider: false,
+            }),
+          },
+        )
+      : null;
+
+    // A pre-created member stands in for the invitation; joining refuses it when deactivated or unverified
+    if (isDefined(preCreatedWorkspaceMemberMatch)) {
+      await this.validatePasswordCredentialsOrThrow(user, input.password);
+
+      await this.userWorkspaceService.addUserToWorkspaceIfUserNotInWorkspace(
+        user,
+        workspace,
+      );
+
       return user;
     }
 
@@ -232,6 +266,28 @@ export class AuthService {
     await this.checkIsEmailVerified(user.isEmailVerified);
 
     return user;
+  }
+
+  private async assertUserIsNotDeactivatedInWorkspaceOrThrow(
+    user: Pick<UserEntity, 'id'>,
+    workspace: WorkspaceEntity,
+  ) {
+    if (!isWorkspaceProvisioned(workspace)) {
+      return;
+    }
+
+    const workspaceMember =
+      await this.workspaceMemberAccessService.findWorkspaceMemberByUserId({
+        workspaceId: workspace.id,
+        userId: user.id,
+      });
+
+    if (
+      isDefined(workspaceMember) &&
+      isWorkspaceMemberDeactivated(workspaceMember)
+    ) {
+      throw buildWorkspaceMemberDeactivatedException();
+    }
   }
 
   async checkIsEmailVerified(isEmailVerified: boolean) {
@@ -912,6 +968,7 @@ export class AuthService {
     invitation,
     workspaceInviteHash,
     workspace,
+    isEmailVerifiedByAuthProvider,
   }: {
     workspaceInviteHash?: string;
   } & ExistingUserOrNewUser &
@@ -926,6 +983,24 @@ export class AuthService {
       userData.type === 'newUser'
         ? userData.newUserPayload.email
         : userData.existingUser.email;
+
+    if (isDefined(workspace) && isWorkspaceProvisioned(workspace)) {
+      const workspaceMemberSignInAccess =
+        await this.getWorkspaceMemberSignInAccess({
+          workspaceId: workspace.id,
+          userData,
+          email,
+          isEmailVerifiedByAuthProvider,
+        });
+
+      if (workspaceMemberSignInAccess === 'deactivated') {
+        throw buildWorkspaceMemberDeactivatedException();
+      }
+
+      if (workspaceMemberSignInAccess === 'pre-created') {
+        return;
+      }
+    }
 
     if (
       isDefined(workspace) &&
@@ -978,6 +1053,57 @@ export class AuthService {
           userFriendlyMessage: msg`User does not have access to this workspace`,
         },
       );
+    }
+  }
+
+  private async getWorkspaceMemberSignInAccess({
+    workspaceId,
+    userData,
+    email,
+    isEmailVerifiedByAuthProvider,
+  }: {
+    workspaceId: string;
+    email: string;
+  } & ExistingUserOrNewUser &
+    SignInEmailVerification): Promise<
+    'deactivated' | 'pre-created' | 'default'
+  > {
+    if (userData.type === 'existingUser') {
+      const workspaceMember =
+        await this.workspaceMemberAccessService.findWorkspaceMemberByUserId({
+          workspaceId,
+          userId: userData.existingUser.id,
+        });
+
+      if (isDefined(workspaceMember)) {
+        return isWorkspaceMemberDeactivated(workspaceMember)
+          ? 'deactivated'
+          : 'default';
+      }
+    }
+
+    const preCreatedWorkspaceMemberMatch =
+      await this.workspaceMemberAccessService.findPreCreatedWorkspaceMemberMatch(
+        {
+          workspaceId,
+          email,
+          isEmailVerified: isEmailVerifiedForSignIn({
+            isUserEmailVerified:
+              userData.type === 'existingUser'
+                ? userData.existingUser.isEmailVerified
+                : userData.newUserPayload.isEmailAlreadyVerified,
+            isEmailVerifiedByAuthProvider,
+          }),
+        },
+      );
+
+    switch (preCreatedWorkspaceMemberMatch?.decision) {
+      case 'deactivated':
+        return 'deactivated';
+      case 'attach':
+        return 'pre-created';
+      default:
+        return 'default';
     }
   }
 
@@ -1070,6 +1196,7 @@ export class AuthService {
         invitation,
         workspaceInviteHash,
         workspace: currentWorkspace,
+        isEmailVerifiedByAuthProvider: true,
       });
 
       const { user, workspace } = await this.signInUp({
@@ -1080,6 +1207,7 @@ export class AuthService {
           provider: authProvider,
         },
         billingCheckoutSessionState,
+        isEmailVerifiedByAuthProvider: true,
       });
 
       await this.createSsoConnectedAccountIfFeatureFlagIsOn({

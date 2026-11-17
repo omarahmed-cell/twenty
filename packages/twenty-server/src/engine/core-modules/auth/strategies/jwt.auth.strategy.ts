@@ -18,6 +18,7 @@ import { type RawAuthContext } from 'src/engine/core-modules/auth/types/raw-auth
 import { type JwtPayload } from 'src/engine/core-modules/auth/types/jwt-payload.type';
 import { JwtTokenTypeEnum } from 'src/engine/core-modules/auth/types/jwt-token-type.enum';
 import { type PlaygroundTokenJwtPayload } from 'src/engine/core-modules/auth/types/playground-token-jwt-payload.type';
+import { assertWorkspaceMemberIsNotDeactivated } from 'src/engine/core-modules/auth/utils/assert-workspace-member-is-not-deactivated.util';
 import { type WorkspaceAgnosticTokenJwtPayload } from 'src/engine/core-modules/auth/types/workspace-agnostic-token-jwt-payload.type';
 import { IMPERSONATION_DENIAL_BY_REASON } from 'src/engine/core-modules/impersonation/constants/impersonation-denial-by-reason.constant';
 import { ImpersonationAuthorizationService } from 'src/engine/core-modules/impersonation/services/impersonation-authorization.service';
@@ -204,6 +205,11 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
           userFriendlyMessage: msg`User is not a member of the workspace.`,
         },
       ),
+    );
+
+    assertWorkspaceMemberIsNotDeactivated(
+      workspaceMember,
+      AuthExceptionCode.UNAUTHENTICATED,
     );
 
     return {
@@ -418,6 +424,11 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
             userFriendlyMessage: msg`User is not a member of the workspace.`,
           },
         ),
+      );
+
+      assertWorkspaceMemberIsNotDeactivated(
+        workspaceMember,
+        AuthExceptionCode.UNAUTHENTICATED,
       );
 
       context.workspaceMemberId = workspaceMemberId;

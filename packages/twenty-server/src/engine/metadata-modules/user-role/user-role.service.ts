@@ -22,6 +22,7 @@ import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scope
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { STANDARD_ROLE } from 'src/engine/workspace-manager/twenty-standard-application/constants/standard-role.constant';
 import { WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
+import { isWorkspaceMemberDeactivated } from 'src/modules/workspace-member/utils/is-workspace-member-deactivated.util';
 
 export class UserRoleService {
   constructor(
@@ -408,7 +409,12 @@ export class UserRoleService {
     const workspaceMembersWithAdminRole =
       await this.getWorkspaceMembersAssignedToRole(adminRoleId, workspaceId);
 
-    if (workspaceMembersWithAdminRole.length === 1) {
+    const activeAdminCount = workspaceMembersWithAdminRole.filter(
+      (workspaceMember) => !isWorkspaceMemberDeactivated(workspaceMember),
+    ).length;
+
+    // Deactivated admins cannot sign in, so they do not count as a remaining admin
+    if (workspaceMembersWithAdminRole.length === 1 || activeAdminCount <= 1) {
       throw new PermissionsException(
         PermissionsExceptionMessage.CANNOT_UNASSIGN_LAST_ADMIN,
         PermissionsExceptionCode.CANNOT_UNASSIGN_LAST_ADMIN,

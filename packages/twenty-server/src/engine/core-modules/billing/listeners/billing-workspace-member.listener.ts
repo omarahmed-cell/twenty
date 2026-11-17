@@ -2,7 +2,11 @@
 
 import { Injectable } from '@nestjs/common';
 
-import { type ObjectRecordCreateEvent } from 'twenty-shared/database-events';
+import {
+  type ObjectRecordCreateEvent,
+  type ObjectRecordUpdateEvent,
+} from 'twenty-shared/database-events';
+import { isDefined } from 'twenty-shared/utils';
 
 import { OnDatabaseBatchEvent } from 'src/engine/api/graphql/graphql-query-runner/decorators/on-database-batch-event.decorator';
 import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
@@ -34,6 +38,29 @@ export class BillingWorkspaceMemberListener {
       ObjectRecordCreateEvent<WorkspaceMemberWorkspaceEntity>
     >,
   ) {
+    await this.enqueueSubscriptionQuantityUpdate(payload.workspaceId);
+  }
+
+  @OnDatabaseBatchEvent('workspaceMember', DatabaseEventAction.UPDATED)
+  async handleUpdateEvent(
+    payload: WorkspaceEventBatch<
+      ObjectRecordUpdateEvent<WorkspaceMemberWorkspaceEntity>
+    >,
+  ) {
+    const hasSeatRelevantChange = payload.events.some(
+      ({ properties }) =>
+        isDefined(properties.diff?.memberStatus) ||
+        isDefined(properties.diff?.isPreCreated),
+    );
+
+    if (!hasSeatRelevantChange) {
+      return;
+    }
+
+    await this.enqueueSubscriptionQuantityUpdate(payload.workspaceId);
+  }
+
+  private async enqueueSubscriptionQuantityUpdate(workspaceId: string) {
     if (!this.twentyConfigService.get('IS_BILLING_ENABLED')) {
       return;
     }
@@ -42,7 +69,7 @@ export class BillingWorkspaceMemberListener {
     // don't each generate a new Stripe invoice.
     await this.messageQueueService.add<UpdateSubscriptionQuantityJobData>(
       UpdateSubscriptionQuantityJob.name,
-      { workspaceId: payload.workspaceId },
+      { workspaceId },
       {
         delay: UPDATE_SUBSCRIPTION_QUANTITY_JOB_DELAY_MS,
       },

@@ -11,6 +11,7 @@ import { objectFilterDropdownSearchInputComponentState } from '@/object-record/o
 import { relationTargetFieldMetadataIdUsedInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/relationTargetFieldMetadataIdUsedInDropdownComponentState';
 import { selectedOperandInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/selectedOperandInDropdownComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
+import { useWorkspaceMemberFilterItemSections } from '@/object-record/object-filter-dropdown/hooks/useWorkspaceMemberFilterItemSections';
 import { MultipleSelectDropdown } from '@/object-record/select/components/MultipleSelectDropdown';
 import { useRecordsForSelect } from '@/object-record/select/hooks/useRecordsForSelect';
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
@@ -19,6 +20,7 @@ import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { type RelationFilterValue } from '@/views/view-filter-value/types/RelationFilterValue';
 import { t } from '@lingui/core/macro';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import {
   arrayOfUuidOrVariableSchema,
   getJunctionTargetFieldId,
@@ -129,6 +131,13 @@ const ObjectFilterDropdownRecordSelectContent = ({
       allowRequestsToTwentyIcons,
     });
 
+  const { activeItemsToSelect, deactivatedSection } =
+    useWorkspaceMemberFilterItemSections({
+      itemsToSelect: recordsToSelect,
+      isWorkspaceMemberList:
+        objectNameSingular === CoreObjectNameSingular.WorkspaceMember,
+    });
+
   const currentWorkspaceMemberSelectableItem: SelectableItem = {
     id: CURRENT_WORKSPACE_MEMBER_SELECTABLE_ITEM_ID,
     name: t`Me`,
@@ -231,7 +240,8 @@ const ObjectFilterDropdownRecordSelectContent = ({
       <MultipleSelectDropdown
         selectableListId="object-filter-record-select-id"
         focusId={dropdownId}
-        itemsToSelect={recordsToSelect}
+        itemsToSelect={activeItemsToSelect}
+        secondarySection={deactivatedSection}
         filteredSelectedItems={filteredSelectedRecords}
         selectedItems={selectedRecords}
         onChange={handleMultipleRecordSelectChange}

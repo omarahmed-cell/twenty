@@ -11,7 +11,7 @@ import { type EmailRecipientPerson } from '@/activities/emails/recipients/types/
 import { getEmailRecipientKey } from '@/activities/emails/recipients/utils/getEmailRecipientKey';
 import { getEmailRecipientPersonFromRecord } from '@/activities/emails/recipients/utils/getEmailRecipientPersonFromRecord';
 import { isValidEmailRecipientAddress } from '@/activities/emails/recipients/utils/isValidEmailRecipientAddress';
-import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { activeWorkspaceMembersSelector } from '@/workspace-member/states/activeWorkspaceMembersSelector';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useObjectRecordSearchRecords } from '@/object-record/hooks/useObjectRecordSearchRecords';
@@ -70,8 +70,8 @@ export const useEmailRecipientSuggestions = ({
   excludedRecipientKeys,
   contextRecord,
 }: UseEmailRecipientSuggestionsArgs) => {
-  const currentWorkspaceMembers = useAtomStateValue(
-    currentWorkspaceMembersState,
+  const activeWorkspaceMembers = useAtomStateValue(
+    activeWorkspaceMembersSelector,
   );
 
   const trimmedSearchInput = searchInput.trim();
@@ -157,7 +157,7 @@ export const useEmailRecipientSuggestions = ({
   const contextPersonIds = new Set(contextPeople.map((person) => person.id));
 
   const workspaceMembersById = new Map(
-    currentWorkspaceMembers.map((workspaceMember) => [
+    activeWorkspaceMembers.map((workspaceMember) => [
       workspaceMember.id,
       workspaceMember,
     ]),

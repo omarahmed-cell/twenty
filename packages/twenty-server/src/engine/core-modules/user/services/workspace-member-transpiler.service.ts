@@ -16,12 +16,15 @@ import {
   type WorkspaceMemberTimeFormatEnum,
   type WorkspaceMemberWorkspaceEntity,
 } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
+import { WORKSPACE_MEMBER_STATUS } from 'src/modules/workspace-member/constants/workspace-member-status.constant';
 import { FileFolder, OpenRecordIn } from 'twenty-shared/types';
 
+// Pre-created members have no userWorkspace and therefore no role yet
 export type ToWorkspaceMemberDtoArgs = {
+  workspaceId: string;
   workspaceMemberEntity: WorkspaceMemberWorkspaceEntity;
   userWorkspaceRoles: RoleEntity[];
-  userWorkspace: UserWorkspaceEntity;
+  userWorkspace: UserWorkspaceEntity | undefined;
 };
 
 @Injectable()
@@ -59,6 +62,7 @@ export class WorkspaceMemberTranspiler {
   }
 
   async toWorkspaceMemberDto({
+    workspaceId,
     userWorkspace,
     workspaceMemberEntity,
     userWorkspaceRoles,
@@ -78,10 +82,12 @@ export class WorkspaceMemberTranspiler {
       calendarStartDay,
       numberFormat,
       userId,
+      memberStatus,
+      isPreCreated,
     } = workspaceMemberEntity;
 
     const avatarUrl = await this.generateSignedAvatarUrl({
-      workspaceId: userWorkspace.workspaceId,
+      workspaceId,
       workspaceMember: {
         avatarUrl: avatarUrlFromEntity,
         id,
@@ -100,7 +106,7 @@ export class WorkspaceMemberTranspiler {
       userEmail,
       avatarUrl,
       userId,
-      userWorkspaceId: userWorkspace.id,
+      userWorkspaceId: userWorkspace?.id,
       colorScheme,
       openRecordIn: openRecordIn as OpenRecordIn,
       uiScale,
@@ -111,6 +117,8 @@ export class WorkspaceMemberTranspiler {
       roles,
       calendarStartDay,
       numberFormat: numberFormat as WorkspaceMemberNumberFormatEnum,
+      memberStatus: memberStatus ?? WORKSPACE_MEMBER_STATUS.ACTIVE,
+      isPreCreated: isPreCreated ?? false,
     } satisfies WorkspaceMemberDTO;
   }
 

@@ -1,9 +1,14 @@
 import { msg } from '@lingui/core/macro';
+import {
+  getSelectOptionUniversalIdentifier,
+  TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+} from 'twenty-shared/application';
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-application/utils/i18n-label.util';
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  MetadataWritability,
   NumberDataType,
   RelationType,
   OpenRecordIn,
@@ -16,6 +21,7 @@ import {
   createStandardFieldFlatMetadata,
 } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-field-flat-metadata.util';
 import { createStandardRelationFieldFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-relation-field-flat-metadata.util';
+import { WORKSPACE_MEMBER_STATUS } from 'src/modules/workspace-member/constants/workspace-member-status.constant';
 import { WorkspaceMemberNumberFormatEnum } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 
 export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
@@ -1376,4 +1382,96 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  memberStatus: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'memberStatus',
+        type: FieldMetadataType.SELECT,
+        label: i18nLabel(
+          msg({ message: `Status`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whether the workspace member can sign in`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconUserCheck',
+        isSystem: true,
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: `'${WORKSPACE_MEMBER_STATUS.ACTIVE}'`,
+        options: [
+          {
+            id: getSelectOptionUniversalIdentifier({
+              applicationUniversalIdentifier:
+                TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+              fieldUniversalIdentifier:
+                STANDARD_OBJECTS.workspaceMember.fields.memberStatus
+                  .universalIdentifier,
+              value: WORKSPACE_MEMBER_STATUS.ACTIVE,
+            }),
+            value: WORKSPACE_MEMBER_STATUS.ACTIVE,
+            label: i18nLabel(
+              msg({ message: `Active`, context: 'fieldMetadata.label' }),
+            ),
+            position: 0,
+            color: 'green',
+          },
+          {
+            id: getSelectOptionUniversalIdentifier({
+              applicationUniversalIdentifier:
+                TWENTY_STANDARD_APPLICATION_UNIVERSAL_IDENTIFIER,
+              fieldUniversalIdentifier:
+                STANDARD_OBJECTS.workspaceMember.fields.memberStatus
+                  .universalIdentifier,
+              value: WORKSPACE_MEMBER_STATUS.DEACTIVATED,
+            }),
+            value: WORKSPACE_MEMBER_STATUS.DEACTIVATED,
+            label: i18nLabel(
+              msg({ message: `Deactivated`, context: 'fieldMetadata.label' }),
+            ),
+            position: 1,
+            color: 'gray',
+          },
+        ],
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isPreCreated: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isPreCreated',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({ message: `Pre-created`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Created by an admin before the person had an account`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconUserPlus',
+        isSystem: true,
+        isNullable: false,
+        isUIEditable: false,
+        defaultValue: false,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
 });

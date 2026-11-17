@@ -278,6 +278,7 @@ export class UserResolver {
     }
 
     return this.workspaceMemberTranspiler.toWorkspaceMemberDto({
+      workspaceId,
       workspaceMemberEntity,
       userWorkspace,
       userWorkspaceRoles,
@@ -328,6 +329,15 @@ export class UserResolver {
             workspaceMemberEntity.userId,
           );
 
+          if (workspaceMemberEntity.isPreCreated === true) {
+            return {
+              workspaceId: workspace.id,
+              userWorkspace: undefined,
+              userWorkspaceRoles: [],
+              workspaceMemberEntity,
+            };
+          }
+
           if (!isDefined(userWorkspace)) {
             throw new Error('UserEntity workspace not found');
           }
@@ -341,6 +351,7 @@ export class UserResolver {
           }
 
           return {
+            workspaceId: workspace.id,
             userWorkspace,
             userWorkspaceRoles,
             workspaceMemberEntity,
@@ -496,6 +507,13 @@ export class UserResolver {
       );
     }
 
+    if (workspaceMemberToDelete.isPreCreated === true) {
+      return this.userService.deletePreCreatedWorkspaceMember({
+        workspaceMember: workspaceMemberToDelete,
+        workspaceId: workspace.id,
+      });
+    }
+
     return this.userService.deleteUserWorkspaceAndPotentiallyDeleteUser({
       userId: workspaceMemberToDelete.userId,
       workspaceId: workspace.id,
@@ -605,6 +623,11 @@ export class UserResolver {
     await this.workspaceOrmManager.executeInWorkspaceContext(() =>
       workspaceMemberRepository.save(workspaceMemberUpdatePayload),
     );
+
+    // A pre-created member has no account yet, so there is no onboarding or userWorkspace to sync
+    if (workspaceMember.isPreCreated === true) {
+      return true;
+    }
 
     await this.onboardingService.completeOnboardingProfileStepIfNameProvided({
       userId: workspaceMember.userId,

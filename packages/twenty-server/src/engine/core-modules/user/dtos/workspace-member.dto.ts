@@ -73,4 +73,10 @@ export class WorkspaceMemberDTO {
 
   @Field(() => WorkspaceMemberNumberFormatEnum, { nullable: true })
   numberFormat?: WorkspaceMemberNumberFormatEnum;
+
+  @Field(() => String, { nullable: false })
+  memberStatus: string;
+
+  @Field(() => Boolean, { nullable: false })
+  isPreCreated: boolean;
 }

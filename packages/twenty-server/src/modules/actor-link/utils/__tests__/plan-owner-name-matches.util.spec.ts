@@ -20,26 +20,31 @@ const resolvedTo = (workspaceMemberId: string): OwnerResolution => ({
 });
 
 describe('buildOwnerNameIndex', () => {
-  it('keeps unique resolved names and lists duplicate and unresolved ones', () => {
+  it('resolves names shared by one person and lists conflicting and unresolved ones', () => {
     const index = buildOwnerNameIndex({
       ownerMap: {
         '1': buildOwner(' Sara Adel '),
         '2': buildOwner('Omar Nabil'),
         '3': buildOwner('Omar Nabil'),
         '4': buildOwner('Mona Ali'),
+        '5': buildOwner('Ali Hassan'),
+        '6': buildOwner('Ali Hassan'),
       },
       ownerResolutionByOwnerId: {
         '1': resolvedTo('member-sara'),
         '2': resolvedTo('member-omar'),
         '3': resolvedTo('member-omar'),
         '4': { isResolved: false, reason: 'EMAIL_NOT_FOUND' },
+        '5': resolvedTo('member-ali-one'),
+        '6': resolvedTo('member-ali-two'),
       },
     });
 
     expect([...index.workspaceMemberIdByName]).toEqual([
       ['Sara Adel', 'member-sara'],
+      ['Omar Nabil', 'member-omar'],
     ]);
-    expect(index.duplicateNames).toEqual(['Omar Nabil']);
+    expect(index.duplicateNames).toEqual(['Ali Hassan']);
     expect(index.unresolvedNames).toEqual(['Mona Ali']);
   });
 });

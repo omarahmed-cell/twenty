@@ -345,14 +345,19 @@ export class UserService {
 
     const userWorkspaceId = userWorkspace.id;
 
-    if (workspaceMembers.length === 1) {
+    // Pre-created members have no account, so they never keep a workspace alive
+    const workspaceMembersWithAccount = workspaceMembers.filter(
+      (workspaceMember) => workspaceMember.isPreCreated !== true,
+    );
+
+    if (workspaceMembersWithAccount.length === 1) {
       await this.workspaceService.suspendWorkspace(workspaceId);
       await this.workspaceService.deleteWorkspace(workspaceId, true);
 
       return;
     }
 
-    if (workspaceMembers.length > 1) {
+    if (workspaceMembersWithAccount.length > 1) {
       try {
         await this.userRoleService.validateUserWorkspaceIsNotUniqueAdminOrThrow(
           {
@@ -423,6 +428,46 @@ export class UserService {
     // After the membership is gone, so a failed removal keeps the history and threads created meanwhile are cleaned.
     await this.agentChatThreadRepository.delete(workspaceId, {
       workspaceMemberId: workspaceMember.id,
+    });
+  }
+
+  async deletePreCreatedWorkspaceMember({
+    workspaceMember,
+    workspaceId,
+  }: {
+    workspaceMember: Pick<
+      WorkspaceMemberWorkspaceEntity,
+      'id' | 'userId' | 'isPreCreated'
+    >;
+    workspaceId: string;
+  }): Promise<UserWorkspaceEntity> {
+    assert(
+      workspaceMember.isPreCreated === true,
+      `Workspace member ${workspaceMember.id} is not pre-created`,
+    );
+
+    await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
+      const workspaceMemberRepository =
+        this.workspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+          'workspaceMember',
+          { shouldBypassPermissionChecks: true },
+        );
+
+      await workspaceMemberRepository.delete({
+        id: workspaceMember.id,
+        isPreCreated: true,
+      });
+    }, buildSystemAuthContext(workspaceId));
+
+    await this.workspaceCacheService.invalidateAndRecompute(workspaceId, [
+      'flatWorkspaceMemberMaps',
+    ]);
+
+    // The mutation returns a UserWorkspace, which a pre-created member never had
+    return Object.assign(new UserWorkspaceEntity(), {
+      id: workspaceMember.id,
+      userId: workspaceMember.userId,
+      workspaceId,
     });
   }
 

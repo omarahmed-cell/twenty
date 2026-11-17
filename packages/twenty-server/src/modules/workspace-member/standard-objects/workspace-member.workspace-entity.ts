@@ -9,6 +9,7 @@ import { type AgentChatThreadParticipantWorkspaceEntity } from 'src/engine/metad
 import { type AgentChatThreadWorkspaceEntity } from 'src/engine/metadata-modules/ai/ai-history/standard-objects/agent-chat-thread.workspace-entity';
 import { type AgentMessageReactionWorkspaceEntity } from 'src/engine/metadata-modules/ai/ai-history/standard-objects/agent-message-reaction.workspace-entity';
 import { BaseWorkspaceEntity } from 'src/engine/twenty-orm/base.workspace-entity';
+import { type WorkspaceMemberStatus } from 'src/modules/workspace-member/constants/workspace-member-status.constant';
 import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-objects/attachment.workspace-entity';
 import { type BlocklistWorkspaceEntity } from 'src/modules/blocklist/standard-objects/blocklist.workspace-entity';
 import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-participant.workspace-entity';
@@ -72,6 +73,8 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   jobTitle: string | null;
   calendarStartDay: number;
   userId: string;
+  memberStatus: WorkspaceMemberStatus;
+  isPreCreated: boolean;
   timeZone: string;
   dateFormat: string;
   timeFormat: string;

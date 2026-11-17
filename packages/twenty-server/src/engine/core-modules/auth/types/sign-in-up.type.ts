@@ -10,11 +10,16 @@ export type SocialSsoSignInUpActionType =
   | 'list-available-workspaces'
   | 'join-workspace';
 
+// Set by providers that vouch for the email (Google, Microsoft, SSO), as an existing user's own flag may still be false
+export type SignInEmailVerification = {
+  isEmailVerifiedByAuthProvider?: boolean;
+};
+
 export type SignInUpBaseParams = {
   invitation?: AppTokenEntity;
   workspace?: WorkspaceEntity | null;
   billingCheckoutSessionState?: string | null;
-};
+} & SignInEmailVerification;
 
 export type SignInUpNewUserPayload = {
   email: string;

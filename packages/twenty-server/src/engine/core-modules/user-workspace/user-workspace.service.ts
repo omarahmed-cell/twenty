@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import { msg } from '@lingui/core/macro';
 import { type APP_LOCALES, SOURCE_LOCALE } from 'twenty-shared/translations';
 import { FileFolder, OpenRecordIn } from 'twenty-shared/types';
 import { assertIsDefinedOrThrow, isDefined } from 'twenty-shared/utils';
@@ -19,11 +20,15 @@ import {
 } from 'src/engine/core-modules/auth/auth.exception';
 import { type AvailableWorkspace } from 'src/engine/core-modules/auth/dto/available-workspaces.dto';
 import { LoginTokenService } from 'src/engine/core-modules/auth/token/services/login-token.service';
+import { type SignInEmailVerification } from 'src/engine/core-modules/auth/types/sign-in-up.type';
+import { buildWorkspaceMemberDeactivatedException } from 'src/engine/core-modules/auth/utils/assert-workspace-member-is-not-deactivated.util';
+import { isEmailVerifiedForSignIn } from 'src/engine/core-modules/auth/utils/is-email-verified-for-sign-in.util';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { FileCorePictureService } from 'src/engine/core-modules/file/file-core-picture/services/file-core-picture.service';
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
 import { extractFileIdFromUrl } from 'src/engine/core-modules/file/files-field/utils/extract-file-id-from-url.util';
 import { OnboardingService } from 'src/engine/core-modules/onboarding/onboarding.service';
+import { WorkspaceMemberAccessService } from 'src/engine/core-modules/user-workspace/services/workspace-member-access.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { WorkflowRunRecordShareService } from 'src/engine/core-modules/workflow/services/workflow-run-record-share.service';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
@@ -73,6 +78,7 @@ export class UserWorkspaceService {
     private readonly twentyConfigService: TwentyConfigService,
     private readonly workflowRunRecordShareService: WorkflowRunRecordShareService,
     private readonly workspaceCacheService: WorkspaceCacheService,
+    private readonly workspaceMemberAccessService: WorkspaceMemberAccessService,
   ) {}
 
   async findById(id: string): Promise<UserWorkspaceEntity | null> {
@@ -222,6 +228,7 @@ export class UserWorkspaceService {
     user: UserEntity,
     workspace: WorkspaceEntity,
     roleId?: string | null,
+    { isEmailVerifiedByAuthProvider }: SignInEmailVerification = {},
   ) {
     const existingUserWorkspace = await this.checkUserWorkspaceExists(
       user.id,
@@ -237,6 +244,13 @@ export class UserWorkspaceService {
       workspace,
     );
 
+    const preCreatedWorkspaceMemberToAttach =
+      await this.findPreCreatedWorkspaceMemberToAttachOrThrow({
+        user,
+        workspaceId: workspace.id,
+        isEmailVerifiedByAuthProvider,
+      });
+
     const userWorkspace = await this.create({
       userId: user.id,
       workspaceId: workspace.id,
@@ -244,7 +258,24 @@ export class UserWorkspaceService {
       locale: user.locale,
     });
 
-    await this.createWorkspaceMember(workspace.id, user);
+    if (isDefined(preCreatedWorkspaceMemberToAttach)) {
+      // The member lives in the workspace datasource, so the userWorkspace is undone by hand if the attach fails
+      try {
+        await this.workspaceMemberAccessService.attachPreCreatedWorkspaceMember(
+          {
+            workspaceId: workspace.id,
+            workspaceMember: preCreatedWorkspaceMemberToAttach,
+            user,
+          },
+        );
+      } catch (error) {
+        await this.userWorkspaceRepository.delete({ id: userWorkspace.id });
+
+        throw error;
+      }
+    } else {
+      await this.createWorkspaceMember(workspace.id, user);
+    }
 
     await this.workspaceCacheService.invalidateAndRecompute(workspace.id, [
       'flatWorkspaceMemberMaps',
@@ -266,6 +297,66 @@ export class UserWorkspaceService {
       workspaceId: workspace.id,
       value: true,
     });
+  }
+
+  // Never touches a member the user already has, and refuses rather than inserting a duplicate of a pre-created one
+  private async findPreCreatedWorkspaceMemberToAttachOrThrow({
+    user,
+    workspaceId,
+    isEmailVerifiedByAuthProvider,
+  }: {
+    user: Pick<UserEntity, 'id' | 'email' | 'isEmailVerified'>;
+    workspaceId: string;
+    isEmailVerifiedByAuthProvider: boolean | undefined;
+  }): Promise<WorkspaceMemberWorkspaceEntity | undefined> {
+    const existingWorkspaceMember =
+      await this.workspaceMemberAccessService.findWorkspaceMemberByUserId({
+        workspaceId,
+        userId: user.id,
+      });
+
+    if (isDefined(existingWorkspaceMember)) {
+      return undefined;
+    }
+
+    const preCreatedWorkspaceMemberMatch =
+      await this.workspaceMemberAccessService.findPreCreatedWorkspaceMemberMatch(
+        {
+          workspaceId,
+          email: user.email,
+          isEmailVerified: isEmailVerifiedForSignIn({
+            isUserEmailVerified: user.isEmailVerified,
+            isEmailVerifiedByAuthProvider,
+          }),
+        },
+      );
+
+    if (!isDefined(preCreatedWorkspaceMemberMatch)) {
+      return undefined;
+    }
+
+    switch (preCreatedWorkspaceMemberMatch.decision) {
+      case 'attach':
+        return preCreatedWorkspaceMemberMatch.workspaceMember;
+      case 'deactivated':
+        throw buildWorkspaceMemberDeactivatedException();
+      case 'email-not-verified':
+        throw new AuthException(
+          'Verify your email to join this workspace',
+          AuthExceptionCode.FORBIDDEN_EXCEPTION,
+          {
+            userFriendlyMessage: msg`Verify your email to join this workspace`,
+          },
+        );
+      case 'ineligible':
+        throw new AuthException(
+          'A pre-created workspace member with this email cannot be attached',
+          AuthExceptionCode.FORBIDDEN_EXCEPTION,
+          {
+            userFriendlyMessage: msg`User does not have access to this workspace`,
+          },
+        );
+    }
   }
 
   private async resolveRoleIdForNewMember(

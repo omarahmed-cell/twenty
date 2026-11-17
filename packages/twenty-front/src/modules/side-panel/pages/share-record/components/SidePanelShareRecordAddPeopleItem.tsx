@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Dropdown } from 'twenty-ui/components/navigation';
 import { IconLock, IconPlus, IconUsers } from 'twenty-ui/icon';
 
-import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { activeWorkspaceMembersSelector } from '@/workspace-member/states/activeWorkspaceMembersSelector';
 import { RecordSharingAccessSelect } from '@/object-record/record-sharing/components/RecordSharingAccessSelect';
 import { type useRecordSharing } from '@/object-record/record-sharing/hooks/useRecordSharing';
 import { SidePanelShareRecordDropdownItem } from '@/side-panel/pages/share-record/components/SidePanelShareRecordDropdownItem';
@@ -31,8 +31,8 @@ export const SidePanelShareRecordAddPeopleItem = ({
   setShare,
 }: SidePanelShareRecordAddPeopleItemProps) => {
   const { t } = useLingui();
-  const currentWorkspaceMembers = useAtomStateValue(
-    currentWorkspaceMembersState,
+  const activeWorkspaceMembers = useAtomStateValue(
+    activeWorkspaceMembersSelector,
   );
   const [search, setSearch] = useState('');
   const [invitationAccessLevel, setInvitationAccessLevel] = useState(
@@ -42,7 +42,7 @@ export const SidePanelShareRecordAddPeopleItem = ({
     text.toLowerCase().includes(search.trim().toLowerCase());
   const isAlreadyShared = (principalId: string) =>
     sharing.shares.some((share) => share.principalId === principalId);
-  const availableMembers = currentWorkspaceMembers.filter(
+  const availableMembers = activeWorkspaceMembers.filter(
     (member) =>
       !isAlreadyShared(member.id) &&
       matchesSearch(

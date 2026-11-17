@@ -14,6 +14,7 @@ import {
   AuthExceptionCode,
 } from 'src/engine/core-modules/auth/auth.exception';
 import { type AuthToken } from 'src/engine/core-modules/auth/dto/auth-token.dto';
+import { assertWorkspaceMemberIsNotDeactivated } from 'src/engine/core-modules/auth/utils/assert-workspace-member-is-not-deactivated.util';
 import { JwtAuthStrategy } from 'src/engine/core-modules/auth/strategies/jwt.auth.strategy';
 import { type RawAuthContext } from 'src/engine/core-modules/auth/types/raw-auth-context.type';
 import { type AccessTokenJwtPayload } from 'src/engine/core-modules/auth/types/access-token-jwt-payload.type';
@@ -102,6 +103,8 @@ export class AccessTokenService {
               },
             ),
           );
+
+          assertWorkspaceMemberIsNotDeactivated(workspaceMember);
 
           return workspaceMember.id;
         }, authContext);

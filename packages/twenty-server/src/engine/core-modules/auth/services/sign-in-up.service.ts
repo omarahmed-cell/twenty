@@ -46,6 +46,7 @@ import {
   type AuthProviderWithPasswordType,
   type ExistingUserOrPartialUserWithPicture,
   type PartialUserWithPicture,
+  type SignInEmailVerification,
   type SignInUpBaseParams,
   type SignInUpNewUserPayload,
 } from 'src/engine/core-modules/auth/types/sign-in-up.type';
@@ -146,6 +147,7 @@ export class SignInUpService {
         user: await this.signInUpWithPersonalInvitation({
           invitation: params.invitation,
           userData: params.userData,
+          isEmailVerifiedByAuthProvider: params.isEmailVerifiedByAuthProvider,
         }),
       };
     }
@@ -154,6 +156,7 @@ export class SignInUpService {
       const updatedUser = await this.signInUpOnExistingWorkspace({
         workspace: params.workspace,
         userData: params.userData,
+        isEmailVerifiedByAuthProvider: params.isEmailVerifiedByAuthProvider,
       });
 
       return { user: updatedUser, workspace: params.workspace };
@@ -181,7 +184,8 @@ export class SignInUpService {
   private async signInUpWithPersonalInvitation(
     params: {
       invitation: AppTokenEntity;
-    } & ExistingUserOrPartialUserWithPicture,
+    } & ExistingUserOrPartialUserWithPicture &
+      SignInEmailVerification,
   ) {
     if (!params.invitation) {
       throw new AuthException(
@@ -224,6 +228,7 @@ export class SignInUpService {
       workspace: invitationValidation.workspace,
       userData: params.userData,
       roleId: params.invitation.context?.roleId,
+      isEmailVerifiedByAuthProvider: params.isEmailVerifiedByAuthProvider,
     });
 
     if (
@@ -288,7 +293,8 @@ export class SignInUpService {
     params: {
       workspace: WorkspaceEntity;
       roleId?: string | null;
-    } & ExistingUserOrPartialUserWithPicture,
+    } & ExistingUserOrPartialUserWithPicture &
+      SignInEmailVerification,
   ) {
     await this.throwIfWorkspaceIsNotReadyForSignInUp(params.workspace, params);
 
@@ -315,6 +321,7 @@ export class SignInUpService {
         user,
         params.workspace,
         params.roleId,
+        { isEmailVerifiedByAuthProvider: params.isEmailVerifiedByAuthProvider },
       );
 
       return user;
@@ -331,6 +338,7 @@ export class SignInUpService {
       user,
       params.workspace,
       params.roleId,
+      { isEmailVerifiedByAuthProvider: params.isEmailVerifiedByAuthProvider },
     );
 
     return user;

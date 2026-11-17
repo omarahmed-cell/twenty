@@ -3,6 +3,11 @@ import { DropdownContent } from '@/ui/layout/dropdown/components/DropdownContent
 import { DROPDOWN_OFFSET_Y } from '@/ui/layout/dropdown/constants/DropdownOffsetY';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
+import { SettingsWorkspaceMemberAddModal } from '@/settings/members/components/SettingsWorkspaceMemberAddModal';
+import { useRefreshCurrentWorkspaceMembers } from '@/settings/members/hooks/useRefreshCurrentWorkspaceMembers';
+import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
+import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
+import { getWorkspaceMemberLabelWithStatus } from '@/workspace-member/utils/getWorkspaceMemberLabelWithStatus';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
@@ -28,12 +33,14 @@ import {
   IconChevronRight,
   IconHierarchy,
   IconListDetails,
+  IconPlus,
 } from 'twenty-ui/icon';
 import { Avatar } from 'twenty-ui/primitives/data-display';
 import { Button } from 'twenty-ui/primitives/input';
 import { Tooltip } from 'twenty-ui/primitives/surfaces';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 import { useDebounce } from 'use-debounce';
+import { PermissionFlagType } from '~/generated-metadata/graphql';
 import { useNavigateApp } from '~/hooks/useNavigateApp';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
@@ -72,6 +79,20 @@ const StyledTableRows = styled.div`
   padding-top: ${themeCssVariables.spacing[2]};
 `;
 
+const StyledNotSignedInYet = styled.span`
+  color: ${themeCssVariables.font.color.tertiary};
+  margin-left: ${themeCssVariables.spacing[1]};
+  white-space: nowrap;
+`;
+
+const StyledNameCellContent = styled.div`
+  align-items: center;
+  display: flex;
+  min-width: 0;
+`;
+
+const ADD_WORKSPACE_MEMBER_MODAL_ID = 'add-workspace-member-modal';
+
 const StyledChevronWrapper = styled.div`
   align-items: center;
   color: ${themeCssVariables.font.color.secondary};
@@ -88,6 +109,12 @@ export const SettingsWorkspaceMembersTeamTab = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const canManageMembers = useHasPermissionFlag(
+    PermissionFlagType.WORKSPACE_MEMBERS,
+  );
+  const { openDialog } = useDialog();
+  const { refreshCurrentWorkspaceMembers } =
+    useRefreshCurrentWorkspaceMembers();
 
   const [debouncedSearchFilter] = useDebounce(searchFilter, 300);
 
@@ -114,10 +141,15 @@ export const SettingsWorkspaceMembersTeamTab = () => {
     fetchMoreRecords,
     hasNextPage,
     loading,
+    refetch,
   } = useFindManyRecords<WorkspaceMember>({
     objectNameSingular: CoreObjectNameSingular.WorkspaceMember,
     filter: searchServerFilter,
   });
+
+  const handleMemberAdded = async () => {
+    await Promise.all([refetch(), refreshCurrentWorkspaceMembers()]);
+  };
 
   const handleSearchChange = (text: string) => {
     setSearchFilter(text);
@@ -203,11 +235,19 @@ export const SettingsWorkspaceMembersTeamTab = () => {
             </Dropdown.Section>
           </DropdownContent>
         </DropdownRoot>
+        {canManageMembers && (
+          <Button
+            startIcon={<IconPlus />}
+            size="md"
+            variant="outline"
+            onClick={() => openDialog(ADD_WORKSPACE_MEMBER_MODAL_ID)}
+          >{t`Add member`}</Button>
+        )}
       </StyledSearchContainer>
       <StyledTableContainer hasMoreRows={hasNextPage}>
         <Table>
           <TableRow
-            gridAutoColumns="150px 1fr 40px"
+            gridAutoColumns="220px 1fr 40px"
             mobileGridAutoColumns="100px 1fr 32px"
           >
             <TableHeader>
@@ -222,7 +262,7 @@ export const SettingsWorkspaceMembersTeamTab = () => {
             {optimizedWorkspaceMembers.length > 0 ? (
               optimizedWorkspaceMembers.map((workspaceMember) => (
                 <TableRow
-                  gridAutoColumns="150px 1fr 40px"
+                  gridAutoColumns="220px 1fr 40px"
                   mobileGridAutoColumns="100px 1fr 32px"
                   key={workspaceMember.id}
                   cursor="pointer"
@@ -246,18 +286,29 @@ export const SettingsWorkspaceMembersTeamTab = () => {
                       />
                     </StyledIconWrapper>
                     <Tooltip
-                      content={`${workspaceMember.name.firstName} ${workspaceMember.name.lastName}`}
+                      content={getWorkspaceMemberLabelWithStatus({
+                        label: `${workspaceMember.name.firstName} ${workspaceMember.name.lastName}`,
+                        memberStatus: workspaceMember.memberStatus,
+                      })}
                       side="top"
                       positionMethod="fixed"
                       delay={TooltipDelay.shortDelay}
                     >
-                      <StyledTextContainerWithEllipsis
-                        id={`hover-text-${workspaceMember.id}`}
-                      >
-                        {workspaceMember.name.firstName +
-                          ' ' +
-                          workspaceMember.name.lastName}
-                      </StyledTextContainerWithEllipsis>
+                      <StyledNameCellContent>
+                        <StyledTextContainerWithEllipsis
+                          id={`hover-text-${workspaceMember.id}`}
+                        >
+                          {getWorkspaceMemberLabelWithStatus({
+                            label: `${workspaceMember.name.firstName} ${workspaceMember.name.lastName}`,
+                            memberStatus: workspaceMember.memberStatus,
+                          })}
+                        </StyledTextContainerWithEllipsis>
+                        {workspaceMember.isPreCreated === true && (
+                          <StyledNotSignedInYet>
+                            <Trans>Not signed in yet</Trans>
+                          </StyledNotSignedInYet>
+                        )}
+                      </StyledNameCellContent>
                     </Tooltip>
                   </TableCell>
                   <TableCell>
@@ -296,6 +347,12 @@ export const SettingsWorkspaceMembersTeamTab = () => {
           )}
         </Table>
       </StyledTableContainer>
+      {canManageMembers && (
+        <SettingsWorkspaceMemberAddModal
+          modalInstanceId={ADD_WORKSPACE_MEMBER_MODAL_ID}
+          onMemberAdded={handleMemberAdded}
+        />
+      )}
     </Section.Root>
   );
 };

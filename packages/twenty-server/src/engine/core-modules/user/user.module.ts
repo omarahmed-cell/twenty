@@ -15,6 +15,7 @@ import { WorkspaceMemberTranspiler } from 'src/engine/core-modules/user/services
 import { UserVarsModule } from 'src/engine/core-modules/user/user-vars/user-vars.module';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { UserResolver } from 'src/engine/core-modules/user/user.resolver';
+import { WorkspaceMemberAccessResolver } from 'src/engine/core-modules/user/workspace-member-access.resolver';
 import { WorkspaceModule } from 'src/engine/core-modules/workspace/workspace.module';
 import { AgentHistoryModule } from 'src/engine/metadata-modules/ai/ai-history/ai-history.module';
 import { RecordShareOwnershipTransferModule } from 'src/engine/core-modules/record-share/record-share-ownership-transfer.module';
@@ -48,6 +49,7 @@ import { UserService } from './services/user.service';
   providers: [
     UserService,
     UserResolver,
+    WorkspaceMemberAccessResolver,
     UserEntityCacheProviderService,
     WorkspaceMemberTranspiler,
     WorkspaceFlatWorkspaceMemberMapCacheService,

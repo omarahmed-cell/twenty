@@ -3,6 +3,7 @@ import { getImageIdentifierFieldMetadataItem } from '@/object-metadata/utils/get
 import { getLabelIdentifierFieldMetadataItem } from '@/object-metadata/utils/getLabelIdentifierFieldMetadataItem';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 import { type ObjectRecordIdentifier } from '@/object-record/types/ObjectRecordIdentifier';
+import { getRecordIdentifierLabel } from '@/object-record/utils/getRecordIdentifierLabel';
 
 import { getAvatarShape } from './getAvatarShape';
 import { getAvatarUrl } from './getAvatarUrl';
@@ -51,7 +52,11 @@ export const getObjectRecordIdentifier = ({
 
   return {
     id: record.id,
-    name: `${labelIdentifierFieldValue}`,
+    name: getRecordIdentifierLabel({
+      objectNameSingular: objectMetadataItem.nameSingular,
+      record,
+      label: `${labelIdentifierFieldValue}`,
+    }),
     avatarUrl,
     avatarShape,
     linkToShowPage,

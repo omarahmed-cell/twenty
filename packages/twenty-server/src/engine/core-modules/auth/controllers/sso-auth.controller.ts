@@ -242,6 +242,7 @@ export class SsoAuthController {
       invitation,
       workspaceInviteHash: payload.workspaceInviteHash,
       workspace: currentWorkspace,
+      isEmailVerifiedByAuthProvider: true,
     });
 
     const { workspace, user } = await this.authService.signInUp({
@@ -251,6 +252,7 @@ export class SsoAuthController {
       authParams: {
         provider: AuthProviderEnum.SSO,
       },
+      isEmailVerifiedByAuthProvider: true,
     });
 
     if (!user.isEmailVerified && !isNonEmptyString(user.passwordHash)) {

@@ -9,7 +9,7 @@ import { themeCssVariables, useTheme } from 'twenty-ui/theme';
 
 import { useAssignAgentChatThreads } from '@/ai/hooks/useAssignAgentChatThreads';
 import { agentChatThreadsSharedAssigneeIdFamilySelector } from '@/ai/states/selectors/agentChatThreadsSharedAssigneeIdFamilySelector';
-import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { activeWorkspaceMembersSelector } from '@/workspace-member/states/activeWorkspaceMembersSelector';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { SidePanelList } from '@/side-panel/components/SidePanelList';
@@ -36,8 +36,8 @@ export const SidePanelAssignAiChatPage = () => {
   const assignAiChatThreadIds = useAtomComponentStateValue(
     assignAiChatThreadIdsComponentState,
   );
-  const currentWorkspaceMembers = useAtomStateValue(
-    currentWorkspaceMembersState,
+  const activeWorkspaceMembers = useAtomStateValue(
+    activeWorkspaceMembersSelector,
   );
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
   const { sharedAssigneeId, hasAssignee } = useAtomFamilySelectorValue(
@@ -53,7 +53,7 @@ export const SidePanelAssignAiChatPage = () => {
   }
 
   const members = getAssignAiChatMemberOptions({
-    workspaceMembers: currentWorkspaceMembers,
+    workspaceMembers: activeWorkspaceMembers,
     currentWorkspaceMemberId: currentWorkspaceMember?.id,
     search,
   });

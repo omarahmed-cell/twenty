@@ -4,6 +4,7 @@ import { CURRENT_WORKSPACE_MEMBER_SELECTABLE_ITEM_ID } from '@/object-record/obj
 import { useApplyObjectFilterDropdownFilterValue } from '@/object-record/object-filter-dropdown/hooks/useApplyObjectFilterDropdownFilterValue';
 import { useObjectFilterDropdownFilterValue } from '@/object-record/object-filter-dropdown/hooks/useObjectFilterDropdownFilterValue';
 import { objectFilterDropdownSearchInputComponentState } from '@/object-record/object-filter-dropdown/states/objectFilterDropdownSearchInputComponentState';
+import { useWorkspaceMemberFilterItemSections } from '@/object-record/object-filter-dropdown/hooks/useWorkspaceMemberFilterItemSections';
 import { MultipleSelectDropdown } from '@/object-record/select/components/MultipleSelectDropdown';
 import { useRecordsForSelect } from '@/object-record/select/hooks/useRecordsForSelect';
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
@@ -58,6 +59,12 @@ export const ObjectFilterDropdownActorSelect = ({
       objectNameSingular: CoreObjectNameSingular.WorkspaceMember,
       limit: 10,
       allowRequestsToTwentyIcons: false,
+    });
+
+  const { activeItemsToSelect, deactivatedSection } =
+    useWorkspaceMemberFilterItemSections({
+      itemsToSelect: recordsToSelect,
+      isWorkspaceMemberList: true,
     });
 
   const currentWorkspaceMemberSelectableItem: SelectableItem = {
@@ -161,7 +168,8 @@ export const ObjectFilterDropdownActorSelect = ({
       <MultipleSelectDropdown
         selectableListId="object-filter-actor-select-id"
         focusId={dropdownId}
-        itemsToSelect={recordsToSelect}
+        itemsToSelect={activeItemsToSelect}
+        secondarySection={deactivatedSection}
         filteredSelectedItems={filteredSelectedRecords}
         selectedItems={selectedRecords}
         onChange={handleMultipleRecordSelectChange}

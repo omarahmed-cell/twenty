@@ -1,4 +1,4 @@
-import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { activeWorkspaceMembersSelector } from '@/workspace-member/states/activeWorkspaceMembersSelector';
 import { type PartialWorkspaceMember } from '@/settings/roles/types/RoleWithPartialMembers';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { t } from '@lingui/core/macro';
@@ -20,8 +20,8 @@ export const SettingsRoleAssignmentWorkspaceMemberPickerDropdownContent = ({
   filteredWorkspaceMembers,
   onSelect,
 }: SettingsRoleAssignmentWorkspaceMemberPickerDropdownContentProps) => {
-  const currentWorkspaceMembers = useAtomStateValue(
-    currentWorkspaceMembersState,
+  const activeWorkspaceMembers = useAtomStateValue(
+    activeWorkspaceMembersSelector,
   );
 
   if (loading) {
@@ -34,7 +34,7 @@ export const SettingsRoleAssignmentWorkspaceMemberPickerDropdownContent = ({
 
   const enrichedWorkspaceMembers = filteredWorkspaceMembers
     .map((workspaceMember) =>
-      currentWorkspaceMembers.find(
+      activeWorkspaceMembers.find(
         (member) => member.id === workspaceMember.recordId,
       ),
     )

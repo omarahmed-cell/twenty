@@ -57,6 +57,7 @@ import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager
 import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
 import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
+import { isWorkspaceMemberBillable } from 'src/modules/workspace-member/utils/is-workspace-member-billable.util';
 @Injectable()
 export class BillingSubscriptionUpdateService {
   protected readonly logger = new Logger(BillingSubscriptionUpdateService.name);
@@ -375,7 +376,9 @@ export class BillingSubscriptionUpdateService {
             { shouldBypassPermissionChecks: true },
           );
 
-        return await workspaceMemberRepository.count();
+        return (await workspaceMemberRepository.find()).filter(
+          isWorkspaceMemberBillable,
+        ).length;
       },
       authContext,
     );

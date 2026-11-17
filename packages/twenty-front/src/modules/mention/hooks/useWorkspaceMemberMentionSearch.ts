@@ -2,7 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useCallback } from 'react';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 
-import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { activeWorkspaceMembersSelector } from '@/workspace-member/states/activeWorkspaceMembersSelector';
 import type { MentionSearchResult } from '@/mention/types/MentionSearchResult';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
@@ -10,15 +10,15 @@ const WORKSPACE_MEMBER_MENTION_SEARCH_LIMIT = 50;
 
 export const useWorkspaceMemberMentionSearch = () => {
   const { t } = useLingui();
-  const currentWorkspaceMembers = useAtomStateValue(
-    currentWorkspaceMembersState,
+  const activeWorkspaceMembers = useAtomStateValue(
+    activeWorkspaceMembersSelector,
   );
 
   const searchWorkspaceMembers = useCallback(
     (query: string): MentionSearchResult[] => {
       const normalizedQuery = query.trim().toLowerCase();
 
-      return currentWorkspaceMembers
+      return activeWorkspaceMembers
         .map((workspaceMember) => ({
           workspaceMember,
           fullName:
@@ -39,7 +39,7 @@ export const useWorkspaceMemberMentionSearch = () => {
           imageUrl: workspaceMember.avatarUrl ?? '',
         }));
     },
-    [currentWorkspaceMembers, t],
+    [activeWorkspaceMembers, t],
   );
 
   return { searchWorkspaceMembers };

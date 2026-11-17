@@ -12,6 +12,7 @@ import { isLabelIdentifierField } from '@/object-metadata/utils/isLabelIdentifie
 import { isFieldIdentifierDisplay } from '@/object-record/record-field/ui/meta-types/display/utils/isFieldIdentifierDisplay';
 import { type RecordChipData } from '@/object-record/record-field/ui/types/RecordChipData';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { getRecordIdentifierLabel } from '@/object-record/utils/getRecordIdentifierLabel';
 import { isDefined } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
@@ -82,10 +83,14 @@ export const getRecordChipGenerators = (
             (record: ObjectRecord) =>
               ({
                 recordId: record.id,
-                name: getLabelIdentifierFieldValue(
+                name: getRecordIdentifierLabel({
+                  objectNameSingular: objectNameSingularToFind,
                   record,
-                  labelIdentifierFieldMetadataItemToUse,
-                ),
+                  label: getLabelIdentifierFieldValue(
+                    record,
+                    labelIdentifierFieldMetadataItemToUse,
+                  ),
+                }),
                 avatarUrl: getAvatarUrl(
                   objectMetadataItemToUse.nameSingular,
                   record,

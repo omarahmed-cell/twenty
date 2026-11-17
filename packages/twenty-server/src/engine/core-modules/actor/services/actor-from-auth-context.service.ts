@@ -5,6 +5,7 @@ import { isDefined } from 'twenty-shared/utils';
 
 import { applyRecordSourceFromCreatedBy } from 'src/engine/core-modules/actor/utils/apply-record-source-from-created-by.util';
 import { assertRecordSourceNotWritten } from 'src/engine/core-modules/actor/utils/assert-record-source-not-written.util';
+import { assertWorkspaceMemberAccessFieldsNotWritten } from 'src/engine/core-modules/actor/utils/assert-workspace-member-access-fields-not-written.util';
 import { buildActorMetadataFromAuthContext } from 'src/engine/core-modules/actor/utils/build-actor-metadata-from-auth-context.util';
 import { isRecordSourceObjectName } from 'src/engine/core-modules/actor/utils/is-record-source-object-name.util';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
@@ -52,6 +53,12 @@ export class ActorFromAuthContextService {
       isUpdate: false,
     });
 
+    assertWorkspaceMemberAccessFieldsNotWritten({
+      records,
+      objectMetadataNameSingular,
+      authContext,
+    });
+
     const recordsWithCreatedBy = await this.injectActorField({
       records,
       objectMetadataNameSingular,
@@ -96,6 +103,12 @@ export class ActorFromAuthContextService {
       objectMetadataNameSingular,
       authContext,
       isUpdate: true,
+    });
+
+    assertWorkspaceMemberAccessFieldsNotWritten({
+      records,
+      objectMetadataNameSingular,
+      authContext,
     });
 
     return this.injectActorField({

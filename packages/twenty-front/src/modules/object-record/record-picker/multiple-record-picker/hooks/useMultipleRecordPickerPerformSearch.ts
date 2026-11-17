@@ -12,6 +12,8 @@ import { searchRecordStoreFamilyState } from '@/object-record/record-picker/mult
 import { sortMorphItems } from '@/object-record/record-picker/multiple-record-picker/utils/sortMorphItems';
 import { type RecordPickerPickableMorphItem } from '@/object-record/record-picker/types/RecordPickerPickableMorphItem';
 import { getObjectPermissionsForObject } from '@/object-metadata/utils/getObjectPermissionsForObject';
+import { getWorkspaceMemberIdsExcludedFromPicker } from '@/workspace-member/utils/getWorkspaceMemberIdsExcludedFromPicker';
+import { deactivatedWorkspaceMemberIdsSelector } from '@/workspace-member/states/deactivatedWorkspaceMemberIdsSelector';
 import { type ApolloClient } from '@apollo/client';
 import { isNonEmptyArray } from '@sniptt/guards';
 import { useStore } from 'jotai';
@@ -115,6 +117,14 @@ export const useMultipleRecordPickerPerformSearch = () => {
           ({ recordId }) => recordId,
         ),
         after: loadMore ? paginationState.endCursor : null,
+        excludedRecordIds: getWorkspaceMemberIdsExcludedFromPicker({
+          objectNameSingulars: filteredSearchableObjectMetadataItems.map(
+            ({ nameSingular }) => nameSingular,
+          ),
+          deactivatedWorkspaceMemberIds: store.get(
+            deactivatedWorkspaceMemberIdsSelector.atom,
+          ),
+        }),
       });
 
       const existingMorphItems = store.get(
@@ -375,6 +385,7 @@ const performSearchQueries = async ({
   searchFilter,
   searchableObjectMetadataItems,
   pickedRecordIds,
+  excludedRecordIds,
   limit = MULTIPLE_RECORD_PICKER_PAGE_SIZE,
   after = null,
 }: {
@@ -382,6 +393,7 @@ const performSearchQueries = async ({
   searchFilter: string;
   searchableObjectMetadataItems: EnrichedObjectMetadataItem[];
   pickedRecordIds: string[];
+  excludedRecordIds: string[];
   limit?: number;
   after?: string | null;
 }): Promise<
@@ -422,12 +434,14 @@ const performSearchQueries = async ({
     };
   };
 
+  const notFilterIds = [...pickedRecordIds, ...excludedRecordIds];
+
   const searchRecordsExcludingPickedRecordsResult = await searchRecords(
-    pickedRecordIds.length > 0
+    notFilterIds.length > 0
       ? {
           not: {
             id: {
-              in: pickedRecordIds,
+              in: notFilterIds,
             },
           },
         }
