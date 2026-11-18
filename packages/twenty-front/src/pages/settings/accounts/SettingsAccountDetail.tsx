@@ -24,6 +24,9 @@ export const SettingsAccountDetail = () => {
   const isAppPreferencesEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_APP_PREFERENCES_ENABLED,
   );
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
   const { connectedAccountId } = useParams<{ connectedAccountId: string }>();
   const { groups, loading } = useMyAccountGroups();
   const tabListComponentInstanceId = `${SETTINGS_ACCOUNT_GROUP_TAB_LIST_COMPONENT_ID}-${connectedAccountId}`;
@@ -35,7 +38,7 @@ export const SettingsAccountDetail = () => {
     getConnectedAccountSettingsChannels(nativeAccount);
 
   const tabs = [
-    isDefined(messageChannel)
+    isDefined(messageChannel) && !isUnifiedEmailEnabled
       ? { id: 'emails', title: t`Emails`, Icon: IconMail }
       : undefined,
     isDefined(calendarChannel)
@@ -57,7 +60,11 @@ export const SettingsAccountDetail = () => {
     : undefined;
 
   const renderContent = () => {
-    if (activeTabId === 'emails' && isDefined(messageChannel)) {
+    if (
+      activeTabId === 'emails' &&
+      isDefined(messageChannel) &&
+      !isUnifiedEmailEnabled
+    ) {
       return (
         <SettingsAppPreferencesSelectedMessageChannelDetails
           messageChannel={messageChannel}

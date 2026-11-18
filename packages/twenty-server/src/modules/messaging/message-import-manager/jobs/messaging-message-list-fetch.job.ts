@@ -69,8 +69,9 @@ export class MessagingMessageListFetchJob {
         }
 
         if (
+          !messageChannel.isSyncEnabled ||
           messageChannel.syncStage !==
-          MessageChannelSyncStage.MESSAGE_LIST_FETCH_SCHEDULED
+            MessageChannelSyncStage.MESSAGE_LIST_FETCH_SCHEDULED
         ) {
           return;
         }

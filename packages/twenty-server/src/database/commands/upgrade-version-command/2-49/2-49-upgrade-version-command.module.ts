@@ -30,6 +30,7 @@ import { ProvisionRecordSourceCommand } from 'src/database/commands/upgrade-vers
 import { ProvisionActivityAssignedToCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794933094490-provision-activity-assigned-to.command';
 import { ProvisionWorkspaceMemberAccessCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1794943307202-provision-workspace-member-access.command';
 import { ProvisionTaskAndNoteFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795011565106-provision-task-and-note-fields.command';
+import { ProvisionUnifiedEmailFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795034153621-provision-unified-email-fields.command';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
@@ -79,6 +80,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionActivityAssignedToCommand,
     ProvisionWorkspaceMemberAccessCommand,
     ProvisionTaskAndNoteFieldsCommand,
+    ProvisionUnifiedEmailFieldsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

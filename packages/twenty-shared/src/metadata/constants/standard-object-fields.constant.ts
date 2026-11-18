@@ -668,7 +668,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.calendarEvent,
     ),
-    recordSource: { universalIdentifier: '7e09807c-ad83-4ad2-b613-4b68fde655d7' },
+    recordSource: {
+      universalIdentifier: '7e09807c-ad83-4ad2-b613-4b68fde655d7',
+    },
     title: { universalIdentifier: '20202020-080e-49d1-b21d-9702a7e2525c' },
     recordedVideo: {
       universalIdentifier: '639ca583-524f-4610-ab0c-2a37c907e8d4',
@@ -798,7 +800,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.call,
     ),
-    recordSource: { universalIdentifier: '6f278322-415c-4ae4-8bbe-bfaf244ff532' },
+    recordSource: {
+      universalIdentifier: '6f278322-415c-4ae4-8bbe-bfaf244ff532',
+    },
     title: { universalIdentifier: 'eb2ab184-bfc6-44da-ba32-76d21ea5e29b' },
     bodyV2: { universalIdentifier: 'a461c678-dac1-4914-8816-eb31ae67c1d3' },
     direction: {
@@ -883,7 +887,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.communication,
     ),
-    recordSource: { universalIdentifier: '4d608fda-2c1c-43f1-9a53-4fb57be781c7' },
+    recordSource: {
+      universalIdentifier: '4d608fda-2c1c-43f1-9a53-4fb57be781c7',
+    },
     title: { universalIdentifier: '2258a1fe-6b0a-48a3-ad97-288d009c6487' },
     bodyV2: { universalIdentifier: '02596eef-47b8-477e-8f87-97a008494000' },
     direction: {
@@ -923,7 +929,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.email,
     ),
-    recordSource: { universalIdentifier: '16cc3939-c650-4e9e-81ad-d563dafb9242' },
+    recordSource: {
+      universalIdentifier: '16cc3939-c650-4e9e-81ad-d563dafb9242',
+    },
     subject: { universalIdentifier: 'bbf960c6-04b2-450e-a6ae-0c2b677a009b' },
     bodyV2: { universalIdentifier: 'ee124fa0-9a92-47cf-8062-2d1b9f4696d8' },
     direction: {
@@ -934,6 +942,42 @@ export const STANDARD_OBJECT_FIELDS = {
     sentAt: { universalIdentifier: 'd00aa002-2139-434b-9fdf-067fc4a532b3' },
     status: { universalIdentifier: '37d2dc28-0111-45c3-85c6-5aa3b3d3f690' },
     hubspotId: { universalIdentifier: '5da1a434-6172-4a4e-90f7-7902511f297c' },
+    cc: { universalIdentifier: 'abdaf66c-f80b-450a-9099-bdfb3b191c6d' },
+    bcc: { universalIdentifier: '34f218c5-b16b-4bb8-af57-ae4365782ba3' },
+    bodyPreview: {
+      universalIdentifier: '2d61a067-a296-4988-bcb6-7ec35852607f',
+    },
+    source: { universalIdentifier: '8dbcebce-0d5d-4ece-a53c-616416ee1db2' },
+    loggedBy: { universalIdentifier: '48abde3c-e623-4dd3-b76a-90f93c5aa231' },
+    gmailMessageId: {
+      universalIdentifier: '96af0948-aae4-42df-b502-38d417587b9a',
+    },
+    gmailThreadId: {
+      universalIdentifier: 'c1150731-62d2-4e4b-be1c-68f07b66a728',
+    },
+    rfcMessageId: {
+      universalIdentifier: '577b032c-c608-45cf-a585-604eb2a54fdd',
+    },
+    inReplyTo: { universalIdentifier: '6905320b-58a3-48d2-9c25-d2ab4fca3df4' },
+    trackEnabled: {
+      universalIdentifier: '5d707574-c519-47c7-8805-8749f9413624',
+    },
+    openCount: { universalIdentifier: 'b6d3414b-d789-41e5-95fc-b229ddf9ad8c' },
+    clickCount: { universalIdentifier: 'f42433cd-15fc-4e0a-9dd8-4ba77b90a60e' },
+    replyCount: { universalIdentifier: '212917c4-f36b-4695-ad4b-2a234cfd67a7' },
+    firstOpenedAt: {
+      universalIdentifier: '7ecdef4f-e9a3-469f-b7d2-9bb0854dcce4',
+    },
+    lastOpenedAt: {
+      universalIdentifier: 'd47706e7-8b31-4b40-9f21-6bcb9a1ade61',
+    },
+    lastClickedAt: {
+      universalIdentifier: 'd191a683-054b-4f36-a543-e15aab43706a',
+    },
+    repliedAt: { universalIdentifier: '151ca942-3923-4d61-8ab4-9ce12df003de' },
+    deliveryError: {
+      universalIdentifier: 'efd0c279-cd64-40b4-9d79-15a46ceb6197',
+    },
     timelineActivities: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -1111,7 +1155,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company,
     ),
-    recordSource: { universalIdentifier: 'ecad06e4-de16-4d60-8848-d97b8a3e5fe7' },
+    recordSource: {
+      universalIdentifier: 'ecad06e4-de16-4d60-8848-d97b8a3e5fe7',
+    },
     segmentMembers: {
       universalIdentifier: 'd4ec2d5b-1bf7-4041-809c-53e87fe1cbaf',
     },
@@ -1781,7 +1827,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.note,
     ),
-    recordSource: { universalIdentifier: 'cf99643e-9953-41fc-bb7d-a7d82b82eb4e' },
+    recordSource: {
+      universalIdentifier: 'cf99643e-9953-41fc-bb7d-a7d82b82eb4e',
+    },
     title: { universalIdentifier: '20202020-faeb-4c76-8ba6-ccbb0b4a965f' },
     bodyV2: { universalIdentifier: '20202020-a7bb-4d94-be51-8f25181502c8' },
     noteTargets: {
@@ -1863,7 +1911,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunity,
     ),
-    recordSource: { universalIdentifier: '2f1b7197-6d49-4d1f-adc0-2945287b0db0' },
+    recordSource: {
+      universalIdentifier: '2f1b7197-6d49-4d1f-adc0-2945287b0db0',
+    },
     segmentMembers: {
       universalIdentifier: '80a590cf-546f-4ab5-adee-18f2d4da57ee',
     },
@@ -2041,7 +2091,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person,
     ),
-    recordSource: { universalIdentifier: '5cb12ad5-ce2f-4c60-89cc-801762ba55fa' },
+    recordSource: {
+      universalIdentifier: '5cb12ad5-ce2f-4c60-89cc-801762ba55fa',
+    },
     segmentMembers: {
       universalIdentifier: '1c757569-68e9-4ca4-98ec-5b86ffd615fd',
     },
@@ -2279,7 +2331,9 @@ export const STANDARD_OBJECT_FIELDS = {
     stageHistory: {
       universalIdentifier: '47ba4bba-cf37-4be7-bc54-9e7729d21d14',
     },
-    recordSource: { universalIdentifier: 'dff416a3-1805-4127-a434-df4c45354eef' },
+    recordSource: {
+      universalIdentifier: 'dff416a3-1805-4127-a434-df4c45354eef',
+    },
     name: { universalIdentifier: '120f9f98-08d8-4ca3-8af3-5f8911565f64' },
     company: { universalIdentifier: 'a10f3e30-45d3-4ae3-ad28-44d02b7b9bbb' },
     pointOfContact: {
@@ -2504,7 +2558,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task,
     ),
-    recordSource: { universalIdentifier: '14762e20-45c5-4021-a6a3-15ecbff86401' },
+    recordSource: {
+      universalIdentifier: '14762e20-45c5-4021-a6a3-15ecbff86401',
+    },
     title: { universalIdentifier: '20202020-b386-4cb7-aa5a-08d4a4d92680' },
     bodyV2: { universalIdentifier: '20202020-4aa0-4ae8-898d-7df0afd47ab1' },
     dueAt: { universalIdentifier: '20202020-fd99-40da-951b-4cb9a352fce3' },
@@ -2743,6 +2799,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     tasksAssignedBy: {
       universalIdentifier: '728b4fc3-0863-41ac-b515-2c75f56b11e4',
+    },
+    emailsLogged: {
+      universalIdentifier: '1d14cb5d-df5c-431c-bee4-c9123d1fd51c',
     },
     ownedOpportunities: {
       universalIdentifier: '20202020-9e4d-4b3a-8c1f-6d7e8f9a0b1c',

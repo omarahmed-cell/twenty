@@ -729,6 +729,36 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  emailsLogged: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'emailsLogged',
+      label: i18nLabel(
+        msg({ message: `Emails logged`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Emails the workspace member logged or sent`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMail',
+      isNullable: false,
+      isUIEditable: false,
+      targetObjectName: 'email',
+      targetFieldName: 'loggedBy',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   accountOwnerForCompanies: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

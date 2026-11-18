@@ -24,6 +24,9 @@ export const SettingsAccountsEmails = () => {
   const isAppPreferencesEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_APP_PREFERENCES_ENABLED,
   );
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
 
   const { channels: allMessageChannels, loading } = useMyMessageChannels();
 
@@ -44,7 +47,7 @@ export const SettingsAccountsEmails = () => {
     title: messageChannel.handle,
   }));
 
-  if (isAppPreferencesEnabled) {
+  if (isAppPreferencesEnabled || isUnifiedEmailEnabled) {
     return <Navigate to={getSettingsPath(SettingsPath.Accounts)} replace />;
   }
 

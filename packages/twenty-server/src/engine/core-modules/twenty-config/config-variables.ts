@@ -362,6 +362,60 @@ export class ConfigVariables {
   CALENDAR_EVENTS_IMPORT_HORIZON_DAYS = 365;
 
   @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Email domains of the company itself: emails where every address is on one of them are never logged, and these addresses never become contacts',
+    type: ConfigVariableType.ARRAY,
+  })
+  @IsOptional()
+  UNIFIED_EMAIL_INTERNAL_DOMAINS: string[] = ['roboost.app'];
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Personal email providers: contacts on these domains are created without a company',
+    type: ConfigVariableType.ARRAY,
+  })
+  @IsOptional()
+  UNIFIED_EMAIL_PERSONAL_DOMAINS: string[] = [
+    'gmail.com',
+    'googlemail.com',
+    'hotmail.com',
+    'outlook.com',
+    'yahoo.com',
+    'icloud.com',
+    'live.com',
+    'me.com',
+    'msn.com',
+    'aol.com',
+    'proton.me',
+    'protonmail.com',
+    'gmx.com',
+    'mail.com',
+    'yandex.com',
+    'zoho.com',
+  ];
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Public base URL of the email open and click tracking endpoints, without a trailing slash',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  UNIFIED_EMAIL_TRACKING_BASE_URL = 'https://chai.roboost.app/t';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Logged Gmail threads stop being checked for replies after this many days without a new message',
+    type: ConfigVariableType.NUMBER,
+  })
+  @CastToPositiveNumber()
+  @IsOptional()
+  UNIFIED_EMAIL_REPLY_SYNC_MAX_IDLE_DAYS = 90;
+
+  @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.MICROSOFT_AUTH,
     description: 'Enable or disable the Microsoft Calendar integration',
     type: ConfigVariableType.BOOLEAN,

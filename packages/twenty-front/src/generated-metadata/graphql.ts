@@ -2249,6 +2249,7 @@ export type FeatureFlag = {
 export enum FeatureFlagKey {
   IS_AI_CHAT_INBOX_ENABLED = 'IS_AI_CHAT_INBOX_ENABLED',
   IS_APP_PREFERENCES_ENABLED = 'IS_APP_PREFERENCES_ENABLED',
+  IS_UNIFIED_EMAIL_ENABLED = 'IS_UNIFIED_EMAIL_ENABLED',
   IS_ASYNC_CSV_EXPORT_ENABLED = 'IS_ASYNC_CSV_EXPORT_ENABLED',
   IS_CALENDAR_EVENT_SHARED_ACROSS_CHANNELS_ENABLED = 'IS_CALENDAR_EVENT_SHARED_ACROSS_CHANNELS_ENABLED',
   IS_CALENDAR_SYNC_SKIP_UNCHANGED_RECORDS_ENABLED = 'IS_CALENDAR_SYNC_SKIP_UNCHANGED_RECORDS_ENABLED',
@@ -6508,7 +6509,10 @@ export type SendEmailInput = {
   fromHandle?: InputMaybe<Scalars['String']['input']>;
   inReplyTo?: InputMaybe<Scalars['String']['input']>;
   subject: Scalars['String']['input'];
+  targetObjectNameSingular?: InputMaybe<Scalars['String']['input']>;
+  targetRecordId?: InputMaybe<Scalars['String']['input']>;
   to: Scalars['String']['input'];
+  trackEmail?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type SendEmailOutput = {

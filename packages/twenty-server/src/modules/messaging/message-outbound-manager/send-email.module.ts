@@ -6,6 +6,7 @@ import { ConnectedAccountMetadataModule } from 'src/engine/metadata-modules/conn
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
 import { SendEmailResolver } from 'src/modules/messaging/message-outbound-manager/resolvers/send-email.resolver';
 import { MessagingSendManagerModule } from 'src/modules/messaging/message-outbound-manager/messaging-send-manager.module';
+import { UnifiedEmailModule } from 'src/modules/unified-email/unified-email.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MessagingSendManagerModule } from 'src/modules/messaging/message-outbou
     MessagingSendManagerModule,
     ConnectedAccountMetadataModule,
     PermissionsModule,
+    UnifiedEmailModule,
   ],
   providers: [SendEmailResolver],
 })

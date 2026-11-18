@@ -11,4 +11,6 @@ export type ToolExecutionContext = {
   rolePermissionConfig?: RolePermissionConfig;
   authContext?: WorkspaceAuthContext;
   onCodeExecutionUpdate?: CodeExecutionStreamEmitter;
+  isWorkflowRun?: boolean;
+  workspaceMemberId?: string;
 };

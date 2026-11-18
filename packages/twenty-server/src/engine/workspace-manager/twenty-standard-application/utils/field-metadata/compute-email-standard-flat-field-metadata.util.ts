@@ -619,4 +619,502 @@ export const buildEmailStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  cc: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'cc',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(msg({ message: `CC`, context: 'fieldMetadata.label' })),
+      description: i18nLabel(
+        msg({
+          message: `Copied recipients, as Name <address> separated by commas`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsers',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  bcc: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'bcc',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(msg({ message: `BCC`, context: 'fieldMetadata.label' })),
+      description: i18nLabel(
+        msg({
+          message: `Blind-copied recipients, as Name <address> separated by commas`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsers',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  bodyPreview: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'bodyPreview',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Body preview`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Plain-text start of the body`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconAlignLeft',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  source: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'source',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Source`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Where the email came from`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconSourceCode',
+      isNullable: true,
+      isUIEditable: false,
+      options: [
+        {
+          id: '2adef701-1012-48ce-80a9-2c667c929168',
+          value: 'HUBSPOT_IMPORT',
+          label: i18nLabel(
+            msg({ message: `HubSpot import`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'orange',
+        },
+        {
+          id: '6981783b-e754-4139-aea5-b4fb595df4ea',
+          value: 'GMAIL_EXTENSION',
+          label: i18nLabel(
+            msg({ message: `Gmail extension`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'red',
+        },
+        {
+          id: 'dba4e779-fd56-494c-9040-5b608a1bd05f',
+          value: 'CRM',
+          label: i18nLabel(
+            msg({ message: `CRM`, context: 'fieldMetadata.label' }),
+          ),
+          position: 2,
+          color: 'blue',
+        },
+        {
+          id: 'f07152af-d7ef-4c22-aaf3-7f487724572d',
+          value: 'WORKFLOW',
+          label: i18nLabel(
+            msg({ message: `Workflow`, context: 'fieldMetadata.label' }),
+          ),
+          position: 3,
+          color: 'purple',
+        },
+        {
+          id: '743d6d0a-0033-4759-95bb-da27ee12c2b4',
+          value: 'SEQUENCE',
+          label: i18nLabel(
+            msg({ message: `Sequence`, context: 'fieldMetadata.label' }),
+          ),
+          position: 4,
+          color: 'turquoise',
+        },
+        {
+          id: 'd536b27c-50dd-4f3e-866e-43074e1bdbd7',
+          value: 'REPLY_SYNC',
+          label: i18nLabel(
+            msg({ message: `Reply sync`, context: 'fieldMetadata.label' }),
+          ),
+          position: 5,
+          color: 'green',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  gmailMessageId: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'gmailMessageId',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Gmail message ID`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Gmail message ID header or id, used to match replies and avoid duplicates`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isSystem: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  gmailThreadId: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'gmailThreadId',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Gmail thread ID`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Gmail thread ID header or id, used to match replies and avoid duplicates`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isSystem: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  rfcMessageId: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'rfcMessageId',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `RFC Message-ID`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `RFC Message-ID header or id, used to match replies and avoid duplicates`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isSystem: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  inReplyTo: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'inReplyTo',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `In-Reply-To`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `In-Reply-To header or id, used to match replies and avoid duplicates`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isSystem: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  trackEnabled: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'trackEnabled',
+      type: FieldMetadataType.BOOLEAN,
+      label: i18nLabel(
+        msg({ message: `Track enabled`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Whether opens and clicks are tracked`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconEye',
+      isNullable: true,
+      isUIEditable: false,
+      defaultValue: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  openCount: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'openCount',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Open count`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Number of opens`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isUIEditable: false,
+      settings: { type: 'number', decimals: 0 },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  clickCount: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'clickCount',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Click count`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Number of link clicks`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isUIEditable: false,
+      settings: { type: 'number', decimals: 0 },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  replyCount: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'replyCount',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Reply count`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Number of replies`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconHash',
+      isNullable: true,
+      isUIEditable: false,
+      settings: { type: 'number', decimals: 0 },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  firstOpenedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'firstOpenedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `First opened at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When the email was first opened`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  lastOpenedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'lastOpenedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `Last opened at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When the email was last opened`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  lastClickedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'lastClickedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `Last clicked at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When a link was last clicked`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  repliedAt: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'repliedAt',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `Replied at`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When the latest reply arrived`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  deliveryError: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'deliveryError',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Delivery error`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Why sending failed`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconAlertTriangle',
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  loggedBy: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'loggedBy',
+      label: i18nLabel(
+        msg({ message: `Logged by`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Workspace member who logged or sent the email`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUserCheck',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'workspaceMember',
+      targetFieldName: 'emailsLogged',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'loggedById',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

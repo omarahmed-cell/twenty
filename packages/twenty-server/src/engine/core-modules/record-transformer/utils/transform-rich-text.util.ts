@@ -74,3 +74,20 @@ export const transformRichTextValue = async (
         : null),
   };
 };
+
+export const transformHtmlToRichTextValue = async (
+  html: string,
+): Promise<RichTextMetadata> => {
+  const serverBlockNoteEditor = await getServerBlockNoteEditor();
+
+  try {
+    const blocks = await serverBlockNoteEditor.tryParseHTMLToBlocks(html);
+
+    return {
+      blocknote: JSON.stringify(blocks),
+      markdown: await serverBlockNoteEditor.blocksToMarkdownLossy(blocks),
+    };
+  } catch {
+    return transformRichTextValue({ markdown: html, blocknote: null });
+  }
+};

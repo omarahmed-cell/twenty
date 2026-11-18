@@ -9,7 +9,9 @@ import {
   MessageChannelSyncStatus,
   MessageChannelType,
   MessageChannelVisibility,
+  FeatureFlagKey,
 } from 'twenty-shared/types';
+import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channel/entities/message-channel.entity';
@@ -26,7 +28,10 @@ export type CreateMessageChannelInput = {
 
 @Injectable()
 export class CreateMessageChannelService {
-  constructor(private readonly workspaceOrmManager: WorkspaceOrmManager) {}
+  constructor(
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly featureFlagService: FeatureFlagService,
+  ) {}
 
   async createMessageChannel(
     input: CreateMessageChannelInput,
@@ -41,6 +46,13 @@ export class CreateMessageChannelService {
     } = input;
 
     const authContext = buildSystemAuthContext(workspaceId);
+
+    // The channel is still needed to send email, it just never syncs the mailbox
+    const isUnifiedEmailEnabled =
+      await this.featureFlagService.isFeatureEnabled(
+        FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+        workspaceId,
+      );
 
     return this.workspaceOrmManager.executeInWorkspaceContext(async () => {
       const messageChannelRepo =
@@ -61,6 +73,7 @@ export class CreateMessageChannelService {
           : MessageChannelSyncStage.PENDING_CONFIGURATION,
         pendingGroupEmailsAction: MessageChannelPendingGroupEmailsAction.NONE,
         ...LOCKED_MESSAGE_CHANNEL_CONTACT_AUTO_CREATION,
+        ...(isUnifiedEmailEnabled ? { isSyncEnabled: false } : {}),
         workspaceId,
       });
 

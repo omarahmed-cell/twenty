@@ -77,6 +77,7 @@ export class ChannelSyncService {
           connectedAccountId,
           syncStage: MessageChannelSyncStage.PENDING_CONFIGURATION,
           type: In([...POLLED_MESSAGE_CHANNEL_TYPES]),
+          isSyncEnabled: true,
           workspaceId,
         },
       });

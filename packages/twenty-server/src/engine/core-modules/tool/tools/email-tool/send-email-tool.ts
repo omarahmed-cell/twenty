@@ -13,6 +13,7 @@ import { type ToolOutput } from 'src/engine/core-modules/tool/types/tool-output.
 import { type ToolExecutionContext } from 'src/engine/core-modules/tool/types/tool-execution-context.type';
 import { type Tool } from 'src/engine/core-modules/tool/types/tool.type';
 import { SendEmailService } from 'src/modules/messaging/message-outbound-manager/services/send-email.service';
+import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
 
 @Injectable()
 export class SendEmailTool implements Tool {
@@ -26,6 +27,7 @@ export class SendEmailTool implements Tool {
     private readonly emailComposerService: EmailComposerService,
     private readonly sendEmailService: SendEmailService,
     private readonly i18nService: I18nService,
+    private readonly sentEmailRecorderService: SentEmailRecorderService,
   ) {}
 
   async execute(
@@ -49,7 +51,39 @@ export class SendEmailTool implements Tool {
 
       const { data } = result;
 
-      const sendResult = await this.sendEmailService.sendComposedEmail(data);
+      const recordInput = {
+        workspaceId: context.workspaceId,
+        composedEmail: data,
+        source:
+          context.isWorkflowRun === true
+            ? ('WORKFLOW' as const)
+            : ('CRM' as const),
+        loggedByWorkspaceMemberId:
+          context.isWorkflowRun === true
+            ? null
+            : (context.workspaceMemberId ?? null),
+      };
+
+      let sendResult;
+
+      try {
+        sendResult = await this.sendEmailService.sendComposedEmail(data);
+      } catch (sendError) {
+        await this.sentEmailRecorderService.recordSentEmail({
+          ...recordInput,
+          deliveryError:
+            sendError instanceof Error ? sendError.message : String(sendError),
+        });
+
+        throw sendError;
+      }
+
+      const emailRecordId = await this.sentEmailRecorderService.recordSentEmail(
+        {
+          ...recordInput,
+          sendResult,
+        },
+      );
 
       const persistedMessage = data.shouldPersistMessage
         ? await this.sendEmailService.persistSentMessage(
@@ -79,6 +113,7 @@ export class SendEmailTool implements Tool {
           threadExternalId: sendResult.threadExternalId,
           messageId: persistedMessage?.messageId,
           messageThreadId: persistedMessage?.messageThreadId,
+          emailRecordId,
         },
       };
     } catch (error) {

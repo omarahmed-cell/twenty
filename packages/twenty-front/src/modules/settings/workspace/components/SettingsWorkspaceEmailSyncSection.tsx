@@ -9,7 +9,11 @@ import { useToast } from 'twenty-ui/components/feedback';
 import { Section } from 'twenty-ui/components/layout';
 import { IconCalendarEvent, IconMail } from 'twenty-ui/icon';
 import { Card } from 'twenty-ui/primitives/surfaces';
-import { UpdateWorkspaceDocument } from '~/generated-metadata/graphql';
+import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
+import {
+  FeatureFlagKey,
+  UpdateWorkspaceDocument,
+} from '~/generated-metadata/graphql';
 
 type InternalImportSetting =
   | 'isInternalMessagesImportEnabled'
@@ -17,6 +21,9 @@ type InternalImportSetting =
 
 export const SettingsWorkspaceEmailSyncSection = () => {
   const { t } = useLingui();
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
 
   const [currentWorkspace, setCurrentWorkspace] = useAtomState(
     currentWorkspaceState,
@@ -59,19 +66,21 @@ export const SettingsWorkspaceEmailSyncSection = () => {
         description={t`Control what the workspace imports from connected mailboxes and calendars`}
       />
       <Card.Root rounded>
-        <SettingsOptionCardContentSwitch
-          Icon={IconMail}
-          title={t`Sync Internal Emails`}
-          description={t`Include emails where all participants share the same domain.`}
-          checked={currentWorkspace?.isInternalMessagesImportEnabled ?? false}
-          onChange={(value) =>
-            handleInternalImportSettingChange(
-              'isInternalMessagesImportEnabled',
-              value,
-            )
-          }
-          divider
-        />
+        {!isUnifiedEmailEnabled && (
+          <SettingsOptionCardContentSwitch
+            Icon={IconMail}
+            title={t`Sync Internal Emails`}
+            description={t`Include emails where all participants share the same domain.`}
+            checked={currentWorkspace?.isInternalMessagesImportEnabled ?? false}
+            onChange={(value) =>
+              handleInternalImportSettingChange(
+                'isInternalMessagesImportEnabled',
+                value,
+              )
+            }
+            divider
+          />
+        )}
         <SettingsOptionCardContentSwitch
           Icon={IconCalendarEvent}
           title={t`Sync Internal Meetings`}

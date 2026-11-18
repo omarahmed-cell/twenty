@@ -11,7 +11,11 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
-import { StartChannelSyncDocument } from '~/generated-metadata/graphql';
+import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
+import {
+  FeatureFlagKey,
+  StartChannelSyncDocument,
+} from '~/generated-metadata/graphql';
 import { SettingsAccountsConfigurationSelectedMessageChannelEffect } from '~/pages/settings/accounts/SettingsAccountsConfigurationSelectedMessageChannelEffect';
 import { SettingsAccountsConfigurationStepCalendar } from '~/pages/settings/accounts/SettingsAccountsConfigurationStepCalendar';
 import { SettingsAccountsConfigurationStepEmail } from '~/pages/settings/accounts/SettingsAccountsConfigurationStepEmail';
@@ -28,6 +32,9 @@ export const SettingsAccountsConfiguration = () => {
   }>();
   const navigate = useNavigate();
   const { enqueueToast } = useToast();
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
   const [startChannelSyncMutation, { loading: isSubmitting }] = useMutation(
     StartChannelSyncDocument,
   );
@@ -84,6 +91,7 @@ export const SettingsAccountsConfiguration = () => {
   };
 
   const showEmailStep =
+    !isUnifiedEmailEnabled &&
     currentStep === SettingsAccountsConfigurationStep.Email &&
     isDefined(messageChannel);
 

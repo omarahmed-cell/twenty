@@ -48,6 +48,7 @@ const buildWorkspaceMember = ({
   assignedEmails: [],
   assignedCommunications: [],
   tasksAssignedBy: [],
+  emailsLogged: [],
 });
 
 describe('buildFlatWorkspaceMemberMaps', () => {

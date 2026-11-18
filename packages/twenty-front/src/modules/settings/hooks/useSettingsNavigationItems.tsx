@@ -77,6 +77,9 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
   const isAppPreferencesEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_APP_PREFERENCES_ENABLED,
   );
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
 
   return [
     {
@@ -105,6 +108,7 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
                   path: SettingsPath.AccountsEmails,
                   Icon: IconMail,
                   isHidden:
+                    isUnifiedEmailEnabled ||
                     !permissionFlagMap[PermissionFlagType.CONNECTED_ACCOUNTS],
                   indentationLevel: 2,
                 },

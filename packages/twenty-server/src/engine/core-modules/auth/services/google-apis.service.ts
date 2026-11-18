@@ -5,6 +5,7 @@ import {
   CalendarChannelSyncStage,
   type CalendarChannelVisibility,
   ConnectedAccountProvider,
+  FeatureFlagKey,
   MessageChannelSyncStage,
   MessageChannelSyncStatus,
   type MessageChannelVisibility,
@@ -29,6 +30,7 @@ import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decora
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { MessageQueueService } from 'src/engine/core-modules/message-queue/services/message-queue.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { CalendarChannelEntity } from 'src/engine/metadata-modules/calendar-channel/entities/calendar-channel.entity';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
@@ -89,6 +91,7 @@ export class GoogleAPIsService {
     private readonly messageChannelRepository: Repository<MessageChannelEntity>,
     @InjectRepository(CalendarChannelEntity)
     private readonly calendarChannelRepository: Repository<CalendarChannelEntity>,
+    private readonly featureFlagService: FeatureFlagService,
   ) {}
 
   async refreshGoogleRefreshToken(input: {
@@ -262,7 +265,12 @@ export class GoogleAPIsService {
                 connectedAccountId: newOrExistingConnectedAccountId,
                 workspaceId,
               },
-              { isSyncEnabled: true },
+              {
+                isSyncEnabled: !(await this.featureFlagService.isFeatureEnabled(
+                  FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+                  workspaceId,
+                )),
+              },
             );
           }
 
@@ -340,8 +348,9 @@ export class GoogleAPIsService {
         if (isMessagingAvailable) {
           for (const messageChannel of messageChannels) {
             if (
+              messageChannel.isSyncEnabled &&
               messageChannel.syncStage !==
-              MessageChannelSyncStage.PENDING_CONFIGURATION
+                MessageChannelSyncStage.PENDING_CONFIGURATION
             ) {
               await this.messagingChannelSyncStatusService.resetAndMarkAsMessagesListFetchPending(
                 [messageChannel.id],

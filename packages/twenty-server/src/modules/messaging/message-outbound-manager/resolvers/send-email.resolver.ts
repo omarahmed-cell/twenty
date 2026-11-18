@@ -20,12 +20,15 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import { EmailComposerService } from 'src/engine/core-modules/tool/tools/email-tool/email-composer.service';
 import { AuthUserWorkspaceId } from 'src/engine/decorators/auth/auth-user-workspace-id.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
+import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace-member-id.decorator';
 import { SettingsPermissionGuard } from 'src/engine/guards/settings-permission.guard';
 import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { ConnectedAccountMetadataService } from 'src/engine/metadata-modules/connected-account/connected-account-metadata.service';
 import { SendEmailOutputDTO } from 'src/modules/messaging/message-outbound-manager/dtos/send-email-output.dto';
 import { SendEmailInput } from 'src/modules/messaging/message-outbound-manager/dtos/send-email.input';
 import { SendEmailService } from 'src/modules/messaging/message-outbound-manager/services/send-email.service';
+import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
+import { getEmailRecordLinksFromTarget } from 'src/modules/unified-email/utils/get-email-record-links-from-target.util';
 import { CustomException } from 'src/utils/custom-exception';
 import { isDefined } from 'twenty-shared/utils';
 import { isNonEmptyString } from '@sniptt/guards';
@@ -56,6 +59,7 @@ export class SendEmailResolver {
     private readonly fileEmailAttachmentService: FileEmailAttachmentService,
     private readonly sendEmailService: SendEmailService,
     private readonly i18nService: I18nService,
+    private readonly sentEmailRecorderService: SentEmailRecorderService,
   ) {}
 
   @Mutation(() => SendEmailOutputDTO)
@@ -64,6 +68,7 @@ export class SendEmailResolver {
     @AuthWorkspace() workspace: WorkspaceEntity,
     @AuthUserWorkspaceId() userWorkspaceId: string,
     @Context() context: I18nContext,
+    @AuthWorkspaceMemberId() workspaceMemberId?: string,
   ): Promise<SendEmailOutputDTO> {
     try {
       await this.connectedAccountMetadataService.verifyUsableByCaller({
@@ -101,13 +106,41 @@ export class SendEmailResolver {
 
       const { data } = result;
 
-      const sendResult = isDefined(input.draftMessageId)
-        ? await this.sendEmailService.sendComposedDraft(
-            data,
-            input.draftMessageId,
-            workspace.id,
-          )
-        : await this.sendEmailService.sendComposedEmail(data);
+      const recordInput = {
+        workspaceId: workspace.id,
+        composedEmail: data,
+        source: 'CRM' as const,
+        loggedByWorkspaceMemberId: workspaceMemberId ?? null,
+        ...getEmailRecordLinksFromTarget({
+          objectNameSingular: input.targetObjectNameSingular,
+          recordId: input.targetRecordId,
+        }),
+      };
+
+      let sendResult;
+
+      try {
+        sendResult = isDefined(input.draftMessageId)
+          ? await this.sendEmailService.sendComposedDraft(
+              data,
+              input.draftMessageId,
+              workspace.id,
+            )
+          : await this.sendEmailService.sendComposedEmail(data);
+      } catch (sendError) {
+        await this.sentEmailRecorderService.recordSentEmail({
+          ...recordInput,
+          deliveryError:
+            sendError instanceof Error ? sendError.message : String(sendError),
+        });
+
+        throw sendError;
+      }
+
+      await this.sentEmailRecorderService.recordSentEmail({
+        ...recordInput,
+        sendResult,
+      });
 
       let messageThreadId: string | undefined;
 

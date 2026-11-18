@@ -47,11 +47,13 @@ import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filt
 import { InjectWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/inject-workspace-scoped-repository.decorator';
 import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
 import {
+  FeatureFlagKey,
   MessageChannelPendingGroupEmailsAction,
   MessageChannelSyncStage,
   MessageChannelType,
   MessageFolderPendingSyncAction,
 } from 'twenty-shared/types';
+import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 
 @UseGuards(
   AuthPrincipalGuard({
@@ -77,6 +79,7 @@ export class MessageChannelResolver {
     @InjectWorkspaceScopedRepository(MessageFolderEntity)
     private readonly messageFolderRepository: WorkspaceScopedRepository<MessageFolderEntity>,
     private readonly messagingProcessGroupEmailActionsService: MessagingProcessGroupEmailActionsService,
+    private readonly featureFlagService: FeatureFlagService,
   ) {}
 
   @ResolveField('importProgress', () => Int, { nullable: true })
@@ -191,6 +194,19 @@ export class MessageChannelResolver {
       throw new MessageChannelException(
         `Message channel ${input.id} is owned by an application and cannot be updated through this endpoint`,
         MessageChannelExceptionCode.MESSAGE_CHANNEL_OWNERSHIP_VIOLATION,
+      );
+    }
+
+    if (
+      input.update.isSyncEnabled === true &&
+      (await this.featureFlagService.isFeatureEnabled(
+        FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+        workspace.id,
+      ))
+    ) {
+      throw new MessageChannelException(
+        'Mailbox sync is turned off for this workspace',
+        MessageChannelExceptionCode.INVALID_MESSAGE_CHANNEL_INPUT,
       );
     }
 

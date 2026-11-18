@@ -1,6 +1,9 @@
 import { useCallback, useMemo } from 'react';
 
 import { useLinkedRecordsIdentifiers } from '@/activities/timeline-activities/hooks/useLinkedRecordsIdentifiers';
+import { useTimelineActivityTypes } from '@/activities/timeline-activities/hooks/useTimelineActivityTypes';
+import { isNativeEmailTimelineActivityType } from '@/activities/timeline-activities/utils/isNativeEmailTimelineActivityType';
+import { getTimelineActivityType } from '@/activities/timeline-activities/utils/getTimelineActivityType';
 import { type TimelineActivity } from '@/activities/timeline-activities/types/TimelineActivity';
 import { getTimelineActivityRecordGqlFields } from '@/activities/timeline-activities/utils/getTimelineActivityRecordGqlFields';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
@@ -58,8 +61,11 @@ export const useTimelineActivities = (
     [allObjectMetadataItems, timelineActivityMetadata.fields],
   );
 
+  const { timelineActivityTypeMaps, isUnifiedEmailEnabled } =
+    useTimelineActivityTypes();
+
   const {
-    records: timelineActivities,
+    records: allTimelineActivities,
     loading: loadingTimelineActivities,
     fetchMoreRecords,
     refetch,
@@ -75,6 +81,24 @@ export const useTimelineActivities = (
     recordGqlFields,
     fetchPolicy: 'cache-and-network',
   });
+
+  const timelineActivities = useMemo(
+    () =>
+      isUnifiedEmailEnabled
+        ? allTimelineActivities.filter((timelineActivity) => {
+            const timelineActivityType = getTimelineActivityType(
+              timelineActivity,
+              timelineActivityTypeMaps,
+            );
+
+            return !(
+              isDefined(timelineActivityType) &&
+              isNativeEmailTimelineActivityType(timelineActivityType)
+            );
+          })
+        : allTimelineActivities,
+    [allTimelineActivities, isUnifiedEmailEnabled, timelineActivityTypeMaps],
+  );
 
   const operationSignature = useMemo(
     () => ({

@@ -28,6 +28,7 @@ import { CalendarEventCreationManagerModule } from 'src/modules/calendar/calenda
 import { MessagingSendManagerModule } from 'src/modules/messaging/message-outbound-manager/messaging-send-manager.module';
 import { provideWorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/provide-workspace-scoped-repository';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
+import { UnifiedEmailModule } from 'src/modules/unified-email/unified-email.module';
 @Module({
   imports: [
     MessagingSendManagerModule,
@@ -41,6 +42,7 @@ import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache
     RecordShareModule,
     SecureHttpClientModule,
     WorkspaceCacheModule,
+    UnifiedEmailModule,
   ],
   providers: [
     HttpTool,

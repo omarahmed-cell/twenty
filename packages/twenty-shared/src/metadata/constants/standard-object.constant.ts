@@ -464,6 +464,18 @@ export const STANDARD_OBJECTS = {
       assignedToIdIndex: {
         universalIdentifier: '76a50e33-4864-48ae-a552-510d80aa8081',
       },
+      loggedByIdIndex: {
+        universalIdentifier: 'ccbc0720-aa7c-4706-a1ae-70545e6c9a43',
+      },
+      gmailMessageIdUniqueIndex: {
+        universalIdentifier: 'e3d19004-3723-4d83-aa48-6217bf1b170f',
+      },
+      gmailThreadIdIndex: {
+        universalIdentifier: 'b25197b3-a69f-4f0d-99a5-d65095a8ec2e',
+      },
+      rfcMessageIdIndex: {
+        universalIdentifier: 'c1bf4de5-50da-442a-b277-b23de7d67bbc',
+      },
     },
     views: {
       allEmails: buildStandardObjectIndexView({
@@ -953,7 +965,8 @@ export const STANDARD_OBJECTS = {
     },
   },
   serviceStageHistory: {
-    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.serviceStageHistory,
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.serviceStageHistory,
     fields: STANDARD_OBJECT_FIELDS.serviceStageHistory,
     indexes: {
       serviceIdIndex: {

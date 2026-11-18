@@ -27,7 +27,9 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
-import { SettingsPath } from 'twenty-shared/types';
+import { CoreObjectNameSingular, SettingsPath } from 'twenty-shared/types';
+import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
+import { FeatureFlagKey } from '~/generated-metadata/graphql';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { SearchInput } from 'twenty-ui/components/input';
 import { Dropdown } from 'twenty-ui/components/navigation';
@@ -78,6 +80,9 @@ export const SettingsObjectTable = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeactivated, setShowDeactivated] = useState(true);
   const [showSystemObjects, setShowSystemObjects] = useState(false);
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
 
   const { deleteOneObjectMetadataItem } = useDeleteOneObjectMetadataItem();
 
@@ -142,16 +147,25 @@ export const SettingsObjectTable = ({
 
         const isHiddenSystemObject =
           item.objectMetadataItem.isSystem &&
-          !SYSTEM_OBJECTS_LISTED_IN_DATA_MODEL.includes(
+          (!SYSTEM_OBJECTS_LISTED_IN_DATA_MODEL.includes(
             item.objectMetadataItem.nameSingular,
-          );
+          ) ||
+            (isUnifiedEmailEnabled &&
+              item.objectMetadataItem.nameSingular ===
+                CoreObjectNameSingular.MessageThread));
         if (isHiddenSystemObject && !showSystemObjects) {
           return false;
         }
 
         return true;
       }),
-    [sortedObjectSettingsItems, searchTerm, showDeactivated, showSystemObjects],
+    [
+      sortedObjectSettingsItems,
+      searchTerm,
+      showDeactivated,
+      showSystemObjects,
+      isUnifiedEmailEnabled,
+    ],
   );
 
   return (

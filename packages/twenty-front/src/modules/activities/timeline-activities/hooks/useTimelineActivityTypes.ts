@@ -3,11 +3,19 @@ import { useMemo } from 'react';
 
 import { type TimelineActivityType } from '@/activities/timeline-activities/types/TimelineActivityType';
 import { type TimelineActivityTypeMaps } from '@/activities/timeline-activities/types/TimelineActivityTypeMaps';
+import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
+import { isNativeEmailTimelineActivityType } from '@/activities/timeline-activities/utils/isNativeEmailTimelineActivityType';
 import { isTimelineActivityAction } from 'twenty-shared/timeline';
-import { FindManyTimelineActivityTypesDocument } from '~/generated-metadata/graphql';
+import {
+  FeatureFlagKey,
+  FindManyTimelineActivityTypesDocument,
+} from '~/generated-metadata/graphql';
 
 export const useTimelineActivityTypes = () => {
   const { data } = useQuery(FindManyTimelineActivityTypesDocument);
+  const isUnifiedEmailEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
 
   const timelineActivityTypeMaps = useMemo<TimelineActivityTypeMaps>(() => {
     const timelineActivityTypes: TimelineActivityType[] = (
@@ -40,10 +48,19 @@ export const useTimelineActivityTypes = () => {
   const activeTimelineActivityTypes = useMemo(
     () =>
       [...timelineActivityTypeMaps.byId.values()].filter(
-        ({ isActive }) => isActive,
+        (timelineActivityType) =>
+          timelineActivityType.isActive &&
+          !(
+            isUnifiedEmailEnabled &&
+            isNativeEmailTimelineActivityType(timelineActivityType)
+          ),
       ),
-    [timelineActivityTypeMaps],
+    [timelineActivityTypeMaps, isUnifiedEmailEnabled],
   );
 
-  return { timelineActivityTypeMaps, activeTimelineActivityTypes };
+  return {
+    timelineActivityTypeMaps,
+    activeTimelineActivityTypes,
+    isUnifiedEmailEnabled,
+  };
 };

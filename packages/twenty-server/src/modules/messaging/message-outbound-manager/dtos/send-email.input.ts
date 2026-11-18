@@ -40,4 +40,13 @@ export class SendEmailInput {
 
   @Field(() => [SendEmailAttachmentInput], { nullable: true })
   files?: SendEmailAttachmentInput[];
+
+  @Field(() => String, { nullable: true })
+  targetObjectNameSingular?: string;
+
+  @Field(() => String, { nullable: true })
+  targetRecordId?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  trackEmail?: boolean;
 }

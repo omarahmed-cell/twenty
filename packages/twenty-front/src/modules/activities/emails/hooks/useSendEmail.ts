@@ -28,6 +28,9 @@ type SendEmailParams = {
   inReplyTo?: string;
   draftMessageId?: string;
   files?: EmailAttachment[];
+  targetObjectNameSingular?: string;
+  targetRecordId?: string;
+  trackEmail?: boolean;
 };
 
 export const useSendEmail = () => {
@@ -56,6 +59,9 @@ export const useSendEmail = () => {
               inReplyTo: params.inReplyTo,
               draftMessageId: params.draftMessageId,
               files: params.files,
+              targetObjectNameSingular: params.targetObjectNameSingular,
+              targetRecordId: params.targetRecordId,
+              trackEmail: params.trackEmail,
             },
           },
         });
@@ -72,6 +78,7 @@ export const useSendEmail = () => {
               'FindManyMessages',
               'FindManyMessageParticipants',
               'FindManyMessageChannelMessageAssociations',
+              'FindManyEmailTargets',
             ],
           });
 
