@@ -69,6 +69,7 @@ export const useEmailComposerState = ({
     initialCc.length > 0 || initialBcc.length > 0,
   );
   const [files, setFiles] = useState<EmailAttachment[]>([]);
+  const [trackEmail, setTrackEmail] = useState(false);
 
   const { sendEmail, loading } = useSendEmail();
 
@@ -112,6 +113,7 @@ export const useEmailComposerState = ({
       files: files.length > 0 ? files : undefined,
       targetObjectNameSingular: contextRecord?.objectNameSingular,
       targetRecordId: contextRecord?.recordId,
+      trackEmail,
     });
 
     if (success) {
@@ -130,11 +132,14 @@ export const useEmailComposerState = ({
     draftPrefill?.messageId,
     files,
     contextRecord,
+    trackEmail,
     sendEmail,
     onSent,
   ]);
 
   return {
+    trackEmail,
+    setTrackEmail,
     connectedAccountId,
     fromHandle,
     setSender,

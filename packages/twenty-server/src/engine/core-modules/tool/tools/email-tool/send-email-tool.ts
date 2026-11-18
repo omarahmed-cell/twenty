@@ -13,7 +13,9 @@ import { type ToolOutput } from 'src/engine/core-modules/tool/types/tool-output.
 import { type ToolExecutionContext } from 'src/engine/core-modules/tool/types/tool-execution-context.type';
 import { type Tool } from 'src/engine/core-modules/tool/types/tool.type';
 import { SendEmailService } from 'src/modules/messaging/message-outbound-manager/services/send-email.service';
+import { EmailTrackingService } from 'src/modules/unified-email/services/email-tracking.service';
 import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class SendEmailTool implements Tool {
@@ -28,6 +30,7 @@ export class SendEmailTool implements Tool {
     private readonly sendEmailService: SendEmailService,
     private readonly i18nService: I18nService,
     private readonly sentEmailRecorderService: SentEmailRecorderService,
+    private readonly emailTrackingService: EmailTrackingService,
   ) {}
 
   async execute(
@@ -49,11 +52,22 @@ export class SendEmailTool implements Tool {
         return { success: false, message: errorMessage, error: errorMessage };
       }
 
-      const { data } = result;
+      const emailRecordId = v4();
+      const data =
+        parameters.trackEmail === true
+          ? {
+              ...result.data,
+              sanitizedHtmlBody: this.emailTrackingService.addTrackingToHtml({
+                html: result.data.sanitizedHtmlBody,
+                workspaceId: context.workspaceId,
+                emailId: emailRecordId,
+              }),
+            }
+          : result.data;
 
       const recordInput = {
         workspaceId: context.workspaceId,
-        composedEmail: data,
+        composedEmail: result.data,
         source:
           context.isWorkflowRun === true
             ? ('WORKFLOW' as const)
@@ -62,6 +76,8 @@ export class SendEmailTool implements Tool {
           context.isWorkflowRun === true
             ? null
             : (context.workspaceMemberId ?? null),
+        emailId: emailRecordId,
+        trackEnabled: parameters.trackEmail === true,
       };
 
       let sendResult;
@@ -78,12 +94,11 @@ export class SendEmailTool implements Tool {
         throw sendError;
       }
 
-      const emailRecordId = await this.sentEmailRecorderService.recordSentEmail(
-        {
+      const recordedEmailId =
+        await this.sentEmailRecorderService.recordSentEmail({
           ...recordInput,
           sendResult,
-        },
-      );
+        });
 
       const persistedMessage = data.shouldPersistMessage
         ? await this.sendEmailService.persistSentMessage(
@@ -113,7 +128,7 @@ export class SendEmailTool implements Tool {
           threadExternalId: sendResult.threadExternalId,
           messageId: persistedMessage?.messageId,
           messageThreadId: persistedMessage?.messageThreadId,
-          emailRecordId,
+          emailRecordId: recordedEmailId,
         },
       };
     } catch (error) {

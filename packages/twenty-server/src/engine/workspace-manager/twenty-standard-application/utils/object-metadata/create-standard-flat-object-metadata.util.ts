@@ -1271,6 +1271,52 @@ export const STANDARD_FLAT_OBJECT_METADATA_BUILDERS_BY_OBJECT_NAME = {
       twentyStandardApplicationId,
       now,
     }),
+  emailTrackingEvent: ({
+    now,
+    workspaceId,
+    standardObjectMetadataRelatedEntityIds,
+    twentyStandardApplicationId,
+    dependencyFlatEntityMaps,
+  }: Omit<
+    CreateStandardObjectArgs<'emailTrackingEvent'>,
+    'context' | 'objectName'
+  >) =>
+    createStandardObjectFlatMetadata({
+      objectName: 'emailTrackingEvent',
+      dependencyFlatEntityMaps,
+      context: {
+        universalIdentifier:
+          STANDARD_OBJECTS.emailTrackingEvent.universalIdentifier,
+        nameSingular: 'emailTrackingEvent',
+        namePlural: 'emailTrackingEvents',
+        labelSingular: i18nLabel(
+          msg({
+            message: `Email Tracking Event`,
+            context: 'objectMetadata.labelSingular',
+          }),
+        ),
+        labelPlural: i18nLabel(
+          msg({
+            message: `Email Tracking Events`,
+            context: 'objectMetadata.labelPlural',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `One open or link click of a tracked email, written by the server`,
+            context: 'objectMetadata.description',
+          }),
+        ),
+        icon: 'IconEye',
+        isSystem: true,
+        isUICreatable: false,
+        labelIdentifierFieldMetadataName: 'id',
+      },
+      workspaceId,
+      standardObjectMetadataRelatedEntityIds,
+      twentyStandardApplicationId,
+      now,
+    }),
   opportunityStageHistory: ({
     now,
     workspaceId,

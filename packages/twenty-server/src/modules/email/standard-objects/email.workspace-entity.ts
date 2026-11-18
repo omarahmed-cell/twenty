@@ -3,6 +3,7 @@ import { type ActorMetadata, type RichTextMetadata } from 'twenty-shared/types';
 import { BaseWorkspaceEntity } from 'src/engine/twenty-orm/base.workspace-entity';
 import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
 import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-objects/attachment.workspace-entity';
+import { type EmailTrackingEventWorkspaceEntity } from 'src/modules/email/standard-objects/email-tracking-event.workspace-entity';
 import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-objects/email-target.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
 import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
@@ -36,6 +37,7 @@ export class EmailWorkspaceEntity extends BaseWorkspaceEntity {
   deliveryError: string | null;
   loggedBy: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
   loggedById: string | null;
+  trackingEvents: EntityRelation<EmailTrackingEventWorkspaceEntity[]>;
   createdBy: ActorMetadata;
   updatedBy: ActorMetadata;
   assignedTo: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;

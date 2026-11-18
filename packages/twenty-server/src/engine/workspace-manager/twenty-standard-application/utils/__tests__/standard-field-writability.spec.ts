@@ -205,6 +205,7 @@ describe('Standard field writability', () => {
               STANDARD_OBJECTS.agentChatThreadParticipant.universalIdentifier,
               STANDARD_OBJECTS.campaignDelivery.universalIdentifier,
               STANDARD_OBJECTS.messageSuppression.universalIdentifier,
+              STANDARD_OBJECTS.emailTrackingEvent.universalIdentifier,
             ].some(
               (identifier) =>
                 identifier ===

@@ -21,6 +21,7 @@ export enum ApiPath {
   PublicAssets = 'public-assets',
   Rest = 'rest',
   RouteTrigger = 's',
+  Tracking = 't',
   Webhooks = 'webhooks',
   WellKnown = '.well-known',
 }

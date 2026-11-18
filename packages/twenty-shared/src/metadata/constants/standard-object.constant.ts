@@ -940,6 +940,24 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  emailTrackingEvent: {
+    universalIdentifier:
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTrackingEvent,
+    fields: STANDARD_OBJECT_FIELDS.emailTrackingEvent,
+    indexes: {
+      emailIdIndex: {
+        universalIdentifier: '1803a7e9-54cf-4297-8b73-3b28473a8ba7',
+      },
+    },
+    views: {
+      allEmailTrackingEvents: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTrackingEvent,
+        fields: STANDARD_OBJECT_FIELDS.emailTrackingEvent,
+        viewFieldNames: ['occurredAt', 'email', 'type', 'url', 'isCounted'],
+      }),
+    },
+  },
   opportunityStageHistory: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunityStageHistory,

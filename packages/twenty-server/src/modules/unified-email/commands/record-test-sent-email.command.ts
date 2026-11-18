@@ -7,7 +7,9 @@ import {
 import { WorkspaceIteratorService } from 'src/database/commands/command-runners/workspace-iterator.service';
 import { type RunOnWorkspaceArgs } from 'src/database/commands/command-runners/workspace.command-runner';
 import { type ComposedEmail } from 'src/engine/core-modules/tool/tools/email-tool/types/composed-email.type';
+import { EmailTrackingService } from 'src/modules/unified-email/services/email-tracking.service';
 import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
+import { v4 } from 'uuid';
 
 type RecordTestSentEmailCommandOptions = ProvisionedWorkspaceCommandOptions & {
   to?: string[];
@@ -15,6 +17,7 @@ type RecordTestSentEmailCommandOptions = ProvisionedWorkspaceCommandOptions & {
   source?: 'CRM' | 'WORKFLOW';
   opportunityId?: string;
   failed?: boolean;
+  track?: boolean;
 };
 
 // Runs the post-send step without a mail provider, so the record and its links can be checked on a server with no Gmail account
@@ -27,6 +30,7 @@ export class RecordTestSentEmailCommand extends ProvisionedWorkspaceCommandRunne
   constructor(
     protected readonly workspaceIteratorService: WorkspaceIteratorService,
     private readonly sentEmailRecorderService: SentEmailRecorderService,
+    private readonly emailTrackingService: EmailTrackingService,
   ) {
     super(workspaceIteratorService);
   }
@@ -56,6 +60,11 @@ export class RecordTestSentEmailCommand extends ProvisionedWorkspaceCommandRunne
     return true;
   }
 
+  @Option({ flags: '--track', required: false })
+  parseTrack(): boolean {
+    return true;
+  }
+
   override async runOnWorkspace({
     workspaceId,
     options,
@@ -79,8 +88,20 @@ export class RecordTestSentEmailCommand extends ProvisionedWorkspaceCommandRunne
       shouldPersistMessage: false,
     } as unknown as ComposedEmail;
 
+    const plannedEmailId = v4();
+    const isTracked = options.track === true;
+    const trackedHtml = isTracked
+      ? this.emailTrackingService.addTrackingToHtml({
+          html: '<p>Test email <a href="https://example.com/pricing?a=1">pricing</a></p>',
+          workspaceId,
+          emailId: plannedEmailId,
+        })
+      : undefined;
+
     const emailId = await this.sentEmailRecorderService.recordSentEmail({
       workspaceId,
+      emailId: plannedEmailId,
+      trackEnabled: isTracked,
       composedEmail,
       source: options.source === 'WORKFLOW' ? 'WORKFLOW' : 'CRM',
       ...(options.failed === true
@@ -93,6 +114,22 @@ export class RecordTestSentEmailCommand extends ProvisionedWorkspaceCommandRunne
       opportunityIds: options.opportunityId ? [options.opportunityId] : [],
     });
 
-    this.logger.log(`RESULT ${JSON.stringify({ emailId })}`);
+    const trackingUrls = isTracked
+      ? this.emailTrackingService.buildTrackingUrls({
+          workspaceId,
+          emailId: plannedEmailId,
+        })
+      : undefined;
+
+    this.logger.log(
+      `RESULT ${JSON.stringify({
+        emailId,
+        trackedHtml,
+        openPixelUrl: trackingUrls?.openPixelUrl,
+        clickUrl: trackingUrls?.buildClickUrl(
+          'https://example.com/pricing?a=1',
+        ),
+      })}`,
+    );
   }
 }

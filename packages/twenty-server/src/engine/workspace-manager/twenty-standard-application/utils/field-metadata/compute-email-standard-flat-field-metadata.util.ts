@@ -1117,4 +1117,37 @@ export const buildEmailStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  trackingEvents: {
+    ...createStandardRelationFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        type: FieldMetadataType.RELATION,
+        morphId: null,
+        fieldName: 'trackingEvents',
+        label: i18nLabel(
+          msg({ message: `Tracking events`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Opens and link clicks of the email`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconEye',
+        isNullable: true,
+        isUIEditable: false,
+        targetObjectName: 'emailTrackingEvent',
+        targetFieldName: 'email',
+        settings: {
+          relationType: RelationType.ONE_TO_MANY,
+        },
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    isSystem: true,
+  },
 });

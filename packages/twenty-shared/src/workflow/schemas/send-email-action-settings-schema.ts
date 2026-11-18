@@ -36,5 +36,9 @@ export const workflowSendEmailActionSettingsSchema =
         ),
       files: workflowEmailFilesSchema,
       inReplyTo: z.string().trim().optional(),
+      trackEmail: z
+        .boolean()
+        .optional()
+        .describe('Track opens and link clicks of the sent email'),
     }),
   });

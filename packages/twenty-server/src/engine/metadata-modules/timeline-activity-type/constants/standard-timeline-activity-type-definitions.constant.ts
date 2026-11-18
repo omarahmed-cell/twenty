@@ -341,6 +341,38 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       },
     },
     {
+      name: 'emailOpened',
+      universalIdentifier: '2756f602-f7c0-40ea-94d3-418bb21e66e7',
+      label: msg({
+        message: `email opened`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconEye',
+      frontComponentUniversalIdentifier: null,
+      // Rows are written by the email tracking job; tracking-event writes emit no events, so this never fires on its own
+      emit: {
+        on: 'created',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.emailTrackingEvent.universalIdentifier,
+      },
+    },
+    {
+      name: 'emailLinkClicked',
+      universalIdentifier: 'f70d3bea-bd10-4ce3-9f58-95f2378d553c',
+      label: msg({
+        message: `link clicked in an email`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconClick',
+      frontComponentUniversalIdentifier: null,
+      // Rows are written by the email tracking job; tracking-event writes emit no events, so this never fires on its own
+      emit: {
+        on: 'updated',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.emailTrackingEvent.universalIdentifier,
+      },
+    },
+    {
       name: 'taskLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0c',
       label: msg({

@@ -15,8 +15,9 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { IconPaperclip, IconSend, IconTrash } from 'twenty-ui/icon';
-import { Button } from 'twenty-ui/primitives/input';
+import { Button, Checkbox } from 'twenty-ui/primitives/input';
 import { IconButton } from 'twenty-ui/components/input';
+import { themeCssVariables } from 'twenty-ui/theme';
 
 import { useAttachEmailFiles } from '@/activities/emails/hooks/useAttachEmailFiles';
 
@@ -24,6 +25,15 @@ const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+`;
+
+const StyledTrackOption = styled.label`
+  align-items: center;
+  color: ${themeCssVariables.font.color.secondary};
+  cursor: pointer;
+  display: flex;
+  font-size: ${themeCssVariables.font.size.sm};
+  gap: ${themeCssVariables.spacing[1]};
 `;
 
 const StyledContent = styled.div`
@@ -113,6 +123,16 @@ export const SidePanelComposeEmailPage = () => {
           >
             <IconPaperclip />
           </IconButton>,
+          <StyledTrackOption key="track">
+            <Checkbox
+              aria-label={t`Track opens and clicks`}
+              checked={composerState.trackEmail}
+              onCheckedChange={(checked) =>
+                composerState.setTrackEmail(checked === true)
+              }
+            />
+            {t`Track`}
+          </StyledTrackOption>,
           <Button
             key="send"
             size="sm"

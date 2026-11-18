@@ -27,7 +27,9 @@ import { ConnectedAccountMetadataService } from 'src/engine/metadata-modules/con
 import { SendEmailOutputDTO } from 'src/modules/messaging/message-outbound-manager/dtos/send-email-output.dto';
 import { SendEmailInput } from 'src/modules/messaging/message-outbound-manager/dtos/send-email.input';
 import { SendEmailService } from 'src/modules/messaging/message-outbound-manager/services/send-email.service';
+import { EmailTrackingService } from 'src/modules/unified-email/services/email-tracking.service';
 import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
+import { v4 } from 'uuid';
 import { getEmailRecordLinksFromTarget } from 'src/modules/unified-email/utils/get-email-record-links-from-target.util';
 import { CustomException } from 'src/utils/custom-exception';
 import { isDefined } from 'twenty-shared/utils';
@@ -60,6 +62,7 @@ export class SendEmailResolver {
     private readonly sendEmailService: SendEmailService,
     private readonly i18nService: I18nService,
     private readonly sentEmailRecorderService: SentEmailRecorderService,
+    private readonly emailTrackingService: EmailTrackingService,
   ) {}
 
   @Mutation(() => SendEmailOutputDTO)
@@ -104,12 +107,25 @@ export class SendEmailResolver {
         };
       }
 
-      const { data } = result;
+      const emailRecordId = v4();
+      const data =
+        input.trackEmail === true
+          ? {
+              ...result.data,
+              sanitizedHtmlBody: this.emailTrackingService.addTrackingToHtml({
+                html: result.data.sanitizedHtmlBody,
+                workspaceId: workspace.id,
+                emailId: emailRecordId,
+              }),
+            }
+          : result.data;
 
       const recordInput = {
         workspaceId: workspace.id,
-        composedEmail: data,
+        composedEmail: result.data,
         source: 'CRM' as const,
+        emailId: emailRecordId,
+        trackEnabled: input.trackEmail === true,
         loggedByWorkspaceMemberId: workspaceMemberId ?? null,
         ...getEmailRecordLinksFromTarget({
           objectNameSingular: input.targetObjectNameSingular,

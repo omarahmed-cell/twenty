@@ -18,6 +18,7 @@ export enum CoreObjectNameSingular {
   Email = 'email',
   CommunicationTarget = 'communicationTarget',
   EmailTarget = 'emailTarget',
+  EmailTrackingEvent = 'emailTrackingEvent',
   Company = 'company',
   Dashboard = 'dashboard',
   TimelineActivity = 'timelineActivity',

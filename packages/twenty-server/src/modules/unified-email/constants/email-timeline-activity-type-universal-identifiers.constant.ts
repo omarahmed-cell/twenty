@@ -1,0 +1,4 @@
+export const EMAIL_TIMELINE_ACTIVITY_TYPE_UNIVERSAL_IDENTIFIERS = {
+  emailOpened: '2756f602-f7c0-40ea-94d3-418bb21e66e7',
+  emailLinkClicked: 'f70d3bea-bd10-4ce3-9f58-95f2378d553c',
+} as const;

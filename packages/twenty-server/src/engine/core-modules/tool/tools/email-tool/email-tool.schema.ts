@@ -53,4 +53,10 @@ export const EmailToolInputZodSchema = z.object({
       'The RFC 2822 Message-ID of an existing email to reply to. When provided, the email is sent as a reply in the same thread.',
     )
     .optional(),
+  trackEmail: z
+    .boolean()
+    .describe(
+      'Track opens and link clicks of this email. Off unless the user asks for tracking.',
+    )
+    .optional(),
 });

@@ -36,6 +36,7 @@ describe('SendEmailResolver errors', () => {
       {} as never,
       i18nService as never,
       { recordSentEmail: jest.fn() } as never,
+      { addTrackingToHtml: jest.fn() } as never,
     );
 
     return { resolver, i18nService };

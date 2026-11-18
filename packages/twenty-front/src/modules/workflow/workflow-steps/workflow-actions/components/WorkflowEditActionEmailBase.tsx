@@ -28,6 +28,7 @@ import { WorkflowVariablePicker } from '@/workflow/workflow-variables/components
 import { useQuery } from '@apollo/client/react';
 import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
+import { FormBooleanFieldInput } from '@/object-record/record-field/ui/form-types/components/FormBooleanFieldInput';
 import { useEffect, useState } from 'react';
 import {
   ConnectedAccountProvider,
@@ -420,6 +421,14 @@ export const WorkflowEditActionEmailBase = ({
               handleFieldChange('files', files);
             }}
             VariablePicker={WorkflowVariablePicker}
+          />
+          <FormBooleanFieldInput
+            label={t`Track opens and clicks`}
+            defaultValue={formData.trackEmail}
+            readonly={actionOptions.readonly}
+            onChange={(value) => {
+              handleFieldChange('trackEmail', value === true);
+            }}
           />
         </WorkflowStepBody>
         {!actionOptions.readonly && <WorkflowStepFooter stepId={action.id} />}

@@ -975,6 +975,9 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: 'd191a683-054b-4f36-a543-e15aab43706a',
     },
     repliedAt: { universalIdentifier: '151ca942-3923-4d61-8ab4-9ce12df003de' },
+    trackingEvents: {
+      universalIdentifier: 'f51e5b89-35bf-408c-aaf3-19163d7793c7',
+    },
     deliveryError: {
       universalIdentifier: 'efd0c279-cd64-40b4-9d79-15a46ceb6197',
     },
@@ -1558,6 +1561,19 @@ export const STANDARD_OBJECT_FIELDS = {
     toStage: { universalIdentifier: '12854d71-673a-4ec5-834f-0c3b674b56d5' },
     changedAt: { universalIdentifier: '60669d57-0b7c-414d-8e66-6bd6f9d003cb' },
     changedBy: { universalIdentifier: '56a02e55-60bf-4adf-a354-9d51f9b68044' },
+  },
+  emailTrackingEvent: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.emailTrackingEvent,
+    ),
+    email: { universalIdentifier: '1715c086-14df-4c54-970b-9519c42d21a7' },
+    type: { universalIdentifier: '59c7dc67-70a3-4f3b-bb4a-771649633513' },
+    url: { universalIdentifier: 'b657768e-fd7c-48e9-9dd2-416a50f319fe' },
+    occurredAt: { universalIdentifier: '269d9915-88e7-4deb-9a66-38b8f97a94a7' },
+    userAgent: { universalIdentifier: '8b239193-b415-4824-9ee5-60085c2d9483' },
+    isProxy: { universalIdentifier: 'f91c4311-fbfb-4f50-82e0-1ef299e650c5' },
+    isSender: { universalIdentifier: '075f7a00-8e3a-42c6-a7e8-d497d16391e0' },
+    isCounted: { universalIdentifier: 'c69ae495-732c-4741-b7f1-9b9e556e6188' },
   },
   serviceStageHistory: {
     ...buildStandardObjectSystemFields(

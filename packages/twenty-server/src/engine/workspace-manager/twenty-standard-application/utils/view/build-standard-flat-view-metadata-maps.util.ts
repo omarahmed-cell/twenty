@@ -25,6 +25,7 @@ import { computeStandardMessageListMemberViews } from 'src/engine/workspace-mana
 import { computeStandardOpportunityContactViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-opportunity-contact-views.util';
 import { computeStandardOpportunityCollaboratorViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-opportunity-collaborator-views.util';
 import { computeStandardOpportunityStageHistoryViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-opportunity-stage-history-views.util';
+import { computeStandardEmailTrackingEventViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-email-tracking-event-views.util';
 import { computeStandardServiceStageHistoryViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-service-stage-history-views.util';
 import { computeStandardPipelineViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-pipeline-views.util';
 import { computeStandardPipelineStageViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-pipeline-stage-views.util';
@@ -80,6 +81,7 @@ const STANDARD_FLAT_VIEW_METADATA_BUILDERS_BY_OBJECT_NAME = {
   messageListMember: computeStandardMessageListMemberViews,
   opportunityContact: computeStandardOpportunityContactViews,
   opportunityCollaborator: computeStandardOpportunityCollaboratorViews,
+  emailTrackingEvent: computeStandardEmailTrackingEventViews,
   opportunityStageHistory: computeStandardOpportunityStageHistoryViews,
   serviceStageHistory: computeStandardServiceStageHistoryViews,
   pipeline: computeStandardPipelineViews,

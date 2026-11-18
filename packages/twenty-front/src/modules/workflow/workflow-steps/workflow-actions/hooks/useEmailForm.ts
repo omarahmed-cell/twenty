@@ -30,6 +30,7 @@ export const useEmailForm = ({
       body: action.settings.input.body ?? '',
       files: action.settings.input.files ?? [],
       inReplyTo: action.settings.input.inReplyTo ?? '',
+      trackEmail: action.settings.input.trackEmail ?? false,
     };
   });
 
@@ -50,6 +51,7 @@ export const useEmailForm = ({
           body: formData.body,
           files: formData.files,
           inReplyTo: formData.inReplyTo,
+          trackEmail: formData.trackEmail,
         },
       },
     });

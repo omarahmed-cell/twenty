@@ -5,6 +5,7 @@ import { SOURCE_LOCALE } from 'twenty-shared/translations';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { EmailComposerService } from 'src/engine/core-modules/tool/tools/email-tool/email-composer.service';
 import { SendEmailTool } from 'src/engine/core-modules/tool/tools/email-tool/send-email-tool';
+import { EmailTrackingService } from 'src/modules/unified-email/services/email-tracking.service';
 import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
 import { type EmailToolInput } from 'src/engine/core-modules/tool/tools/email-tool/types/email-tool-input.type';
 import { SendEmailService } from 'src/modules/messaging/message-outbound-manager/services/send-email.service';
@@ -76,6 +77,10 @@ describe('SendEmailTool', () => {
         {
           provide: SentEmailRecorderService,
           useValue: { recordSentEmail: jest.fn().mockResolvedValue(null) },
+        },
+        {
+          provide: EmailTrackingService,
+          useValue: { addTrackingToHtml: jest.fn() },
         },
       ],
     }).compile();
