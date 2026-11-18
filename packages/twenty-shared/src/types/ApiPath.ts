@@ -12,6 +12,7 @@ export enum ApiPath {
   File = 'file',
   FileUpload = 'file-upload',
   Files = 'files',
+  GmailExtension = 'gmail-extension',
   GraphQL = 'graphql',
   Health = 'healthz',
   Mcp = 'mcp',

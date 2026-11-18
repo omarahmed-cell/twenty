@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Roboost CRM for Gmail</title>
+    <style>
+      body { font: 14px Roboto, Arial, sans-serif; margin: 16px; min-width: 340px; color: #202124; }
+      label { display: block; font-weight: 600; margin: 12px 0 4px; }
+      input { box-sizing: border-box; padding: 6px 8px; width: 100%; }
+      button { margin-top: 12px; padding: 6px 12px; cursor: pointer; }
+      .muted { color: #5f6368; font-size: 12px; }
+      #status { margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <h3>Roboost CRM for Gmail</h3>
+    <p class="muted">Create your personal token in the CRM: Settings &gt; Gmail extension &gt; Create token.</p>
+    <label for="crmUrl">CRM address</label>
+    <input id="crmUrl" type="url" placeholder="https://chai.roboost.app" />
+    <label for="token">Personal token</label>
+    <input id="token" type="password" placeholder="rgx_…" autocomplete="off" />
+    <button id="save" type="button">Save and test</button>
+    <button id="signOut" type="button">Remove token</button>
+    <div id="status" class="muted"></div>
+    <script src="options.js"></script>
+  </body>
+</html>

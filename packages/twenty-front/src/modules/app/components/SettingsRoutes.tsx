@@ -421,6 +421,14 @@ const SettingsTwoFactorAuthenticationMethod = lazy(() =>
   ),
 );
 
+const SettingsGmailExtension = lazy(() =>
+  import('~/pages/settings/gmail-extension/SettingsGmailExtension').then(
+    (module) => ({
+      default: module.SettingsGmailExtension,
+    }),
+  ),
+);
+
 const SettingsExperience = lazy(() =>
   import('~/pages/settings/profile/appearance/components/SettingsExperience').then(
     (module) => ({
@@ -798,6 +806,10 @@ const createSettingsRouteElements = ({
       element={<SettingsTwoFactorAuthenticationMethod />}
     />
     <Route path={SettingsPath.Experience} element={<SettingsExperience />} />
+    <Route
+      path={SettingsPath.GmailExtension}
+      element={<SettingsGmailExtension />}
+    />
     <Route
       element={
         <SettingsProtectedRouteWrapper

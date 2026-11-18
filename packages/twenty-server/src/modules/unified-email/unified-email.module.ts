@@ -1,6 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
+import { KeyValuePairEntity } from 'src/engine/core-modules/key-value-pair/key-value-pair.entity';
+import { GmailExtensionTokenCommand } from 'src/modules/unified-email/commands/gmail-extension-token.command';
+import { GmailExtensionController } from 'src/modules/unified-email/gmail-extension/controllers/gmail-extension.controller';
+import { GmailExtensionTokenResolver } from 'src/modules/unified-email/gmail-extension/resolvers/gmail-extension-token.resolver';
+import { GmailExtensionLogService } from 'src/modules/unified-email/gmail-extension/services/gmail-extension-log.service';
+import { GmailExtensionLookupService } from 'src/modules/unified-email/gmail-extension/services/gmail-extension-lookup.service';
+import { GmailExtensionTokenService } from 'src/modules/unified-email/gmail-extension/services/gmail-extension-token.service';
 import { CacheLockModule } from 'src/engine/core-modules/cache-lock/cache-lock.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { FindOrCreateEmailContactsCommand } from 'src/modules/unified-email/commands/find-or-create-email-contacts.command';
@@ -16,8 +24,13 @@ import { EmailRecordService } from 'src/modules/unified-email/services/email-rec
 import { SentEmailRecorderService } from 'src/modules/unified-email/services/sent-email-recorder.service';
 
 @Module({
-  imports: [CacheLockModule, WorkspaceIteratorModule, WorkspaceCacheModule],
-  controllers: [EmailTrackingController],
+  imports: [
+    CacheLockModule,
+    WorkspaceIteratorModule,
+    WorkspaceCacheModule,
+    TypeOrmModule.forFeature([KeyValuePairEntity]),
+  ],
+  controllers: [EmailTrackingController, GmailExtensionController],
   providers: [
     EmailDerivedFieldsJob,
     EmailDerivedFieldsListener,
@@ -29,8 +42,14 @@ import { SentEmailRecorderService } from 'src/modules/unified-email/services/sen
     EmailTrackingEventJob,
     FindOrCreateEmailContactsCommand,
     RecordTestSentEmailCommand,
+    GmailExtensionTokenCommand,
+    GmailExtensionTokenService,
+    GmailExtensionTokenResolver,
+    GmailExtensionLookupService,
+    GmailExtensionLogService,
   ],
   exports: [
+    GmailExtensionTokenCommand,
     FindOrCreateEmailContactsCommand,
     RecordTestSentEmailCommand,
     EmailContactFindOrCreateService,

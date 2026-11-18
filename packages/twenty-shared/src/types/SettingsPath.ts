@@ -2,6 +2,7 @@ export enum SettingsPath {
   ProfilePage = 'profile',
   TwoFactorAuthenticationStrategyConfig = 'profile/two-factor-authentication/:twoFactorAuthenticationStrategy',
   Experience = 'experience',
+  GmailExtension = 'gmail-extension',
   Accounts = 'accounts',
   AccountDetail = 'accounts/detail/:connectedAccountId',
   NativeAccountApp = 'accounts/apps/:nativeAccountAppId',

@@ -201,7 +201,11 @@ describe('useSettingsNavigationItems', () => {
     ).toBeGreaterThan(0);
     expect(
       userSection?.items
-        .filter((item) => item.path !== SettingsPath.Accounts)
+        .filter(
+          (item) =>
+            item.path !== SettingsPath.Accounts &&
+            item.path !== SettingsPath.GmailExtension,
+        )
         .every((item) => !item.isHidden),
     ).toBe(true);
   });

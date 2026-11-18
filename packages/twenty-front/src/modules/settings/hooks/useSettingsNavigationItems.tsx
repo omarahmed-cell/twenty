@@ -20,6 +20,7 @@ import {
   IconCalendarEvent,
   IconCode,
   IconColorSwatch,
+  IconPuzzle,
   type IconComponent,
   IconCreditCard,
   IconDoorEnter,
@@ -94,6 +95,12 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Experience`,
           path: SettingsPath.Experience,
           Icon: IconColorSwatch,
+        },
+        {
+          label: t`Gmail extension`,
+          path: SettingsPath.GmailExtension,
+          Icon: IconPuzzle,
+          isHidden: !isUnifiedEmailEnabled,
         },
         {
           label: isAppPreferencesEnabled ? t`App preferences` : t`Accounts`,
