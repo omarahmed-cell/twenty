@@ -1790,6 +1790,9 @@ export const STANDARD_OBJECT_FIELDS = {
     assignedTo: {
       universalIdentifier: '132f2237-653f-4513-8ca6-2d61cfe218f7',
     },
+    activityDate: {
+      universalIdentifier: '7e292b1d-2e59-4aa7-8bbf-4646241fbc06',
+    },
     attachments: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -2519,6 +2522,14 @@ export const STANDARD_OBJECT_FIELDS = {
       }),
     },
     assignee: { universalIdentifier: '20202020-065a-4f42-a906-e20422c1753f' },
+    assignedBy: { universalIdentifier: '170934c7-cdca-47b0-a0da-cfdfd76fb3f1' },
+    assigneeAssignedAt: {
+      universalIdentifier: '05910f6d-ef47-42d4-9439-c39544b5ec62',
+    },
+    completedAt: {
+      universalIdentifier: '66c584a4-8cdb-41d9-a351-19a717e5ff31',
+    },
+    isOverdue: { universalIdentifier: 'c774cc0d-f693-42bc-ad5c-4809bb878287' },
     timelineActivities: {
       universalIdentifier: getSystemRelationFieldUniversalIdentifier({
         applicationUniversalIdentifier:
@@ -2729,6 +2740,9 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     assignedTasks: {
       universalIdentifier: '20202020-61dc-4a1c-99e8-38ebf8d2bbeb',
+    },
+    tasksAssignedBy: {
+      universalIdentifier: '728b4fc3-0863-41ac-b515-2c75f56b11e4',
     },
     ownedOpportunities: {
       universalIdentifier: '20202020-9e4d-4b3a-8c1f-6d7e8f9a0b1c',

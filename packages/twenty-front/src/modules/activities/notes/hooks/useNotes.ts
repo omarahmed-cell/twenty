@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { useActivities } from '@/activities/hooks/useActivities';
+import { NOTES_ORDER_BY } from '@/activities/notes/constants/NotesOrderBy';
 import { currentNotesQueryVariablesState } from '@/activities/notes/states/currentNotesQueryVariablesState';
 import { FIND_MANY_TIMELINE_ACTIVITIES_ORDER_BY } from '@/activities/timeline-activities/constants/FindManyTimelineActivitiesOrderBy';
 import { type NoteLikeActivity } from '@/activities/types/NoteLikeActivity';
@@ -24,9 +25,12 @@ export const useNotes = (
   const notesQueryVariables = useMemo(
     () =>
       ({
-        orderBy: FIND_MANY_TIMELINE_ACTIVITIES_ORDER_BY,
+        orderBy:
+          activityObjectNameSingular === CoreObjectNameSingular.Note
+            ? NOTES_ORDER_BY
+            : FIND_MANY_TIMELINE_ACTIVITIES_ORDER_BY,
       }) as RecordGqlOperationVariables,
-    [],
+    [activityObjectNameSingular],
   );
 
   const {

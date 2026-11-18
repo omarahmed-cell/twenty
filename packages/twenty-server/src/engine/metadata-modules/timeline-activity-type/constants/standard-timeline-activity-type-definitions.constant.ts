@@ -116,6 +116,8 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
         through: {
           relationFieldUniversalIdentifier:
             STANDARD_OBJECTS.note.fields.noteTargets.universalIdentifier,
+          happensAtFieldUniversalIdentifier:
+            STANDARD_OBJECTS.note.fields.activityDate.universalIdentifier,
         },
       },
     },

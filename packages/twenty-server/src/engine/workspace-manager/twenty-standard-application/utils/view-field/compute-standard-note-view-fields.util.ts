@@ -20,6 +20,18 @@ export const computeStandardNoteViewFields = (
         size: 210,
       },
     }),
+    allNotesActivityDate: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'note',
+      context: {
+        viewName: 'allNotes',
+        viewFieldName: 'activityDate',
+        fieldName: 'activityDate',
+        position: 0.5,
+        isVisible: true,
+        size: 150,
+      },
+    }),
     allNotesNoteTargets: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'note',
@@ -69,6 +81,19 @@ export const computeStandardNoteViewFields = (
       },
     }),
 
+    noteRecordPageFieldsActivityDate: createStandardViewFieldFlatMetadata({
+      ...args,
+      objectName: 'note',
+      context: {
+        viewName: 'noteRecordPageFields',
+        viewFieldName: 'activityDate',
+        fieldName: 'activityDate',
+        position: 0.5,
+        isVisible: true,
+        size: 150,
+        viewFieldGroupName: 'general',
+      },
+    }),
     noteRecordPageFieldsNoteTargets: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'note',

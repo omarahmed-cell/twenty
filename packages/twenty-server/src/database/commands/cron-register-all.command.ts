@@ -45,6 +45,7 @@ import { CompanyCalculatedFieldsNightlyCronCommand } from 'src/modules/company-c
 import { CompanyPastMeetingsCronCommand } from 'src/modules/company-calculated-fields/crons/commands/company-past-meetings.cron.command';
 import { OpportunityCalculatedFieldsNightlyCronCommand } from 'src/modules/opportunity-calculated-fields/crons/commands/opportunity-calculated-fields-nightly.cron.command';
 import { PersonCalculatedFieldsNightlyCronCommand } from 'src/modules/person-calculated-fields/crons/commands/person-calculated-fields-nightly.cron.command';
+import { TaskOverdueCronCommand } from 'src/modules/task-calculated-fields/crons/commands/task-overdue.cron.command';
 
 @Command({
   name: 'cron:register:all',
@@ -74,6 +75,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly companyCalculatedFieldsNightlyCronCommand: CompanyCalculatedFieldsNightlyCronCommand,
     private readonly companyPastMeetingsCronCommand: CompanyPastMeetingsCronCommand,
     private readonly personCalculatedFieldsNightlyCronCommand: PersonCalculatedFieldsNightlyCronCommand,
+    private readonly taskOverdueCronCommand: TaskOverdueCronCommand,
     private readonly opportunityCalculatedFieldsNightlyCronCommand: OpportunityCalculatedFieldsNightlyCronCommand,
 
     private readonly workflowCronTriggerCronCommand: WorkflowCronTriggerCronCommand,
@@ -182,6 +184,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'PersonCalculatedFieldsNightly',
         command: this.personCalculatedFieldsNightlyCronCommand,
+      },
+      {
+        name: 'TaskOverdue',
+        command: this.taskOverdueCronCommand,
       },
       {
         name: 'OpportunityCalculatedFieldsNightly',

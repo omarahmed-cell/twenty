@@ -20,5 +20,6 @@ export const useDateTimeFieldDisplay = () => {
     fieldDefinition: fieldDefinition as FieldDefinition<FieldDateTimeMetadata>,
     fieldValue,
     clearable,
+    recordId,
   };
 };

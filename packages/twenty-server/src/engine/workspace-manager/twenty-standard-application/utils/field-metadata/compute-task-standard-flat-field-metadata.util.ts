@@ -4,6 +4,7 @@ import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  MetadataWritability,
   RelationOnDeleteAction,
   RelationType,
 } from 'twenty-shared/types';
@@ -443,6 +444,123 @@ export const buildTaskStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  assignedBy: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedBy',
+      label: i18nLabel(
+        msg({ message: `Task assigned by`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Workspace member who last changed the assignee`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUserShare',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'workspaceMember',
+      targetFieldName: 'tasksAssignedBy',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'assignedById',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assigneeAssignedAt: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'assigneeAssignedAt',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({
+            message: `Owner assigned date`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the current assignee was assigned`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarTime',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  completedAt: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'completedAt',
+        type: FieldMetadataType.DATE_TIME,
+        label: i18nLabel(
+          msg({ message: `Completed at`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `When the task was set to Done`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCalendarCheck',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isOverdue: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'isOverdue',
+        type: FieldMetadataType.BOOLEAN,
+        label: i18nLabel(
+          msg({ message: `Is Overdue`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Whether the due date has passed and the task is not done`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconAlarm',
+        isUIEditable: false,
+        isNullable: false,
+        defaultValue: false,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
   timelineActivities: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

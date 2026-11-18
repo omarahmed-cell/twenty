@@ -1,6 +1,8 @@
 // Standard fields the server fills itself; names are only trusted on fields that are not UI editable
 export const STANDARD_CALCULATED_FIELD_NAMES = new Set([
   'actualDuration',
+  'assigneeAssignedAt',
+  'completedAt',
   'dateEnteredCurrentStage',
   'dealProbability',
   'firstDealCreatedDate',
@@ -10,6 +12,7 @@ export const STANDARD_CALCULATED_FIELD_NAMES = new Set([
   'isClosedLost',
   'isClosedWon',
   'isOpen',
+  'isOverdue',
   'isParentCompany',
   'lastActivityDate',
   'nextActivityDate',

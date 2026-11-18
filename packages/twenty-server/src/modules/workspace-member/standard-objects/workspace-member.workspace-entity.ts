@@ -79,6 +79,7 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   dateFormat: string;
   timeFormat: string;
   assignedTasks: Relation<TaskWorkspaceEntity[]>;
+  tasksAssignedBy: Relation<TaskWorkspaceEntity[]>;
   accountOwnerForCompanies: Relation<CompanyWorkspaceEntity[]>;
   authoredAttachments: Relation<AttachmentWorkspaceEntity[]>;
   messageParticipants: Relation<MessageParticipantWorkspaceEntity[]>;

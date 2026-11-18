@@ -15,6 +15,7 @@ export class NoteWorkspaceEntity extends BaseWorkspaceEntity {
   updatedBy: ActorMetadata;
   assignedTo: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
   assignedToId: string | null;
+  activityDate: string | null;
   noteTargets: EntityRelation<NoteTargetWorkspaceEntity[]>;
   attachments: EntityRelation<AttachmentWorkspaceEntity[]>;
   timelineActivities: EntityRelation<TimelineActivityWorkspaceEntity[]>;

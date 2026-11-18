@@ -374,6 +374,30 @@ export const buildNoteStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  activityDate: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'activityDate',
+      type: FieldMetadataType.DATE_TIME,
+      label: i18nLabel(
+        msg({ message: `Activity date`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `When the note's activity happened; it sets the note's place in the timeline`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      defaultValue: 'now',
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   assignedTo: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

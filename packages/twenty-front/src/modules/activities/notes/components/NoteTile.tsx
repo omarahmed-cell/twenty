@@ -90,6 +90,11 @@ export const NoteTile = ({
     objectNameSingular: activityObjectNameSingular,
   }).junctionField.name;
 
+  const displayedDate =
+    note.__typename === 'Note' && isNonEmptyString(note.activityDate)
+      ? note.activityDate
+      : note.createdAt;
+
   const instanceIdPrefix =
     useActivityFieldComponentInstanceId('note-card-targets');
   const componentInstanceId = getRecordFieldInputInstanceId({
@@ -117,9 +122,9 @@ export const NoteTile = ({
               context={note.createdBy.context}
             />
           )}
-          {isNonEmptyString(note.createdAt) && (
+          {isNonEmptyString(displayedDate) && (
             <StyledTimestamp>
-              {beautifyPastDateRelativeToNow(note.createdAt, localeCatalog)}
+              {beautifyPastDateRelativeToNow(displayedDate, localeCatalog)}
             </StyledTimestamp>
           )}
         </StyledCardHeader>

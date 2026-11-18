@@ -19,6 +19,11 @@ export class TaskWorkspaceEntity extends BaseWorkspaceEntity {
   attachments: EntityRelation<AttachmentWorkspaceEntity[]>;
   assignee: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
   assigneeId: string | null;
+  assignedBy: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
+  assignedById: string | null;
+  assigneeAssignedAt: string | null;
+  completedAt: string | null;
+  isOverdue: boolean;
   timelineActivities: EntityRelation<TimelineActivityWorkspaceEntity[]>;
   searchVector: string;
 }

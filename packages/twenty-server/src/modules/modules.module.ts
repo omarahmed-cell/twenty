@@ -19,6 +19,7 @@ import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calcu
 import { MeetingFieldsModule } from 'src/modules/meeting-fields/meeting-fields.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
+import { TaskCalculatedFieldsModule } from 'src/modules/task-calculated-fields/task-calculated-fields.module';
 import { StageDateTrackingModule } from 'src/modules/stage-date-tracking/stage-date-tracking.module';
 import { DealStageHistoryModule } from 'src/modules/deal-stage-history/deal-stage-history.module';
 import { RecordSourceModule } from 'src/modules/record-source/record-source.module';
@@ -77,6 +78,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     AssignedDateTrackingModule,
     CompanyCalculatedFieldsModule,
     PersonCalculatedFieldsModule,
+    TaskCalculatedFieldsModule,
     OpportunityCalculatedFieldsModule,
     MeetingFieldsModule,
     PipelineModule,

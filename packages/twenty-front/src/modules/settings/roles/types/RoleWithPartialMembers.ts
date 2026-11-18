@@ -12,7 +12,10 @@ export type PartialWorkspaceMember = Omit<
   | 'calendarStartDay'
   | 'createdAt'
   | 'updatedAt'
->;
+  | 'memberStatus'
+  | 'isPreCreated'
+> &
+  Partial<Pick<WorkspaceMember, 'memberStatus' | 'isPreCreated'>>;
 
 export type RoleWithPartialMembers = Omit<Role, 'workspaceMembers'> & {
   workspaceMembers: PartialWorkspaceMember[];

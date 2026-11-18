@@ -1304,6 +1304,7 @@ export const STANDARD_OBJECTS = {
         fields: STANDARD_OBJECT_FIELDS.note,
         viewFieldNames: [
           'title',
+          'activityDate',
           'noteTargets',
           'assignedTo',
           'bodyV2',
@@ -1315,6 +1316,7 @@ export const STANDARD_OBJECTS = {
         objectUniversalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.note,
         fields: STANDARD_OBJECT_FIELDS.note,
         viewFieldNames: [
+          'activityDate',
           'noteTargets',
           'assignedTo',
           'attachments',
@@ -1920,6 +1922,9 @@ export const STANDARD_OBJECTS = {
       assigneeIdIndex: {
         universalIdentifier: 'f48fa3b1-0cec-44da-a9e5-f8a5e766637e',
       },
+      assignedByIdIndex: {
+        universalIdentifier: '3f0f3124-8c2f-4359-bffe-ce2e4694536c',
+      },
       searchVectorGinIndex: {
         universalIdentifier: 'a86b32b3-01d3-4302-a152-8b7f247db7b4',
       },
@@ -1934,7 +1939,9 @@ export const STANDARD_OBJECTS = {
           'taskTargets',
           'createdBy',
           'dueAt',
+          'isOverdue',
           'assignee',
+          'completedAt',
           'bodyV2',
           'createdAt',
         ],
@@ -2022,6 +2029,10 @@ export const STANDARD_OBJECTS = {
           'dueAt',
           'status',
           'assignee',
+          'assignedBy',
+          'assigneeAssignedAt',
+          'completedAt',
+          'isOverdue',
           'taskTargets',
           'attachments',
           'timelineActivities',

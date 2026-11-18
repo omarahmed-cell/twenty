@@ -129,7 +129,7 @@ export const UserMetadataProviderInitialEffect = () => {
     } = userQueryData.currentUser;
 
     const affectDefaultValuesOnEmptyWorkspaceMemberFields = (
-      workspaceMember: WorkspaceMember,
+      workspaceMember: Omit<WorkspaceMember, 'memberStatus' | 'isPreCreated'>,
     ) => {
       return {
         ...workspaceMember,

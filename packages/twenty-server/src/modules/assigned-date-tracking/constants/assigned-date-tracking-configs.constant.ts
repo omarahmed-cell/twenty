@@ -26,4 +26,9 @@ export const ASSIGNED_DATE_TRACKING_CONFIGS: AssignedDateTrackingConfig[] = [
     userFieldJoinColumnName: 'ownerId',
     assignedDateFieldName: 'ownerAssignedDate',
   },
+  {
+    objectNameSingular: 'task',
+    userFieldJoinColumnName: 'assigneeId',
+    assignedDateFieldName: 'assigneeAssignedAt',
+  },
 ];

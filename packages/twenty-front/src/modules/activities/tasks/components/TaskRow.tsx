@@ -156,7 +156,7 @@ export const TaskRow = ({
       <StyledRightSideContainer>
         {task.dueAt && (
           <StyledDueDate
-            isPast={hasDatePassed(task.dueAt) && task.status === 'TODO'}
+            isPast={hasDatePassed(task.dueAt) && task.status !== 'DONE'}
           >
             <IconCalendar size={theme.icon.size.md} />
             {beautifyExactDate(task.dueAt)}

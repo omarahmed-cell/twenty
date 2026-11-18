@@ -699,6 +699,36 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  tasksAssignedBy: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'tasksAssignedBy',
+      label: i18nLabel(
+        msg({ message: `Tasks assigned by`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Tasks whose assignee the workspace member set`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUserShare',
+      isNullable: false,
+      isUIEditable: false,
+      targetObjectName: 'task',
+      targetFieldName: 'assignedBy',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   accountOwnerForCompanies: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

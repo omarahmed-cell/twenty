@@ -63,12 +63,25 @@ describe('Standard field writability', () => {
     STANDARD_OBJECTS.calendarEvent.fields.meetingSource.universalIdentifier,
   ]);
 
+  const taskServerWrittenFieldUniversalIdentifiers = new Set([
+    STANDARD_OBJECTS.task.fields.completedAt.universalIdentifier,
+    STANDARD_OBJECTS.task.fields.isOverdue.universalIdentifier,
+    STANDARD_OBJECTS.task.fields.assigneeAssignedAt.universalIdentifier,
+  ]);
+
+  const workspaceMemberServerWrittenFieldUniversalIdentifiers = new Set([
+    STANDARD_OBJECTS.workspaceMember.fields.memberStatus.universalIdentifier,
+    STANDARD_OBJECTS.workspaceMember.fields.isPreCreated.universalIdentifier,
+  ]);
+
   const serverWrittenFieldUniversalIdentifiers = new Set([
     ...companyServerComputedFieldUniversalIdentifiers,
     ...personServerComputedFieldUniversalIdentifiers,
     ...companyAssignedDateFieldUniversalIdentifiers,
     ...opportunityServerWrittenFieldUniversalIdentifiers,
     ...meetingServerWrittenFieldUniversalIdentifiers,
+    ...taskServerWrittenFieldUniversalIdentifiers,
+    ...workspaceMemberServerWrittenFieldUniversalIdentifiers,
   ]);
 
   const searchVectorFlatFieldMetadatas = standardFlatFieldMetadatas.filter(
@@ -151,6 +164,23 @@ describe('Standard field writability', () => {
     expect(meetingServerWrittenFlatFieldMetadatas).toHaveLength(3);
     expect(
       meetingServerWrittenFlatFieldMetadatas.every(
+        (flatFieldMetadata) =>
+          flatFieldMetadata.writability === MetadataWritability.SYSTEM,
+      ),
+    ).toBe(true);
+  });
+
+  it('marks the server-written task fields as SYSTEM', () => {
+    const taskServerWrittenFlatFieldMetadatas =
+      standardFlatFieldMetadatas.filter((flatFieldMetadata) =>
+        taskServerWrittenFieldUniversalIdentifiers.has(
+          flatFieldMetadata.universalIdentifier,
+        ),
+      );
+
+    expect(taskServerWrittenFlatFieldMetadatas).toHaveLength(3);
+    expect(
+      taskServerWrittenFlatFieldMetadatas.every(
         (flatFieldMetadata) =>
           flatFieldMetadata.writability === MetadataWritability.SYSTEM,
       ),
