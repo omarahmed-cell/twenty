@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
+import { isDefined } from 'twenty-shared/utils';
 import {
   IconDotsVertical,
   IconDownload,
@@ -14,8 +15,8 @@ import { Dropdown } from 'twenty-ui/components/navigation';
 type AttachmentDropdownProps = {
   attachmentId: string;
   onDownload: () => void;
-  onDelete: () => void;
-  onRename: () => void;
+  onDelete?: () => void;
+  onRename?: () => void;
   hasDownloadPermission: boolean;
 };
 
@@ -50,16 +51,20 @@ export const AttachmentDropdown = ({
               {t`Download`}
             </Dropdown.ActionItem>
           )}
-          <Dropdown.ActionItem startIcon={<IconPencil />} onClick={onRename}>
-            {t`Rename`}
-          </Dropdown.ActionItem>
-          <Dropdown.ActionItem
-            color="danger"
-            startIcon={<IconTrash />}
-            onClick={onDelete}
-          >
-            {t`Delete`}
-          </Dropdown.ActionItem>
+          {isDefined(onRename) && (
+            <Dropdown.ActionItem startIcon={<IconPencil />} onClick={onRename}>
+              {t`Rename`}
+            </Dropdown.ActionItem>
+          )}
+          {isDefined(onDelete) && (
+            <Dropdown.ActionItem
+              color="danger"
+              startIcon={<IconTrash />}
+              onClick={onDelete}
+            >
+              {t`Delete`}
+            </Dropdown.ActionItem>
+          )}
         </Dropdown.Section>
       </DropdownContent>
     </DropdownRoot>

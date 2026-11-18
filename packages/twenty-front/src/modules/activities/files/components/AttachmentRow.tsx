@@ -73,8 +73,15 @@ const StyledLink = styled.a`
 `;
 
 const StyledLinkContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   overflow: auto;
   width: 100%;
+`;
+
+const StyledSourceLabel = styled.span`
+  color: ${themeCssVariables.font.color.tertiary};
+  font-size: ${themeCssVariables.font.size.sm};
 `;
 
 const StyledTextInputContainer = styled.div`
@@ -87,13 +94,16 @@ type AttachmentRowProps = {
   attachment: AttachmentWithFile;
   onPreview?: (attachment: AttachmentWithFile) => void;
   divider?: boolean;
+  sourceLabel?: string;
 };
 
 export const AttachmentRow = ({
   attachment,
   onPreview,
   divider = false,
+  sourceLabel,
 }: AttachmentRowProps) => {
+  const isFromLinkedActivity = isDefined(sourceLabel);
   const theme = useTheme();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -235,6 +245,11 @@ export const AttachmentRow = ({
                   text={`${attachmentFileName}${attachmentFileExtension}`}
                 />
               </StyledLink>
+              {isFromLinkedActivity && (
+                <StyledSourceLabel>
+                  <OverflowingTextWithTooltip text={sourceLabel} />
+                </StyledSourceLabel>
+              )}
             </StyledLinkContainer>
           )}
         </StyledLeftContent>
@@ -245,9 +260,9 @@ export const AttachmentRow = ({
           {formatToHumanReadableDate(attachment.createdAt)}
           <AttachmentDropdown
             attachmentId={attachment.id}
-            onDelete={handleDelete}
+            onDelete={isFromLinkedActivity ? undefined : handleDelete}
             onDownload={handleDownload}
-            onRename={handleRename}
+            onRename={isFromLinkedActivity ? undefined : handleRename}
             hasDownloadPermission={hasDownloadPermission}
           />
         </StyledRightContent>

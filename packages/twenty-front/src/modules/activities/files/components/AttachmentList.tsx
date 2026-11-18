@@ -37,6 +37,7 @@ const DocumentViewer = lazy(() =>
 type AttachmentListProps = {
   targetableObject: ActivityTargetableObject;
   attachments: Attachment[];
+  sourceLabelByAttachmentId?: Record<string, string>;
 };
 
 const StyledContainer = styled.div`
@@ -107,6 +108,7 @@ const PREVIEW_MODAL_ID = 'preview-modal';
 export const AttachmentList = ({
   targetableObject,
   attachments,
+  sourceLabelByAttachmentId,
 }: AttachmentListProps) => {
   const { uploadAttachmentFile } = useUploadAttachmentFile();
   const [isDraggingFile, setIsDraggingFile] = useState(false);
@@ -174,6 +176,7 @@ export const AttachmentList = ({
                   <AttachmentRow
                     key={attachment.id}
                     attachment={attachment}
+                    sourceLabel={sourceLabelByAttachmentId?.[attachment.id]}
                     divider={index < attachmentsWithFile.length - 1}
                     onPreview={
                       isAttachmentPreviewEnabled ? handlePreview : undefined

@@ -27,6 +27,7 @@ const StyledDropZoneContainer = styled.div`
 
 type FilesCardContentProps = {
   attachments: Attachment[];
+  sourceLabelByAttachmentId?: Record<string, string>;
   canUploadFiles: boolean;
   loading: boolean;
   onUploadFiles: (files: File[]) => Promise<void>;
@@ -35,6 +36,7 @@ type FilesCardContentProps = {
 
 export const FilesCardContent = ({
   attachments,
+  sourceLabelByAttachmentId,
   canUploadFiles,
   loading,
   onUploadFiles,
@@ -92,6 +94,7 @@ export const FilesCardContent = ({
       <AttachmentList
         targetableObject={targetRecord}
         attachments={attachments}
+        sourceLabelByAttachmentId={sourceLabelByAttachmentId}
       />
     </StyledAttachmentsContainer>
   );
