@@ -17,10 +17,17 @@ export const isTaskOverdue = ({
   dueAt: unknown;
   status: unknown;
   now: Date;
-}) =>
-  isNonEmptyString(dueAt) &&
-  new Date(dueAt).getTime() < now.getTime() &&
-  status !== DONE_STATUS;
+}) => {
+  // Database events carry dates as Date objects, API payloads as strings
+  const dueTime =
+    dueAt instanceof Date
+      ? dueAt.getTime()
+      : isNonEmptyString(dueAt)
+        ? new Date(dueAt).getTime()
+        : Number.NaN;
+
+  return dueTime < now.getTime() && status !== DONE_STATUS;
+};
 
 // Imports bring their own Completed at and Task assigned by through the loader
 export const computeTaskCalculatedFieldUpdates = ({

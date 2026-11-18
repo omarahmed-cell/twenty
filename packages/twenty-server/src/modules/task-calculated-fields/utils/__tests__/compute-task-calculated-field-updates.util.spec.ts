@@ -150,6 +150,14 @@ describe('computeTaskCalculatedFieldUpdates', () => {
     ).toEqual({ completedAt: NOW.toISOString(), isOverdue: false });
   });
 
+  it('reads a due date given as a Date, as database events carry it', () => {
+    expect(
+      compute({
+        after: { status: 'TODO', dueAt: new Date(PAST), isOverdue: false },
+      }),
+    ).toEqual({ isOverdue: true });
+  });
+
   it('treats a task without a due date as not overdue', () => {
     expect(
       compute({ after: { status: null, dueAt: null, isOverdue: true } }),
