@@ -31,6 +31,7 @@ export type EmailRecordLinks = {
   personIds?: string[];
   companyIds?: string[];
   opportunityIds?: string[];
+  serviceIds?: string[];
 };
 
 export type CreateEmailRecordInput = {
@@ -56,6 +57,8 @@ export type CreateEmailRecordInput = {
   createdBy: ActorMetadata;
   links: EmailRecordLinks;
   emailId?: string;
+  // Reply sync writes its own "email reply" timeline rows instead of "logged an email"
+  skipEventEmission?: boolean;
 };
 
 export type EmailRecordResult = { emailId: string; isDuplicate: boolean };
@@ -139,6 +142,7 @@ export class EmailRecordService {
         const emailRepository = this.workspaceOrmManager.getRepository(
           'email',
           { shouldBypassPermissionChecks: true },
+          { shouldSkipEventEmission: input.skipEventEmission === true },
         );
 
         const inserted = await emailRepository.insert({
@@ -178,6 +182,7 @@ export class EmailRecordService {
       workspaceId: input.workspaceId,
       emailId,
       links: input.links,
+      skipEventEmission: input.skipEventEmission,
     });
 
     return { emailId, isDuplicate: false };
@@ -188,21 +193,25 @@ export class EmailRecordService {
     workspaceId,
     emailId,
     links,
+    skipEventEmission = false,
   }: {
     workspaceId: string;
     emailId: string;
     links: EmailRecordLinks;
+    skipEventEmission?: boolean;
   }) {
     await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
       const emailTargetRepository = this.workspaceOrmManager.getRepository(
         'emailTarget',
         { shouldBypassPermissionChecks: true },
+        { shouldSkipEventEmission: skipEventEmission },
       );
 
       const groups = [
         { column: 'targetOpportunityId', ids: links.opportunityIds ?? [] },
         { column: 'targetPersonId', ids: links.personIds ?? [] },
         { column: 'targetCompanyId', ids: links.companyIds ?? [] },
+        { column: 'targetServiceId', ids: links.serviceIds ?? [] },
       ];
 
       for (const { column, ids } of groups) {

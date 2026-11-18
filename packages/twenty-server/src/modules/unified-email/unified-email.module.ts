@@ -2,6 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
+import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-flag.module';
+import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
+import { OAuth2ClientManagerModule } from 'src/modules/connected-account/oauth2-client-manager/oauth2-client-manager.module';
+import { EmailReplySyncCommand } from 'src/modules/unified-email/commands/email-reply-sync.command';
+import { EmailReplySyncCronCommand } from 'src/modules/unified-email/crons/commands/email-reply-sync.cron.command';
+import { EmailReplySyncCronJob } from 'src/modules/unified-email/crons/jobs/email-reply-sync.cron.job';
+import { EmailReplySyncService } from 'src/modules/unified-email/services/email-reply-sync.service';
 import { KeyValuePairEntity } from 'src/engine/core-modules/key-value-pair/key-value-pair.entity';
 import { GmailExtensionTokenCommand } from 'src/modules/unified-email/commands/gmail-extension-token.command';
 import { GmailExtensionController } from 'src/modules/unified-email/gmail-extension/controllers/gmail-extension.controller';
@@ -28,7 +35,9 @@ import { SentEmailRecorderService } from 'src/modules/unified-email/services/sen
     CacheLockModule,
     WorkspaceIteratorModule,
     WorkspaceCacheModule,
-    TypeOrmModule.forFeature([KeyValuePairEntity]),
+    TypeOrmModule.forFeature([KeyValuePairEntity, WorkspaceEntity]),
+    FeatureFlagModule,
+    OAuth2ClientManagerModule,
   ],
   controllers: [EmailTrackingController, GmailExtensionController],
   providers: [
@@ -47,8 +56,14 @@ import { SentEmailRecorderService } from 'src/modules/unified-email/services/sen
     GmailExtensionTokenResolver,
     GmailExtensionLookupService,
     GmailExtensionLogService,
+    EmailReplySyncService,
+    EmailReplySyncCronJob,
+    EmailReplySyncCronCommand,
+    EmailReplySyncCommand,
   ],
   exports: [
+    EmailReplySyncCronCommand,
+    EmailReplySyncCommand,
     GmailExtensionTokenCommand,
     FindOrCreateEmailContactsCommand,
     RecordTestSentEmailCommand,

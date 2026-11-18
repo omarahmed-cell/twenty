@@ -373,6 +373,22 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       },
     },
     {
+      name: 'emailReplied',
+      universalIdentifier: '5d81703a-a9e9-4144-b71c-403859b4443f',
+      label: msg({
+        message: `email reply`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconArrowBackUp',
+      frontComponentUniversalIdentifier: null,
+      // Rows are written by reply sync; tracking-event writes emit no events, so this never fires on its own
+      emit: {
+        on: 'deleted',
+        objectUniversalIdentifier:
+          STANDARD_OBJECTS.emailTrackingEvent.universalIdentifier,
+      },
+    },
+    {
       name: 'taskLinked',
       universalIdentifier: '20202020-0d1a-4f0e-8a55-1c0a2f0a2c0c',
       label: msg({
