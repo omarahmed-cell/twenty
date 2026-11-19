@@ -15,5 +15,7 @@ export const getTimelineActivityAuthorFullName = (
     return fullName;
   }
 
-  return isNonEmptyString(recordCreatorName) ? recordCreatorName : 'Twenty';
+  return isNonEmptyString(recordCreatorName)
+    ? recordCreatorName
+    : 'Roboost CRM';
 };

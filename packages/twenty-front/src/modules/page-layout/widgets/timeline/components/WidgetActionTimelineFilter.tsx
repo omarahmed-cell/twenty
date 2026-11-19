@@ -11,7 +11,8 @@ import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
 import { isDefined, isNonEmptyArray } from 'twenty-shared/utils';
 import { Dropdown } from 'twenty-ui/components/navigation';
-import { IconFilter, IconFilterOff, useIcons } from 'twenty-ui/icon';
+import { IconEye, IconFilter, IconFilterOff, useIcons } from 'twenty-ui/icon';
+import { isEmailTrackingTimelineActivityType } from '@/activities/timeline-activities/utils/isEmailTrackingTimelineActivityType';
 import { normalizeSearchText } from 'twenty-ui/utilities';
 
 export const WidgetActionTimelineFilter = () => {
@@ -34,13 +35,47 @@ export const WidgetActionTimelineFilter = () => {
     );
 
   const normalizedSearchInputValue = normalizeSearchText(searchInputValue);
+  const emailTrackingUniversalIdentifiers = activeTimelineActivityTypes
+    .map(({ universalIdentifier }) => universalIdentifier)
+    .filter(isEmailTrackingTimelineActivityType);
+  const emailTrackingLabel = t`Email Tracking Activity`;
+  const isEmailTrackingOptionVisible =
+    isNonEmptyArray(emailTrackingUniversalIdentifiers) &&
+    normalizeSearchText(emailTrackingLabel).includes(
+      normalizedSearchInputValue,
+    );
+  // Opens, clicks and replies are filtered together as one option
   const filteredTimelineActivityTypes = activeTimelineActivityTypes.filter(
-    ({ label }) =>
+    ({ label, universalIdentifier }) =>
+      !isEmailTrackingTimelineActivityType(universalIdentifier) &&
       normalizeSearchText(label).includes(normalizedSearchInputValue),
   );
 
   const effectiveTimelineActivityTypeUniversalIdentifiersFilter =
     nullableEffectiveTimelineActivityTypeUniversalIdentifiersFilter ?? [];
+  const isEmailTrackingSelected =
+    isNonEmptyArray(emailTrackingUniversalIdentifiers) &&
+    emailTrackingUniversalIdentifiers.every((universalIdentifier) =>
+      effectiveTimelineActivityTypeUniversalIdentifiersFilter.includes(
+        universalIdentifier,
+      ),
+    );
+
+  const handleEmailTrackingSelectChange = () =>
+    setTimelineActivityTypeUniversalIdentifiersFilter(
+      isEmailTrackingSelected
+        ? timelineActivityTypeUniversalIdentifiersFilter.filter(
+            (universalIdentifier) =>
+              !isEmailTrackingTimelineActivityType(universalIdentifier),
+          )
+        : [
+            ...timelineActivityTypeUniversalIdentifiersFilter.filter(
+              (universalIdentifier) =>
+                !isEmailTrackingTimelineActivityType(universalIdentifier),
+            ),
+            ...emailTrackingUniversalIdentifiers,
+          ],
+    );
 
   if (!isNonEmptyArray(activeTimelineActivityTypes)) {
     return null;
@@ -94,6 +129,15 @@ export const WidgetActionTimelineFilter = () => {
         />
         <Dropdown.Separator />
         <Dropdown.Section scrollable>
+          {isEmailTrackingOptionVisible && (
+            <Dropdown.OptionItem
+              selected={isEmailTrackingSelected}
+              onSelect={handleEmailTrackingSelectChange}
+              startIcon={<SelectOptionIcon Icon={IconEye} />}
+            >
+              {emailTrackingLabel}
+            </Dropdown.OptionItem>
+          )}
           {filteredTimelineActivityTypes.map((timelineActivityType) => (
             <Dropdown.OptionItem
               key={timelineActivityType.universalIdentifier}
@@ -121,9 +165,10 @@ export const WidgetActionTimelineFilter = () => {
               {timelineActivityType.label}
             </Dropdown.OptionItem>
           ))}
-          {!isNonEmptyArray(filteredTimelineActivityTypes) && (
-            <Dropdown.Empty>{t`No results`}</Dropdown.Empty>
-          )}
+          {!isNonEmptyArray(filteredTimelineActivityTypes) &&
+            !isEmailTrackingOptionVisible && (
+              <Dropdown.Empty>{t`No results`}</Dropdown.Empty>
+            )}
         </Dropdown.Section>
         {isNonEmptyArray(timelineActivityTypeUniversalIdentifiersFilter) && (
           <>

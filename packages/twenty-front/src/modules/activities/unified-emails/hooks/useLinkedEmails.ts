@@ -1,4 +1,5 @@
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
+import { LINKED_EMAIL_RECORD_GQL_FIELDS } from '@/activities/unified-emails/constants/LinkedEmailRecordGqlFields';
 import { type LinkedEmail } from '@/activities/unified-emails/types/LinkedEmail';
 import { getActivityTargetsFilter } from '@/activities/utils/getActivityTargetsFilter';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
@@ -48,19 +49,7 @@ export const useLinkedEmails = (targetRecord: ActivityTargetableObject) => {
       recordGqlFields: {
         id: true,
         emailId: true,
-        email: {
-          id: true,
-          subject: true,
-          bodyPreview: true,
-          direction: true,
-          from: true,
-          to: true,
-          sentAt: true,
-          status: true,
-          openCount: true,
-          clickCount: true,
-          replyCount: true,
-        },
+        email: LINKED_EMAIL_RECORD_GQL_FIELDS,
       },
       orderBy: [{ createdAt: 'DescNullsLast' }],
       limit: LINKED_EMAILS_LIMIT,

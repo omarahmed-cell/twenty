@@ -56,9 +56,9 @@ describe('getTimelineActivityAuthorFullName', () => {
     ).toBe('John Doe');
   });
 
-  it('should return "Twenty" if the workspace member is not defined', () => {
+  it('should return "Roboost CRM" if the workspace member is not defined', () => {
     expect(getTimelineActivityAuthorFullName({} as TimelineActivity)).toBe(
-      'Twenty',
+      'Roboost CRM',
     );
   });
 });

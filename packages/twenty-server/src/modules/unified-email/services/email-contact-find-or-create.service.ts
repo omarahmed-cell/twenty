@@ -41,7 +41,12 @@ export type FindOrCreateEmailContactsResult = {
   companyIds: string[];
 };
 
-type PersonRow = { id: string; companyId: string | null; email: string };
+type PersonRow = {
+  id: string;
+  companyId: string | null;
+  email: string;
+  name: string | null;
+};
 
 @Injectable()
 export class EmailContactFindOrCreateService {
@@ -60,6 +65,33 @@ export class EmailContactFindOrCreateService {
         internalDomains: this.getInternalDomains(),
         personalDomains: [],
       }) === 'INTERNAL'
+    );
+  }
+
+  async getWorkspaceMemberName(
+    workspaceId: string,
+    workspaceMemberId: string,
+  ): Promise<string | null> {
+    const [member]: { name: string | null }[] = await this.coreDataSource.query(
+      `SELECT NULLIF(btrim(concat_ws(' ', "nameFirstName", "nameLastName")), '') AS name
+      FROM "${getWorkspaceSchemaName(workspaceId)}"."workspaceMember" WHERE id = $1`,
+      [workspaceMemberId],
+    );
+
+    return member?.name ?? null;
+  }
+
+  // The contact's name when the address is known, else the name in the header, else the address
+  async getDisplayName(
+    workspaceId: string,
+    participant: EmailParticipantInput,
+  ): Promise<string> {
+    const [person] = await this.findPeopleByAddresses(workspaceId, [
+      normalizeEmailAddress(participant.address),
+    ]);
+
+    return (
+      person?.name ?? (participant.displayName?.trim() || participant.address)
     );
   }
 
@@ -238,13 +270,15 @@ export class EmailContactFindOrCreateService {
     const schemaName = getWorkspaceSchemaName(workspaceId);
 
     return this.coreDataSource.query(
-      `SELECT DISTINCT ON (matched.email) matched.id, matched."companyId", matched.email
+      `SELECT DISTINCT ON (matched.email) matched.id, matched."companyId", matched.email, matched.name
       FROM (
-        SELECT person.id, person."companyId", person."createdAt", lower(person."emailsPrimaryEmail") AS email
+        SELECT person.id, person."companyId", person."createdAt", lower(person."emailsPrimaryEmail") AS email,
+          NULLIF(btrim(concat_ws(' ', person."nameFirstName", person."nameLastName")), '') AS name
         FROM "${schemaName}"."person" person
         WHERE person."deletedAt" IS NULL AND lower(person."emailsPrimaryEmail") = ANY($1::text[])
         UNION ALL
-        SELECT person.id, person."companyId", person."createdAt", lower(additional.email) AS email
+        SELECT person.id, person."companyId", person."createdAt", lower(additional.email) AS email,
+          NULLIF(btrim(concat_ws(' ', person."nameFirstName", person."nameLastName")), '') AS name
         FROM "${schemaName}"."person" person,
           jsonb_array_elements_text(
             CASE WHEN jsonb_typeof(person."emailsAdditionalEmails") = 'array'

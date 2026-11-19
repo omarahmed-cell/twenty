@@ -69,11 +69,14 @@ export const RichTextFieldEditor = ({
 
   const { updateOneRecord } = useUpdateOneRecord();
 
-  const isRecordFieldReadOnly = useIsRecordFieldReadOnly({
+  const isFieldReadOnly = useIsRecordFieldReadOnly({
     recordId,
     objectMetadataId: objectMetadataItem.id,
     fieldMetadataId: fieldMetadataItem?.id ?? '',
   });
+  // An email body is what was sent or received, so it is never edited in the CRM
+  const isRecordFieldReadOnly =
+    isFieldReadOnly || objectNameSingular === CoreObjectNameSingular.Email;
 
   const { pushFocusItemToFocusStack } = usePushFocusItemToFocusStack();
   const { removeFocusItemFromFocusStackById } =

@@ -3,6 +3,8 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { type KeyboardEvent, useState } from 'react';
 
 import { EventCard } from '@/activities/timeline-activities/rows/components/EventCard';
+import { EmailTimelineCard } from '@/activities/unified-emails/components/EmailTimelineCard';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { EventCardToggleButton } from '@/activities/timeline-activities/rows/components/EventCardToggleButton';
 import { EventRowDate } from '@/activities/timeline-activities/rows/components/EventRowDate';
 import { type EventRowNativeComponentProps } from '@/activities/timeline-activities/rows/components/EventRowDynamicComponent.types';
@@ -137,15 +139,20 @@ export const EventRowGenericLinked = ({
         </StyledEventRowContent>
         <EventRowDate happensAt={happensAt} />
       </StyledEventRowContainer>
-      {canOpen && (
-        <EventCard isOpen={isOpen}>
-          <SidePanelSearchRecordPreviewCard
-            objectNameSingular={linkedRecord.objectNameSingular}
-            recordId={linkedRecord.id}
-            label={linkedRecordName}
-          />
-        </EventCard>
-      )}
+      {canOpen &&
+        (linkedRecord.objectNameSingular === CoreObjectNameSingular.Email ? (
+          <EventCard isOpen={isOpen} isFullWidth>
+            <EmailTimelineCard emailId={linkedRecord.id} />
+          </EventCard>
+        ) : (
+          <EventCard isOpen={isOpen}>
+            <SidePanelSearchRecordPreviewCard
+              objectNameSingular={linkedRecord.objectNameSingular}
+              recordId={linkedRecord.id}
+              label={linkedRecordName}
+            />
+          </EventCard>
+        ))}
     </StyledEventRow>
   );
 };

@@ -4,21 +4,22 @@ import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme';
 type EventCardProps = {
   children: React.ReactNode;
   isOpen: boolean;
+  isFullWidth?: boolean;
 };
 
-const StyledCardContainer = styled.div`
+const StyledCardContainer = styled.div<{ isFullWidth: boolean }>`
   align-items: flex-start;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   gap: ${themeCssVariables.spacing[2]};
-  max-width: 400px;
+  max-width: ${({ isFullWidth }) => (isFullWidth ? 'none' : '400px')};
   padding: ${themeCssVariables.spacing[2]} 0px ${themeCssVariables.spacing[1]}
     0px;
   width: 100%;
 
   @media (max-width: ${MOBILE_VIEWPORT}px) {
-    max-width: 300px;
+    max-width: ${({ isFullWidth }) => (isFullWidth ? 'none' : '300px')};
   }
 `;
 
@@ -37,11 +38,19 @@ const StyledCardInnerContainer = styled.div`
   padding: ${themeCssVariables.spacing[2]};
 `;
 
-export const EventCard = ({ children, isOpen }: EventCardProps) => {
+export const EventCard = ({
+  children,
+  isOpen,
+  isFullWidth = false,
+}: EventCardProps) => {
   return (
     isOpen && (
-      <StyledCardContainer>
-        <StyledCardInnerContainer>{children}</StyledCardInnerContainer>
+      <StyledCardContainer isFullWidth={isFullWidth}>
+        {isFullWidth ? (
+          children
+        ) : (
+          <StyledCardInnerContainer>{children}</StyledCardInnerContainer>
+        )}
       </StyledCardContainer>
     )
   );

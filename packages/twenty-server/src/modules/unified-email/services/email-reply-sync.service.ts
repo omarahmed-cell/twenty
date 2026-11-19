@@ -270,6 +270,17 @@ export class EmailReplySyncService {
     }
 
     await this.emailTimelineService.addRowsForEmail({
+      actorName: isOutbound
+        ? ((isDefined(thread.loggedById)
+            ? await this.emailContactFindOrCreateService.getWorkspaceMemberName(
+                workspaceId,
+                thread.loggedById,
+              )
+            : null) ?? fromAddress)
+        : await this.emailContactFindOrCreateService.getDisplayName(
+            workspaceId,
+            { address: fromAddress, displayName: parsed.from?.name ?? null },
+          ),
       workspaceId,
       emailId,
       timelineActivityTypeUniversalIdentifier:

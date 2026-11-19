@@ -81,7 +81,14 @@ export const transformHtmlToRichTextValue = async (
   const serverBlockNoteEditor = await getServerBlockNoteEditor();
 
   try {
-    const blocks = await serverBlockNoteEditor.tryParseHTMLToBlocks(html);
+    // Email layouts nest everything in tables, which would come back as editable table blocks
+    const htmlWithoutLayoutTables = html
+      .replace(/<\/?(table|tbody|thead|tfoot|tr)\b[^>]*>/gi, '')
+      .replace(/<(td|th)\b[^>]*>/gi, '<div>')
+      .replace(/<\/(td|th)>/gi, '</div>');
+    const blocks = await serverBlockNoteEditor.tryParseHTMLToBlocks(
+      htmlWithoutLayoutTables,
+    );
 
     return {
       blocknote: JSON.stringify(blocks),

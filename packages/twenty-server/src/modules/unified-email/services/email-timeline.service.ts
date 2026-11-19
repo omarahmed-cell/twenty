@@ -36,12 +36,14 @@ export class EmailTimelineService {
     timelineActivityTypeUniversalIdentifier,
     happensAt,
     properties = {},
+    actorName,
   }: {
     workspaceId: string;
     emailId: string;
     timelineActivityTypeUniversalIdentifier: string;
     happensAt: Date;
     properties?: Record<string, unknown>;
+    actorName: string;
   }): Promise<number> {
     const { flatTimelineActivityTypeMaps, flatObjectMetadataMaps } =
       await this.workspaceCacheService.getOrRecompute(workspaceId, [
@@ -98,14 +100,14 @@ export class EmailTimelineService {
           happensAt: happensAt.toISOString(),
           timelineActivityTypeId: resolvedType.id,
           timelineActivityTypeSnapshot: resolvedType.snapshot,
-          properties,
+          properties: { ...properties, actorName },
           linkedRecordId: emailId,
           linkedObjectMetadataId: emailObjectMetadata.id,
           linkedRecordCachedName: (email?.subject as string | null) ?? '',
           workspaceMemberId: null,
           createdBy: {
             source: FieldActorSource.SYSTEM,
-            name: 'Email tracking',
+            name: actorName,
             workspaceMemberId: null,
             context: {},
           },

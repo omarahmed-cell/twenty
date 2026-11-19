@@ -26,7 +26,9 @@ export class CalendarEventUpdateOneMeetingFieldsPreQueryHook implements Workspac
       throw new CommonQueryRunnerException(
         `${fieldList} can only be set by Twenty`,
         CommonQueryRunnerExceptionCode.BAD_REQUEST,
-        { userFriendlyMessage: msg`${fieldList} can only be set by Twenty.` },
+        {
+          userFriendlyMessage: msg`${fieldList} can only be set by Roboost CRM.`,
+        },
       );
     }
 

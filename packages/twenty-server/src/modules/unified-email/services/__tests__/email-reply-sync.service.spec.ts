@@ -100,6 +100,8 @@ const buildService = () => {
     emailTimelineService as never,
     {
       isInternalAddress: (address: string) => address.endsWith('@roboost.app'),
+      getDisplayName: async () => 'Ann',
+      getWorkspaceMemberName: async () => 'Rep',
     } as never,
   );
 

@@ -122,7 +122,7 @@ export const SignInUp = () => {
     }
 
     if (isGlobalScope) {
-      return t`Welcome to Twenty`;
+      return t`Welcome to Roboost CRM`;
     }
 
     const workspaceName = workspacePublicData?.displayName;

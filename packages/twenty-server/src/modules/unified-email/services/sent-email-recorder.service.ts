@@ -89,6 +89,23 @@ export class SentEmailRecorderService {
         ],
       );
 
+    const nameByAddress = new Map(
+      people.map(({ email, name }) => [email, name]),
+    );
+    const withContactNames = (addresses: typeof to) =>
+      addresses.map((address) => ({
+        ...address,
+        displayName:
+          nameByAddress.get(normalizeEmailAddress(address.address)) ??
+          address.displayName,
+      }));
+    const senderName = isDefined(loggedByWorkspaceMemberId)
+      ? await this.emailContactFindOrCreateService.getWorkspaceMemberName(
+          workspaceId,
+          loggedByWorkspaceMemberId,
+        )
+      : null;
+
     const isGmail = composedEmail.connectedAccount.provider === 'google';
     const isFailed = isDefined(deliveryError) || !isDefined(sendResult);
 
@@ -106,10 +123,11 @@ export class SentEmailRecorderService {
         from: {
           address:
             composedEmail.fromHandle ?? composedEmail.connectedAccount.handle,
+          displayName: senderName,
         },
-        to,
-        cc,
-        bcc,
+        to: withContactNames(to),
+        cc: withContactNames(cc),
+        bcc: withContactNames(bcc),
         gmailMessageId: isGmail
           ? (sendResult?.messageExternalId ?? null)
           : null,
@@ -124,7 +142,8 @@ export class SentEmailRecorderService {
             source === 'WORKFLOW'
               ? FieldActorSource.WORKFLOW
               : FieldActorSource.MANUAL,
-          name: source === 'WORKFLOW' ? 'Workflow' : 'Email',
+          name:
+            senderName ?? (source === 'WORKFLOW' ? 'Workflow' : 'Roboost CRM'),
           workspaceMemberId: loggedByWorkspaceMemberId ?? null,
           context: {},
         },

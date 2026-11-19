@@ -11,7 +11,9 @@ import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { EMAIL_TIMELINE_ACTIVITY_TYPE_UNIVERSAL_IDENTIFIERS } from 'src/modules/unified-email/constants/email-timeline-activity-type-universal-identifiers.constant';
+import { EmailContactFindOrCreateService } from 'src/modules/unified-email/services/email-contact-find-or-create.service';
 import { EmailTimelineService } from 'src/modules/unified-email/services/email-timeline.service';
+import { parseEmailAddressList } from 'src/modules/unified-email/utils/format-email-address-list.util';
 import { classifyEmailTrackingRequest } from 'src/modules/unified-email/utils/classify-email-tracking-request.util';
 import { isSameUtcDay } from 'src/modules/unified-email/utils/is-same-utc-day.util';
 
@@ -29,6 +31,7 @@ type EmailTrackingState = {
   id: string;
   sentAt: string | null;
   lastOpenedAt: string | null;
+  to: string | null;
 };
 
 @Processor({ queueName: MessageQueue.workspaceQueue, scope: Scope.REQUEST })
@@ -40,13 +43,14 @@ export class EmailTrackingEventJob {
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
     private readonly emailTimelineService: EmailTimelineService,
+    private readonly emailContactFindOrCreateService: EmailContactFindOrCreateService,
   ) {}
 
   @Process(EmailTrackingEventJob.name)
   async handle(data: EmailTrackingEventJobData): Promise<void> {
     const schemaName = getWorkspaceSchemaName(data.workspaceId);
     const [email]: EmailTrackingState[] = await this.coreDataSource.query(
-      `SELECT id, "sentAt", "lastOpenedAt" FROM "${schemaName}"."email" WHERE id = $1 AND "deletedAt" IS NULL`,
+      `SELECT id, "sentAt", "lastOpenedAt", "to" FROM "${schemaName}"."email" WHERE id = $1 AND "deletedAt" IS NULL`,
       [data.emailId],
     );
 
@@ -103,7 +107,16 @@ export class EmailTrackingEventJob {
         !isSameUtcDay(new Date(email.lastOpenedAt), occurredAt);
 
       if (shouldAddTimelineRow) {
+        // The pixel can't tell which recipient opened, so the row names the first one
+        const [firstRecipient] = parseEmailAddressList(email.to);
+
         await this.emailTimelineService.addRowsForEmail({
+          actorName: isDefined(firstRecipient)
+            ? await this.emailContactFindOrCreateService.getDisplayName(
+                data.workspaceId,
+                firstRecipient,
+              )
+            : 'Recipient',
           workspaceId: data.workspaceId,
           emailId: email.id,
           timelineActivityTypeUniversalIdentifier: isOpen

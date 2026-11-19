@@ -198,7 +198,7 @@ const buildActorName = (authContext: WorkspaceAuthContext) => {
     return authContext.apiKey.name;
   }
 
-  return 'Twenty';
+  return 'Roboost CRM';
 };
 
 // The pipeline rules a non-Admin must follow on every pipeline record write the query runners handle
@@ -219,7 +219,7 @@ export class DealPipelineRulesService {
       authContext.type === 'user' ? authContext.workspaceMemberId : null;
 
     if (authContext.type === 'system') {
-      return { kind: 'SYSTEM', name: 'Twenty', workspaceMemberId };
+      return { kind: 'SYSTEM', name: 'Roboost CRM', workspaceMemberId };
     }
 
     if (isWorkflowRecordWrite()) {

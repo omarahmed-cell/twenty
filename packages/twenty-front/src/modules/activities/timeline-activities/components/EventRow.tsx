@@ -24,6 +24,8 @@ import { themeCssVariables } from 'twenty-ui/theme';
 import { allowRequestsToTwentyIconsState } from '@/client-config/states/allowRequestsToTwentyIcons';
 import { frontComponentsSelector } from '@/front-components/states/frontComponentsSelector';
 import { isDefined } from 'twenty-shared/utils';
+import { isNonEmptyString } from '@sniptt/guards';
+import { getEmailTrackingEventLabel } from '@/activities/timeline-activities/utils/getEmailTrackingEventLabel';
 
 const StyledTimelineItemContainer = styled.div`
   color: ${themeCssVariables.font.color.primary};
@@ -170,10 +172,16 @@ export const EventRow = ({
         ? recordStore.createdBy?.name
         : undefined;
 
-  const authorFullName = getTimelineActivityAuthorFullName(
-    event,
-    recordCreatorName,
+  const emailTrackingLabel = getEmailTrackingEventLabel(
+    timelineActivityType?.universalIdentifier,
   );
+  const trackingActorName = event.properties?.actorName;
+
+  // Tracking rows name the prospect who opened, clicked or replied, not a CRM user
+  const authorFullName =
+    isDefined(emailTrackingLabel) && isNonEmptyString(trackingActorName)
+      ? trackingActorName
+      : getTimelineActivityAuthorFullName(event, recordCreatorName);
 
   return (
     <>
@@ -192,8 +200,10 @@ export const EventRow = ({
             authorFullName={authorFullName}
             labelIdentifierValue={labelIdentifier.name}
             event={event}
-            eventAction={timelineActivityAction}
-            eventTypeLabel={timelineActivityType?.label}
+            eventAction={
+              isDefined(emailTrackingLabel) ? null : timelineActivityAction
+            }
+            eventTypeLabel={emailTrackingLabel ?? timelineActivityType?.label}
             renderer={renderer}
             mainObjectMetadataItem={mainObjectMetadataItem}
             linkedObjectMetadataItem={linkedObjectMetadataItem}

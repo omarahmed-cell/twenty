@@ -53,7 +53,7 @@ export class PropertySettingsWriteService {
         {
           userFriendlyMessage:
             objectName === PROPERTY_CREATION_OBJECT_NAME
-              ? msg`Only Twenty records who created a property.`
+              ? msg`Only Roboost CRM records who created a property.`
               : msg`Only workspace admins can change property groups and conditional logic.`,
         },
       );

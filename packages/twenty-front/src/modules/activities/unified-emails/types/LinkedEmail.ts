@@ -6,9 +6,14 @@ export type LinkedEmail = {
   direction: string | null;
   from: string | null;
   to: string | null;
+  cc: string | null;
   sentAt: string | null;
   status: string | null;
   openCount: number | null;
   clickCount: number | null;
   replyCount: number | null;
+  loggedBy?: {
+    id: string;
+    name?: { firstName?: string | null; lastName?: string | null } | null;
+  } | null;
 };
