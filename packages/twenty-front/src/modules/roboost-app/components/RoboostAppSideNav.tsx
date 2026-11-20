@@ -1,4 +1,8 @@
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
+import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { ROBOOST_NAV_DEFINITION } from '@/roboost-app/constants/RoboostNavDefinition';
 import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
 import { type NavGroup, SideNav } from '@/roboost-ui/components/SideNav';
@@ -14,6 +18,35 @@ export const RoboostAppSideNav = () => {
   const [roboostNavCollapsed, setRoboostNavCollapsed] = useAtomState(
     roboostNavCollapsedState,
   );
+  const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+
+  // Totals only: one row each, the count comes from totalCount
+  const { totalCount: contactCount } = useFindManyRecords({
+    objectNameSingular: CoreObjectNameSingular.Person,
+    recordGqlFields: { id: true },
+    limit: 1,
+  });
+  const { totalCount: dealCount } = useFindManyRecords({
+    objectNameSingular: CoreObjectNameSingular.Opportunity,
+    recordGqlFields: { id: true },
+    limit: 1,
+  });
+  const { totalCount: myOpenTaskCount } = useFindManyRecords({
+    objectNameSingular: CoreObjectNameSingular.Task,
+    recordGqlFields: { id: true },
+    filter: {
+      assigneeId: { eq: currentWorkspaceMember?.id },
+      status: { neq: 'DONE' },
+    },
+    skip: !isDefined(currentWorkspaceMember?.id),
+    limit: 1,
+  });
+
+  const countsByEntryId: Record<string, number | undefined> = {
+    people: contactCount,
+    opportunities: dealCount,
+    tasks: myOpenTaskCount,
+  };
 
   const groupLabels: Record<string, string | undefined> = {
     main: undefined,
@@ -24,6 +57,7 @@ export const RoboostAppSideNav = () => {
   const staticLabels: Record<string, string> = {
     home: t`Home`,
     settings: t`Settings`,
+    calendarEvents: t`Meetings`,
   };
 
   const groups: NavGroup[] = ROBOOST_NAV_DEFINITION.map((group) => ({
@@ -60,9 +94,10 @@ export const RoboostAppSideNav = () => {
       return [
         {
           id: entry.id,
-          label: objectMetadataItem.labelPlural,
+          label: staticLabels[entry.id] ?? objectMetadataItem.labelPlural,
           icon: entry.icon,
           href: indexPath,
+          count: countsByEntryId[entry.id] || undefined,
           active:
             pathname.startsWith(indexPath) ||
             pathname.startsWith(showPathPrefix),
