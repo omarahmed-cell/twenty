@@ -1,0 +1,1 @@
+export const RECORD_PAGE_PANEL_RAIL_WIDTH = 44;

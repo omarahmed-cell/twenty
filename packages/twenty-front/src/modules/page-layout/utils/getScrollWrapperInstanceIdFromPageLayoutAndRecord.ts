@@ -4,7 +4,7 @@ import { type TargetRecordIdentifier } from '@/ui/layout/contexts/TargetRecordId
 import { isDefined } from 'twenty-shared/utils';
 import { PageLayoutType } from '~/generated-metadata/graphql';
 
-type PageLayoutScrollWrapperArea = 'left-panel' | 'tab-content';
+type PageLayoutScrollWrapperArea = 'left-panel' | 'right-panel' | 'tab-content';
 
 export const getScrollWrapperInstanceIdFromPageLayoutAndRecord = ({
   pageLayoutId,

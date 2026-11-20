@@ -8,6 +8,12 @@ import { PageLayoutScrollResetEffect } from '@/page-layout/components/PageLayout
 import { PageLayoutTabList } from '@/page-layout/components/PageLayoutTabList';
 import { PageLayoutTabListEffect } from '@/page-layout/components/PageLayoutTabListEffect';
 import { PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH } from '@/page-layout/constants/PageLayoutLeftPanelContainerWidth';
+import { RECORD_PAGE_PANEL_CLASS_NAMES } from '@/page-layout/constants/RecordPagePanelClassNames';
+import { RECORD_PAGE_PANEL_RAIL_WIDTH } from '@/page-layout/constants/RecordPagePanelRailWidth';
+import { recordPageLeftPanelState } from '@/page-layout/states/recordPageLeftPanelState';
+import { recordPageRightPanelState } from '@/page-layout/states/recordPageRightPanelState';
+import { isAssociationWidget } from '@/page-layout/utils/isAssociationWidget';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useCurrentPageLayoutOrThrow } from '@/page-layout/hooks/useCurrentPageLayoutOrThrow';
 import { useIsPageLayoutInEditMode } from '@/page-layout/hooks/useIsPageLayoutInEditMode';
 import { usePageLayoutAddTabStrategy } from '@/page-layout/hooks/usePageLayoutAddTabStrategy';
@@ -32,6 +38,8 @@ import { MOBILE_VIEWPORT, themeCssVariables } from 'twenty-ui/theme';
 import { PageLayoutType } from '~/generated-metadata/graphql';
 
 const StyledRoot = styled.div`
+  container-name: record-page;
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -44,11 +52,96 @@ const StyledRoot = styled.div`
   }
 `;
 
-const StyledContainer = styled.div<{ hasPinnedTab: boolean }>`
+// Side panels shrink to their minimum, then the right one and finally the left
+// one fold to a rail, driven by the record page's own width (container queries)
+const StyledPanelTracks = styled.div`
+  --record-page-left-track: ${PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH}px;
+  --record-page-right-track: 0px;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+
+  &[data-has-panel-chrome='true'] {
+    --record-page-left-track: clamp(280px, 26cqi, 360px);
+  }
+
+  &[data-has-right-panel='true'] {
+    --record-page-right-track: clamp(280px, 24cqi, 340px);
+  }
+
+  &[data-left-panel-state='collapsed'] {
+    --record-page-left-track: ${RECORD_PAGE_PANEL_RAIL_WIDTH}px;
+
+    .${RECORD_PAGE_PANEL_CLASS_NAMES.leftPanel} {
+      .${RECORD_PAGE_PANEL_CLASS_NAMES.rail} {
+        display: block;
+      }
+      .${RECORD_PAGE_PANEL_CLASS_NAMES.panelBody} {
+        display: none;
+      }
+    }
+  }
+
+  &[data-has-right-panel='true'][data-right-panel-state='collapsed'] {
+    --record-page-right-track: ${RECORD_PAGE_PANEL_RAIL_WIDTH}px;
+
+    .${RECORD_PAGE_PANEL_CLASS_NAMES.rightPanel} {
+      .${RECORD_PAGE_PANEL_CLASS_NAMES.rail} {
+        display: block;
+      }
+      .${RECORD_PAGE_PANEL_CLASS_NAMES.panelBody} {
+        display: none;
+      }
+    }
+  }
+
+  @container record-page (max-width: 1039px) {
+    &[data-has-right-panel='true'][data-right-panel-state='auto'] {
+      --record-page-right-track: ${RECORD_PAGE_PANEL_RAIL_WIDTH}px;
+
+      .${RECORD_PAGE_PANEL_CLASS_NAMES.rightPanel} {
+        .${RECORD_PAGE_PANEL_CLASS_NAMES.rail} {
+          display: block;
+        }
+        .${RECORD_PAGE_PANEL_CLASS_NAMES.panelBody} {
+          display: none;
+        }
+      }
+    }
+  }
+
+  @container record-page (max-width: 803px) {
+    &[data-has-panel-chrome='true'][data-left-panel-state='auto'] {
+      --record-page-left-track: ${RECORD_PAGE_PANEL_RAIL_WIDTH}px;
+
+      .${RECORD_PAGE_PANEL_CLASS_NAMES.leftPanel} {
+        .${RECORD_PAGE_PANEL_CLASS_NAMES.rail} {
+          display: block;
+        }
+        .${RECORD_PAGE_PANEL_CLASS_NAMES.panelBody} {
+          display: none;
+        }
+      }
+    }
+  }
+
+  @media print {
+    display: block;
+  }
+`;
+
+const StyledContainer = styled.div<{
+  hasPinnedTab: boolean;
+  hasRightPanel: boolean;
+}>`
   display: grid;
   flex: 1;
-  grid-template-columns: ${({ hasPinnedTab }) =>
-    hasPinnedTab ? `${PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH}px 1fr` : '1fr'};
+  grid-template-columns: ${({ hasPinnedTab, hasRightPanel }) =>
+    hasPinnedTab
+      ? `var(--record-page-left-track) minmax(0, 1fr)${hasRightPanel ? ' var(--record-page-right-track)' : ''}`
+      : '1fr'};
   grid-template-rows: minmax(0, 1fr);
   min-height: 0;
   width: 100%;
@@ -175,6 +268,17 @@ export const PageLayoutTabsRenderer = () => {
   const { tabsToRenderInTabList, pinnedLeftTab } =
     usePageLayoutRenderableTabs();
 
+  const recordPageLeftPanel = useAtomStateValue(recordPageLeftPanelState);
+  const recordPageRightPanel = useAtomStateValue(recordPageRightPanelState);
+
+  const hasPanelChrome =
+    isDefined(pinnedLeftTab) &&
+    !isPageLayoutInEditMode &&
+    currentPageLayout.type === PageLayoutType.RECORD_PAGE;
+
+  const hasRightPanel =
+    hasPanelChrome && pinnedLeftTab.widgets.some(isAssociationWidget);
+
   const sortedTabs = sortTabsByPosition(tabsToRenderInTabList);
 
   const activeTabExistsInRenderableTabs = sortedTabs.some(
@@ -238,66 +342,90 @@ export const PageLayoutTabsRenderer = () => {
         enabled={hasTabPanels}
       >
         <StyledRoot>
-          {shouldRenderRecordIdentifierBar && (
-            <PageLayoutRecordIdentifierBar
-              targetRecordIdentifier={targetRecordIdentifier}
-              pinnedTab={pinnedLeftTab}
-              isPinnedTabEditable={isPageLayoutInEditMode}
-              tabList={tabList}
-            />
-          )}
-
-          <StyledContainer hasPinnedTab={isDefined(pinnedLeftTab)}>
-            {isDefined(pinnedLeftTab) && (
-              <PageLayoutLeftPanel
-                pageLayoutId={currentPageLayout.id}
-                pinnedLeftTabId={pinnedLeftTab.id}
+          <StyledPanelTracks
+            data-has-panel-chrome={hasPanelChrome}
+            data-has-right-panel={hasRightPanel}
+            data-left-panel-state={
+              hasPanelChrome ? recordPageLeftPanel : undefined
+            }
+            data-right-panel-state={
+              hasRightPanel ? recordPageRightPanel : undefined
+            }
+          >
+            {shouldRenderRecordIdentifierBar && (
+              <PageLayoutRecordIdentifierBar
+                targetRecordIdentifier={targetRecordIdentifier}
+                pinnedTab={pinnedLeftTab}
+                isPinnedTabEditable={isPageLayoutInEditMode}
+                tabList={tabList}
               />
             )}
 
-            <StyledTabsAndDashboardContainer>
-              <PageLayoutTabListEffect
-                isInEditMode={isPageLayoutInEditMode}
-                tabs={sortedTabs}
-                componentInstanceId={tabListInstanceId}
-                defaultTabToFocusOnMobileAndSidePanelId={
-                  currentPageLayout.defaultTabToFocusOnMobileAndSidePanelId ??
-                  undefined
-                }
-              />
-              {!shouldRenderRecordIdentifierBar && tabList}
+            <StyledContainer
+              hasPinnedTab={isDefined(pinnedLeftTab)}
+              hasRightPanel={hasRightPanel}
+            >
+              {isDefined(pinnedLeftTab) && (
+                <PageLayoutLeftPanel
+                  pageLayoutId={currentPageLayout.id}
+                  pinnedLeftTabId={pinnedLeftTab.id}
+                  hasPanelChrome={hasPanelChrome}
+                />
+              )}
 
-              <StyledScrollWrapperContainer>
-                <ScrollWrapper
-                  className="page-layout-scroll-wrapper"
-                  componentInstanceId={scrollWrapperInstanceId}
-                  defaultEnableXScroll={false}
-                >
-                  {isDefined(activeTabId) &&
-                    activeTabExistsInRenderableTabs &&
-                    tabsToMount.map((tab) =>
-                      hasTabPanels ? (
-                        <Tabs.Panel
-                          key={tab.id}
-                          value={tab.id}
-                          keepMounted
-                          render={<StyledTabPanel />}
-                        >
-                          <PageLayoutMainContent tabId={tab.id} />
-                        </Tabs.Panel>
-                      ) : (
-                        <StyledTabContentDisplay
-                          key={tab.id}
-                          isActiveTab={tab.id === activeTabId}
-                        >
-                          <PageLayoutMainContent tabId={tab.id} />
-                        </StyledTabContentDisplay>
-                      ),
-                    )}
-                </ScrollWrapper>
-              </StyledScrollWrapperContainer>
-            </StyledTabsAndDashboardContainer>
-          </StyledContainer>
+              <StyledTabsAndDashboardContainer>
+                <PageLayoutTabListEffect
+                  isInEditMode={isPageLayoutInEditMode}
+                  tabs={sortedTabs}
+                  componentInstanceId={tabListInstanceId}
+                  defaultTabToFocusOnMobileAndSidePanelId={
+                    currentPageLayout.defaultTabToFocusOnMobileAndSidePanelId ??
+                    undefined
+                  }
+                />
+                {!shouldRenderRecordIdentifierBar && tabList}
+
+                <StyledScrollWrapperContainer>
+                  <ScrollWrapper
+                    className="page-layout-scroll-wrapper"
+                    componentInstanceId={scrollWrapperInstanceId}
+                    defaultEnableXScroll={false}
+                  >
+                    {isDefined(activeTabId) &&
+                      activeTabExistsInRenderableTabs &&
+                      tabsToMount.map((tab) =>
+                        hasTabPanels ? (
+                          <Tabs.Panel
+                            key={tab.id}
+                            value={tab.id}
+                            keepMounted
+                            render={<StyledTabPanel />}
+                          >
+                            <PageLayoutMainContent tabId={tab.id} />
+                          </Tabs.Panel>
+                        ) : (
+                          <StyledTabContentDisplay
+                            key={tab.id}
+                            isActiveTab={tab.id === activeTabId}
+                          >
+                            <PageLayoutMainContent tabId={tab.id} />
+                          </StyledTabContentDisplay>
+                        ),
+                      )}
+                  </ScrollWrapper>
+                </StyledScrollWrapperContainer>
+              </StyledTabsAndDashboardContainer>
+
+              {hasRightPanel && (
+                <PageLayoutLeftPanel
+                  pageLayoutId={currentPageLayout.id}
+                  pinnedLeftTabId={pinnedLeftTab.id}
+                  side="right"
+                  hasPanelChrome
+                />
+              )}
+            </StyledContainer>
+          </StyledPanelTracks>
         </StyledRoot>
       </TabListRoot>
     </PageLayoutWidgetDndProvider>

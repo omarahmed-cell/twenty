@@ -32,7 +32,7 @@ const StyledBar = styled.div<{
   display: grid;
   grid-template-columns: ${({ hasPinnedTab, hasTabList }) =>
     hasPinnedTab
-      ? `${PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH}px minmax(0, 1fr)`
+      ? `var(--record-page-left-track, ${PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH}px) minmax(0, 1fr)`
       : hasTabList
         ? `${SIDE_TRACK} minmax(0, 1fr) ${SIDE_TRACK}`
         : 'minmax(0, 1fr) auto'};
@@ -51,6 +51,7 @@ const StyledIdentifierCell = styled.div<{ hasPinnedTab: boolean }>`
   gap: ${themeCssVariables.spacing[2]};
   justify-content: space-between;
   min-width: 0;
+  overflow: hidden;
   padding-left: ${themeCssVariables.spacing[3]};
   padding-right: ${themeCssVariables.spacing[2]};
 `;

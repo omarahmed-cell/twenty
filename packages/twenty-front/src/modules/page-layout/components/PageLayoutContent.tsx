@@ -7,6 +7,7 @@ import { usePageLayoutTabWithVisibleWidgetsOrThrow } from '@/page-layout/hooks/u
 import { RecordPageAddWidgetSection } from '@/page-layout/widgets/components/RecordPageAddWidgetSection';
 import { RecordPageWidgetInsertionSeparator } from '@/page-layout/widgets/components/RecordPageWidgetInsertionSeparator';
 import { StandaloneWidgetPlaceholder } from '@/page-layout/widgets/components/StandaloneWidgetPlaceholder';
+import { filterWidgetsByPlacement } from '@/page-layout/utils/filterWidgetsByPlacement';
 import { isViewportFillingWidget } from '@/page-layout/widgets/utils/isViewportFillingWidget';
 import { styled } from '@linaria/react';
 import { isDefined } from 'twenty-shared/utils';
@@ -23,10 +24,14 @@ const StyledEmptyStandalonePageContainer = styled.div`
 export const PageLayoutContent = () => {
   const isPageLayoutInEditMode = useIsPageLayoutInEditMode();
 
-  const { layoutMode, tabId } = usePageLayoutContentContext();
+  const { layoutMode, tabId, widgetPlacement } = usePageLayoutContentContext();
 
   const activeTab = usePageLayoutTabWithVisibleWidgetsOrThrow(tabId);
-  const firstWidget = activeTab.widgets[0];
+  const widgets = filterWidgetsByPlacement(
+    activeTab.widgets,
+    widgetPlacement ?? 'all',
+  );
+  const firstWidget = widgets[0];
 
   const { currentPageLayout } = useCurrentPageLayoutOrThrow();
 
@@ -37,7 +42,7 @@ export const PageLayoutContent = () => {
 
   const isEmptyStandalonePage =
     currentPageLayout.type === PageLayoutType.STANDALONE_PAGE &&
-    activeTab.widgets.length === 0;
+    widgets.length === 0;
 
   if (isEmptyStandalonePage) {
     return (
@@ -54,7 +59,7 @@ export const PageLayoutContent = () => {
   return (
     <PageLayoutVerticalList
       isInEditMode={isPageLayoutInEditMode && isRecordPageLayout}
-      widgets={activeTab.widgets}
+      widgets={widgets}
       leadingElement={
         isRecordPageLayout &&
         isDefined(firstWidget) &&
