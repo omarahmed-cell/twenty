@@ -1,3 +1,4 @@
+import { RoboostMark } from '@/ui/brand/components/RoboostMark';
 import { UndecoratedLink } from '@/ui/navigation/link/components/UndecoratedLink/UndecoratedLink';
 import { getWorkspaceAvatarColorSeed } from '@/workspace/utils/getWorkspaceAvatarColorSeed';
 import { styled } from '@linaria/react';
@@ -46,6 +47,14 @@ const StyledSecondaryLogoContainer = styled.div`
   width: ${themeCssVariables.spacing[7]};
 `;
 
+const StyledDefaultLogo = styled.div`
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+`;
+
 const StyledPrimaryLogo = styled.div`
   background-size: cover;
   height: 100%;
@@ -60,12 +69,12 @@ export const Logo = ({
   to = AppPath.SignInUp,
 }: LogoProps) => {
   const { redirectToDefaultDomain } = useRedirectToDefaultDomain();
-  const defaultPrimaryLogoUrl = `${window.location.origin}/images/icons/android/android-launchericon-192-192.png`;
-
-  const primaryLogoUrl = getImageAbsoluteURI({
-    imageUrl: primaryLogo ?? defaultPrimaryLogoUrl,
-    baseUrl: REACT_APP_SERVER_BASE_URL,
-  });
+  const primaryLogoUrl = isDefined(primaryLogo)
+    ? getImageAbsoluteURI({
+        imageUrl: primaryLogo,
+        baseUrl: REACT_APP_SERVER_BASE_URL,
+      })
+    : null;
 
   const secondaryLogoUrl = isNonEmptyString(secondaryLogo)
     ? getImageAbsoluteURI({
@@ -80,31 +89,32 @@ export const Logo = ({
     <StyledContainer onClick={() => onClick?.()}>
       {isUsingDefaultLogo ? (
         <UndecoratedLink to={to} onClick={() => redirectToDefaultDomain()}>
-          <StyledPrimaryLogo
-            style={{ backgroundImage: `url(${primaryLogoUrl})` }}
-          />
+          <StyledDefaultLogo>
+            <RoboostMark height={26} />
+          </StyledDefaultLogo>
         </UndecoratedLink>
       ) : (
         <StyledPrimaryLogo
           style={{ backgroundImage: `url(${primaryLogoUrl})` }}
         />
       )}
-      {isDefined(secondaryLogoUrl) ? (
-        <StyledSecondaryLogoContainer>
-          <StyledSecondaryLogo src={secondaryLogoUrl} />
-        </StyledSecondaryLogoContainer>
-      ) : (
-        isDefined(placeholder) && (
+      {!isUsingDefaultLogo &&
+        (isDefined(secondaryLogoUrl) ? (
           <StyledSecondaryLogoContainer>
-            <Avatar
-              size="lg"
-              name={placeholder}
-              shape="square"
-              colorSeed={getWorkspaceAvatarColorSeed(placeholder)}
-            />
+            <StyledSecondaryLogo src={secondaryLogoUrl} />
           </StyledSecondaryLogoContainer>
-        )
-      )}
+        ) : (
+          isDefined(placeholder) && (
+            <StyledSecondaryLogoContainer>
+              <Avatar
+                size="lg"
+                name={placeholder}
+                shape="square"
+                colorSeed={getWorkspaceAvatarColorSeed(placeholder)}
+              />
+            </StyledSecondaryLogoContainer>
+          )
+        ))}
     </StyledContainer>
   );
 };

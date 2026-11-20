@@ -5,7 +5,11 @@ import { fieldMetadataItemByIdSelector } from '@/object-metadata/states/fieldMet
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
 import { RECORD_TABLE_CELL_CONTENT_CLASS_NAME } from '@/object-record/record-table/constants/RecordTableCellContentClassName';
 import { useAtomFamilySelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilySelectorValue';
-import { useIcons } from 'twenty-ui/icon';
+import { IconArrowDown, IconArrowUp, useIcons } from 'twenty-ui/icon';
+import { ViewSortDirection } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
+import { currentRecordSortsComponentState } from '@/object-record/record-sort/states/currentRecordSortsComponentState';
+import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useTheme, themeCssVariables } from 'twenty-ui/theme';
 
 const StyledTitle = styled.div`
@@ -20,6 +24,12 @@ const StyledTitle = styled.div`
 `;
 
 const StyledIcon = styled.div`
+  display: flex;
+  flex-shrink: 0;
+`;
+
+const StyledSortIcon = styled.div`
+  color: ${themeCssVariables.accent.accent9};
   display: flex;
   flex-shrink: 0;
 `;
@@ -45,6 +55,14 @@ export const RecordTableColumnHead = ({
   const fieldMetadataItem =
     correspondingFieldMetadataItem.foundFieldMetadataItem;
 
+  const currentRecordSorts = useAtomComponentStateValue(
+    currentRecordSortsComponentState,
+  );
+  const sortDirection = currentRecordSorts.find(
+    (recordSort) =>
+      recordSort.fieldMetadataId === recordField.fieldMetadataItemId,
+  )?.direction;
+
   return (
     <StyledTitle className={RECORD_TABLE_CELL_CONTENT_CLASS_NAME}>
       <StyledIcon>
@@ -54,6 +72,15 @@ export const RecordTableColumnHead = ({
         label={fieldMetadataItem?.label}
         description={fieldMetadataItem?.description}
       />
+      {isDefined(sortDirection) && (
+        <StyledSortIcon>
+          {sortDirection === ViewSortDirection.ASC ? (
+            <IconArrowUp size={theme.icon.size.sm} />
+          ) : (
+            <IconArrowDown size={theme.icon.size.sm} />
+          )}
+        </StyledSortIcon>
+      )}
     </StyledTitle>
   );
 };

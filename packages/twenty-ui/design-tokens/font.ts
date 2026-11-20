@@ -1,3 +1,4 @@
+import { ROBOOST_TOKENS } from './roboost';
 import { COLOR_TOKENS } from './color';
 import { GRAY_SCALE_TOKENS } from './grayScale';
 import { token } from './token';
@@ -26,5 +27,7 @@ export const FONT_TOKENS = {
     medium: token('500', { unit: 'number' }),
     semiBold: token('600', { unit: 'number' }),
   },
-  family: token('Inter, sans-serif'),
+  family: token(ROBOOST_TOKENS.fonts.sans),
+  familyDisplay: token(ROBOOST_TOKENS.fonts.display),
+  familyMono: token(ROBOOST_TOKENS.fonts.mono),
 };

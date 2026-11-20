@@ -1,18 +1,19 @@
 @import './viewport-zoom.css';
+@import './brand-fonts.css';
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--t-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--t-background-tertiary);
+  background: var(--t-background-canvas);
   color: var(--t-font-color-primary);
   touch-action: manipulation;
 }
 
 html {
   font-size: 13px;
-  background: var(--t-background-tertiary);
+  background: var(--t-background-canvas);
   /* The interface scale preference. Standardized CSS zoom multiplies every
      used length uniformly, exactly like browser zoom, while computed styles,
      offset and scroll geometry stay in design pixels. Viewport units are the

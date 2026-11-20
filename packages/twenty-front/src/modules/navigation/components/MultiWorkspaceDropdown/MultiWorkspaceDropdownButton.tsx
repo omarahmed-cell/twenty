@@ -3,7 +3,6 @@ import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
 import { MultiWorkspaceDropdownClickableComponent } from '@/navigation/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownClickableComponent';
 import { MultiWorkspaceDropdownDefaultComponents } from '@/navigation/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents';
 import { MultiWorkspaceDropdownOpenRecordInComponents } from '@/navigation/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownOpenRecordInComponents';
-import { MultiWorkspaceDropdownThemesComponents } from '@/navigation/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents';
 import { MultiWorkspaceDropdownWorkspacesListComponents } from '@/navigation/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownWorkspacesListComponents';
 import { MULTI_WORKSPACE_DROPDOWN_ID } from '@/navigation/constants/MultiWorkspaceDropdownId';
 import { MULTI_WORKSPACE_DROPDOWN_MOBILE_BOUNDARY_PADDING } from '@/navigation/constants/MultiWorkspaceDropdownMobileBoundaryPadding';
@@ -48,9 +47,6 @@ export const MultiWorkspaceDropdownButton = ({
       >
         <Dropdown.Page id="root">
           <MultiWorkspaceDropdownDefaultComponents />
-        </Dropdown.Page>
-        <Dropdown.Page id="themes" type="picker">
-          <MultiWorkspaceDropdownThemesComponents />
         </Dropdown.Page>
         <Dropdown.Page id="open-record-in" type="picker">
           <MultiWorkspaceDropdownOpenRecordInComponents />

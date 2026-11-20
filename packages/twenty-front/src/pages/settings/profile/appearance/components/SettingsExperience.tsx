@@ -10,7 +10,6 @@ import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { Section } from 'twenty-ui/components/layout';
 import { themeCssVariables } from 'twenty-ui/theme';
-import { SettingsAppearance } from '~/pages/settings/profile/appearance/components/SettingsAppearance';
 import { LocalePicker } from '~/pages/settings/profile/appearance/components/LocalePicker';
 
 const StyledInterfaceControls = styled.div`
@@ -34,8 +33,6 @@ export const SettingsExperience = () => {
       ]}
     >
       <SettingsPageContainer>
-        <SettingsAppearance />
-
         <Section.Root>
           <Section.Header
             title={t`Interface`}

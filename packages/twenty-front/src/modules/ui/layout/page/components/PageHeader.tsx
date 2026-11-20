@@ -50,8 +50,10 @@ const StyledLeftContainer = styled.div`
 const StyledTitleContainer = styled.div`
   align-items: center;
   display: flex;
-  font-size: ${themeCssVariables.font.size.md};
-  font-weight: ${themeCssVariables.font.weight.medium};
+  font-family: ${themeCssVariables.font.familyDisplay};
+  font-size: ${themeCssVariables.font.size.lg};
+  font-weight: ${themeCssVariables.font.weight.semiBold};
+  letter-spacing: -0.01em;
   margin-right: ${themeCssVariables.spacing[1]};
   overflow: hidden;
   width: 100%;
@@ -108,7 +110,7 @@ export const PageHeader = ({
     <AnimatePresence initial={false}>
       <StyledTopBarContainer className={className} isMobile={isMobile}>
         <StyledLeftContainer>
-          {!isNavigationDrawerExpanded && (!isMobile || isSettingsPage) && (
+          {!isNavigationDrawerExpanded && isMobile && isSettingsPage && (
             <NavigationDrawerCollapseButton direction="right" />
           )}
           {hasClosePageButton && (

@@ -20,7 +20,7 @@ const StyledDragDropHeaderCell = styled.div<{
   background-color: ${({ backgroundColor }) => backgroundColor};
   border-bottom: ${({ shouldDisplayBorderBottom }) =>
     shouldDisplayBorderBottom
-      ? `1px solid ${themeCssVariables.background.primary}`
+      ? `1px solid ${themeCssVariables.background.secondary}`
       : 'none'};
   cursor: pointer;
   max-height: ${RECORD_TABLE_ROW_HEIGHT}px;
@@ -72,7 +72,7 @@ export const RecordTableHeaderDragDropColumn = () => {
         'header-cell',
         RECORD_TABLE_COLUMN_DRAG_AND_DROP_WIDTH_CLASS_NAME,
       )}
-      backgroundColor={theme.background.primary}
+      backgroundColor={theme.background.secondary}
       shouldDisplayBorderBottom={shouldDisplayBorderBottom}
     />
   );

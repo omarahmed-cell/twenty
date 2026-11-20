@@ -8,7 +8,6 @@ import { useToggleNavigationDrawer } from '@/ui/navigation/navigation-drawer/hoo
 import { sidePanelSearchState } from '@/side-panel/states/sidePanelSearchState';
 import { isLogConsoleEnabledState } from '@/log-console/states/isLogConsoleEnabledState';
 import { isSelectOptionMatchingSearch } from '@/ui/input/components/internal/select/utils/isSelectOptionMatchingSearch';
-import { useColorScheme } from '@/workspace-member/hooks/useColorScheme';
 import { normalizeSearchText, useIsMobile } from 'twenty-ui/utilities';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -16,7 +15,6 @@ import { useLingui } from '@lingui/react/macro';
 import { useContext } from 'react';
 import { IconCopy, IconTerminal } from 'twenty-ui/icon';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
-import { type ColorScheme } from '@/ui/theme/types/ColorScheme';
 
 export const useCommandMenuAppActions = () => {
   const { t } = useLingui();
@@ -30,19 +28,12 @@ export const useCommandMenuAppActions = () => {
     isNavigationDrawerExpanded,
   );
   const { copyToClipboard } = useCopyToClipboard();
-  const { colorScheme, setColorScheme, colorSchemeList } = useColorScheme();
   const isLogConsoleEnabled = useAtomStateValue(isLogConsoleEnabledState);
   const { setIsLogConsoleEnabled } = useSetIsLogConsoleEnabled();
   const isLogConsoleAllowed = useIsLogConsoleAllowed();
   const [logConsoleDisplayMode, setLogConsoleDisplayMode] = useAtomState(
     logConsoleDisplayModeState,
   );
-
-  const themeLabels: Record<ColorScheme, string> = {
-    Light: t`Change theme to light`,
-    Dark: t`Change theme to dark`,
-    System: t`Change theme to system`,
-  };
 
   const appActions = [
     {
@@ -61,14 +52,6 @@ export const useCommandMenuAppActions = () => {
         copyToClipboard(window.location.href, t`Link copied to clipboard`),
       isAvailable: true,
     },
-    ...colorSchemeList.map((theme) => ({
-      id: `change-theme-${theme.id.toLowerCase()}`,
-      section: 'WORKSPACE',
-      label: themeLabels[theme.id],
-      Icon: theme.icon,
-      onClick: () => setColorScheme(theme.id),
-      isAvailable: theme.id !== colorScheme,
-    })),
     {
       id: 'show-logs',
       section: 'DEVELOPER',

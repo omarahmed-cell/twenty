@@ -89,7 +89,7 @@
   }
 
   &[data-active] {
-    --tw-tabs-color: var(--t-font-color-primary);
+    --tw-tabs-color: var(--t-accent-accent11);
     --tw-tabs-icon-color: var(--tw-tabs-color);
   }
 
@@ -151,8 +151,8 @@
 .indicator {
   --tw-tabs-indicator-offset: var(--active-tab-left);
 
-  background: var(--t-border-color-inverted);
-  block-size: 1px;
+  background: var(--t-accent-accent9);
+  block-size: 2px;
   inline-size: var(--active-tab-width);
   inset-block-end: 0;
   inset-inline-start: var(--tw-tabs-indicator-offset);

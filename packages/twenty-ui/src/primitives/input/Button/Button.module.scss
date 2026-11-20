@@ -113,13 +113,13 @@
 
 $colors: (
   'accent': (
-    base: var(--t-color-blue),
-    text: var(--t-color-blue),
-    border: var(--t-accent-primary),
-    hover: var(--t-color-blue10),
-    active: var(--t-color-blue12),
-    soft: var(--t-accent-tertiary),
-    soft-hover: var(--t-accent-secondary),
+    base: var(--t-accent-accent9),
+    text: var(--t-accent-accent11),
+    border: var(--t-accent-accent5),
+    hover: var(--t-accent-accent10),
+    active: var(--t-accent-accent12),
+    soft: var(--t-accent-accent2),
+    soft-hover: var(--t-accent-accent3),
   ),
   'danger': (
     base: var(--t-color-red),

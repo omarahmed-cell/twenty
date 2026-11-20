@@ -1,21 +1,26 @@
-import { COLOR_TOKENS } from './color';
+import { ROBOOST_TOKENS } from './roboost';
+import { token } from './token';
+
+const accent = (step: keyof typeof ROBOOST_TOKENS.accent) =>
+  token(ROBOOST_TOKENS.accent[step]);
+
 export const ACCENT_TOKENS = {
-  primary: COLOR_TOKENS.blue5,
-  secondary: COLOR_TOKENS.blue5,
-  tertiary: COLOR_TOKENS.blue3,
-  quaternary: COLOR_TOKENS.blue2,
-  accent3570: COLOR_TOKENS.blue8,
-  accent4060: COLOR_TOKENS.blue8,
-  accent1: COLOR_TOKENS.blue1,
-  accent2: COLOR_TOKENS.blue2,
-  accent3: COLOR_TOKENS.blue3,
-  accent4: COLOR_TOKENS.blue4,
-  accent5: COLOR_TOKENS.blue5,
-  accent6: COLOR_TOKENS.blue6,
-  accent7: COLOR_TOKENS.blue7,
-  accent8: COLOR_TOKENS.blue8,
-  accent9: COLOR_TOKENS.blue9,
-  accent10: COLOR_TOKENS.blue10,
-  accent11: COLOR_TOKENS.blue11,
-  accent12: COLOR_TOKENS.blue12,
+  primary: accent('accent5'),
+  secondary: accent('accent5'),
+  tertiary: accent('accent3'),
+  quaternary: accent('accent2'),
+  accent3570: accent('accent8'),
+  accent4060: accent('accent8'),
+  accent1: accent('accent1'),
+  accent2: accent('accent2'),
+  accent3: accent('accent3'),
+  accent4: accent('accent4'),
+  accent5: accent('accent5'),
+  accent6: accent('accent6'),
+  accent7: accent('accent7'),
+  accent8: accent('accent8'),
+  accent9: accent('accent9'),
+  accent10: accent('accent10'),
+  accent11: accent('accent11'),
+  accent12: accent('accent12'),
 };

@@ -6,6 +6,7 @@ import { NavigationDrawerHeader } from '@/navigation/components/NavigationDrawer
 import { NavigationDrawerModeTransition } from '@/navigation/components/NavigationDrawerModeTransition';
 import { SettingsNavigationDrawerContent } from '@/navigation/components/SettingsNavigationDrawerContent';
 import { NavigationDrawer } from '@/ui/navigation/navigation-drawer/components/NavigationDrawer';
+import { NavigationDrawerToggleFooter } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerToggleFooter';
 import { NavigationDrawerFixedContent } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerFixedContent';
 import { useIsMobile } from 'twenty-ui/utilities';
 
@@ -40,6 +41,7 @@ export const AppNavigationDrawer = ({
           <MainNavigationDrawerContent />
         )}
       </NavigationDrawerModeTransition>
+      {!isMobile && <NavigationDrawerToggleFooter />}
     </NavigationDrawer>
   );
 };

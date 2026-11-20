@@ -40,6 +40,13 @@ jest.mock(
 );
 
 jest.mock(
+  '@/ui/navigation/navigation-drawer/components/NavigationDrawerToggleFooter',
+  () => ({
+    NavigationDrawerToggleFooter: () => null,
+  }),
+);
+
+jest.mock(
   '@/ui/navigation/navigation-drawer/components/NavigationDrawerFixedContent',
   () => ({
     NavigationDrawerFixedContent: ({ children }: { children: ReactNode }) => (

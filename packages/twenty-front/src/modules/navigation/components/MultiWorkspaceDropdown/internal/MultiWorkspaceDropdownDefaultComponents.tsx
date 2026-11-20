@@ -12,7 +12,6 @@ import { DropdownRoot } from '@/ui/layout/dropdown/components/DropdownRoot';
 import { AvailableWorkspaceItem } from '@/navigation/components/MultiWorkspaceDropdown/internal/components/AvailableWorkspaceItem';
 import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
 import { OPEN_RECORD_IN_OPTIONS } from '@/navigation/constants/OpenRecordInOptions';
-import { useColorScheme } from '@/workspace-member/hooks/useColorScheme';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { getWorkspaceAvatarColorSeed } from '@/workspace/utils/getWorkspaceAvatarColorSeed';
 import { useLingui } from '@lingui/react/macro';
@@ -47,7 +46,6 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
     countAvailableWorkspaces(availableWorkspaces);
   const { redirectToDefaultDomain } = useRedirectToDefaultDomain();
   const { signOut } = useAuth();
-  const { colorScheme, colorSchemeList } = useColorScheme();
   const supportChat = useAtomStateValue(supportChatState);
   const isSupportChatConfigured =
     supportChat?.supportDriver === 'FRONT' &&
@@ -153,17 +151,6 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
             {t`Settings`}
           </Dropdown.ActionItem>
         )}
-        <Dropdown.ActionItem
-          startIcon={
-            <SelectOptionIcon
-              Icon={colorSchemeList.find(({ id }) => id === colorScheme)?.icon}
-            />
-          }
-          description={colorScheme}
-          page="themes"
-        >
-          {t`Theme`}
-        </Dropdown.ActionItem>
         {canDisplaySidePanel && (
           <Dropdown.ActionItem
             startIcon={

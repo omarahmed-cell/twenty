@@ -134,6 +134,7 @@ export type ThemeType = {
   };
   background: {
     noisy: string;
+    canvas: string;
     primary: string;
     secondary: string;
     tertiary: string;
@@ -198,6 +199,8 @@ export type ThemeType = {
     strong: string;
     underline: string;
     superHeavy: string;
+    focus: string;
+    xs: string;
   };
   font: {
     color: {
@@ -225,6 +228,8 @@ export type ThemeType = {
       semiBold: number;
     };
     family: string;
+    familyDisplay: string;
+    familyMono: string;
   };
   name: string;
   snackBar: {
@@ -1099,5 +1104,10 @@ export type ThemeType = {
       amber11: string;
       amber12: string;
     };
+  };
+  brand: {
+    warm: string;
+    warmRed: string;
+    red: string;
   };
 };

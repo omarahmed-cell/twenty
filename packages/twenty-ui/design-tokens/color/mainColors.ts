@@ -1,5 +1,5 @@
+import { ROBOOST_TOKENS } from '../roboost';
 import { AMBER_COLOR_TOKENS } from './amber';
-import { BLUE_COLOR_TOKENS } from './blue';
 import { BRONZE_COLOR_TOKENS } from './bronze';
 import { BROWN_COLOR_TOKENS } from './brown';
 import { CRIMSON_COLOR_TOKENS } from './crimson';
@@ -41,7 +41,8 @@ export const MAIN_COLOR_TOKENS = {
   turquoise: TURQUOISE_COLOR_TOKENS.scale.turquoise9,
   cyan: CYAN_COLOR_TOKENS.scale.cyan9,
   sky: SKY_COLOR_TOKENS.scale.sky9,
-  blue: BLUE_COLOR_TOKENS.scale.blue9,
+  // Twenty uses the main "blue" as its UI accent (focus, links, selection); blue tags keep the blue scale
+  blue: token(ROBOOST_TOKENS.accent.accent9),
   iris: IRIS_COLOR_TOKENS.scale.iris9,
   violet: VIOLET_COLOR_TOKENS.scale.violet9,
   purple: PURPLE_COLOR_TOKENS.scale.purple9,

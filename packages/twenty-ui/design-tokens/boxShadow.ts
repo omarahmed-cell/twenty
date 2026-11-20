@@ -1,3 +1,4 @@
+import { ROBOOST_TOKENS } from './roboost';
 import { token } from './token';
 
 export const BOX_SHADOW_TOKENS = {
@@ -6,8 +7,7 @@ export const BOX_SHADOW_TOKENS = {
     dark: 'rgba(0, 0, 0, 0.6)',
   }),
   light: token({
-    light:
-      '0px 2px 4px 0px color(display-p3 0 0 0 / 0.039), 0px 0px 4px 0px color(display-p3 0 0 0 / 0.078)',
+    light: ROBOOST_TOKENS.shadow.sm,
     dark: '0px 2px 4px 0px rgba(0, 0, 0, 0.04), 0px 0px 4px 0px rgba(0, 0, 0, 0.08)',
   }),
   sidebar: token({
@@ -19,8 +19,7 @@ export const BOX_SHADOW_TOKENS = {
     dark: '0px 0px 20px 0px rgba(0, 0, 0, 0.1)',
   }),
   strong: token({
-    light:
-      '2px 4px 16px 0px color(display-p3 0 0 0 / 0.161), 0px 2px 4px 0px color(display-p3 0 0 0 / 0.078)',
+    light: ROBOOST_TOKENS.shadow.md,
     dark: '2px 4px 16px 0px rgba(0, 0, 0, 0.16), 0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
   }),
   underline: token({
@@ -28,8 +27,9 @@ export const BOX_SHADOW_TOKENS = {
     dark: '0px 1px 0px 0px rgba(0, 0, 0, 0.32)',
   }),
   superHeavy: token({
-    light:
-      '0px 0px 8px 0px color(display-p3 0 0 0 / 0.161), 0px 8px 64px -16px color(display-p3 0 0 0 / 0.478), 0px 24px 56px -16px color(display-p3 0 0 0 / 0.078)',
+    light: ROBOOST_TOKENS.shadow.lg,
     dark: '2px 4px 16px 0px rgba(0, 0, 0, 0.12), 0px 2px 4px 0px rgba(0, 0, 0, 0.04)',
   }),
+  focus: token(ROBOOST_TOKENS.shadow.focus),
+  xs: token(ROBOOST_TOKENS.shadow.xs),
 };

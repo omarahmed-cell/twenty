@@ -135,6 +135,7 @@ export const themeCssVariables = {
   },
   background: {
     noisy: 'var(--t-background-noisy)',
+    canvas: 'var(--t-background-canvas)',
     primary: 'var(--t-background-primary)',
     secondary: 'var(--t-background-secondary)',
     tertiary: 'var(--t-background-tertiary)',
@@ -199,6 +200,8 @@ export const themeCssVariables = {
     strong: 'var(--t-box-shadow-strong)',
     underline: 'var(--t-box-shadow-underline)',
     superHeavy: 'var(--t-box-shadow-super-heavy)',
+    focus: 'var(--t-box-shadow-focus)',
+    xs: 'var(--t-box-shadow-xs)',
   },
   font: {
     color: {
@@ -226,6 +229,8 @@ export const themeCssVariables = {
       semiBold: 'var(--t-font-weight-semi-bold)',
     },
     family: 'var(--t-font-family)',
+    familyDisplay: 'var(--t-font-family-display)',
+    familyMono: 'var(--t-font-family-mono)',
   },
   name: 'var(--t-name)',
   snackBar: {
@@ -1100,5 +1105,10 @@ export const themeCssVariables = {
       amber11: 'var(--t-color-transparent-amber11)',
       amber12: 'var(--t-color-transparent-amber12)',
     },
+  },
+  brand: {
+    warm: 'var(--t-brand-warm)',
+    warmRed: 'var(--t-brand-warm-red)',
+    red: 'var(--t-brand-red)',
   },
 };

@@ -1,3 +1,4 @@
+import { ROBOOST_TOKENS } from './roboost';
 import { ACCENT_TOKENS } from './accent';
 import { ANIMATION_TOKENS } from './animation';
 import { BACKGROUND_TOKENS } from './background';
@@ -48,4 +49,9 @@ export const DESIGN_TOKENS: DesignTokenNode = {
   IllustrationIcon: ILLUSTRATION_ICON_TOKENS,
   grayScale: GRAY_SCALE_TOKENS,
   color: COLOR_TOKENS,
+  brand: {
+    warm: token(ROBOOST_TOKENS.brand.warm),
+    warmRed: token(ROBOOST_TOKENS.brand.warmRed),
+    red: token(ROBOOST_TOKENS.brand.red),
+  },
 };

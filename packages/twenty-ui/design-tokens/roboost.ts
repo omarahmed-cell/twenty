@@ -1,0 +1,61 @@
+// Roboost CRM brand values (design hand-off tokens.json, 20 Nov 2026). The rest of the design tokens point here,
+// so a brand change is made in this file only. The app is light-only for now, so these are light values.
+export const ROBOOST_TOKENS = {
+  fonts: {
+    // Licensed brand fonts (Sharp Grotesk 20, Alliance No.2) can replace these two lines once their web licence is confirmed
+    sans: "Inter, system-ui, 'Helvetica Neue', Arial, sans-serif",
+    display: "'Space Grotesk', Inter, 'Helvetica Neue', Arial, sans-serif",
+    mono: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
+  },
+  neutrals: {
+    surface: '#ffffff',
+    surfaceSunken: '#f7f8fa',
+    canvas: '#f4f6f8',
+    surfaceHover: '#f0f2f5',
+    border: '#e3e7ed',
+    borderStrong: '#c3cad4',
+    borderSubtle: '#edeff3',
+    surfaceActive: '#e8ebf0',
+    textDisabled: '#9aa2b1',
+    textMuted: '#6b7483',
+    textSecondary: '#596273',
+    text: '#1a2230',
+  },
+  // Twelve steps like the other colour scales: 2 = accent-soft, 3 = accent-soft-hover, 5 = accent-border,
+  // 9 = accent, 10 = accent-hover, 11 = accent-text, 12 = accent-active
+  accent: {
+    accent1: '#fff6f8',
+    accent2: '#fdeaee',
+    accent3: '#fbdbe2',
+    accent4: '#f8cad5',
+    accent5: '#f3b7c3',
+    accent6: '#ee95a6',
+    accent7: '#e86b84',
+    accent8: '#e33d5d',
+    accent9: '#ea0029',
+    accent10: '#c80021',
+    accent11: '#c20022',
+    accent12: '#a8001c',
+  },
+  radius: {
+    xs: '3px',
+    sm: '5px',
+    md: '8px',
+    lg: '12px',
+    full: '999px',
+  },
+  shadow: {
+    xs: '0 1px 2px rgba(16, 24, 40, 0.06)',
+    sm: '0 1px 3px rgba(16, 24, 40, 0.09), 0 1px 2px rgba(16, 24, 40, 0.06)',
+    md: '0 6px 16px rgba(16, 24, 40, 0.12)',
+    lg: '0 16px 40px rgba(16, 24, 40, 0.18)',
+    focus: '0 0 0 2px #ffffff, 0 0 0 4px #ea0029',
+  },
+  overlay: 'rgba(16, 24, 40, 0.45)',
+  // Logo gradient only, never UI chrome
+  brand: {
+    warm: '#ff8300',
+    warmRed: '#ff4713',
+    red: '#ea0029',
+  },
+};

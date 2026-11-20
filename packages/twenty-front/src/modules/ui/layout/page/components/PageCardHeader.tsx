@@ -1,12 +1,9 @@
 import { APP_HEADER_HEIGHT } from '@/ui/layout/constants/AppHeaderHeight';
-import { useNavigationDrawerExpanded } from '@/ui/navigation/navigation-drawer/hooks/useNavigationDrawerExpanded';
 import { useWorkspaceSurface } from '@/ui/layout/hooks/useWorkspaceSurface';
 import { useWorkspaceSurfaceHeaderPortal } from '@/ui/layout/hooks/useWorkspaceSurfaceHeaderPortal';
 import { Breadcrumb } from '@/ui/navigation/bread-crumb/components/Breadcrumb';
 import { type BreadcrumbProps } from '@/ui/navigation/bread-crumb/types/BreadcrumbProps';
 import { PAGE_ACTION_CONTAINER_CLICK_OUTSIDE_ID } from '@/ui/layout/page/constants/PageActionContainerClickOutsideId';
-import { NavigationDrawerCollapseButton } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton';
-import { useIsMobile } from 'twenty-ui/utilities';
 import { styled } from '@linaria/react';
 import { type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -102,8 +99,6 @@ export const PageCardHeader = ({
   centerTitle = false,
   titleColor,
 }: PageCardHeaderProps) => {
-  const isMobile = useIsMobile();
-  const isNavigationDrawerExpanded = useNavigationDrawerExpanded();
   const workspaceSurface = useWorkspaceSurface();
   const workspaceSurfaceHeaderPortal = useWorkspaceSurfaceHeaderPortal();
 
@@ -154,9 +149,6 @@ export const PageCardHeader = ({
   return (
     <StyledHeader centerTitle={shouldCenterTitle}>
       <StyledLeft>
-        {!isMobile && !isNavigationDrawerExpanded && (
-          <NavigationDrawerCollapseButton direction="right" />
-        )}
         {isDefined(breadcrumb)
           ? breadcrumb
           : isDefined(links) && <Breadcrumb links={links} />}

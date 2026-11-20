@@ -11,7 +11,6 @@ import { useIsNavigationDrawerContentExpanded } from '@/ui/navigation/navigation
 import { useOpenRecordsSearchPageInSidePanel } from '@/side-panel/hooks/useOpenRecordsSearchPageInSidePanel';
 import { MultiWorkspaceDropdownButton } from '@/navigation/components/MultiWorkspaceDropdown/MultiWorkspaceDropdownButton';
 import { useIsMobile } from 'twenty-ui/utilities';
-import { NavigationDrawerCollapseButton } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerCollapseButton';
 
 const StyledContainer = styled.div`
   flex-shrink: 0;
@@ -63,22 +62,6 @@ const StyledRightActions = styled.div`
   margin-left: auto;
 `;
 
-const StyledNavigationDrawerCollapseButtonContainer = styled.div`
-  > * {
-    height: ${themeCssVariables.spacing[6]};
-    padding-right: 0;
-    width: ${themeCssVariables.spacing[6]};
-  }
-
-  @media (max-width: ${MOBILE_VIEWPORT}px) {
-    > * {
-      height: ${NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE}px;
-      padding-right: 0;
-      width: ${NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE}px;
-    }
-  }
-`;
-
 const StyledWorkspaceDropdownContainer = styled.div`
   display: flex;
   flex: 1 1 auto;
@@ -113,9 +96,6 @@ export const NavigationDrawerHeader = () => {
           <StyledRightActions>
             <FrontComponentMediaSessionIndicator />
             {searchButton}
-            <StyledNavigationDrawerCollapseButtonContainer>
-              <NavigationDrawerCollapseButton direction="left" />
-            </StyledNavigationDrawerCollapseButtonContainer>
           </StyledRightActions>
         )}
       </StyledHeaderRow>

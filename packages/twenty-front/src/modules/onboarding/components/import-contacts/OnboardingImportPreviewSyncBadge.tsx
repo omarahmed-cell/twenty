@@ -52,6 +52,7 @@ const StyledDivider = styled.div`
 const StyledTwentyLogo = styled.img`
   border-radius: ${themeCssVariables.border.radius.xs};
   height: ${SYNC_BADGE_LOGO_SIZE}px;
+  object-fit: contain;
   width: ${SYNC_BADGE_LOGO_SIZE}px;
 `;
 
@@ -69,7 +70,7 @@ export const OnboardingImportPreviewSyncBadge = () => {
           color={themeCssVariables.font.color.tertiary}
         />
       </StyledArrow>
-      <StyledTwentyLogo src="/images/integrations/twenty-logo.svg" alt="" />
+      <StyledTwentyLogo src="/roboost-mark.svg" alt="" />
     </StyledBadge>
   );
 };

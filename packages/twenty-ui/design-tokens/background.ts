@@ -1,3 +1,4 @@
+import { ROBOOST_TOKENS } from './roboost';
 import { COLOR_TOKENS } from './color';
 import { GRAY_SCALE_TOKENS } from './grayScale';
 import { token } from './token';
@@ -10,6 +11,7 @@ export const BACKGROUND_TOKENS = {
     },
     { jsValue: 'cssVariable' },
   ),
+  canvas: token(ROBOOST_TOKENS.neutrals.canvas),
   primary: GRAY_SCALE_TOKENS.gray1,
   secondary: GRAY_SCALE_TOKENS.gray2,
   tertiary: GRAY_SCALE_TOKENS.gray4,
@@ -40,8 +42,8 @@ export const BACKGROUND_TOKENS = {
     dark: '#000000b8',
   }),
   overlaySecondary: token({
-    light: 'color(display-p3 0 0 0 / 0.361)',
-    dark: '#0000005c',
+    light: ROBOOST_TOKENS.overlay,
+    dark: 'color(display-p3 0 0 0 / 0.361)',
   }),
   overlayTertiary: token({
     light: 'color(display-p3 0 0 0 / 0.071)',

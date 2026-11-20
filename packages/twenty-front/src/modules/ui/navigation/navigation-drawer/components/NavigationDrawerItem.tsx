@@ -49,9 +49,11 @@ type StyledItemProps = Pick<
 const StyledItem = styled.button<StyledItemProps>`
   align-items: center;
   background: ${({ active, variant }) =>
-    active || variant === 'placeholder'
-      ? themeCssVariables.background.transparent.light
-      : 'transparent'};
+    active
+      ? themeCssVariables.accent.accent2
+      : variant === 'placeholder'
+        ? themeCssVariables.background.transparent.light
+        : 'transparent'};
   border: ${({ isSelectedInEditMode }) =>
     isSelectedInEditMode
       ? `1px solid ${themeCssVariables.color.blue}`
@@ -66,7 +68,7 @@ const StyledItem = styled.button<StyledItemProps>`
       return themeCssVariables.font.color.tertiary;
     }
     if (active === true) {
-      return themeCssVariables.font.color.primary;
+      return themeCssVariables.accent.accent11;
     }
     if (isSoon) {
       return themeCssVariables.font.color.light;
@@ -89,7 +91,7 @@ const StyledItem = styled.button<StyledItemProps>`
   padding-left: ${({ isNavigationDrawerExpanded }) =>
     isNavigationDrawerExpanded
       ? themeCssVariables.spacing[1]
-      : `calc(${themeCssVariables.spacing[2]} - 1px)`};
+      : `${(NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE - 16) / 2 - 1}px`};
   padding-right: ${({ hasRightOptions, isNavigationDrawerExpanded }) =>
     hasRightOptions && isNavigationDrawerExpanded
       ? themeCssVariables.spacing['0.5']
@@ -105,11 +107,16 @@ const StyledItem = styled.button<StyledItemProps>`
       : `calc(100% - ${themeCssVariables.spacing['1.5']} + ${themeCssVariables.spacing[1]} + ${hasRightOptions ? themeCssVariables.spacing['0.5'] : themeCssVariables.spacing[1]})`};
 
   &:hover {
-    background: ${themeCssVariables.background.transparent.light};
-    color: ${({ variant }) =>
-      variant === 'tertiary'
-        ? themeCssVariables.font.color.tertiary
-        : themeCssVariables.font.color.primary};
+    background: ${({ active }) =>
+      active
+        ? themeCssVariables.accent.accent3
+        : themeCssVariables.background.transparent.light};
+    color: ${({ active, variant }) =>
+      active
+        ? themeCssVariables.accent.accent11
+        : variant === 'tertiary'
+          ? themeCssVariables.font.color.tertiary
+          : themeCssVariables.font.color.primary};
   }
 
   @media (max-width: ${MOBILE_VIEWPORT}px) {
@@ -123,10 +130,11 @@ const StyledItemElementsContainer = styled.div`
   width: 100%;
 `;
 
-const StyledLabelParent = styled.div`
+const StyledLabelParent = styled.div<{ isNavigationDrawerExpanded: boolean }>`
   align-items: center;
   display: flex;
-  flex: 1 1 auto;
+  flex: ${({ isNavigationDrawerExpanded }) =>
+    isNavigationDrawerExpanded ? '1 1 auto' : '0 0 0'};
   min-width: 0px;
   overflow: hidden;
   text-overflow: clip;
@@ -281,7 +289,7 @@ export const NavigationDrawerItem = ({
       <Tooltip
         content={label}
         side="right"
-        delay={TooltipDelay.noDelay}
+        delay={TooltipDelay.mediumDelay}
         positionMethod="fixed"
         disabled={isExpanded || isMobile}
       >
@@ -358,7 +366,7 @@ export const NavigationDrawerItem = ({
               )
             )}
 
-            <StyledLabelParent>
+            <StyledLabelParent isNavigationDrawerExpanded={isExpanded}>
               {editingContent?.label ?? (
                 <OverflowingTextWithTooltip
                   text={

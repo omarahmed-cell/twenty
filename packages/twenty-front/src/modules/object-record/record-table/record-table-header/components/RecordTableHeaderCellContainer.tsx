@@ -7,7 +7,7 @@ const StyledHeaderCell = styled.div<{
   isResizing: boolean;
   isReadOnly: boolean;
 }>`
-  background-color: ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.secondary};
   border-bottom: ${({ shouldDisplayBorderBottom }) =>
     shouldDisplayBorderBottom
       ? `1px solid ${themeCssVariables.border.color.light}`
@@ -18,7 +18,10 @@ const StyledHeaderCell = styled.div<{
 
   cursor: ${({ isResizing, isReadOnly }) =>
     isReadOnly ? 'default' : isResizing ? 'col-resize' : 'pointer'};
+  font-size: 11px;
+  font-weight: ${themeCssVariables.font.weight.semiBold};
   height: ${RECORD_TABLE_ROW_HEIGHT}px;
+  letter-spacing: 0.06em;
 
   max-height: ${RECORD_TABLE_ROW_HEIGHT}px;
   padding: 0;
@@ -26,20 +29,21 @@ const StyledHeaderCell = styled.div<{
   position: relative;
 
   text-align: left;
+  text-transform: uppercase;
 
   @media (hover: hover) {
     &:hover {
       background: ${({ isResizing, isReadOnly }) =>
         isReadOnly || isResizing
-          ? themeCssVariables.background.primary
-          : themeCssVariables.background.secondary};
+          ? themeCssVariables.background.secondary
+          : themeCssVariables.background.tertiary};
     }
   }
 
   &:active {
     background: ${({ isResizing, isReadOnly }) =>
       isReadOnly || isResizing
-        ? themeCssVariables.background.primary
+        ? themeCssVariables.background.secondary
         : themeCssVariables.background.tertiary};
   }
 

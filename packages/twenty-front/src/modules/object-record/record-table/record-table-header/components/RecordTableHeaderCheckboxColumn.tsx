@@ -19,7 +19,7 @@ import { Checkbox } from 'twenty-ui/primitives/input';
 
 const StyledContainer = styled.div`
   align-items: center;
-  background-color: ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.secondary};
   border-bottom: 1px solid ${themeCssVariables.border.color.light};
   display: flex;
   height: ${RECORD_TABLE_ROW_HEIGHT}px;
@@ -29,7 +29,7 @@ const StyledContainer = styled.div`
 `;
 
 const StyledColumnHeaderCell = styled.div`
-  background-color: ${themeCssVariables.background.primary};
+  background-color: ${themeCssVariables.background.secondary};
 
   cursor: pointer;
 

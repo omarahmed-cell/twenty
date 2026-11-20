@@ -24,6 +24,7 @@
   }
 
   &[data-active]::after {
-    background: var(--t-border-color-inverted);
+    background: var(--t-accent-accent9);
+    block-size: 2px;
   }
 }
