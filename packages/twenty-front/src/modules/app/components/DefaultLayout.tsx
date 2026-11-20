@@ -8,6 +8,12 @@ import { KeyboardShortcutMenu } from '@/keyboard-shortcut-menu/components/Keyboa
 import { LayoutCustomizationBar } from '@/layout-customization/components/LayoutCustomizationBar';
 import { MobileNavigationBar } from '@/navigation/components/MobileNavigationBar';
 import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/providers/PageDragDropProvider';
+import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
+import { RoboostAppSideNav } from '@/roboost-app/components/RoboostAppSideNav';
+import { RoboostTopBar } from '@/roboost-app/components/RoboostTopBar';
+import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
+import { AppShell } from '@/roboost-ui/components/AppShell';
+import { useShowFullscreen } from '@/ui/layout/fullscreen/hooks/useShowFullscreen';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { styled } from '@linaria/react';
 import { Outlet } from 'react-router-dom';
@@ -64,6 +70,13 @@ const StyledMainContainer = styled.div`
 
 export const DefaultLayout = () => {
   const isMobile = useIsMobile();
+  const isRoboostUiEnabled = useIsRoboostUiEnabled();
+  const isSettingsPage = useIsSettingsPage();
+  const showFullscreen = useShowFullscreen();
+
+  // Settings keeps the old frame because its sub-navigation lives in the old drawer
+  const isRoboostShellShown =
+    isRoboostUiEnabled && !isMobile && !isSettingsPage && !showFullscreen;
 
   return (
     <>
@@ -75,12 +88,27 @@ export const DefaultLayout = () => {
             <StyledPageContainer>
               <PageDragDropProvider>
                 <KeyboardShortcutMenu />
-                <DefaultLayoutNavigationDrawer />
-                <StyledMainContainer>
-                  <AppErrorBoundary FallbackComponent={AppPageErrorFallback}>
-                    <Outlet />
-                  </AppErrorBoundary>
-                </StyledMainContainer>
+                {isRoboostShellShown ? (
+                  <AppShell
+                    topbar={<RoboostTopBar />}
+                    nav={<RoboostAppSideNav />}
+                  >
+                    <AppErrorBoundary FallbackComponent={AppPageErrorFallback}>
+                      <Outlet />
+                    </AppErrorBoundary>
+                  </AppShell>
+                ) : (
+                  <>
+                    <DefaultLayoutNavigationDrawer />
+                    <StyledMainContainer>
+                      <AppErrorBoundary
+                        FallbackComponent={AppPageErrorFallback}
+                      >
+                        <Outlet />
+                      </AppErrorBoundary>
+                    </StyledMainContainer>
+                  </>
+                )}
               </PageDragDropProvider>
             </StyledPageContainer>
             {isMobile && <MobileNavigationBar />}

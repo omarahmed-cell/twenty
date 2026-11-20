@@ -8,6 +8,7 @@ let mockCurrentObjectMetadataItemId = 'person-object-metadata-id';
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ objectNamePlural: mockObjectNamePlural }),
+  useSearchParams: () => [new URLSearchParams()],
 }));
 
 jest.mock(

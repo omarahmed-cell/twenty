@@ -1,4 +1,5 @@
 import { ROBOOST_TOKENS } from './roboost';
+import { ROBOOST_UI_TOKENS } from './roboostUi';
 import { ACCENT_TOKENS } from './accent';
 import { ANIMATION_TOKENS } from './animation';
 import { BACKGROUND_TOKENS } from './background';
@@ -54,4 +55,5 @@ export const DESIGN_TOKENS: DesignTokenNode = {
     warmRed: token(ROBOOST_TOKENS.brand.warmRed),
     red: token(ROBOOST_TOKENS.brand.red),
   },
+  rb: ROBOOST_UI_TOKENS,
 };

@@ -52,6 +52,32 @@ export const ROBOOST_TOKENS = {
     focus: '0 0 0 2px #ffffff, 0 0 0 4px #ea0029',
   },
   overlay: 'rgba(16, 24, 40, 0.45)',
+  // Status families: solid mark, dark text tone, soft background, border
+  status: {
+    success: '#0e9a63',
+    successText: '#077d4e',
+    successSoft: '#e4f4ec',
+    successBorder: '#a6ddc2',
+    warning: '#e8930c',
+    warningText: '#975a00',
+    warningSoft: '#fdefd6',
+    warningBorder: '#f4d194',
+    danger: '#d92d20',
+    dangerText: '#b42318',
+    dangerSoft: '#fde7e4',
+    dangerBorder: '#f4b3ab',
+    info: '#1570ef',
+    infoText: '#175cd3',
+    infoSoft: '#e5f0fe',
+    infoBorder: '#aed1fa',
+  },
+  avatar: {
+    background: '#eef1f5',
+    foreground: '#475467',
+  },
+  controlHoverBorder: '#aab2bf',
+  textOnAccent: '#ffffff',
+  tooltipBackground: '#1a2230',
   // Logo gradient only, never UI chrome
   brand: {
     warm: '#ff8300',

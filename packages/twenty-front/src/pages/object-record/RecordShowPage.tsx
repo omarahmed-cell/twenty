@@ -1,7 +1,9 @@
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 
+import { RoboostCompanyRecordPage } from '@/roboost-app/components/RoboostCompanyRecordPage';
+import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { WorkspaceRouteUnavailable } from '@/ui/layout/page/components/WorkspaceRouteUnavailable';
 import { findCoreObjectShowPage } from '@/object-core/utils/findCoreObjectShowPage';
 import { isWorkspaceWorkflowVersionRouteHidden } from '@/object-core/workflows/utils/isWorkspaceWorkflowVersionRouteHidden';
@@ -17,6 +19,8 @@ export const RecordShowPage = () => {
   const parameters = useParams<RecordShowPageParameters>();
   const workspaceSurface = useWorkspaceSurface();
   const { objectMetadataItems } = useObjectMetadataItems();
+  const [searchParams] = useSearchParams();
+  const isRoboostUiEnabled = useIsRoboostUiEnabled();
 
   const isInSidePanel = workspaceSurface.type === 'side-panel';
   const isRouteObjectMetadataAvailable =
@@ -28,6 +32,22 @@ export const RecordShowPage = () => {
 
   if (isInSidePanel && !isRouteObjectMetadataAvailable) {
     return <WorkspaceRouteUnavailable />;
+  }
+
+  if (
+    isRoboostUiEnabled &&
+    !isInSidePanel &&
+    isRouteObjectMetadataAvailable &&
+    parameters.objectNameSingular === CoreObjectNameSingular.Company &&
+    isDefined(parameters.objectRecordId) &&
+    searchParams.get('view') !== 'classic'
+  ) {
+    return (
+      <RoboostCompanyRecordPage
+        key={parameters.objectRecordId}
+        companyId={parameters.objectRecordId}
+      />
+    );
   }
 
   if (

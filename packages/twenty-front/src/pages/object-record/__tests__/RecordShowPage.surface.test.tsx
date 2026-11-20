@@ -20,6 +20,7 @@ let mockRecordResource: {
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => mockParameters,
+  useSearchParams: () => [new URLSearchParams()],
   Navigate: ({ to }: { to: string }) => <div data-testid="navigate">{to}</div>,
 }));
 

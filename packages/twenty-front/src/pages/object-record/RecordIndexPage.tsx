@@ -10,8 +10,10 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { isUndefined } from '@sniptt/guards';
+import { RoboostCompaniesListPage } from '@/roboost-app/components/RoboostCompaniesListPage';
+import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { lazy, Suspense } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 
 const WorkflowCoreIndexPage = lazy(() =>
@@ -23,6 +25,8 @@ const WorkflowCoreIndexPage = lazy(() =>
 export const RecordIndexPage = () => {
   const workspaceSurface = useWorkspaceSurface();
   const { objectNamePlural } = useParams<{ objectNamePlural: string }>();
+  const [searchParams] = useSearchParams();
+  const isRoboostUiEnabled = useIsRoboostUiEnabled();
 
   const contextStoreCurrentObjectMetadataItemId = useAtomComponentStateValue(
     contextStoreCurrentObjectMetadataItemIdComponentState,
@@ -37,6 +41,16 @@ export const RecordIndexPage = () => {
   const routeObjectMetadataItem = objectMetadataItems.find(
     (objectMetadataItem) => objectMetadataItem.namePlural === objectNamePlural,
   );
+
+  if (
+    isRoboostUiEnabled &&
+    workspaceSurface.type === 'main' &&
+    objectNamePlural === 'companies' &&
+    searchParams.get('view') !== 'classic' &&
+    !isUndefined(routeObjectMetadataItem)
+  ) {
+    return <RoboostCompaniesListPage />;
+  }
 
   if (
     workspaceSurface.type === 'side-panel' &&

@@ -1023,6 +1023,64 @@
     --t-brand-warm: #ff8300;
     --t-brand-warm-red: #ff4713;
     --t-brand-red: #ea0029;
+    --t-rb-canvas: #f4f6f8;
+    --t-rb-surface: #ffffff;
+    --t-rb-surface-sunken: #f7f8fa;
+    --t-rb-surface-hover: #f0f2f5;
+    --t-rb-surface-active: #e8ebf0;
+    --t-rb-surface-nav-active: #fdeaee;
+    --t-rb-overlay: rgba(16, 24, 40, 0.45);
+    --t-rb-border: #e3e7ed;
+    --t-rb-border-strong: #c3cad4;
+    --t-rb-border-subtle: #edeff3;
+    --t-rb-control-hover-border: #aab2bf;
+    --t-rb-text: #1a2230;
+    --t-rb-text-secondary: #596273;
+    --t-rb-text-muted: #6b7483;
+    --t-rb-text-disabled: #9aa2b1;
+    --t-rb-text-on-accent: #ffffff;
+    --t-rb-accent: #ea0029;
+    --t-rb-accent-hover: #c80021;
+    --t-rb-accent-active: #a8001c;
+    --t-rb-accent-text: #c20022;
+    --t-rb-accent-soft: #fdeaee;
+    --t-rb-accent-soft-hover: #fbdbe2;
+    --t-rb-accent-border: #f3b7c3;
+    --t-rb-success: #0e9a63;
+    --t-rb-success-text: #077d4e;
+    --t-rb-success-soft: #e4f4ec;
+    --t-rb-success-border: #a6ddc2;
+    --t-rb-warning: #e8930c;
+    --t-rb-warning-text: #975a00;
+    --t-rb-warning-soft: #fdefd6;
+    --t-rb-warning-border: #f4d194;
+    --t-rb-danger: #d92d20;
+    --t-rb-danger-text: #b42318;
+    --t-rb-danger-soft: #fde7e4;
+    --t-rb-danger-border: #f4b3ab;
+    --t-rb-info: #1570ef;
+    --t-rb-info-text: #175cd3;
+    --t-rb-info-soft: #e5f0fe;
+    --t-rb-info-border: #aed1fa;
+    --t-rb-avatar-background: #eef1f5;
+    --t-rb-avatar-foreground: #475467;
+    --t-rb-tooltip-background: #1a2230;
+    --t-rb-radius-xs: 3px;
+    --t-rb-radius-sm: 5px;
+    --t-rb-radius-md: 8px;
+    --t-rb-radius-lg: 12px;
+    --t-rb-radius-full: 999px;
+    --t-rb-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --t-rb-shadow-sm:
+      0 1px 3px rgba(16, 24, 40, 0.09), 0 1px 2px rgba(16, 24, 40, 0.06);
+    --t-rb-shadow-md: 0 6px 16px rgba(16, 24, 40, 0.12);
+    --t-rb-shadow-lg: 0 16px 40px rgba(16, 24, 40, 0.18);
+    --t-rb-shadow-focus: 0 0 0 2px #ffffff, 0 0 0 4px #ea0029;
+    --t-rb-font-sans: Inter, system-ui, 'Helvetica Neue', Arial, sans-serif;
+    --t-rb-font-display:
+      'Space Grotesk', Inter, 'Helvetica Neue', Arial, sans-serif;
+    --t-rb-font-mono:
+      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   }
 
   /* Squircle corners: progressive enhancement for browsers supporting

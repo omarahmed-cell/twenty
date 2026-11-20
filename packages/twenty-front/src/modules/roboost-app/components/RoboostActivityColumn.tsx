@@ -1,0 +1,506 @@
+import { RoboostFeedItemView } from '@/roboost-app/components/RoboostFeedItemView';
+import {
+  type RoboostFeedItem,
+  type RoboostFeedKind,
+} from '@/roboost-app/types/RoboostFeedItem';
+import { type RoboostDateRange } from '@/roboost-app/types/RoboostCompanyListFilters';
+import { FilterChip } from '@/roboost-ui/components/FilterChip';
+import { Input } from '@/roboost-ui/components/Input';
+import { Tabs } from '@/roboost-ui/components/Tabs';
+import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
+import { styled } from '@linaria/react';
+import { useLingui } from '@lingui/react/macro';
+import { Fragment, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+export type RoboostRecordMainTab = 'overview' | 'activities' | 'intelligence';
+export type RoboostActivitySubTab =
+  | 'all'
+  | 'notes'
+  | 'emails'
+  | 'calls'
+  | 'tasks'
+  | 'meetings';
+
+const KINDS_BY_SUB_TAB: Record<
+  RoboostActivitySubTab,
+  RoboostFeedKind[] | null
+> = {
+  all: null,
+  notes: ['note'],
+  emails: ['email', 'tracking'],
+  calls: ['call'],
+  tasks: ['task'],
+  meetings: ['meeting'],
+};
+
+const DAYS_BY_RANGE: Record<Exclude<RoboostDateRange, 'any'>, number> = {
+  last7: 7,
+  last30: 30,
+  last90: 90,
+  last365: 365,
+};
+
+const OVERVIEW_ITEM_COUNT = 5;
+
+const StyledColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+`;
+
+const StyledTabsRow = styled.div`
+  align-items: flex-end;
+  border-bottom: 1px solid ${ROBOOST_UI_THEME.border};
+  display: flex;
+  gap: 12px;
+`;
+
+const StyledTabsSlot = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const StyledCustomize = styled(Link)`
+  color: ${ROBOOST_UI_THEME.accentText};
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+  padding-bottom: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+`;
+
+const StyledSubTabs = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+`;
+
+const StyledSubTab = styled.button`
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: ${ROBOOST_UI_THEME.radiusFull};
+  color: ${ROBOOST_UI_THEME.textSecondary};
+  cursor: pointer;
+  font-family: ${ROBOOST_UI_THEME.fontSans};
+  font-size: 13px;
+  font-weight: 500;
+  height: 28px;
+  line-height: 16px;
+  padding: 0 10px;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${ROBOOST_UI_THEME.surfaceHover};
+    color: ${ROBOOST_UI_THEME.text};
+  }
+
+  &[aria-current='true'] {
+    background: ${ROBOOST_UI_THEME.accentSoft};
+    color: ${ROBOOST_UI_THEME.accentText};
+  }
+`;
+
+const StyledTools = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+const StyledSearch = styled.div`
+  width: 220px;
+`;
+
+const StyledChipButton = styled.button`
+  align-items: center;
+  background: ${ROBOOST_UI_THEME.surface};
+  border: 1px solid ${ROBOOST_UI_THEME.borderStrong};
+  border-radius: ${ROBOOST_UI_THEME.radiusSm};
+  color: ${ROBOOST_UI_THEME.textSecondary};
+  cursor: pointer;
+  display: inline-flex;
+  font-family: ${ROBOOST_UI_THEME.fontSans};
+  font-size: 12px;
+  font-weight: 500;
+  height: 28px;
+  padding: 0 10px;
+
+  &:hover {
+    background: ${ROBOOST_UI_THEME.surfaceHover};
+    color: ${ROBOOST_UI_THEME.text};
+  }
+`;
+
+const StyledChips = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+const StyledClearAll = styled.button`
+  background: none;
+  border: none;
+  color: ${ROBOOST_UI_THEME.accentText};
+  cursor: pointer;
+  font-family: ${ROBOOST_UI_THEME.fontSans};
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+const StyledMonth = styled.p`
+  color: ${ROBOOST_UI_THEME.textMuted};
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 14px;
+  margin: 0;
+  text-transform: uppercase;
+`;
+
+const StyledFeed = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+`;
+
+const StyledEmpty = styled.div`
+  background: ${ROBOOST_UI_THEME.surface};
+  border: 1px dashed ${ROBOOST_UI_THEME.borderStrong};
+  border-radius: ${ROBOOST_UI_THEME.radiusMd};
+  color: ${ROBOOST_UI_THEME.textMuted};
+  font-size: 13px;
+  line-height: 18px;
+  padding: 24px;
+  text-align: center;
+`;
+
+const StyledSectionTitle = styled.h3`
+  color: ${ROBOOST_UI_THEME.text};
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+`;
+
+const MONTH_FORMAT = new Intl.DateTimeFormat('en-GB', {
+  month: 'long',
+  year: 'numeric',
+});
+
+const getMonthLabel = (date: string) => {
+  const parsed = new Date(date);
+
+  return Number.isNaN(parsed.getTime()) ? '' : MONTH_FORMAT.format(parsed);
+};
+
+type RoboostActivityColumnProps = {
+  items: RoboostFeedItem[];
+  loading: boolean;
+  mainTab: RoboostRecordMainTab;
+  onMainTabChange: (tab: RoboostRecordMainTab) => void;
+  subTab: RoboostActivitySubTab;
+  onSubTabChange: (tab: RoboostActivitySubTab) => void;
+  customizePath: string;
+  members: { id: string; name: string }[];
+};
+
+export const RoboostActivityColumn = ({
+  items,
+  loading,
+  mainTab,
+  onMainTabChange,
+  subTab,
+  onSubTabChange,
+  customizePath,
+  members,
+}: RoboostActivityColumnProps) => {
+  const { t } = useLingui();
+  const [search, setSearch] = useState('');
+  const [kinds, setKinds] = useState<RoboostFeedKind[]>([]);
+  const [dateRange, setDateRange] = useState<RoboostDateRange>('any');
+  const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [showTracking, setShowTracking] = useState(true);
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
+
+  const kindLabels: Record<RoboostFeedKind, string> = {
+    email: t`Emails`,
+    tracking: t`Email tracking`,
+    note: t`Notes`,
+    task: t`Tasks`,
+    call: t`Calls`,
+    meeting: t`Meetings`,
+  };
+
+  const dateRangeLabels: Record<RoboostDateRange, string> = {
+    any: t`Any time`,
+    last7: t`Last 7 days`,
+    last30: t`Last 30 days`,
+    last90: t`Last 90 days`,
+    last365: t`Last 12 months`,
+  };
+
+  const subTabs: { id: RoboostActivitySubTab; label: string }[] = [
+    { id: 'all', label: t`All activities` },
+    { id: 'notes', label: t`Notes` },
+    { id: 'emails', label: t`Emails` },
+    { id: 'calls', label: t`Calls` },
+    { id: 'tasks', label: t`Tasks` },
+    { id: 'meetings', label: t`Meetings` },
+  ];
+
+  const now = Date.now();
+  const normalizedSearch = search.trim().toLowerCase();
+  const subTabKinds = KINDS_BY_SUB_TAB[subTab];
+
+  const visibleItems = items.filter((item) => {
+    if (subTabKinds !== null && !subTabKinds.includes(item.kind)) {
+      return false;
+    }
+    if (kinds.length > 0 && !kinds.includes(item.kind)) {
+      return false;
+    }
+    if (!showTracking && item.kind === 'tracking') {
+      return false;
+    }
+    if (ownerId !== null && item.ownerId !== ownerId) {
+      return false;
+    }
+    if (dateRange !== 'any') {
+      const itemTime = new Date(item.date).getTime();
+
+      if (itemTime < now - DAYS_BY_RANGE[dateRange] * 24 * 60 * 60 * 1000) {
+        return false;
+      }
+    }
+
+    return (
+      normalizedSearch === '' ||
+      `${item.title} ${item.body} ${item.ownerName}`
+        .toLowerCase()
+        .includes(normalizedSearch)
+    );
+  });
+
+  const expandableIds = visibleItems
+    .filter((item) => item.kind === 'email')
+    .map((item) => item.id);
+  const isAnyExpanded = expandableIds.some((id) => expandedIds.includes(id));
+  const hasFilters =
+    kinds.length > 0 ||
+    dateRange !== 'any' ||
+    ownerId !== null ||
+    !showTracking;
+
+  const renderFeed = (feedItems: RoboostFeedItem[]) => {
+    let previousMonth = '';
+
+    return (
+      <StyledFeed>
+        {feedItems.map((item) => {
+          const month = getMonthLabel(item.date);
+          const showMonth = month !== previousMonth;
+
+          previousMonth = month;
+
+          return (
+            <Fragment key={item.id}>
+              {showMonth && <StyledMonth>{month}</StyledMonth>}
+              <RoboostFeedItemView
+                item={item}
+                isExpanded={expandedIds.includes(item.id)}
+                onToggleExpanded={(expanded) =>
+                  setExpandedIds(
+                    expanded
+                      ? [...expandedIds, item.id]
+                      : expandedIds.filter((id) => id !== item.id),
+                  )
+                }
+              />
+            </Fragment>
+          );
+        })}
+      </StyledFeed>
+    );
+  };
+
+  const openTasks = items.filter(
+    (item) => item.kind === 'task' && item.status !== 'DONE',
+  );
+
+  return (
+    <StyledColumn>
+      <StyledTabsRow>
+        <StyledTabsSlot>
+          <Tabs
+            hasBorder={false}
+            tabs={[
+              { id: 'overview', label: t`Overview` },
+              { id: 'activities', label: t`Activities`, count: items.length },
+              { id: 'intelligence', label: t`Intelligence` },
+            ]}
+            value={mainTab}
+            onChange={(id) => onMainTabChange(id as RoboostRecordMainTab)}
+          />
+        </StyledTabsSlot>
+        <StyledCustomize to={customizePath}>{t`Customize`}</StyledCustomize>
+      </StyledTabsRow>
+
+      {mainTab === 'intelligence' && (
+        <StyledEmpty>
+          {t`Intelligence for this company will appear here once account insights are connected.`}
+        </StyledEmpty>
+      )}
+
+      {mainTab === 'overview' && (
+        <>
+          <StyledSectionTitle>{t`Open tasks`}</StyledSectionTitle>
+          {openTasks.length > 0 ? (
+            renderFeed(openTasks)
+          ) : (
+            <StyledEmpty>{t`No open tasks.`}</StyledEmpty>
+          )}
+          <StyledSectionTitle>{t`Latest activity`}</StyledSectionTitle>
+          {items.length > 0 ? (
+            renderFeed(items.slice(0, OVERVIEW_ITEM_COUNT))
+          ) : (
+            <StyledEmpty>
+              {loading ? t`Loading activity…` : t`No activity yet.`}
+            </StyledEmpty>
+          )}
+        </>
+      )}
+
+      {mainTab === 'activities' && (
+        <>
+          <StyledSubTabs>
+            {subTabs.map((tab) => (
+              <StyledSubTab
+                key={tab.id}
+                type="button"
+                aria-current={tab.id === subTab ? 'true' : undefined}
+                onClick={() => onSubTabChange(tab.id)}
+              >
+                {tab.label}
+              </StyledSubTab>
+            ))}
+          </StyledSubTabs>
+          <StyledTools>
+            <StyledSearch>
+              <Input
+                icon="search"
+                size="sm"
+                placeholder={t`Search activities`}
+                aria-label={t`Search activities`}
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </StyledSearch>
+            <StyledChipButton
+              type="button"
+              onClick={() => setExpandedIds(isAnyExpanded ? [] : expandableIds)}
+            >
+              {isAnyExpanded ? t`Collapse all` : t`Expand all`}
+            </StyledChipButton>
+          </StyledTools>
+          <StyledChips>
+            <FilterChip
+              label={t`Activity`}
+              value={
+                kinds.length === 0
+                  ? undefined
+                  : kinds.map((kind) => kindLabels[kind]).join(', ')
+              }
+              isActive={kinds.length > 0}
+              keepOpenOnSelect
+              entries={(Object.keys(kindLabels) as RoboostFeedKind[]).map(
+                (kind) => ({
+                  id: kind,
+                  label: kindLabels[kind],
+                  isSelected: kinds.includes(kind),
+                  onSelect: () =>
+                    setKinds(
+                      kinds.includes(kind)
+                        ? kinds.filter((selected) => selected !== kind)
+                        : [...kinds, kind],
+                    ),
+                }),
+              )}
+            />
+            <FilterChip
+              label={t`Activity date`}
+              value={
+                dateRange === 'any' ? undefined : dateRangeLabels[dateRange]
+              }
+              isActive={dateRange !== 'any'}
+              entries={(Object.keys(dateRangeLabels) as RoboostDateRange[]).map(
+                (range) => ({
+                  id: range,
+                  label: dateRangeLabels[range],
+                  isSelected: range === dateRange,
+                  onSelect: () => setDateRange(range),
+                }),
+              )}
+            />
+            <FilterChip
+              label={t`Activity assigned to`}
+              value={members.find((member) => member.id === ownerId)?.name}
+              isActive={ownerId !== null}
+              entries={[
+                {
+                  id: 'anyone',
+                  label: t`Anyone`,
+                  isSelected: ownerId === null,
+                  onSelect: () => setOwnerId(null),
+                },
+                ...members.map((member) => ({
+                  id: member.id,
+                  label: member.name,
+                  isSelected: member.id === ownerId,
+                  onSelect: () => setOwnerId(member.id),
+                })),
+              ]}
+            />
+            <FilterChip
+              label={t`More`}
+              isActive={!showTracking}
+              entries={[
+                {
+                  id: 'tracking',
+                  label: t`Show email tracking`,
+                  isSelected: showTracking,
+                  onSelect: () => setShowTracking(!showTracking),
+                },
+              ]}
+            />
+            {hasFilters && (
+              <StyledClearAll
+                type="button"
+                onClick={() => {
+                  setKinds([]);
+                  setDateRange('any');
+                  setOwnerId(null);
+                  setShowTracking(true);
+                }}
+              >
+                {t`Clear all`}
+              </StyledClearAll>
+            )}
+          </StyledChips>
+          {visibleItems.length > 0 ? (
+            renderFeed(visibleItems)
+          ) : (
+            <StyledEmpty>
+              {loading
+                ? t`Loading activity…`
+                : t`No activity matches. Try another tab or clear the filters.`}
+            </StyledEmpty>
+          )}
+        </>
+      )}
+    </StyledColumn>
+  );
+};
