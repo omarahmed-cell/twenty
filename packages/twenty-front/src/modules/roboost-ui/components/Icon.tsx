@@ -1,15 +1,7 @@
 import { ROBOOST_FILLED_ICON_PATHS } from '@/roboost-ui/constants/RoboostFilledIconPaths';
 import { ROBOOST_ICON_PATHS } from '@/roboost-ui/constants/RoboostIconPaths';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
-import { styled } from '@linaria/react';
-
-const StyledSvg = styled.svg<{ size: number }>`
-  display: inline-block;
-  flex: none;
-  height: ${({ size }) => `${size}px`};
-  vertical-align: middle;
-  width: ${({ size }) => `${size}px`};
-`;
+import { cx } from '@/roboost-ui/utils/cx';
 
 export type IconProps = {
   name: RoboostIconName;
@@ -24,31 +16,36 @@ export const Icon = ({
   className,
   strokeWidth = 1.75,
 }: IconProps) => {
-  if (name === 'more') {
+  const style = { width: size, height: size };
+
+  if (name === 'more' || name === 'more-vertical') {
+    const isVertical = name === 'more-vertical';
+
     return (
-      <StyledSvg
-        className={className}
-        size={size}
+      <svg
+        className={cx('rb-icon', className)}
+        style={{ ...style, fill: 'currentColor', stroke: 'none' }}
         viewBox="0 0 24 24"
-        fill="currentColor"
-        stroke="none"
         aria-hidden
       >
-        <circle cx={5} cy={12} r={1.6} />
-        <circle cx={12} cy={12} r={1.6} />
-        <circle cx={19} cy={12} r={1.6} />
-      </StyledSvg>
+        {[5, 12, 19].map((position) => (
+          <circle
+            key={position}
+            cx={isVertical ? 12 : position}
+            cy={isVertical ? position : 12}
+            r={1.6}
+          />
+        ))}
+      </svg>
     );
   }
 
   if (name in ROBOOST_FILLED_ICON_PATHS) {
     return (
-      <StyledSvg
-        className={className}
-        size={size}
+      <svg
+        className={cx('rb-icon', className)}
+        style={{ ...style, fill: 'currentColor', stroke: 'none' }}
         viewBox="0 0 24 24"
-        fill="currentColor"
-        stroke="none"
         aria-hidden
       >
         <path
@@ -58,7 +55,7 @@ export const Icon = ({
             ]
           }
         />
-      </StyledSvg>
+      </svg>
     );
   }
 
@@ -66,9 +63,9 @@ export const Icon = ({
     ROBOOST_ICON_PATHS[name as keyof typeof ROBOOST_ICON_PATHS] ?? [];
 
   return (
-    <StyledSvg
-      className={className}
-      size={size}
+    <svg
+      className={cx('rb-icon', className)}
+      style={style}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -80,6 +77,6 @@ export const Icon = ({
       {paths.map((path) => (
         <path key={path} d={path} />
       ))}
-    </StyledSvg>
+    </svg>
   );
 };

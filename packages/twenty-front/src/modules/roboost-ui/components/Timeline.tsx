@@ -1,13 +1,8 @@
-import { styled } from '@linaria/react';
+import { cx } from '@/roboost-ui/utils/cx';
 import { type ReactNode } from 'react';
-
-const StyledTimeline = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
 
 export type TimelineProps = { children?: ReactNode; className?: string };
 
 export const Timeline = ({ children, className }: TimelineProps) => (
-  <StyledTimeline className={className}>{children}</StyledTimeline>
+  <div className={cx('rb-timeline', className)}>{children}</div>
 );

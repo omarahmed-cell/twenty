@@ -1,72 +1,8 @@
 import { Icon } from '@/roboost-ui/components/Icon';
-import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
-import { css } from '@linaria/core';
-import { styled } from '@linaria/react';
+import { cx } from '@/roboost-ui/utils/cx';
 import { type FocusEvent, type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const StyledAnchor = styled.div`
-  display: inline-flex;
-  position: relative;
-`;
-
-const StyledMenu = styled.div<{ align: 'left' | 'right' }>`
-  background: ${ROBOOST_UI_THEME.surface};
-  border: 1px solid ${ROBOOST_UI_THEME.border};
-  border-radius: ${ROBOOST_UI_THEME.radiusSm};
-  box-shadow: ${ROBOOST_UI_THEME.shadowMd};
-  left: ${({ align }) => (align === 'left' ? '0' : 'auto')};
-  max-height: 320px;
-  min-width: 200px;
-  overflow: auto;
-  padding: 4px;
-  position: absolute;
-  right: ${({ align }) => (align === 'right' ? '0' : 'auto')};
-  top: calc(100% + 4px);
-  z-index: 40;
-`;
-
-const menuItemClassName = css`
-  align-items: center;
-  background: none;
-  border: none;
-  border-radius: ${ROBOOST_UI_THEME.radiusXs};
-  color: ${ROBOOST_UI_THEME.text};
-  cursor: pointer;
-  display: flex;
-  font-family: ${ROBOOST_UI_THEME.fontSans};
-  font-size: 14px;
-  gap: 8px;
-  padding: 8px 8px 8px 12px;
-  text-align: left;
-  text-decoration: none;
-  white-space: nowrap;
-  width: 100%;
-
-  > svg {
-    color: ${ROBOOST_UI_THEME.textMuted};
-  }
-
-  &:hover {
-    background: ${ROBOOST_UI_THEME.surfaceHover};
-  }
-
-  &[aria-checked='true'] {
-    color: ${ROBOOST_UI_THEME.accentText};
-    font-weight: 500;
-  }
-`;
-
-const StyledItemLabel = styled.span`
-  flex: 1;
-`;
-
-const StyledSeparator = styled.div`
-  background: ${ROBOOST_UI_THEME.borderSubtle};
-  height: 1px;
-  margin: 4px 0;
-`;
 
 export type MenuEntry =
   | {
@@ -74,17 +10,24 @@ export type MenuEntry =
       label: string;
       icon?: RoboostIconName;
       isSelected?: boolean;
+      isDanger?: boolean;
+      isDisabled?: boolean;
+      hint?: string;
       onSelect: () => void;
     }
   | { id: string; label: string; icon?: RoboostIconName; href: string }
-  | { id: string; isSeparator: true };
+  | { id: string; isSeparator: true }
+  | { id: string; heading: string };
 
 export type MenuProps = {
   trigger: (props: { isOpen: boolean; toggle: () => void }) => ReactNode;
   entries: MenuEntry[];
   align?: 'left' | 'right';
   header?: ReactNode;
+  footer?: ReactNode;
   keepOpenOnSelect?: boolean;
+  minWidth?: number;
+  placement?: 'below' | 'above';
 };
 
 export const Menu = ({
@@ -92,7 +35,10 @@ export const Menu = ({
   entries,
   align = 'left',
   header,
+  footer,
   keepOpenOnSelect = false,
+  minWidth = 200,
+  placement = 'below',
 }: MenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -103,11 +49,24 @@ export const Menu = ({
   };
 
   return (
-    <StyledAnchor onBlur={closeWhenFocusLeaves}>
+    <div
+      className="rb-menu-anchor"
+      onBlur={closeWhenFocusLeaves}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          setIsOpen(false);
+        }
+      }}
+    >
       {trigger({ isOpen, toggle: () => setIsOpen(!isOpen) })}
       {isOpen && (
-        <StyledMenu
-          align={align}
+        <div
+          className={cx(
+            'rb-menu',
+            align === 'right' && 'rb-menu-right',
+            placement === 'above' && 'rb-menu-above',
+          )}
+          style={{ minWidth }}
           role="menu"
           tabIndex={-1}
           onMouseDown={(event) => event.preventDefault()}
@@ -115,7 +74,15 @@ export const Menu = ({
           {header}
           {entries.map((entry) => {
             if ('isSeparator' in entry) {
-              return <StyledSeparator key={entry.id} />;
+              return <div key={entry.id} className="rb-menu-sep" />;
+            }
+
+            if ('heading' in entry) {
+              return (
+                <div key={entry.id} className="rb-menu-heading">
+                  {entry.heading}
+                </div>
+              );
             }
 
             const content = (
@@ -123,7 +90,10 @@ export const Menu = ({
                 {entry.icon !== undefined && (
                   <Icon name={entry.icon} size={16} />
                 )}
-                <StyledItemLabel>{entry.label}</StyledItemLabel>
+                <span className="rb-menu-label">{entry.label}</span>
+                {'hint' in entry && entry.hint !== undefined && (
+                  <span className="rb-menu-hint">{entry.hint}</span>
+                )}
                 {'isSelected' in entry && entry.isSelected === true && (
                   <Icon name="check" size={16} />
                 )}
@@ -136,7 +106,7 @@ export const Menu = ({
                   key={entry.id}
                   to={entry.href}
                   role="menuitem"
-                  className={menuItemClassName}
+                  className="rb-menu-item"
                   onClick={() => setIsOpen(false)}
                 >
                   {content}
@@ -154,7 +124,13 @@ export const Menu = ({
                     : 'menuitem'
                 }
                 aria-checked={entry.isSelected}
-                className={menuItemClassName}
+                aria-disabled={entry.isDisabled}
+                className={cx(
+                  'rb-menu-item',
+                  entry.isDanger === true && 'rb-menu-item-danger',
+                  entry.isDisabled === true && 'is-disabled',
+                )}
+                aria-selected={entry.isSelected}
                 onClick={() => {
                   entry.onSelect();
                   if (!keepOpenOnSelect) {
@@ -166,8 +142,9 @@ export const Menu = ({
               </button>
             );
           })}
-        </StyledMenu>
+          {footer}
+        </div>
       )}
-    </StyledAnchor>
+    </div>
   );
 };

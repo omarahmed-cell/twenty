@@ -1,122 +1,9 @@
 import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Icon } from '@/roboost-ui/components/Icon';
-import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
 import { type RoboostAvatarTone } from '@/roboost-ui/types/RoboostAvatarTone';
-import { styled } from '@linaria/react';
+import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { type ReactNode, useState } from 'react';
-
-const StyledCard = styled.div`
-  background: ${ROBOOST_UI_THEME.surface};
-  border: 1px solid ${ROBOOST_UI_THEME.border};
-  border-radius: ${ROBOOST_UI_THEME.radiusMd};
-  overflow: hidden;
-`;
-
-const StyledHead = styled.div`
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  gap: 12px;
-  padding: 12px 16px;
-`;
-
-const StyledMain = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const StyledLine = styled.div`
-  align-items: baseline;
-  display: flex;
-  gap: 8px;
-`;
-
-const StyledFrom = styled.span<{ isUnread: boolean }>`
-  color: ${ROBOOST_UI_THEME.text};
-  font-size: 14px;
-  font-weight: ${({ isUnread }) => (isUnread ? 600 : 400)};
-`;
-
-const StyledTime = styled.span`
-  color: ${ROBOOST_UI_THEME.textMuted};
-  flex: none;
-  font-size: 12px;
-  margin-left: auto;
-  white-space: nowrap;
-`;
-
-const StyledUnreadDot = styled.span`
-  align-self: center;
-  background: ${ROBOOST_UI_THEME.accent};
-  border-radius: 999px;
-  flex: none;
-  height: 7px;
-  width: 7px;
-`;
-
-const StyledSubject = styled.div`
-  color: ${ROBOOST_UI_THEME.text};
-  font-size: 13px;
-  margin-top: 1px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const StyledSnippet = styled.div`
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  color: ${ROBOOST_UI_THEME.textMuted};
-  display: -webkit-box;
-  font-size: 13px;
-  line-height: 18px;
-  overflow: hidden;
-`;
-
-const StyledCaret = styled.span<{ isOpen: boolean }>`
-  color: ${ROBOOST_UI_THEME.textMuted};
-  display: inline-flex;
-  flex: none;
-  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'none')};
-  transition: transform 0.12s;
-`;
-
-const StyledBody = styled.div`
-  border-top: 1px solid ${ROBOOST_UI_THEME.borderSubtle};
-  padding: 0 16px 16px;
-`;
-
-const StyledMeta = styled.div`
-  color: ${ROBOOST_UI_THEME.textMuted};
-  display: flex;
-  flex-wrap: wrap;
-  font-size: 12px;
-  gap: 4px 12px;
-  padding: 12px 0;
-
-  b {
-    color: ${ROBOOST_UI_THEME.textSecondary};
-    font-weight: 500;
-  }
-`;
-
-const StyledText = styled.div`
-  color: ${ROBOOST_UI_THEME.text};
-  font-size: 14px;
-  line-height: 21px;
-  white-space: pre-wrap;
-
-  p {
-    margin: 0 0 12px;
-  }
-`;
-
-const StyledActions = styled.div`
-  display: flex;
-  gap: 8px;
-  padding-top: 12px;
-`;
 
 export type EmailParty = {
   name: string;
@@ -167,8 +54,9 @@ export const EmailCard = ({
   };
 
   return (
-    <StyledCard>
-      <StyledHead
+    <div className={cx('rb-email', unread && 'is-unread')}>
+      <div
+        className="rb-email-head"
         role="button"
         tabIndex={0}
         aria-expanded={isOpen}
@@ -181,24 +69,33 @@ export const EmailCard = ({
         }}
       >
         <Avatar name={from.name} src={from.avatar} size="md" tone={from.tone} />
-        <StyledMain>
-          <StyledLine>
-            {unread && <StyledUnreadDot />}
-            <StyledFrom isUnread={unread}>{fromLabel ?? from.name}</StyledFrom>
-            <StyledTime>{time}</StyledTime>
-          </StyledLine>
-          <StyledSubject>{subject}</StyledSubject>
+        <div className="rb-email-main">
+          <div className="rb-email-line1">
+            {unread && <span className="rb-email-unread-dot" />}
+            <span className="rb-email-from">{fromLabel ?? from.name}</span>
+            <span className="rb-email-time">{time}</span>
+          </div>
+          <div className="rb-email-subject">{subject}</div>
           {!isOpen && snippet !== undefined && (
-            <StyledSnippet>— {snippet}</StyledSnippet>
+            <div className="rb-email-snippet rb-email-snippet-clamp">
+              — {snippet}
+            </div>
           )}
-        </StyledMain>
-        <StyledCaret isOpen={isOpen}>
+        </div>
+        <span
+          className="rb-muted"
+          style={{
+            display: 'inline-flex',
+            flex: 'none',
+            transform: isOpen ? 'rotate(180deg)' : undefined,
+          }}
+        >
           <Icon name="caret" size={16} />
-        </StyledCaret>
-      </StyledHead>
+        </span>
+      </div>
       {isOpen && (
-        <StyledBody>
-          <StyledMeta>
+        <div className="rb-email-body">
+          <div className="rb-email-meta">
             <span>
               <b>{t`From`} </b>
               {from.name}
@@ -210,11 +107,13 @@ export const EmailCard = ({
                 {to}
               </span>
             )}
-          </StyledMeta>
-          <StyledText>{body}</StyledText>
-          {actions !== undefined && <StyledActions>{actions}</StyledActions>}
-        </StyledBody>
+          </div>
+          <div className="rb-email-text">{body}</div>
+          {actions !== undefined && (
+            <div className="rb-email-actions">{actions}</div>
+          )}
+        </div>
       )}
-    </StyledCard>
+    </div>
   );
 };

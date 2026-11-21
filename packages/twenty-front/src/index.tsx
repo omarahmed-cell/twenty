@@ -13,6 +13,9 @@ import 'twenty-ui/style.css';
 import 'twenty-ui/theme-light.css';
 import 'twenty-ui/theme-dark.css';
 import './index.css';
+import '@/roboost-ui/styles/roboost-tokens.css';
+import '@/roboost-ui/styles/roboost-ui.css';
+import '@/roboost-app/styles/roboost-app.css';
 
 const renderApp = () => {
   const root = ReactDOM.createRoot(

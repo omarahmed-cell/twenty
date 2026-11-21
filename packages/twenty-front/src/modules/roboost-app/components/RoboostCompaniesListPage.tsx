@@ -3,7 +3,7 @@ import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { getRecordsFromRecordConnection } from '@/object-record/cache/utils/getRecordsFromRecordConnection';
 import { type RecordGqlOperationFindManyResult } from '@/object-record/graphql/types/RecordGqlOperationFindManyResult';
-import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
+import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
 import { useFindManyRecordsQuery } from '@/object-record/hooks/useFindManyRecordsQuery';
 import { RoboostCompaniesFilterChips } from '@/roboost-app/components/RoboostCompaniesFilterChips';
 import { ROBOOST_COMPANY_COLUMNS } from '@/roboost-app/constants/RoboostCompanyColumns';
@@ -256,9 +256,7 @@ export const RoboostCompaniesListPage = () => {
     recordGqlFields,
   });
 
-  const { createOneRecord: createCompany } = useCreateOneRecord({
-    objectNameSingular: CoreObjectNameSingular.Company,
-  });
+  const openCreatePanel = useOpenRoboostCreatePanel();
 
   const getColumnLabel = (fieldName: string) => {
     const column = availableColumns.find(
@@ -330,11 +328,8 @@ export const RoboostCompaniesListPage = () => {
       objectRecordId: companyId,
     });
 
-  const addCompany = async () => {
-    const company = await createCompany({});
-
-    openCompany(company.id);
-  };
+  const addCompany = () =>
+    openCreatePanel({ objectNameSingular: CoreObjectNameSingular.Company });
 
   const classicPath = `${getAppPath(AppPath.RecordIndexPage, {
     objectNamePlural: objectMetadataItem.namePlural,

@@ -1,87 +1,9 @@
 import { Button } from '@/roboost-ui/components/Button';
 import { Icon } from '@/roboost-ui/components/Icon';
-import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
-import { styled } from '@linaria/react';
+import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { type ReactNode } from 'react';
-
-const StyledScrim = styled.div<{ isInline: boolean }>`
-  align-items: center;
-  background: ${ROBOOST_UI_THEME.overlay};
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  padding: 24px;
-  position: ${({ isInline }) => (isInline ? 'absolute' : 'fixed')};
-  z-index: 50;
-`;
-
-const StyledModal = styled.div`
-  background: ${ROBOOST_UI_THEME.surface};
-  border-radius: ${ROBOOST_UI_THEME.radiusMd};
-  box-shadow: ${ROBOOST_UI_THEME.shadowLg};
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  max-width: 440px;
-  overflow: hidden;
-  width: 100%;
-`;
-
-const StyledHead = styled.div`
-  align-items: flex-start;
-  display: flex;
-  gap: 12px;
-  padding: 20px 20px 12px;
-`;
-
-const StyledTitleBlock = styled.div`
-  flex: 1;
-`;
-
-const StyledTitle = styled.div`
-  color: ${ROBOOST_UI_THEME.text};
-  font-family: ${ROBOOST_UI_THEME.fontDisplay};
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 24px;
-`;
-
-const StyledSubtitle = styled.div`
-  color: ${ROBOOST_UI_THEME.textMuted};
-  font-size: 13px;
-  margin-top: 2px;
-`;
-
-const StyledDangerIcon = styled.span`
-  align-items: center;
-  background: ${ROBOOST_UI_THEME.dangerSoft};
-  border-radius: ${ROBOOST_UI_THEME.radiusFull};
-  color: ${ROBOOST_UI_THEME.dangerText};
-  display: inline-flex;
-  flex: none;
-  height: 36px;
-  justify-content: center;
-  width: 36px;
-`;
-
-const StyledBody = styled.div`
-  color: ${ROBOOST_UI_THEME.textSecondary};
-  font-size: 14px;
-  line-height: 20px;
-  overflow: auto;
-  padding: 0 20px 20px;
-`;
-
-const StyledFoot = styled.div`
-  align-items: center;
-  background: ${ROBOOST_UI_THEME.surfaceSunken};
-  border-top: 1px solid ${ROBOOST_UI_THEME.border};
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  padding: 12px 20px;
-`;
+import { createPortal } from 'react-dom';
 
 export type ModalProps = {
   open?: boolean;
@@ -91,7 +13,9 @@ export type ModalProps = {
   footer?: ReactNode;
   onClose?: () => void;
   inline?: boolean;
+  width?: number;
   children?: ReactNode;
+  className?: string;
 };
 
 export const Modal = ({
@@ -102,7 +26,9 @@ export const Modal = ({
   footer,
   onClose,
   inline = false,
+  width,
   children,
+  className,
 }: ModalProps) => {
   const { t } = useLingui();
 
@@ -110,28 +36,39 @@ export const Modal = ({
     return null;
   }
 
-  return (
-    <StyledScrim
-      isInline={inline}
+  const modal = (
+    <div
+      className="rb-modal-scrim rb-ui"
+      style={{ position: inline ? 'absolute' : 'fixed' }}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose?.();
         }
       }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          onClose?.();
+        }
+      }}
     >
-      <StyledModal role="dialog" aria-modal="true">
-        <StyledHead>
+      <div
+        className={cx('rb-modal', className)}
+        style={width !== undefined ? { maxWidth: width } : undefined}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="rb-modal-head">
           {tone === 'danger' && (
-            <StyledDangerIcon>
+            <span className="rb-modal-icon is-danger">
               <Icon name="alert-triangle" />
-            </StyledDangerIcon>
+            </span>
           )}
-          <StyledTitleBlock>
-            <StyledTitle>{title}</StyledTitle>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="rb-modal-title">{title}</div>
             {subtitle !== undefined && (
-              <StyledSubtitle>{subtitle}</StyledSubtitle>
+              <div className="rb-modal-sub">{subtitle}</div>
             )}
-          </StyledTitleBlock>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -140,10 +77,12 @@ export const Modal = ({
             aria-label={t`Close`}
             onClick={onClose}
           />
-        </StyledHead>
-        <StyledBody>{children}</StyledBody>
-        {footer !== undefined && <StyledFoot>{footer}</StyledFoot>}
-      </StyledModal>
-    </StyledScrim>
+        </div>
+        <div className="rb-modal-body">{children}</div>
+        {footer !== undefined && <div className="rb-modal-foot">{footer}</div>}
+      </div>
+    </div>
   );
+
+  return inline ? modal : createPortal(modal, document.body);
 };

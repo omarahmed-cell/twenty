@@ -1,0 +1,140 @@
+/* Roboost design system v2 tokens (design hand-off v3, tokens.json). Shared values on :root,
+   mode values (accent, focus ring, frame) per [data-theme]: light, roboost, sira.
+   Font families come from the theme (roboost.ts), so they are defined in one place. */
+
+:root {
+  --canvas: #f4f6f8;
+  --surface: #ffffff;
+  --surface-sunken: #f7f8fa;
+  --surface-hover: #f0f2f5;
+  --surface-active: #e8ebf0;
+  --overlay: rgba(16, 24, 40, 0.45);
+  --border: #e3e7ed;
+  --border-strong: #c3cad4;
+  --border-subtle: #edeff3;
+  --control-hover-border: #aab2bf;
+  --text: #1a2230;
+  --text-secondary: #596273;
+  --text-muted: #6b7483;
+  --text-disabled: #9aa2b1;
+  --text-on-accent: #ffffff;
+  --text-on-dark: #f7f8fa;
+  --tooltip-bg: #0e1422;
+
+  --success: #0e9a63;
+  --success-text: #077d4e;
+  --success-soft: #e4f4ec;
+  --success-border: #a6ddc2;
+  --warning: #e8930c;
+  --warning-text: #975a00;
+  --warning-soft: #fdefd6;
+  --warning-border: #f4d194;
+  --danger: #d92d20;
+  --danger-text: #b42318;
+  --danger-soft: #fde7e4;
+  --danger-border: #f4b3ab;
+  --info: #1570ef;
+  --info-text: #175cd3;
+  --info-soft: #e5f0fe;
+  --info-border: #aed1fa;
+  --avatar-bg: #eef1f5;
+  --avatar-fg: #475467;
+
+  --font-display: var(--t-font-family-display);
+  --font-sans: var(--t-font-family);
+  --font-mono: var(--t-font-family-mono);
+
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-sm:
+    0 1px 3px rgba(16, 24, 40, 0.09), 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 6px 16px rgba(16, 24, 40, 0.12);
+  --shadow-lg: 0 16px 40px rgba(16, 24, 40, 0.18);
+  --shadow-focus: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus-ring);
+
+  --brand-gradient: linear-gradient(
+    120deg,
+    #ea0029 0%,
+    #e2430f 55%,
+    #c2500a 100%
+  );
+}
+
+:root,
+[data-theme='light'] {
+  --accent: #ea0029;
+  --accent-hover: #c80021;
+  --accent-active: #a8001c;
+  --accent-text: #c20022;
+  --accent-soft: #fdeaee;
+  --accent-soft-hover: #fbdbe2;
+  --accent-border: #f3b7c3;
+  --focus-ring: #ea0029;
+  --frame: #ffffff;
+  --frame-border: #e3e7ed;
+  --frame-text: #596273;
+  --frame-text-strong: #1a2230;
+  --frame-text-muted: #8a93a3;
+  --frame-active: #fdeaee;
+  --frame-accent: #ea0029;
+  --frame-field: #f0f2f5;
+  --check-fill: var(--accent);
+}
+
+[data-theme='roboost'] {
+  --accent: #ff8300;
+  --accent-hover: #e67600;
+  --accent-active: #cc6900;
+  --accent-text: #c2410c;
+  --accent-soft: #fff1e0;
+  --accent-soft-hover: #ffe6c7;
+  --accent-border: #fbcf9a;
+  --focus-ring: #c2410c;
+  --frame: #011e41;
+  --frame-border: rgba(255, 255, 255, 0.1);
+  --frame-text: #c2cfe3;
+  --frame-text-strong: #ffffff;
+  --frame-text-muted: #8da0bd;
+  --frame-active: rgba(255, 255, 255, 0.12);
+  --frame-accent: #ff8300;
+  --frame-field: rgba(255, 255, 255, 0.12);
+  --check-fill: var(--accent-text);
+}
+
+[data-theme='sira'] {
+  --accent: #1c67f9;
+  --accent-hover: #0f4fe6;
+  --accent-active: #0a3dc4;
+  --accent-text: #0f4fe6;
+  --accent-soft: #eaf1fe;
+  --accent-soft-hover: #d8e6fe;
+  --accent-border: #b6cdfb;
+  --focus-ring: #1c67f9;
+  --frame: #0c3097;
+  --frame-border: rgba(255, 255, 255, 0.12);
+  --frame-text: #c3d2f2;
+  --frame-text-strong: #ffffff;
+  --frame-text-muted: #93a6d6;
+  --frame-active: rgba(255, 255, 255, 0.14);
+  --frame-accent: #59bdf7;
+  --frame-field: rgba(255, 255, 255, 0.14);
+  --check-fill: var(--accent);
+}

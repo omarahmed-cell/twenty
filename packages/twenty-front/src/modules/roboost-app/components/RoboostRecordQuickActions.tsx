@@ -1,5 +1,5 @@
 import { useComposeEmailForTargetRecord } from '@/activities/emails/hooks/useComposeEmailForTargetRecord';
-import { useCreateActivityForTargetRecord } from '@/activities/hooks/useCreateActivityForTargetRecord';
+import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
@@ -86,18 +86,17 @@ export const RoboostRecordQuickActions = ({
   moreEntries,
 }: RoboostRecordQuickActionsProps) => {
   const { t } = useLingui();
-  const note = useCreateActivityForTargetRecord({
-    targetRecord,
-    activityObjectNameSingular: CoreObjectNameSingular.Note,
-  });
-  const task = useCreateActivityForTargetRecord({
-    targetRecord,
-    activityObjectNameSingular: CoreObjectNameSingular.Task,
-  });
-  const call = useCreateActivityForTargetRecord({
-    targetRecord,
-    activityObjectNameSingular: CoreObjectNameSingular.Call,
-  });
+  const openCreatePanel = useOpenRoboostCreatePanel();
+
+  const openActivity = (objectNameSingular: string) =>
+    openCreatePanel({
+      objectNameSingular,
+      linkToRecord: {
+        objectNameSingular: targetRecord.targetObjectNameSingular,
+        recordId: targetRecord.id,
+      },
+    });
+
   const { openComposer } = useComposeEmailForTargetRecord(targetRecord);
 
   const actions: {
@@ -111,23 +110,20 @@ export const RoboostRecordQuickActions = ({
       key: 'note',
       label: t`Note`,
       icon: 'note',
-      onClick: note.createActivity,
-      isDisabled: !note.canCreateActivity,
+      onClick: () => openActivity(CoreObjectNameSingular.Note),
     },
     { key: 'email', label: t`Email`, icon: 'mail', onClick: openComposer },
     {
       key: 'call',
       label: t`Call`,
       icon: 'phone',
-      onClick: call.createActivity,
-      isDisabled: !call.canCreateActivity,
+      onClick: () => openActivity(CoreObjectNameSingular.Call),
     },
     {
       key: 'task',
       label: t`Task`,
       icon: 'tasks',
-      onClick: task.createActivity,
-      isDisabled: !task.canCreateActivity,
+      onClick: () => openActivity(CoreObjectNameSingular.Task),
     },
     {
       key: 'meeting',

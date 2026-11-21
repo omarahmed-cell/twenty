@@ -2,253 +2,12 @@ import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Tag } from '@/roboost-ui/components/Tag';
-import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
 import { type RoboostAvatarTone } from '@/roboost-ui/types/RoboostAvatarTone';
 import { type RoboostTone } from '@/roboost-ui/types/RoboostTone';
 import { getPageNumbers } from '@/roboost-ui/utils/getPageNumbers';
-import { styled } from '@linaria/react';
+import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { type ReactNode, useState } from 'react';
-
-const StyledWrap = styled.div`
-  background: ${ROBOOST_UI_THEME.surface};
-  border: 1px solid ${ROBOOST_UI_THEME.border};
-  border-radius: ${ROBOOST_UI_THEME.radiusMd};
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-`;
-
-const StyledScroll = styled.div`
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-`;
-
-const StyledTable = styled.table`
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 13px;
-  width: 100%;
-
-  th,
-  td {
-    border-bottom: 1px solid ${ROBOOST_UI_THEME.borderSubtle};
-    padding: 8px 12px;
-    text-align: left;
-    white-space: nowrap;
-  }
-
-  thead th {
-    background: ${ROBOOST_UI_THEME.surfaceSunken};
-    border-bottom: 1px solid ${ROBOOST_UI_THEME.border};
-    color: ${ROBOOST_UI_THEME.textMuted};
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    position: sticky;
-    text-transform: uppercase;
-    top: 0;
-    z-index: 2;
-  }
-
-  thead th[data-sortable='true'] {
-    cursor: pointer;
-  }
-
-  thead th[data-sortable='true']:hover {
-    color: ${ROBOOST_UI_THEME.textSecondary};
-  }
-
-  tbody tr {
-    background: ${ROBOOST_UI_THEME.surface};
-  }
-
-  tbody tr[data-clickable='true'] {
-    cursor: pointer;
-  }
-
-  tbody tr:hover {
-    background: ${ROBOOST_UI_THEME.surfaceHover};
-  }
-
-  tbody tr[aria-selected='true'] {
-    background: ${ROBOOST_UI_THEME.accentSoft};
-  }
-
-  tbody tr[aria-selected='true']:hover {
-    background: ${ROBOOST_UI_THEME.accentSoftHover};
-  }
-
-  .roboost-col-check {
-    padding-left: 12px;
-    padding-right: 0;
-    width: 40px;
-  }
-
-  .roboost-sticky {
-    background: inherit;
-    left: 0;
-    position: sticky;
-    z-index: 1;
-  }
-
-  .roboost-sticky-second {
-    background: inherit;
-    left: 40px;
-    position: sticky;
-    z-index: 1;
-  }
-
-  thead th.roboost-sticky,
-  thead th.roboost-sticky-second {
-    z-index: 3;
-  }
-
-  .roboost-sticky-shadow {
-    box-shadow: inset -1px 0 0 ${ROBOOST_UI_THEME.border};
-  }
-
-  .roboost-td-strong {
-    color: ${ROBOOST_UI_THEME.text};
-    font-weight: 500;
-  }
-
-  .roboost-td-mono {
-    color: ${ROBOOST_UI_THEME.textSecondary};
-    font-family: ${ROBOOST_UI_THEME.fontMono};
-  }
-
-  .roboost-td-num {
-    font-family: ${ROBOOST_UI_THEME.fontMono};
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-  }
-`;
-
-const StyledHeadInner = styled.span`
-  align-items: center;
-  display: inline-flex;
-  gap: 4px;
-`;
-
-const StyledSortIcon = styled.span<{ isActive: boolean }>`
-  color: ${({ isActive }) =>
-    isActive ? ROBOOST_UI_THEME.accent : ROBOOST_UI_THEME.textDisabled};
-  display: inline-flex;
-`;
-
-const StyledAvatarCell = styled.span`
-  align-items: center;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 8px;
-`;
-
-const StyledFoot = styled.div`
-  align-items: center;
-  background: ${ROBOOST_UI_THEME.surface};
-  border-top: 1px solid ${ROBOOST_UI_THEME.border};
-  color: ${ROBOOST_UI_THEME.textSecondary};
-  display: flex;
-  flex: none;
-  font-size: 13px;
-  gap: 12px;
-  justify-content: space-between;
-  padding: 8px 12px;
-`;
-
-const StyledFootRight = styled.div`
-  align-items: center;
-  display: inline-flex;
-  gap: 16px;
-`;
-
-const StyledPageSize = styled.label`
-  align-items: center;
-  display: inline-flex;
-  gap: 6px;
-
-  select {
-    background: ${ROBOOST_UI_THEME.surface};
-    border: 1px solid ${ROBOOST_UI_THEME.borderStrong};
-    border-radius: ${ROBOOST_UI_THEME.radiusSm};
-    color: ${ROBOOST_UI_THEME.text};
-    font-family: ${ROBOOST_UI_THEME.fontSans};
-    font-size: 13px;
-    height: 28px;
-    padding: 0 6px;
-  }
-`;
-
-const StyledPager = styled.div`
-  align-items: center;
-  display: inline-flex;
-  gap: 4px;
-`;
-
-const StyledPagerButton = styled.button`
-  align-items: center;
-  background: ${ROBOOST_UI_THEME.surface};
-  border: 1px solid ${ROBOOST_UI_THEME.borderStrong};
-  border-radius: ${ROBOOST_UI_THEME.radiusSm};
-  color: ${ROBOOST_UI_THEME.textSecondary};
-  cursor: pointer;
-  display: inline-flex;
-  height: 28px;
-  justify-content: center;
-  padding: 0;
-  width: 28px;
-
-  &:hover:not(:disabled) {
-    background: ${ROBOOST_UI_THEME.surfaceHover};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.45;
-  }
-`;
-
-const StyledPageButton = styled.button`
-  align-items: center;
-  background: ${ROBOOST_UI_THEME.surface};
-  border: 1px solid ${ROBOOST_UI_THEME.borderStrong};
-  border-radius: ${ROBOOST_UI_THEME.radiusSm};
-  color: ${ROBOOST_UI_THEME.text};
-  cursor: pointer;
-  display: inline-flex;
-  font-family: ${ROBOOST_UI_THEME.fontSans};
-  font-size: 13px;
-  font-weight: 500;
-  height: 28px;
-  justify-content: center;
-  min-width: 28px;
-  padding: 0 6px;
-
-  &:hover {
-    background: ${ROBOOST_UI_THEME.surfaceHover};
-  }
-
-  &[aria-current='true'] {
-    background: ${ROBOOST_UI_THEME.accent};
-    border-color: ${ROBOOST_UI_THEME.accent};
-    color: ${ROBOOST_UI_THEME.textOnAccent};
-  }
-`;
-
-const StyledGap = styled.span`
-  color: ${ROBOOST_UI_THEME.textMuted};
-  padding: 0 2px;
-`;
-
-const StyledEmpty = styled.div`
-  color: ${ROBOOST_UI_THEME.textMuted};
-  font-size: 13px;
-  padding: 32px 16px;
-  text-align: center;
-`;
 
 export type DataTableTagValue = {
   tone: RoboostTone;
@@ -319,10 +78,10 @@ const renderCellContent = (column: Column, value: unknown): ReactNode => {
 
   if (column.type === 'avatar') {
     return isAvatarValue(value) ? (
-      <StyledAvatarCell>
+      <span className="rb-avatar-cell">
         <Avatar name={value.name} src={value.src} size="sm" tone={value.tone} />
-        <span className="roboost-td-strong">{value.name}</span>
-      </StyledAvatarCell>
+        <span className="rb-td-strong">{value.name}</span>
+      </span>
     ) : null;
   }
 
@@ -331,9 +90,9 @@ const renderCellContent = (column: Column, value: unknown): ReactNode => {
 
 const getCellClassName = (column: Column, stickyClassNames: string[]) =>
   [
-    column.type === 'strong' ? 'roboost-td-strong' : '',
-    column.type === 'mono' ? 'roboost-td-mono' : '',
-    column.type === 'num' ? 'roboost-td-num' : '',
+    column.type === 'strong' ? 'rb-td-strong' : '',
+    column.type === 'mono' ? 'rb-td-mono' : '',
+    column.type === 'num' ? 'rb-td-num' : '',
     ...stickyClassNames,
   ]
     .filter(Boolean)
@@ -412,8 +171,8 @@ export const DataTable = ({
     }
     if (columnIndex === 0) {
       return selectable
-        ? ['roboost-sticky-second', 'roboost-sticky-shadow']
-        : ['roboost-sticky', 'roboost-sticky-shadow'];
+        ? ['rb-sticky-second', 'rb-sticky-shadow']
+        : ['rb-sticky', 'rb-sticky-shadow'];
     }
 
     return [];
@@ -423,14 +182,17 @@ export const DataTable = ({
   const pageCount = page?.pages ?? 1;
 
   return (
-    <StyledWrap className={className}>
-      <StyledScroll style={maxHeight !== undefined ? { maxHeight } : undefined}>
-        <StyledTable>
+    <div className={cx('rb-table-wrap', className)}>
+      <div
+        className="rb-table-scroll"
+        style={maxHeight !== undefined ? { maxHeight } : undefined}
+      >
+        <table className="rb-table">
           <thead>
             <tr>
               {selectable && (
                 <th
-                  className={`roboost-col-check ${stickyFirst ? 'roboost-sticky' : ''}`}
+                  className={`rb-col-check ${stickyFirst ? 'rb-sticky' : ''}`}
                 >
                   <Checkbox
                     aria-label={t`Select all rows`}
@@ -462,14 +224,19 @@ export const DataTable = ({
                     }
                     onClick={() => clickSort(column)}
                   >
-                    <StyledHeadInner>
+                    <span className="rb-th-inner">
                       <span>{column.label}</span>
                       {column.sortable === true && (
-                        <StyledSortIcon isActive={isActive}>
+                        <span
+                          className={cx(
+                            'rb-sort-icon',
+                            isActive && 'is-active',
+                          )}
+                        >
                           <Icon name="sort" size={16} />
-                        </StyledSortIcon>
+                        </span>
                       )}
-                    </StyledHeadInner>
+                    </span>
                   </th>
                 );
               })}
@@ -488,7 +255,7 @@ export const DataTable = ({
                 >
                   {selectable && (
                     <td
-                      className={`roboost-col-check ${stickyFirst ? 'roboost-sticky' : ''}`}
+                      className={`rb-col-check ${stickyFirst ? 'rb-sticky' : ''}`}
                     >
                       <Checkbox
                         aria-label={t`Select row`}
@@ -517,22 +284,22 @@ export const DataTable = ({
               );
             })}
           </tbody>
-        </StyledTable>
+        </table>
         {rows.length === 0 && emptyState !== undefined && (
-          <StyledEmpty>{emptyState}</StyledEmpty>
+          <div className="rb-table-empty">{emptyState}</div>
         )}
-      </StyledScroll>
+      </div>
       {page !== undefined && (
-        <StyledFoot>
+        <div className="rb-table-foot">
           <span>
             {isSomeSelected
               ? t`${currentSelectedIds.length} selected`
               : `${page.from ?? 1}–${page.to ?? rows.length} ${t`of`} ${page.count ?? rows.length}`}
           </span>
-          <StyledFootRight>
+          <div className="rb-foot-right">
             {page.pageSizeOptions !== undefined &&
               onPageSizeChange !== undefined && (
-                <StyledPageSize>
+                <label className="rb-page-size">
                   {t`Rows per page`}
                   <select
                     value={page.pageSize}
@@ -546,43 +313,48 @@ export const DataTable = ({
                       </option>
                     ))}
                   </select>
-                </StyledPageSize>
+                </label>
               )}
-            <StyledPager>
-              <StyledPagerButton
+            <div className="rb-pager">
+              <button
+                className="rb-pager-btn"
                 type="button"
                 disabled={currentPage <= 1}
                 aria-label={t`Previous page`}
                 onClick={() => onPageChange?.(currentPage - 1)}
               >
                 <Icon name="chevron-left" size={16} />
-              </StyledPagerButton>
+              </button>
               {getPageNumbers(currentPage, pageCount).map((item) =>
                 typeof item === 'number' ? (
-                  <StyledPageButton
+                  <button
+                    className="rb-pager-page"
                     key={item}
                     type="button"
                     aria-current={item === currentPage}
                     onClick={() => onPageChange?.(item)}
                   >
                     {item}
-                  </StyledPageButton>
+                  </button>
                 ) : (
-                  <StyledGap key={item}>…</StyledGap>
+                  <span className="rb-muted rb-pager-gap" key={item}>
+                    …
+                  </span>
                 ),
               )}
-              <StyledPagerButton
+              <button
+                className="rb-pager-btn"
                 type="button"
                 disabled={currentPage >= pageCount}
                 aria-label={t`Next page`}
                 onClick={() => onPageChange?.(currentPage + 1)}
               >
                 <Icon name="chevron-right" size={16} />
-              </StyledPagerButton>
-            </StyledPager>
-          </StyledFootRight>
-        </StyledFoot>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-    </StyledWrap>
+    </div>
   );
 };

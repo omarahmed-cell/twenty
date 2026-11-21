@@ -1,5 +1,6 @@
 import { styled } from '@linaria/react';
 
+import { RoboostModeSettingsSection } from '@/roboost-app/components/RoboostModeSettingsSection';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { FormatPreferencesSettings } from '@/settings/experience/components/FormatPreferencesSettings';
@@ -33,6 +34,7 @@ export const SettingsExperience = () => {
       ]}
     >
       <SettingsPageContainer>
+        <RoboostModeSettingsSection />
         <Section.Root>
           <Section.Header
             title={t`Interface`}

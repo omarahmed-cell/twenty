@@ -1,0 +1,165 @@
+/* Roboost CRM screens (design hand-off v3 screens/*.dc.html). Tokens: roboost-tokens.css. */
+
+/* ---------- Create panel (Create-Company.dc.html) ---------- */
+.rb-cpanel-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+.rb-cscrim {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+}
+.rb-cpanel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 480px;
+  max-width: 92vw;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  overflow: hidden;
+}
+.rb-cpanel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 20px 10px;
+}
+.rb-cpanel-title {
+  font: 600 20px/26px var(--font-display);
+  color: var(--text);
+  flex: 1;
+}
+.rb-cpanel-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.rb-cpanel-close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.rb-cpanel-editform {
+  padding: 0 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+.rb-cpanel-editform .rb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 500 13px/18px var(--font-sans);
+}
+.rb-cpanel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 20px 20px;
+}
+.rb-cfield {
+  margin-top: 18px;
+}
+.rb-cfield.is-greyed {
+  opacity: 0.5;
+}
+.rb-cflabel {
+  font: 500 13px/18px var(--font-sans);
+  color: var(--text);
+  margin-bottom: 6px;
+  display: block;
+}
+.rb-req {
+  color: var(--danger-text);
+}
+.rb-dupe {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 400 12px/17px var(--font-sans);
+  color: var(--warning-text);
+}
+.rb-dupe .rb-link {
+  font-weight: 600;
+}
+.rb-cpanel-hint {
+  margin: 26px 0 20px;
+  text-align: center;
+  font: 500 15px/22px var(--font-sans);
+  color: var(--text-muted);
+  padding: 0 24px;
+}
+.rb-cpanel-created {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  background: var(--success-soft);
+  color: var(--success-text);
+  font-size: 13px;
+}
+.rb-cpanel-foot {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+/* ---------- Field inputs ---------- */
+.rb-inline-fields {
+  display: flex;
+  gap: 8px;
+}
+.rb-inline-fields .rb-input-wrap {
+  flex: 1;
+  min-width: 0;
+}
+.rb-inline-fields .rb-input-narrow {
+  flex: 0 0 84px;
+}
+.rb-multi-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow: auto;
+  padding: 4px 0;
+}
+.rb-picker {
+  width: 100%;
+}
+.rb-picker .rb-select-trigger {
+  min-width: 0;
+}
+.rb-picker-menu {
+  max-height: 300px;
+}
+.rb-picker-search {
+  padding: 4px 4px 6px;
+  position: sticky;
+  top: -4px;
+  background: var(--surface);
+}
+.rb-select {
+  width: 100%;
+}
+.rb-select .rb-select-trigger {
+  min-width: 0;
+}

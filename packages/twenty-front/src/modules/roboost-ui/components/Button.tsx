@@ -1,92 +1,11 @@
 import { Icon } from '@/roboost-ui/components/Icon';
-import { ROBOOST_BUTTON_COLORS } from '@/roboost-ui/constants/RoboostButtonColors';
-import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
-import { styled } from '@linaria/react';
+import { cx } from '@/roboost-ui/utils/cx';
 import { type MouseEvent, type ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost';
-type ButtonSize = 'sm' | 'md' | 'lg';
-
-const HEIGHT_BY_SIZE: Record<ButtonSize, string> = {
-  sm: '26px',
-  md: '32px',
-  lg: '38px',
-};
-
-type StyledButtonProps = {
-  variant: ButtonVariant;
-  size: ButtonSize;
-  isDanger: boolean;
-  iconOnly: boolean;
-};
-
-const getColors = ({ variant, isDanger }: StyledButtonProps) =>
-  ROBOOST_BUTTON_COLORS[variant][isDanger ? 'danger' : 'default'];
-
-const PADDING_BY_SIZE: Record<ButtonSize, string> = {
-  sm: '0 8px',
-  md: '0 12px',
-  lg: '0 16px',
-};
-
-const FONT_SIZE_BY_SIZE: Record<ButtonSize, string> = {
-  sm: '12px',
-  md: '13px',
-  lg: '14px',
-};
-
-const StyledButton = styled.button<StyledButtonProps>`
-  align-items: center;
-  background: ${(props) => getColors(props).background};
-  border: 1px solid ${(props) => getColors(props).border};
-  border-radius: ${ROBOOST_UI_THEME.radiusSm};
-  box-sizing: border-box;
-  color: ${(props) => getColors(props).color};
-  cursor: pointer;
-  display: inline-flex;
-  flex: none;
-  font-family: ${ROBOOST_UI_THEME.fontSans};
-  font-size: ${({ size }) => FONT_SIZE_BY_SIZE[size]};
-  font-weight: 500;
-  gap: 6px;
-  height: ${({ size }) => HEIGHT_BY_SIZE[size]};
-  justify-content: center;
-  line-height: 16px;
-  padding: ${({ size, iconOnly }) => (iconOnly ? '0' : PADDING_BY_SIZE[size])};
-  text-decoration: none;
-  transition:
-    background 0.12s,
-    border-color 0.12s,
-    color 0.12s;
-  user-select: none;
-  white-space: nowrap;
-  width: ${({ size, iconOnly }) => (iconOnly ? HEIGHT_BY_SIZE[size] : 'auto')};
-
-  &:hover:not(:disabled) {
-    background: ${(props) => getColors(props).hoverBackground};
-    border-color: ${(props) => getColors(props).hoverBorder};
-    color: ${(props) => getColors(props).hoverColor};
-  }
-
-  &:active:not(:disabled) {
-    background: ${(props) => getColors(props).activeBackground};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-
-  &:focus-visible {
-    box-shadow: ${ROBOOST_UI_THEME.shadowFocus};
-    outline: none;
-  }
-`;
-
 export type ButtonProps = {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   tone?: 'danger';
   icon?: RoboostIconName;
   iconOnly?: boolean;
@@ -99,6 +18,7 @@ export type ButtonProps = {
   'aria-label'?: string;
   'aria-expanded'?: boolean;
   'aria-haspopup'?: 'menu' | 'listbox' | 'dialog';
+  'aria-pressed'?: boolean;
 };
 
 export const Button = ({
@@ -116,22 +36,27 @@ export const Button = ({
   'aria-label': ariaLabel,
   'aria-expanded': ariaExpanded,
   'aria-haspopup': ariaHasPopup,
+  'aria-pressed': ariaPressed,
 }: ButtonProps) => (
-  <StyledButton
-    variant={variant}
-    size={size}
-    isDanger={tone === 'danger'}
-    iconOnly={iconOnly}
+  <button
     type={type}
+    className={cx(
+      'rb-btn',
+      `rb-btn-${variant}`,
+      `rb-btn-${size}`,
+      tone === 'danger' && 'rb-btn-danger',
+      iconOnly && 'rb-btn-icon',
+      className,
+    )}
     disabled={disabled}
     title={title}
-    className={className}
     onClick={onClick}
     aria-label={ariaLabel}
     aria-expanded={ariaExpanded}
     aria-haspopup={ariaHasPopup}
+    aria-pressed={ariaPressed}
   >
     {icon !== undefined && <Icon name={icon} size={16} />}
-    {children}
-  </StyledButton>
+    {children !== undefined && children !== null && <span>{children}</span>}
+  </button>
 );

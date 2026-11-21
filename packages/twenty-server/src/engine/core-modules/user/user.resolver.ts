@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import crypto from 'crypto';
 
 import { msg } from '@lingui/core/macro';
-import { GraphQLJSONObject } from 'graphql-type-json';
+import { GraphQLJSON, GraphQLJSONObject } from 'graphql-type-json';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
@@ -42,6 +42,10 @@ import {
   WorkspaceMemberTranspiler,
 } from 'src/engine/core-modules/user/services/workspace-member-transpiler.service';
 import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services/user-vars.service';
+import {
+  assertRoboostUserVar,
+  ROBOOST_USER_VAR_PREFIX,
+} from 'src/engine/core-modules/user/user-vars/utils/assert-roboost-user-var.util';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { userValidator } from 'src/engine/core-modules/user/user.validate';
 import { assertWorkspaceMemberUpdateUsesNonCustomFieldsOnly } from 'src/engine/core-modules/user/utils/assert-workspace-member-update-non-custom-fields.util';
@@ -233,7 +237,11 @@ export class UserResolver {
     ];
 
     const filteredMap = new Map(
-      [...userVars].filter(([key]) => userVarAllowList.includes(key)),
+      [...userVars].filter(
+        ([key]) =>
+          userVarAllowList.includes(key) ||
+          key.startsWith(ROBOOST_USER_VAR_PREFIX),
+      ),
     );
 
     return Object.fromEntries(filteredMap);
@@ -409,6 +417,73 @@ export class UserResolver {
     const key = this.twentyConfigService.get('SUPPORT_FRONT_HMAC_KEY');
 
     return getHMACKey(parent.email, key);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
+    NoPermissionGuard,
+  )
+  async setRoboostUserVar(
+    @Args('key') key: string,
+    @Args('value', { type: () => GraphQLJSON, nullable: true }) value: unknown,
+    @AuthUser() { id: userId }: AuthContextUser,
+    @AuthWorkspace() workspace: WorkspaceEntity,
+  ): Promise<boolean> {
+    assertRoboostUserVar(key, value, 'user');
+
+    if (value === null || value === undefined) {
+      await this.userVarService.delete({
+        userId,
+        workspaceId: workspace.id,
+        key,
+      });
+
+      return true;
+    }
+
+    await this.userVarService.set({
+      userId,
+      workspaceId: workspace.id,
+      key,
+      value,
+    });
+
+    return true;
+  }
+
+  // Workspace-wide defaults (for example an admin's layout order); members override them with their own key
+  @Mutation(() => Boolean)
+  @UseGuards(
+    AuthPrincipalGuard({
+      userSession: true,
+      apiKey: false,
+      oauthClient: false,
+      application: false,
+    }),
+    SettingsPermissionGuard(PermissionFlagType.WORKSPACE),
+  )
+  async setRoboostWorkspaceVar(
+    @Args('key') key: string,
+    @Args('value', { type: () => GraphQLJSON, nullable: true }) value: unknown,
+    @AuthWorkspace() workspace: WorkspaceEntity,
+  ): Promise<boolean> {
+    assertRoboostUserVar(key, value, 'workspace');
+
+    if (value === null || value === undefined) {
+      await this.userVarService.delete({ workspaceId: workspace.id, key });
+
+      return true;
+    }
+
+    await this.userVarService.set({ workspaceId: workspace.id, key, value });
+
+    return true;
   }
 
   @Mutation(() => UserEntity)

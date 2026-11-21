@@ -4,6 +4,8 @@ import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { ROBOOST_NAV_DEFINITION } from '@/roboost-app/constants/RoboostNavDefinition';
+import { ROBOOST_USER_VAR_KEYS } from '@/roboost-app/constants/RoboostUserVarKeys';
+import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
 import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
 import { type NavGroup, SideNav } from '@/roboost-ui/components/SideNav';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
@@ -19,6 +21,7 @@ export const RoboostAppSideNav = () => {
     roboostNavCollapsedState,
   );
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const { setUserVar } = useRoboostUserVars();
 
   // Totals only: one row each, the count comes from totalCount
   const { totalCount: contactCount } = useFindManyRecords({
@@ -110,7 +113,11 @@ export const RoboostAppSideNav = () => {
     <SideNav
       groups={groups}
       collapsed={roboostNavCollapsed}
-      onToggle={setRoboostNavCollapsed}
+      hideBrand
+      onToggle={(collapsed) => {
+        setRoboostNavCollapsed(collapsed);
+        setUserVar(ROBOOST_USER_VAR_KEYS.navCollapsed, collapsed);
+      }}
     />
   );
 };

@@ -10,6 +10,12 @@ import { MobileNavigationBar } from '@/navigation/components/MobileNavigationBar
 import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/providers/PageDragDropProvider';
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { RoboostAppSideNav } from '@/roboost-app/components/RoboostAppSideNav';
+import { RoboostCreateRecordPanel } from '@/roboost-app/components/RoboostCreateRecordPanel';
+import { RoboostPreferencesEffect } from '@/roboost-app/components/RoboostPreferencesEffect';
+import { RoboostSettingsSideNav } from '@/roboost-app/components/RoboostSettingsSideNav';
+import { roboostModeState } from '@/roboost-app/states/roboostModeState';
+import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { RoboostTopBar } from '@/roboost-app/components/RoboostTopBar';
 import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { AppShell } from '@/roboost-ui/components/AppShell';
@@ -74,9 +80,11 @@ export const DefaultLayout = () => {
   const isSettingsPage = useIsSettingsPage();
   const showFullscreen = useShowFullscreen();
 
-  // Settings keeps the old frame because its sub-navigation lives in the old drawer
+  const roboostMode = useAtomStateValue(roboostModeState);
+  const roboostNavCollapsed = useAtomStateValue(roboostNavCollapsedState);
+
   const isRoboostShellShown =
-    isRoboostUiEnabled && !isMobile && !isSettingsPage && !showFullscreen;
+    isRoboostUiEnabled && !isMobile && !showFullscreen;
 
   return (
     <>
@@ -88,10 +96,20 @@ export const DefaultLayout = () => {
             <StyledPageContainer>
               <PageDragDropProvider>
                 <KeyboardShortcutMenu />
+                {isRoboostUiEnabled && <RoboostPreferencesEffect />}
+                {isRoboostUiEnabled && <RoboostCreateRecordPanel />}
                 {isRoboostShellShown ? (
                   <AppShell
+                    mode={roboostMode}
+                    collapsed={!isSettingsPage && roboostNavCollapsed}
                     topbar={<RoboostTopBar />}
-                    nav={<RoboostAppSideNav />}
+                    nav={
+                      isSettingsPage ? (
+                        <RoboostSettingsSideNav />
+                      ) : (
+                        <RoboostAppSideNav />
+                      )
+                    }
                   >
                     <AppErrorBoundary FallbackComponent={AppPageErrorFallback}>
                       <Outlet />

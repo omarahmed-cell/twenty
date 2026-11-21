@@ -35,6 +35,12 @@ export const ROBOOST_NAV_DEFINITION: RoboostNavGroupDefinition[] = [
         objectNamePlural: 'calendarEvents',
       },
       { id: 'emails', icon: 'mail', objectNamePlural: 'emails' },
+      { id: 'calls', icon: 'phone', objectNamePlural: 'calls' },
+      {
+        id: 'communications',
+        icon: 'sms',
+        objectNamePlural: 'communications',
+      },
     ],
   },
   {

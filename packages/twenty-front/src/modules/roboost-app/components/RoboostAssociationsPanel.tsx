@@ -1,7 +1,6 @@
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
-import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
-import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
 import {
   type RoboostAssociationCard,
   RoboostAssociationGroup,
@@ -104,30 +103,18 @@ export const RoboostAssociationsPanel = ({
     recordGqlFields: { id: true, name: true, createdAt: true },
   });
 
-  const { createOneRecord: createPerson } = useCreateOneRecord({
-    objectNameSingular: CoreObjectNameSingular.Person,
-  });
-  const { createOneRecord: createOpportunity } = useCreateOneRecord({
-    objectNameSingular: CoreObjectNameSingular.Opportunity,
-  });
-  const { createOneRecord: createService } = useCreateOneRecord({
-    objectNameSingular:
-      services.targetObjectNameSingular ?? CoreObjectNameSingular.Company,
-  });
+  const openCreatePanel = useOpenRoboostCreatePanel();
 
-  const createAndOpen = async (
-    create: (input: Record<string, unknown>) => Promise<ObjectRecord>,
+  const openCreate = (
     objectNameSingular: string | undefined,
     joinColumnName: string | undefined,
   ) => {
     if (!isDefined(objectNameSingular) || !isDefined(joinColumnName)) {
       return;
     }
-    const record = await create({ [joinColumnName]: companyId });
-
-    navigateApp(AppPath.RecordShowPage, {
+    openCreatePanel({
       objectNameSingular,
-      objectRecordId: record.id,
+      presetValues: { [joinColumnName]: companyId },
     });
   };
 
@@ -259,11 +246,7 @@ export const RoboostAssociationsPanel = ({
           cards={contactCards}
           addLabel={t`Add contact`}
           onAdd={() =>
-            createAndOpen(
-              createPerson,
-              CoreObjectNameSingular.Person,
-              contacts.joinColumnName,
-            )
+            openCreate(CoreObjectNameSingular.Person, contacts.joinColumnName)
           }
           settingsPath={getSettingsPath('person')}
           defaultOpen
@@ -277,11 +260,7 @@ export const RoboostAssociationsPanel = ({
           cards={dealCards}
           addLabel={t`Add deal`}
           onAdd={() =>
-            createAndOpen(
-              createOpportunity,
-              CoreObjectNameSingular.Opportunity,
-              deals.joinColumnName,
-            )
+            openCreate(CoreObjectNameSingular.Opportunity, deals.joinColumnName)
           }
           settingsPath={getSettingsPath('opportunity')}
           defaultOpen
@@ -295,8 +274,7 @@ export const RoboostAssociationsPanel = ({
           cards={serviceCards}
           addLabel={t`Add service`}
           onAdd={() =>
-            createAndOpen(
-              createService,
+            openCreate(
               services.targetObjectNameSingular,
               services.joinColumnName,
             )
