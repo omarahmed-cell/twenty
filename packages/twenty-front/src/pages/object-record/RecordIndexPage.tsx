@@ -10,11 +10,18 @@ import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/use
 import { metadataStoreState } from '@/metadata-store/states/metadataStoreState';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { isUndefined } from '@sniptt/guards';
-import { RoboostCompaniesListPage } from '@/roboost-app/components/RoboostCompaniesListPage';
+import { RoboostObjectListPage } from '@/roboost-app/list/components/RoboostObjectListPage';
 import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { lazy, Suspense } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
+
+const ROBOOST_CLASSIC_ONLY_OBJECTS = new Set<string>([
+  CoreObjectNameSingular.Workflow,
+  CoreObjectNameSingular.WorkflowVersion,
+  CoreObjectNameSingular.WorkflowRun,
+  CoreObjectNameSingular.Dashboard,
+]);
 
 const WorkflowCoreIndexPage = lazy(() =>
   import('~/pages/object-core/WorkflowCoreIndexPage').then((module) => ({
@@ -45,11 +52,16 @@ export const RecordIndexPage = () => {
   if (
     isRoboostUiEnabled &&
     workspaceSurface.type === 'main' &&
-    objectNamePlural === 'companies' &&
     searchParams.get('view') !== 'classic' &&
-    !isUndefined(routeObjectMetadataItem)
+    !isUndefined(routeObjectMetadataItem) &&
+    !ROBOOST_CLASSIC_ONLY_OBJECTS.has(routeObjectMetadataItem.nameSingular)
   ) {
-    return <RoboostCompaniesListPage />;
+    return (
+      <RoboostObjectListPage
+        key={routeObjectMetadataItem.id}
+        objectMetadataItem={routeObjectMetadataItem}
+      />
+    );
   }
 
   if (
