@@ -24,6 +24,12 @@ import {
 } from '@/roboost-app/list/components/RoboostListTable';
 import { RoboostListToolbar } from '@/roboost-app/list/components/RoboostListToolbar';
 import { RoboostViewTabs } from '@/roboost-app/list/components/RoboostViewTabs';
+import { RoboostBoard } from '@/roboost-app/board/components/RoboostBoard';
+import { RoboostBoardMetrics } from '@/roboost-app/board/components/RoboostBoardMetrics';
+import { RoboostCardSettingsPanel } from '@/roboost-app/board/components/RoboostCardSettingsPanel';
+import { useRoboostBoardCardFields } from '@/roboost-app/board/hooks/useRoboostBoardCardFields';
+import { useRoboostPipelines } from '@/roboost-app/board/hooks/useRoboostPipelines';
+import { Select } from '@/roboost-ui/components/Select';
 import { RoboostListNavigationEffect } from '@/roboost-app/list/components/RoboostListNavigationEffect';
 import { useRoboostViewColumns } from '@/roboost-app/list/hooks/useRoboostViewColumns';
 import {
@@ -48,14 +54,13 @@ import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
+import {
+  CoreObjectNameSingular,
+  type RecordGqlOperationFilter,
+} from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { useDebouncedCallback } from 'use-debounce';
-import {
-  FieldMetadataType,
-  RelationType,
-  ViewType,
-} from '~/generated-metadata/graphql';
+import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 
 const EXPORT_LIMIT = 5000;
 const OWNER_FIELD_NAMES = [
@@ -111,6 +116,13 @@ export const RoboostObjectListPage = ({
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isCardSettingsOpen, setIsCardSettingsOpen] = useState(false);
+  const { pipelines } = useRoboostPipelines(objectMetadataItem);
+  const {
+    cardFields,
+    listableFields: cardListableFields,
+    saveCardFields,
+  } = useRoboostBoardCardFields(objectMetadataItem);
 
   const updateDebouncedSearch = useDebouncedCallback((value: string) => {
     setDebouncedSearch(value);
@@ -274,8 +286,22 @@ export const RoboostObjectListPage = ({
     refetch();
   };
 
-  const isBoardObject = BOARD_OBJECTS.has(objectMetadataItem.nameSingular);
-  const boardView = views.find((view) => view.type === ViewType.KANBAN);
+  const isBoardObject =
+    BOARD_OBJECTS.has(objectMetadataItem.nameSingular) &&
+    activeFields.some(
+      (field) =>
+        field.name === 'stage' && field.type === FieldMetadataType.SELECT,
+    );
+  const displayVarKey = `roboost.listDisplay.${objectMetadataItem.nameSingular}`;
+  const pipelineVarKey = `roboost.boardPipeline.${objectMetadataItem.nameSingular}`;
+  const isBoard =
+    isBoardObject && getUserVar<string>(displayVarKey) === 'board';
+  const selectedPipeline =
+    pipelines.find(
+      (pipeline) => pipeline.key === getUserVar<string>(pipelineVarKey),
+    ) ?? pipelines[0];
+  const hasAmountField = activeFields.some((field) => field.name === 'amount');
+  const boardFilter: RecordGqlOperationFilter = filter ?? {};
 
   return (
     <SpreadsheetImportProvider>
@@ -393,34 +419,51 @@ export const RoboostObjectListPage = ({
             onOpenColumns={() => setIsColumnsOpen(true)}
             displayToggle={
               isBoardObject ? (
-                <span className="rb-display-toggle" role="group">
-                  <button
-                    type="button"
-                    className={cx('rb-icon-btn', 'is-on')}
-                    aria-label={t`Table`}
-                    aria-pressed
-                  >
-                    <Icon name="table" size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    className="rb-icon-btn"
-                    aria-label={t`Board`}
-                    aria-pressed={false}
-                    onClick={() => {
-                      if (!isDefined(boardView)) {
-                        return;
-                      }
-                      const nextSearchParams = new URLSearchParams();
-
-                      nextSearchParams.set('view', 'classic');
-                      nextSearchParams.set('viewId', boardView.id);
-                      setSearchParams(nextSearchParams);
-                    }}
-                  >
-                    <Icon name="board" size={16} />
-                  </button>
-                </span>
+                <>
+                  {isBoard && pipelines.length > 1 && (
+                    <Select
+                      aria-label={t`Pipeline`}
+                      className="rb-pipeline-select"
+                      value={selectedPipeline?.key}
+                      options={pipelines.map((pipeline) => ({
+                        value: pipeline.key,
+                        label: pipeline.name,
+                      }))}
+                      onChange={(key) => setUserVar(pipelineVarKey, key)}
+                    />
+                  )}
+                  <span className="rb-display-toggle" role="group">
+                    <button
+                      type="button"
+                      className={cx('rb-icon-btn', isBoard && 'is-on')}
+                      aria-label={t`Board`}
+                      aria-pressed={isBoard}
+                      onClick={() => setUserVar(displayVarKey, 'board')}
+                    >
+                      <Icon name="board" size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      className={cx('rb-icon-btn', !isBoard && 'is-on')}
+                      aria-label={t`Table`}
+                      aria-pressed={!isBoard}
+                      onClick={() => setUserVar(displayVarKey, 'table')}
+                    >
+                      <Icon name="table" size={16} />
+                    </button>
+                  </span>
+                  {isBoard && (
+                    <button
+                      type="button"
+                      className="rb-icon-btn"
+                      aria-label={t`Card settings`}
+                      title={t`Card settings`}
+                      onClick={() => setIsCardSettingsOpen(true)}
+                    >
+                      <Icon name="gear" size={16} />
+                    </button>
+                  )}
+                </>
               ) : undefined
             }
           />
@@ -429,51 +472,116 @@ export const RoboostObjectListPage = ({
               {t`This list could not be loaded: ${error.message}`}
             </div>
           )}
-          <RoboostListTable
-            objectMetadataItem={objectMetadataItem}
-            objectMetadataItems={objectMetadataItems}
-            columns={columns}
-            records={records as (Record<string, unknown> & { id: string })[]}
-            frozenCount={Math.min(frozenCount, columns.length)}
-            sort={sort}
-            onSort={(nextSort) => {
-              setSort(nextSort);
-              setPage(1);
-            }}
-            selectedIds={selectedIds}
-            onSelectionChange={setSelectedIds}
-            onMoveColumn={moveColumn}
-            onToggleColumn={(fieldId) =>
-              columns.some((column) => column.field.id === fieldId)
-                ? removeColumn(fieldId)
-                : addColumn(fieldId)
-            }
-            onSaved={() => refetch()}
-            isLoading={loading}
-          />
-          <RoboostListFooter
-            countLabel={
-              selectedIds.length > 0
-                ? t`${selectedIds.length} selected of ${countLabel}`
-                : countLabel
-            }
-            page={page}
-            pageCount={pageCount}
-            pageSize={pageSize}
-            onPageChange={(nextPage) =>
-              setPage(Math.min(Math.max(1, nextPage), pageCount))
-            }
-            onPageSizeChange={(nextPageSize) => {
-              setPageSize(nextPageSize);
-              setPage(1);
-            }}
-            onRefresh={() => refetch()}
-            onExport={exportRecords}
-            isExporting={isExporting}
-          />
+          {isBoard && hasAmountField && (
+            <RoboostBoardMetrics
+              objectMetadataItem={objectMetadataItem}
+              filter={
+                isDefined(selectedPipeline) && selectedPipeline.key !== ''
+                  ? {
+                      and: [
+                        boardFilter,
+                        { pipeline: { eq: selectedPipeline.key } },
+                      ],
+                    }
+                  : boardFilter
+              }
+            />
+          )}
+          {isBoard && isDefined(selectedPipeline) && (
+            <RoboostBoard
+              objectMetadataItem={objectMetadataItem}
+              pipeline={selectedPipeline}
+              filter={boardFilter}
+              cardFields={cardFields}
+              ownerField={ownerField}
+            />
+          )}
+          {isBoard && (
+            <div className="rb-ls-foot">
+              <span className="rb-lf-count">{countLabel}</span>
+              <span className="rb-sp" />
+              <span className="rb-lf-right">
+                <button
+                  type="button"
+                  className="rb-icon-btn"
+                  aria-label={t`Refresh`}
+                  title={t`Refresh`}
+                  onClick={() =>
+                    apolloCoreClient.refetchQueries({ include: 'active' })
+                  }
+                >
+                  <Icon name="refresh" size={16} />
+                </button>
+                <button
+                  type="button"
+                  className="rb-hbtn"
+                  disabled={isExporting}
+                  onClick={exportRecords}
+                >
+                  <Icon name="download" size={14} />
+                  {isExporting ? t`Exporting…` : t`Export`}
+                </button>
+              </span>
+            </div>
+          )}
+          {!isBoard && (
+            <RoboostListTable
+              objectMetadataItem={objectMetadataItem}
+              objectMetadataItems={objectMetadataItems}
+              columns={columns}
+              records={records as (Record<string, unknown> & { id: string })[]}
+              frozenCount={Math.min(frozenCount, columns.length)}
+              sort={sort}
+              onSort={(nextSort) => {
+                setSort(nextSort);
+                setPage(1);
+              }}
+              selectedIds={selectedIds}
+              onSelectionChange={setSelectedIds}
+              onMoveColumn={moveColumn}
+              onToggleColumn={(fieldId) =>
+                columns.some((column) => column.field.id === fieldId)
+                  ? removeColumn(fieldId)
+                  : addColumn(fieldId)
+              }
+              onSaved={() => refetch()}
+              isLoading={loading}
+            />
+          )}
+          {!isBoard && (
+            <RoboostListFooter
+              countLabel={
+                selectedIds.length > 0
+                  ? t`${selectedIds.length} selected of ${countLabel}`
+                  : countLabel
+              }
+              page={page}
+              pageCount={pageCount}
+              pageSize={pageSize}
+              onPageChange={(nextPage) =>
+                setPage(Math.min(Math.max(1, nextPage), pageCount))
+              }
+              onPageSizeChange={(nextPageSize) => {
+                setPageSize(nextPageSize);
+                setPage(1);
+              }}
+              onRefresh={() => refetch()}
+              onExport={exportRecords}
+              isExporting={isExporting}
+            />
+          )}
         </div>
       </div>
 
+      {isCardSettingsOpen && (
+        <RoboostCardSettingsPanel
+          objectMetadataItem={objectMetadataItem}
+          cardFields={cardFields}
+          listableFields={cardListableFields}
+          onSave={saveCardFields}
+          onClose={() => setIsCardSettingsOpen(false)}
+        />
+      )}
       {isColumnsOpen && (
         <RoboostColumnsModal
           objectMetadataItem={objectMetadataItem}

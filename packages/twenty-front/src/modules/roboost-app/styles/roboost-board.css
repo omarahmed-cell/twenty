@@ -1,0 +1,201 @@
+/* Deals and Services boards (Deals-Board.dc.html, Services-Board.dc.html) */
+.rb-pipeline-select {
+  width: 200px;
+}
+.rb-metrics {
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex: none;
+  overflow-x: auto;
+}
+.rb-metric {
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex: 1 0 160px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+}
+.rb-metric:last-child {
+  border-right: none;
+}
+.rb-metric-label {
+  color: var(--text-secondary);
+  font: 400 12px/16px var(--font-sans);
+}
+.rb-metric-value {
+  color: var(--text);
+  font: 600 20px/24px var(--font-display);
+}
+.rb-board-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+.rb-board-error {
+  align-items: center;
+  background: var(--danger-soft);
+  color: var(--danger-text);
+  display: flex;
+  flex: none;
+  font: 500 13px/18px var(--font-sans);
+  gap: 8px;
+  padding: 8px 14px;
+}
+.rb-board-error span {
+  flex: 1;
+}
+.rb-board {
+  align-items: stretch;
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 12px;
+}
+.rb-board.is-moving {
+  cursor: progress;
+}
+.rb-bcol {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex: 0 0 290px;
+  flex-direction: column;
+  min-height: 0;
+}
+.rb-bcol.is-over {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.rb-bcol-head {
+  align-items: center;
+  display: flex;
+  flex: none;
+  gap: 8px;
+  padding: 10px 10px 8px 12px;
+}
+.rb-bcol-count {
+  color: var(--text-secondary);
+  font: 500 13px/16px var(--font-sans);
+}
+.rb-bcol-cards {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 10px 10px;
+}
+.rb-bcol-empty,
+.rb-bcol-more {
+  color: var(--text-muted);
+  font: 400 12px/16px var(--font-sans);
+  padding: 8px 4px;
+}
+.rb-bcol-foot {
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  font: 400 12px/18px var(--font-sans);
+  padding: 8px 12px 10px;
+}
+.rb-bcol-foot b {
+  color: var(--text);
+  font-weight: 500;
+}
+.rb-bcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  cursor: grab;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+.rb-bcard.is-dragging {
+  opacity: 0.45;
+}
+.rb-bcard-name {
+  color: var(--accent-text);
+  font: 500 14px/18px var(--font-sans);
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-bcard-name:hover {
+  text-decoration: underline;
+}
+.rb-bcard-props {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rb-bcard-prop {
+  align-items: center;
+  color: var(--text);
+  display: flex;
+  font: 400 12px/18px var(--font-sans);
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.rb-bcard-prop b {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rb-bcard-key {
+  color: var(--text-secondary);
+}
+.rb-bcard-meta {
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 6px;
+  padding-top: 8px;
+}
+.rb-bcard-noowner {
+  color: var(--text-muted);
+  font: 400 12px/16px var(--font-sans);
+}
+.rb-bcard-time {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  font: 400 11px/16px var(--font-sans);
+  gap: 4px;
+  padding: 1px 8px;
+}
+.rb-bcard-actions {
+  display: flex;
+  gap: 2px;
+}
+.rb-cardset-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rb-cardset-preview {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+}
+.rb-cardset-preview .rb-bcard {
+  cursor: default;
+}
