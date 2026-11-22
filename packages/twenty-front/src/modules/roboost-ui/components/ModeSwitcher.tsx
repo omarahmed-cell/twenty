@@ -43,7 +43,8 @@ export const ModeSwitcher = ({
           key={mode.id}
           type="button"
           role="radio"
-          {...getRoboostModeAttributes(mode.id)}
+          data-theme={getRoboostModeAttributes(mode.id).theme}
+          data-scheme={getRoboostModeAttributes(mode.id).scheme}
           className={cx('rb-mode-card', value === mode.id && 'is-selected')}
           aria-checked={value === mode.id}
           onClick={() => onChange(mode.id)}

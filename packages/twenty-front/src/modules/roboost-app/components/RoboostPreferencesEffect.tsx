@@ -43,16 +43,16 @@ export const RoboostPreferencesEffect = () => {
   }, [savedMode]);
 
   useEffect(() => {
-    const attributes = getRoboostModeAttributes(roboostMode);
+    const { theme, scheme } = getRoboostModeAttributes(roboostMode);
+    const root = document.documentElement;
 
-    Object.entries(attributes).forEach(([name, value]) =>
-      document.documentElement.setAttribute(name, value),
-    );
+    root.setAttribute('data-theme', theme);
+    root.setAttribute('data-scheme', scheme);
 
-    return () =>
-      Object.keys(attributes).forEach((name) =>
-        document.documentElement.removeAttribute(name),
-      );
+    return () => {
+      root.removeAttribute('data-theme');
+      root.removeAttribute('data-scheme');
+    };
   }, [roboostMode]);
 
   return null;

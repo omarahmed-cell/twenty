@@ -29,7 +29,8 @@ export const AppShell = ({
 }: AppShellProps) => (
   <div
     className={cx('rb-shell rb-ui', className)}
-    {...getRoboostModeAttributes(mode)}
+    data-theme={getRoboostModeAttributes(mode).theme}
+    data-scheme={getRoboostModeAttributes(mode).scheme}
     data-nav={collapsed ? 'collapsed' : 'expanded'}
     style={style}
   >
