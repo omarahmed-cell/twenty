@@ -1,5 +1,6 @@
 import { Icon } from '@/roboost-ui/components/Icon';
 import { useLingui } from '@lingui/react/macro';
+import { useEffect, useRef } from 'react';
 
 export type MenuSearchProps = {
   value: string;
@@ -13,11 +14,22 @@ export const MenuSearch = ({
   placeholder,
 }: MenuSearchProps) => {
   const { t } = useLingui();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // The opening click is still being handled by page-level listeners that move focus, so focus once it settles
+  useEffect(() => {
+    const timeoutId = window.setTimeout(
+      () => inputRef.current?.focus({ preventScroll: true }),
+      0,
+    );
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   return (
     <div className="rb-menu-search">
       <input
-        autoFocus
+        ref={inputRef}
         className="rb-menu-search-input"
         value={value}
         placeholder={placeholder ?? t`Search`}
