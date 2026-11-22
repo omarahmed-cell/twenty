@@ -2,7 +2,8 @@
    mode values (accent, focus ring, frame) per [data-theme]: light, roboost, sira.
    Font families come from the theme (roboost.ts), so they are defined in one place. */
 
-:root {
+:root,
+[data-scheme='light'] {
   --canvas: #f4f6f8;
   --surface: #ffffff;
   --surface-sunken: #f7f8fa;

@@ -58,7 +58,7 @@ import {
   CoreObjectNameSingular,
   type RecordGqlOperationFilter,
 } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { getOrderByForFieldMetadataType, isDefined } from 'twenty-shared/utils';
 import { useDebouncedCallback } from 'use-debounce';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 
@@ -182,8 +182,16 @@ export const RoboostObjectListPage = ({
     now: new Date(),
   });
 
+  const sortField = isDefined(sort)
+    ? objectMetadataItem.fields.find((field) => field.name === sort.fieldName)
+    : undefined;
   const orderBy = isDefined(sort)
-    ? [{ [sort.fieldName]: SORT_ORDER[sort.direction] }]
+    ? isDefined(sortField)
+      ? getOrderByForFieldMetadataType({
+          field: sortField,
+          orderByDirection: SORT_ORDER[sort.direction],
+        })
+      : [{ [sort.fieldName]: SORT_ORDER[sort.direction] }]
     : viewOrderBy.length > 0
       ? viewOrderBy
       : [{ createdAt: 'DescNullsLast' }];
