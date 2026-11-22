@@ -9,7 +9,6 @@ import {
   type RoboostRecordMainTab,
 } from '@/roboost-app/components/RoboostActivityColumn';
 import { RoboostRecordQuickActions } from '@/roboost-app/components/RoboostRecordQuickActions';
-import { RoboostTopBarTitleEffect } from '@/roboost-app/components/RoboostTopBarTitleEffect';
 import {
   getRoboostLabelIdentifierFieldName,
   getRoboostRecordLabel,
@@ -543,7 +542,6 @@ const RoboostRecordPageContent = ({
 
   return (
     <div className="rb-recpage">
-      <RoboostTopBarTitleEffect title={recordName} />
       <RoboostRecentRecordEffect
         objectNameSingular={objectNameSingular}
         recordId={recordId}

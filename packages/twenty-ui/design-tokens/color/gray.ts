@@ -1,55 +1,57 @@
-import { ROBOOST_TOKENS } from '../roboost';
+import { ROBOOST_DARK_TOKENS, ROBOOST_TOKENS } from '../roboost';
 import { token } from '../token';
+
+const { neutrals: darkNeutrals } = ROBOOST_DARK_TOKENS;
 
 export const GRAY_COLOR_TOKENS = {
   scale: {
     gray1: token({
       light: ROBOOST_TOKENS.neutrals.surface,
-      dark: 'color(display-p3 0.09 0.09 0.09)',
+      dark: darkNeutrals.surface,
     }),
     gray2: token({
       light: ROBOOST_TOKENS.neutrals.surfaceSunken,
-      dark: 'color(display-p3 0.106 0.106 0.106)',
+      dark: darkNeutrals.surfaceSunken,
     }),
     gray3: token({
       light: ROBOOST_TOKENS.neutrals.canvas,
-      dark: 'color(display-p3 0.098 0.098 0.098)',
+      dark: darkNeutrals.canvas,
     }),
     gray4: token({
       light: ROBOOST_TOKENS.neutrals.surfaceHover,
-      dark: 'color(display-p3 0.114 0.114 0.114)',
+      dark: darkNeutrals.surfaceHover,
     }),
     gray5: token({
       light: ROBOOST_TOKENS.neutrals.border,
-      dark: 'color(display-p3 0.133 0.133 0.133)',
+      dark: darkNeutrals.border,
     }),
     gray6: token({
       light: ROBOOST_TOKENS.neutrals.borderStrong,
-      dark: 'color(display-p3 0.282 0.282 0.282)',
+      dark: '#33445e',
     }),
     gray7: token({
       light: '#b4bcc8',
-      dark: 'color(display-p3 0.298 0.298 0.298)',
+      dark: '#425573',
     }),
     gray8: token({
       light: ROBOOST_TOKENS.neutrals.textDisabled,
-      dark: 'color(display-p3 0.4 0.4 0.4)',
+      dark: darkNeutrals.textDisabled,
     }),
     gray9: token({
       light: ROBOOST_TOKENS.neutrals.textMuted,
-      dark: 'color(display-p3 0.506 0.506 0.506)',
+      dark: darkNeutrals.textMuted,
     }),
     gray10: token({
       light: '#636c7c',
-      dark: 'color(display-p3 0.482 0.482 0.482)',
+      dark: '#a3afc1',
     }),
     gray11: token({
       light: ROBOOST_TOKENS.neutrals.textSecondary,
-      dark: 'color(display-p3 0.702 0.702 0.702)',
+      dark: darkNeutrals.textSecondary,
     }),
     gray12: token({
       light: ROBOOST_TOKENS.neutrals.text,
-      dark: 'color(display-p3 0.922 0.922 0.922)',
+      dark: darkNeutrals.text,
     }),
   },
   transparent: {

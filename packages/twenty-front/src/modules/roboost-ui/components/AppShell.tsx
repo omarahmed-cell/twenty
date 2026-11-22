@@ -1,6 +1,7 @@
 import { FrameLogo } from '@/roboost-ui/components/FrameLogo';
 import { type RoboostMode } from '@/roboost-ui/types/RoboostMode';
 import { cx } from '@/roboost-ui/utils/cx';
+import { getRoboostModeAttributes } from '@/roboost-ui/utils/getRoboostModeAttributes';
 import { type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -28,7 +29,7 @@ export const AppShell = ({
 }: AppShellProps) => (
   <div
     className={cx('rb-shell rb-ui', className)}
-    data-theme={mode}
+    {...getRoboostModeAttributes(mode)}
     data-nav={collapsed ? 'collapsed' : 'expanded'}
     style={style}
   >

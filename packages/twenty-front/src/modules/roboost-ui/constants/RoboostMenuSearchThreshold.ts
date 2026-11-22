@@ -1,0 +1,1 @@
+export const ROBOOST_MENU_SEARCH_THRESHOLD = 7;

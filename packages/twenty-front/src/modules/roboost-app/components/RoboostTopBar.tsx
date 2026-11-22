@@ -1,7 +1,6 @@
 import { useAuth } from '@/auth/hooks/useAuth';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { RoboostNewRecordMenu } from '@/roboost-app/components/RoboostNewRecordMenu';
-import { roboostTopBarTitleState } from '@/roboost-app/states/roboostTopBarTitleState';
 import { getRoboostPersonName } from '@/roboost-app/utils/getRoboostPersonName';
 import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Icon } from '@/roboost-ui/components/Icon';
@@ -11,13 +10,11 @@ import { roboostSearchOpenState } from '@/roboost-app/search/states/roboostSearc
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
-import { isNonEmptyString } from '@sniptt/guards';
 import { Link } from 'react-router-dom';
 
 export const RoboostTopBar = () => {
   const { t } = useLingui();
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
-  const roboostTopBarTitle = useAtomStateValue(roboostTopBarTitleState);
   const [roboostSearchOpen, setRoboostSearchOpen] = useAtomState(
     roboostSearchOpenState,
   );
@@ -27,11 +24,6 @@ export const RoboostTopBar = () => {
 
   return (
     <>
-      {isNonEmptyString(roboostTopBarTitle) && (
-        <span className="rb-topbar-title rb-truncate">
-          {roboostTopBarTitle}
-        </span>
-      )}
       <div className="rb-topbar-search">
         <button
           type="button"

@@ -2,6 +2,7 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { type RoboostListSort } from '@/roboost-app/list/components/RoboostListTable';
+import { RoboostSortPopover } from '@/roboost-app/list/components/RoboostSortPopover';
 import {
   type RoboostDateRange,
   type RoboostListFilters,
@@ -203,50 +204,10 @@ export const RoboostListToolbar = ({
         <Icon name="filter" size={14} />
         {advancedCount > 0 ? t`Filter (${advancedCount})` : t`Filter`}
       </button>
-      <Menu
-        minWidth={240}
-        entries={[
-          ...(sort !== null
-            ? [
-                {
-                  id: 'clear',
-                  label: t`Default order`,
-                  icon: 'x' as const,
-                  onSelect: () => onSortChange(null),
-                },
-                { id: 'sep', isSeparator: true as const },
-              ]
-            : []),
-          ...sortableFields.flatMap((field) => [
-            {
-              id: `${field.name}-asc`,
-              label: `${field.label} ↑`,
-              isSelected:
-                sort?.fieldName === field.name && sort.direction === 'asc',
-              onSelect: () =>
-                onSortChange({ fieldName: field.name, direction: 'asc' }),
-            },
-            {
-              id: `${field.name}-desc`,
-              label: `${field.label} ↓`,
-              isSelected:
-                sort?.fieldName === field.name && sort.direction === 'desc',
-              onSelect: () =>
-                onSortChange({ fieldName: field.name, direction: 'desc' }),
-            },
-          ]),
-        ]}
-        trigger={({ toggle, isOpen }) => (
-          <button
-            type="button"
-            className={cx('rb-chip', sort !== null && 'is-on')}
-            aria-expanded={isOpen}
-            onClick={toggle}
-          >
-            <Icon name="sort-lines" size={14} />
-            {t`Sort`}
-          </button>
-        )}
+      <RoboostSortPopover
+        sortableFields={sortableFields}
+        sort={sort}
+        onSortChange={onSortChange}
       />
       <span className="rb-tdiv" />
       {isDefined(ownerField) && (

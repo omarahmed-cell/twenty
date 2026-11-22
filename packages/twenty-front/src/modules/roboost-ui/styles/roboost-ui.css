@@ -425,8 +425,8 @@
 }
 [data-theme='roboost'] .rb-check[data-checked='true'] .rb-check-box,
 [data-theme='roboost'] .rb-check[data-indeterminate='true'] .rb-check-box {
-  background: var(--accent-text);
-  border-color: var(--accent-text);
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
 }
 .rb-check[data-checked='true'] .rb-check-box .rb-icon {
   opacity: 1;
@@ -505,8 +505,8 @@
   border-color: var(--accent);
 }
 [data-theme='roboost'] .rb-tag-solid.rb-tag-accent {
-  background: var(--accent-text);
-  border-color: var(--accent-text);
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
 }
 .rb-tag-x {
   display: inline-flex;
@@ -942,12 +942,6 @@
   gap: var(--space-2);
   padding: 0 var(--space-4) 0 var(--space-2);
   min-width: 0;
-}
-.rb-topbar-title {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--frame-text-strong);
 }
 .rb-topbar-spacer {
   flex: 1;
@@ -2231,4 +2225,146 @@
   right: auto;
   top: auto;
   z-index: 90;
+}
+
+/* ---------- Dropdowns: search, two-line rows, own scrollbar ---------- */
+.rb-menu.rb-menu-portal {
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+.rb-menu.rb-menu-portal::-webkit-scrollbar {
+  width: 8px;
+}
+.rb-menu.rb-menu-portal::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+.rb-menu-search {
+  align-items: center;
+  background: var(--surface);
+  display: flex;
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-1)) var(--space-1);
+  padding: var(--space-2);
+  position: sticky;
+  top: calc(-1 * var(--space-1));
+  z-index: 1;
+}
+.rb-menu-search .rb-icon {
+  color: var(--text-muted);
+  margin-left: -30px;
+  pointer-events: none;
+}
+.rb-menu-search-input {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--text);
+  flex: 1;
+  font: 400 14px/18px var(--font-sans);
+  height: 34px;
+  min-width: 0;
+  outline: none;
+  padding: 0 34px 0 14px;
+}
+.rb-menu-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.rb-menu-two-line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: normal;
+}
+.rb-menu-label-main {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-menu-label-sub {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-menu-item[aria-selected='true'] .rb-menu-label-sub {
+  font-weight: 400;
+}
+.rb-menu-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: var(--space-2) var(--space-3);
+}
+.rb-picker-menu.rb-menu-portal {
+  min-width: 240px;
+}
+
+/* ---------- Popover panel + sort box ---------- */
+.rb-popover-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+  position: fixed;
+  z-index: 80;
+}
+.rb-sort-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  width: 460px;
+}
+.rb-sort-box-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.rb-sort-box-title {
+  font: 500 14px/20px var(--font-sans);
+}
+.rb-sort-box-row {
+  align-items: center;
+  display: flex;
+  gap: var(--space-3);
+}
+.rb-sort-box-field {
+  flex: 1;
+  min-width: 0;
+}
+.rb-segmented {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  flex: none;
+  overflow: hidden;
+}
+.rb-segmented-btn {
+  background: var(--surface);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font: 500 13px/18px var(--font-sans);
+  height: 32px;
+  padding: 0 var(--space-3);
+  white-space: nowrap;
+}
+.rb-segmented-btn + .rb-segmented-btn {
+  border-left: 1px solid var(--border-strong);
+}
+.rb-segmented-btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+.rb-segmented-btn.is-on {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.rb-segmented-btn:disabled {
+  color: var(--text-disabled);
+  cursor: default;
 }

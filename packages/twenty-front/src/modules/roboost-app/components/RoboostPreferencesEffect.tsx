@@ -2,12 +2,12 @@ import { currentUserState } from '@/auth/states/currentUserState';
 import { ROBOOST_USER_VAR_KEYS } from '@/roboost-app/constants/RoboostUserVarKeys';
 import { roboostModeState } from '@/roboost-app/states/roboostModeState';
 import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
+import { ROBOOST_MODES } from '@/roboost-ui/constants/RoboostModes';
 import { type RoboostMode } from '@/roboost-ui/types/RoboostMode';
+import { getRoboostModeAttributes } from '@/roboost-ui/utils/getRoboostModeAttributes';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useEffect } from 'react';
-
-const ROBOOST_MODES: RoboostMode[] = ['roboost', 'sira', 'light'];
 
 // Follows the member's saved mode and nav state and puts it on <html>, so menus and dialogs portalled to <body> match
 export const RoboostPreferencesEffect = () => {
@@ -43,9 +43,16 @@ export const RoboostPreferencesEffect = () => {
   }, [savedMode]);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', roboostMode);
+    const attributes = getRoboostModeAttributes(roboostMode);
 
-    return () => document.documentElement.removeAttribute('data-theme');
+    Object.entries(attributes).forEach(([name, value]) =>
+      document.documentElement.setAttribute(name, value),
+    );
+
+    return () =>
+      Object.keys(attributes).forEach((name) =>
+        document.documentElement.removeAttribute(name),
+      );
   }, [roboostMode]);
 
   return null;

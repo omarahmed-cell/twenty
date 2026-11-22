@@ -1,1 +1,6 @@
-export type RoboostMode = 'roboost' | 'sira' | 'light';
+export type RoboostMode =
+  | 'roboost'
+  | 'roboost-dark'
+  | 'sira'
+  | 'sira-dark'
+  | 'light';

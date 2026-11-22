@@ -1,5 +1,6 @@
 import { type RoboostMode } from '@/roboost-ui/types/RoboostMode';
 import { cx } from '@/roboost-ui/utils/cx';
+import { getRoboostModeAttributes } from '@/roboost-ui/utils/getRoboostModeAttributes';
 import { useLingui } from '@lingui/react/macro';
 
 export type ModeSwitcherProps = {
@@ -21,7 +22,17 @@ export const ModeSwitcher = ({
       name: t`Roboost`,
       description: t`Navy frame · orange accent`,
     },
+    {
+      id: 'roboost-dark',
+      name: t`Roboost Dark`,
+      description: t`Deep navy · orange accent`,
+    },
     { id: 'sira', name: t`Sira`, description: t`Blue frame · blue accent` },
+    {
+      id: 'sira-dark',
+      name: t`Sira Dark`,
+      description: t`Deep blue · blue accent`,
+    },
     { id: 'light', name: t`Light`, description: t`White frame · red accent` },
   ];
 
@@ -32,7 +43,7 @@ export const ModeSwitcher = ({
           key={mode.id}
           type="button"
           role="radio"
-          data-theme={mode.id}
+          {...getRoboostModeAttributes(mode.id)}
           className={cx('rb-mode-card', value === mode.id && 'is-selected')}
           aria-checked={value === mode.id}
           onClick={() => onChange(mode.id)}

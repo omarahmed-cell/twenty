@@ -1,16 +1,16 @@
 // Generated from design-tokens by scripts/generateThemeTokens.ts.
 // Do not edit manually. Regenerate with: npx nx generateTokens twenty-ui.
 export const GRAY_SCALE_DARK = {
-  gray1: 'color(display-p3 0.09 0.09 0.09)',
-  gray2: 'color(display-p3 0.106 0.106 0.106)',
-  gray3: 'color(display-p3 0.098 0.098 0.098)',
-  gray4: 'color(display-p3 0.114 0.114 0.114)',
-  gray5: 'color(display-p3 0.133 0.133 0.133)',
-  gray6: 'color(display-p3 0.282 0.282 0.282)',
-  gray7: 'color(display-p3 0.298 0.298 0.298)',
-  gray8: 'color(display-p3 0.4 0.4 0.4)',
-  gray9: 'color(display-p3 0.506 0.506 0.506)',
-  gray10: 'color(display-p3 0.482 0.482 0.482)',
-  gray11: 'color(display-p3 0.702 0.702 0.702)',
-  gray12: 'color(display-p3 0.922 0.922 0.922)',
+  gray1: '#111c2e',
+  gray2: '#0d1727',
+  gray3: '#0b1424',
+  gray4: '#18253a',
+  gray5: '#26354c',
+  gray6: '#33445e',
+  gray7: '#425573',
+  gray8: '#66748a',
+  gray9: '#94a2b6',
+  gray10: '#a3afc1',
+  gray11: '#b1bccc',
+  gray12: '#e9eef5',
 };

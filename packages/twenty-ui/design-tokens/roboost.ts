@@ -1,5 +1,6 @@
 // Roboost CRM brand values (design hand-off tokens.json, 20 Nov 2026). The rest of the design tokens point here,
-// so a brand change is made in this file only. The app is light-only for now, so these are light values.
+// so a brand change is made in this file only. ROBOOST_TOKENS are the light values, ROBOOST_DARK_TOKENS the
+// Roboost Dark / Sira Dark ones, mirrored in twenty-front roboost-tokens.css under [data-scheme='dark'].
 export const ROBOOST_TOKENS = {
   fonts: {
     // Licensed brand fonts (Sharp Grotesk 20, Alliance No.2) can replace these two lines once their web licence is confirmed
@@ -83,5 +84,85 @@ export const ROBOOST_TOKENS = {
     warm: '#ff8300',
     warmRed: '#ff4713',
     red: '#ea0029',
+  },
+};
+
+// Text levels reach 4.5:1 and borderStrong 3:1 on surface, canvas and hover
+export const ROBOOST_DARK_TOKENS = {
+  neutrals: {
+    surface: '#111c2e',
+    surfaceSunken: '#0d1727',
+    canvas: '#0b1424',
+    surfaceHover: '#18253a',
+    border: '#26354c',
+    borderStrong: '#60749a',
+    borderSubtle: '#1c2a3f',
+    surfaceActive: '#203049',
+    textDisabled: '#66748a',
+    textMuted: '#94a2b6',
+    textSecondary: '#b1bccc',
+    text: '#e9eef5',
+  },
+  shadow: {
+    xs: '0 1px 2px rgba(0, 0, 0, 0.4)',
+    sm: '0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4)',
+    md: '0 6px 16px rgba(0, 0, 0, 0.5)',
+    lg: '0 16px 40px rgba(0, 0, 0, 0.6)',
+  },
+  overlay: 'rgba(2, 6, 14, 0.66)',
+  status: {
+    success: '#34c48b',
+    successText: '#6fdcae',
+    successSoft: '#0f3328',
+    successBorder: '#1f6149',
+    warning: '#f0a63a',
+    warningText: '#f6c272',
+    warningSoft: '#3a2a10',
+    warningBorder: '#6e4f1c',
+    danger: '#f26b61',
+    dangerText: '#ff9b93',
+    dangerSoft: '#3f1b1d',
+    dangerBorder: '#7a3332',
+    info: '#4d94ff',
+    infoText: '#93bcff',
+    infoSoft: '#132a4d',
+    infoBorder: '#2a5290',
+  },
+  avatar: {
+    background: '#223149',
+    foreground: '#c8d2e0',
+  },
+  controlHoverBorder: '#8496b4',
+  tooltipBackground: '#2a3a52',
+  modes: {
+    roboost: {
+      accent: '#ff8300',
+      accentHover: '#ff962e',
+      accentActive: '#e67600',
+      accentText: '#ffa149',
+      accentSoft: '#3b2614',
+      accentSoftHover: '#4a2f16',
+      accentBorder: '#7a4a18',
+      // Solid fills behind white content (checkboxes, solid tags); the orange itself is too light for white
+      accentFill: '#c2410c',
+      focusRing: '#ff962e',
+      frame: '#00122a',
+      frameText: '#c2cfe3',
+      frameTextMuted: '#8da0bd',
+    },
+    sira: {
+      accent: '#2f6fe8',
+      accentHover: '#4a83f2',
+      accentActive: '#2560d6',
+      accentText: '#94b8ff',
+      accentSoft: '#16295a',
+      accentSoftHover: '#1c3370',
+      accentBorder: '#2f4f9a',
+      accentFill: '#2f6fe8',
+      focusRing: '#6a9dff',
+      frame: '#06164a',
+      frameText: '#c3d2f2',
+      frameTextMuted: '#93a6d6',
+    },
   },
 };

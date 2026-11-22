@@ -1,17 +1,14 @@
 import { Icon } from '@/roboost-ui/components/Icon';
+import { MenuSearch } from '@/roboost-ui/components/MenuSearch';
+import { ROBOOST_MENU_SEARCH_THRESHOLD } from '@/roboost-ui/constants/RoboostMenuSearchThreshold';
+import { useRoboostCloseOnOutsideScroll } from '@/roboost-ui/hooks/useRoboostCloseOnOutsideScroll';
+import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverPosition';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
-import {
-  type CSSProperties,
-  type FocusEvent,
-  type ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useLingui } from '@lingui/react/macro';
+import { type FocusEvent, type ReactNode, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { isDefined } from 'twenty-shared/utils';
 
 export type MenuEntry =
   | {
@@ -22,6 +19,7 @@ export type MenuEntry =
       isDanger?: boolean;
       isDisabled?: boolean;
       hint?: string;
+      description?: string;
       onSelect: () => void;
     }
   | { id: string; label: string; icon?: RoboostIconName; href: string }
@@ -37,7 +35,13 @@ export type MenuProps = {
   keepOpenOnSelect?: boolean;
   minWidth?: number;
   placement?: 'below' | 'above';
+  isSearchable?: boolean;
+  searchPlaceholder?: string;
 };
+
+const isActionEntry = (
+  entry: MenuEntry,
+): entry is Extract<MenuEntry, { label: string }> => 'label' in entry;
 
 export const Menu = ({
   trigger,
@@ -48,51 +52,45 @@ export const Menu = ({
   keepOpenOnSelect = false,
   minWidth = 200,
   placement = 'below',
+  isSearchable,
+  searchPlaceholder,
 }: MenuProps) => {
+  const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState<CSSProperties>({});
+  const [search, setSearch] = useState('');
   const anchorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { position, updatePosition } = useRoboostPopoverPosition({
+    anchorRef,
+    align,
+    placement,
+  });
+
+  const actionEntries = entries.filter(isActionEntry);
+  const showSearch =
+    isSearchable ?? actionEntries.length > ROBOOST_MENU_SEARCH_THRESHOLD;
+  const searchTerm = search.trim().toLowerCase();
+  const visibleEntries =
+    showSearch && searchTerm !== ''
+      ? actionEntries.filter((entry) =>
+          `${entry.label} ${'description' in entry ? (entry.description ?? '') : ''}`
+            .toLowerCase()
+            .includes(searchTerm),
+        )
+      : entries;
 
   // Popovers live in a body portal so scrolling panels and modals never clip them
   const open = () => {
-    const rect = anchorRef.current?.getBoundingClientRect();
-
-    if (isDefined(rect)) {
-      setPosition({
-        ...(placement === 'above'
-          ? { bottom: window.innerHeight - rect.top + 4 }
-          : { top: rect.bottom + 4 }),
-        ...(align === 'right'
-          ? { right: Math.max(8, window.innerWidth - rect.right) }
-          : { left: Math.max(8, rect.left) }),
-      });
-    }
+    updatePosition();
+    setSearch('');
     setIsOpen(true);
   };
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    const close = (event: Event) => {
-      if (
-        event.target instanceof Node &&
-        menuRef.current?.contains(event.target) === true
-      ) {
-        return;
-      }
-      setIsOpen(false);
-    };
-
-    window.addEventListener('scroll', close, true);
-    window.addEventListener('resize', close);
-
-    return () => {
-      window.removeEventListener('scroll', close, true);
-      window.removeEventListener('resize', close);
-    };
-  }, [isOpen]);
+  useRoboostCloseOnOutsideScroll({
+    isOpen,
+    popoverRef: menuRef,
+    onClose: () => setIsOpen(false),
+  });
 
   const closeWhenFocusLeaves = (event: FocusEvent<HTMLDivElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -123,10 +121,21 @@ export const Menu = ({
             style={{ minWidth, ...position }}
             role="menu"
             tabIndex={-1}
-            onMouseDown={(event) => event.preventDefault()}
+            onMouseDown={(event) => {
+              if (!(event.target instanceof HTMLInputElement)) {
+                event.preventDefault();
+              }
+            }}
           >
+            {showSearch && (
+              <MenuSearch
+                value={search}
+                onChange={setSearch}
+                placeholder={searchPlaceholder}
+              />
+            )}
             {header}
-            {entries.map((entry) => {
+            {visibleEntries.map((entry) => {
               if ('isSeparator' in entry) {
                 return <div key={entry.id} className="rb-menu-sep" />;
               }
@@ -144,7 +153,16 @@ export const Menu = ({
                   {entry.icon !== undefined && (
                     <Icon name={entry.icon} size={16} />
                   )}
-                  <span className="rb-menu-label">{entry.label}</span>
+                  {'description' in entry && entry.description !== undefined ? (
+                    <span className="rb-menu-label rb-menu-two-line">
+                      <span className="rb-menu-label-main">{entry.label}</span>
+                      <span className="rb-menu-label-sub">
+                        {entry.description}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="rb-menu-label">{entry.label}</span>
+                  )}
                   {'hint' in entry && entry.hint !== undefined && (
                     <span className="rb-menu-hint">{entry.hint}</span>
                   )}
@@ -196,6 +214,9 @@ export const Menu = ({
                 </button>
               );
             })}
+            {showSearch && visibleEntries.length === 0 && (
+              <div className="rb-menu-empty">{t`No matches`}</div>
+            )}
             {footer}
           </div>,
           document.body,
