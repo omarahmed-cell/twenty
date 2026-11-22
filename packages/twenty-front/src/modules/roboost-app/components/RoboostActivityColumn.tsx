@@ -30,7 +30,7 @@ const KINDS_BY_SUB_TAB: Record<
   all: null,
   notes: ['note'],
   emails: ['email', 'tracking'],
-  calls: ['call'],
+  calls: ['call', 'communication'],
   tasks: ['task'],
   meetings: ['meeting'],
 };
@@ -250,6 +250,7 @@ export const RoboostActivityColumn = ({
     task: t`Tasks`,
     call: t`Calls`,
     meeting: t`Meetings`,
+    communication: t`Messages`,
   };
 
   const dateRangeLabels: Record<RoboostActivityDateRange, string> = {

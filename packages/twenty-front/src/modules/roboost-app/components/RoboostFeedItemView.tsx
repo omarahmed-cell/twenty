@@ -177,6 +177,30 @@ export const RoboostFeedItemView = ({
             .join(' · ')}
         />
       );
+    case 'communication':
+      return (
+        <RoboostActivityCard
+          icon={
+            item.title === t`LinkedIn`
+              ? 'linkedin'
+              : item.title === t`SMS`
+                ? 'sms'
+                : 'whatsapp'
+          }
+          tone="success"
+          onOpen={openInSidePanel('communication')}
+          title={
+            <>
+              <b>{item.title}</b>
+              {isNonEmptyString(item.ownerName)
+                ? ` ${t`logged by`} ${item.ownerName}`
+                : ''}
+            </>
+          }
+          time={time}
+          description={description}
+        />
+      );
     default:
       return null;
   }

@@ -4,7 +4,8 @@ export type RoboostFeedKind =
   | 'note'
   | 'task'
   | 'call'
-  | 'meeting';
+  | 'meeting'
+  | 'communication';
 
 export type RoboostFeedEmail = {
   id: string;

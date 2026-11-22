@@ -147,7 +147,44 @@ export const useRoboostActivityFeed = ({
     },
   });
 
+  const communications = useRoboostTargetedRecords({
+    ...target,
+    junctionObjectNameSingular: 'communicationTarget',
+    relationFieldName: 'communication',
+    recordGqlFields: {
+      id: true,
+      title: true,
+      bodyV2: true,
+      channelType: true,
+      direction: true,
+      createdAt: true,
+      createdBy: true,
+    },
+  });
+
+  const channelLabels: Record<string, string> = {
+    WHATSAPP: t`WhatsApp`,
+    LINKEDIN: t`LinkedIn`,
+    SMS: t`SMS`,
+  };
+
   const items: RoboostFeedItem[] = [];
+
+  for (const record of communications.records as LooseRecord[]) {
+    const channel = asString(record.channelType) ?? '';
+
+    items.push({
+      id: `communication-${String(record.id)}`,
+      kind: 'communication',
+      date: asString(record.createdAt) ?? '',
+      title: channelLabels[channel] ?? channel,
+      body: getMarkdown(record.bodyV2),
+      ownerId: getActorId(record.createdBy),
+      ownerName: getActorName(record.createdBy),
+      creatorId: getActorId(record.createdBy),
+      meta: asString(record.direction) ?? '',
+    });
+  }
 
   for (const record of emails.records as LooseRecord[]) {
     const email: RoboostFeedEmail = {
@@ -291,6 +328,7 @@ export const useRoboostActivityFeed = ({
       notes.loading ||
       tasks.loading ||
       calls.loading ||
-      meetings.loading,
+      meetings.loading ||
+      communications.loading,
   };
 };

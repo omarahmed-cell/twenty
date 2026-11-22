@@ -5,6 +5,7 @@ export const ROBOOST_ICON_PATHS = {
   caret: ['M6 9l6 6 6-6'],
   'chevron-left': ['M15 18l-6-6 6-6'],
   'chevron-right': ['M9 18l6-6-6-6'],
+  'chevron-up': ['M6 15l6-6 6 6'],
   sort: ['M8 9l4-4 4 4', 'M16 15l-4 4-4-4'],
   'sort-lines': ['M7 4v16', 'M4 8l3-4 3 4', 'M17 20V4', 'M14 16l3 4 3-4'],
   check: ['M20 6L9 17l-5-5'],

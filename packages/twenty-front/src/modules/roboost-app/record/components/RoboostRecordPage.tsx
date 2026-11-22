@@ -308,23 +308,6 @@ const RoboostRecordPageContent = ({
   );
   const rightHandlers = dragHandlers('right', rightIds);
 
-  // Modules not built yet stay visible and do nothing
-  const quickActionMoreEntries: MenuEntry[] = [
-    {
-      id: 'whatsapp',
-      label: t`WhatsApp`,
-      icon: 'whatsapp',
-      onSelect: () => {},
-    },
-    {
-      id: 'linkedin',
-      label: t`LinkedIn`,
-      icon: 'linkedin',
-      onSelect: () => {},
-    },
-    { id: 'sms', label: t`SMS`, icon: 'sms', onSelect: () => {} },
-  ];
-
   const left = (
     <>
       <section className="rb-rc rb-tb" aria-label={t`Record summary`}>
@@ -393,11 +376,8 @@ const RoboostRecordPageContent = ({
             id: recordId,
             targetObjectNameSingular: objectNameSingular,
           }}
-          onOpenMeetings={() => {
-            setMainTab('activities');
-            setSubTab('meetings');
-          }}
-          moreEntries={quickActionMoreEntries}
+          targetLabel={recordName}
+          moreEntries={[]}
         />
       </section>
       {leftIds.map((sectionId, index) => {

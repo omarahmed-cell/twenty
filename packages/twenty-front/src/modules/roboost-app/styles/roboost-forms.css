@@ -1,0 +1,195 @@
+/* Settings → Forms (Forms-Settings.dc.html) */
+.rb-forms-page {
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 28px 32px 40px;
+  width: 100%;
+}
+.rb-forms-crumbs {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  font: 400 14px/18px var(--font-sans);
+  gap: 8px;
+}
+.rb-forms-crumbs a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.rb-forms-crumbs b {
+  color: var(--text);
+  font-weight: 500;
+}
+.rb-forms-title {
+  font: 600 28px/34px var(--font-display);
+  margin: 18px 0 0;
+}
+.rb-forms-sub {
+  color: var(--text-secondary);
+  font: 400 15px/20px var(--font-sans);
+  margin: 4px 0 18px;
+}
+.rb-forms-grid {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 220px minmax(0, 1.4fr) minmax(0, 1fr);
+}
+.rb-forms-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  min-width: 0;
+}
+.rb-forms-card-head {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  font: 600 15px/20px var(--font-sans);
+  gap: 8px;
+  padding: 16px 18px;
+}
+.rb-forms-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+}
+.rb-forms-card-foot {
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 10px;
+  padding: 14px 18px;
+}
+.rb-forms-objects {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+}
+.rb-forms-object {
+  align-items: center;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  display: flex;
+  font: 500 14px/18px var(--font-sans);
+  gap: 10px;
+  padding: 9px 10px;
+  text-decoration: none;
+}
+.rb-forms-object:hover {
+  background: var(--surface-hover);
+}
+.rb-forms-object.is-on {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.rb-forms-hint {
+  color: var(--text-secondary);
+  font: 400 14px/20px var(--font-sans);
+  margin: 0 0 4px;
+}
+.rb-forms-row {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+}
+.rb-forms-row.is-dragging {
+  opacity: 0.5;
+}
+.rb-forms-name {
+  flex: 1;
+  font: 600 14px/18px var(--font-sans);
+  min-width: 0;
+}
+.rb-forms-kind {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.rb-forms-req {
+  color: var(--text-secondary);
+  font: 400 13px/16px var(--font-sans);
+}
+.rb-forms-add {
+  position: relative;
+}
+.rb-forms-addpop {
+  left: 0;
+  right: auto;
+  top: calc(100% + 6px);
+}
+.rb-forms-additem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+}
+.rb-forms-live {
+  background: var(--success);
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+.rb-forms-preview {
+  gap: 16px;
+}
+.rb-forms-star {
+  color: var(--danger);
+}
+.rb-forms-status {
+  color: var(--success-text);
+  font: 500 13px/16px var(--font-sans);
+}
+.rb-forms-status.is-error {
+  color: var(--danger-text);
+}
+.rb-toggle {
+  background: var(--border-strong);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  flex: none;
+  height: 22px;
+  padding: 2px;
+  position: relative;
+  transition: background 0.15s;
+  width: 40px;
+}
+.rb-toggle.is-on {
+  background: var(--accent);
+}
+.rb-toggle[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.rb-toggle-knob {
+  background: var(--surface);
+  border-radius: 50%;
+  box-shadow: var(--shadow-xs);
+  display: block;
+  height: 18px;
+  transition: transform 0.15s;
+  width: 18px;
+}
+.rb-toggle.is-on .rb-toggle-knob {
+  transform: translateX(18px);
+}
+@media (max-width: 1280px) {
+  .rb-forms-grid {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .rb-forms-grid > :last-child {
+    grid-column: 2;
+  }
+}

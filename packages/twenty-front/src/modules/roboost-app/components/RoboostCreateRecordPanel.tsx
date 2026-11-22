@@ -141,7 +141,7 @@ const RoboostCreateRecordForm = ({
       <div className="rb-cpanel-editform">
         <Link
           className="rb-link"
-          to={`/settings/forms/${objectMetadataItem.namePlural}`}
+          to={`/settings/roboost-forms/${objectMetadataItem.nameSingular}`}
           onClick={onClose}
         >
           {t`Edit this form`} <Icon name="external-link" size={12} />

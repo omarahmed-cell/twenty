@@ -17,7 +17,15 @@ export type InputProps = {
   defaultValue?: string;
   placeholder?: string;
   disabled?: boolean;
-  type?: 'text' | 'search' | 'email' | 'number' | 'url' | 'tel' | 'date';
+  type?:
+    | 'text'
+    | 'search'
+    | 'email'
+    | 'number'
+    | 'url'
+    | 'datetime-local'
+    | 'tel'
+    | 'date';
   name?: string;
   className?: string;
   inputRef?: Ref<HTMLInputElement>;

@@ -52,8 +52,22 @@ export const RoboostSettingsSideNav = () => {
     ],
   };
 
+  const roboostGroup: NavGroup = {
+    label: t`Roboost CRM`,
+    items: [
+      {
+        id: 'roboost-forms',
+        label: t`Forms`,
+        icon: 'list',
+        href: '/settings/roboost-forms',
+        active: pathname.startsWith('/settings/roboost-forms'),
+      },
+    ],
+  };
+
   const groups: NavGroup[] = [
     backGroup,
+    roboostGroup,
     ...sections.map((section) => ({
       label: section.label,
       items: toNavItems(section.items, pathname),

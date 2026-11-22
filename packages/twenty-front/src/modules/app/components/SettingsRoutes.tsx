@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { RoboostFormsSettingsPage } from '@/roboost-app/forms/components/RoboostFormsSettingsPage';
 import {
   createRoutesFromElements,
   Navigate,
@@ -806,6 +807,11 @@ const createSettingsRouteElements = ({
       element={<SettingsTwoFactorAuthenticationMethod />}
     />
     <Route path={SettingsPath.Experience} element={<SettingsExperience />} />
+    <Route path="roboost-forms" element={<RoboostFormsSettingsPage />} />
+    <Route
+      path="roboost-forms/:objectNameSingular"
+      element={<RoboostFormsSettingsPage />}
+    />
     <Route
       path={SettingsPath.GmailExtension}
       element={<SettingsGmailExtension />}

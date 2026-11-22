@@ -11,6 +11,7 @@ import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/provide
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { RoboostAppSideNav } from '@/roboost-app/components/RoboostAppSideNav';
 import { RoboostCreateRecordPanel } from '@/roboost-app/components/RoboostCreateRecordPanel';
+import { RoboostActivityComposer } from '@/roboost-app/activity/components/RoboostActivityComposer';
 import { RoboostPreferencesEffect } from '@/roboost-app/components/RoboostPreferencesEffect';
 import { RoboostSettingsSideNav } from '@/roboost-app/components/RoboostSettingsSideNav';
 import { roboostModeState } from '@/roboost-app/states/roboostModeState';
@@ -98,6 +99,7 @@ export const DefaultLayout = () => {
                 <KeyboardShortcutMenu />
                 {isRoboostUiEnabled && <RoboostPreferencesEffect />}
                 {isRoboostUiEnabled && <RoboostCreateRecordPanel />}
+                {isRoboostUiEnabled && <RoboostActivityComposer />}
                 {isRoboostShellShown ? (
                   <AppShell
                     mode={roboostMode}

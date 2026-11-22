@@ -1,5 +1,9 @@
 import { useComposeEmailForTargetRecord } from '@/activities/emails/hooks/useComposeEmailForTargetRecord';
-import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
+import {
+  type RoboostActivityType,
+  roboostActivityComposerState,
+} from '@/roboost-app/activity/states/roboostActivityComposerState';
+import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
@@ -7,7 +11,6 @@ import { ROBOOST_UI_THEME } from '@/roboost-ui/constants/RoboostUiTheme';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
-import { CoreObjectNameSingular } from 'twenty-shared/types';
 
 const StyledRow = styled.div`
   display: flex;
@@ -79,25 +82,30 @@ const StyledMoreAnchor = styled.div`
 
 type RoboostRecordQuickActionsProps = {
   targetRecord: ActivityTargetableObject;
-  onOpenMeetings: () => void;
+  targetLabel: string;
   moreEntries: MenuEntry[];
 };
 
 export const RoboostRecordQuickActions = ({
   targetRecord,
-  onOpenMeetings,
+  targetLabel,
   moreEntries,
 }: RoboostRecordQuickActionsProps) => {
   const { t } = useLingui();
-  const openCreatePanel = useOpenRoboostCreatePanel();
+  const setRoboostActivityComposer = useSetAtomState(
+    roboostActivityComposerState,
+  );
 
-  const openActivity = (objectNameSingular: string) =>
-    openCreatePanel({
-      objectNameSingular,
-      linkToRecord: {
-        objectNameSingular: targetRecord.targetObjectNameSingular,
-        recordId: targetRecord.id,
-      },
+  const openActivity = (type: RoboostActivityType) =>
+    setRoboostActivityComposer({
+      type,
+      targets: [
+        {
+          objectNameSingular: targetRecord.targetObjectNameSingular,
+          recordId: targetRecord.id,
+          label: targetLabel,
+        },
+      ],
     });
 
   const { openComposer } = useComposeEmailForTargetRecord(targetRecord);
@@ -113,26 +121,26 @@ export const RoboostRecordQuickActions = ({
       key: 'note',
       label: t`Note`,
       icon: 'note',
-      onClick: () => openActivity(CoreObjectNameSingular.Note),
+      onClick: () => openActivity('note'),
     },
     { key: 'email', label: t`Email`, icon: 'mail', onClick: openComposer },
     {
       key: 'call',
       label: t`Call`,
       icon: 'phone',
-      onClick: () => openActivity(CoreObjectNameSingular.Call),
+      onClick: () => openActivity('call'),
     },
     {
       key: 'task',
       label: t`Task`,
       icon: 'tasks',
-      onClick: () => openActivity(CoreObjectNameSingular.Task),
+      onClick: () => openActivity('task'),
     },
     {
       key: 'meeting',
       label: t`Meeting`,
       icon: 'calendar',
-      onClick: onOpenMeetings,
+      onClick: () => openActivity('meeting'),
     },
   ];
 
@@ -154,7 +162,30 @@ export const RoboostRecordQuickActions = ({
       <StyledMoreAnchor>
         <Menu
           align="right"
-          entries={moreEntries}
+          entries={[
+            {
+              id: 'whatsapp',
+              label: t`Log WhatsApp`,
+              icon: 'whatsapp',
+              onSelect: () => openActivity('whatsapp'),
+            },
+            {
+              id: 'linkedin',
+              label: t`Log LinkedIn message`,
+              icon: 'linkedin',
+              onSelect: () => openActivity('linkedin'),
+            },
+            {
+              id: 'sms',
+              label: t`Log SMS`,
+              icon: 'sms',
+              onSelect: () => openActivity('sms'),
+            },
+            ...(moreEntries.length > 0
+              ? [{ id: 'more-separator', isSeparator: true as const }]
+              : []),
+            ...moreEntries,
+          ]}
           trigger={({ toggle, isOpen }) => (
             <StyledAction
               type="button"
