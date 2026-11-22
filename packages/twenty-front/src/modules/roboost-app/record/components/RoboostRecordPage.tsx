@@ -15,7 +15,13 @@ import {
   getRoboostRecordLabel,
 } from '@/roboost-app/fields/getRoboostRecordLabel';
 import { useRoboostActivityFeed } from '@/roboost-app/hooks/useRoboostActivityFeed';
-import { useRoboostPropertySections } from '@/roboost-app/hooks/useRoboostPropertySections';
+import { useRoboostRecordLayoutConfig } from '@/roboost-app/layout/hooks/useRoboostRecordLayoutConfig';
+import {
+  getRoboostCardLogicFieldNames,
+  isRoboostCardVisible,
+} from '@/roboost-app/layout/utils/roboostCardLogic';
+import { getRoboostRecordViewSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
+import { buildConditionalLogicFields } from '@/conditional-logic/utils/buildConditionalLogicFields';
 import { getRoboostListRecordGqlFields } from '@/roboost-app/list/utils/getRoboostListRecordGqlFields';
 import { RoboostAssociationContainer } from '@/roboost-app/record/components/RoboostAssociationContainer';
 import { RoboostAttachmentsContainer } from '@/roboost-app/record/components/RoboostAttachmentsContainer';
@@ -27,7 +33,6 @@ import {
   type RoboostRecordPanelSide,
   useRoboostRecordLayout,
 } from '@/roboost-app/record/hooks/useRoboostRecordLayout';
-import { getRoboostAssociations } from '@/roboost-app/record/utils/getRoboostAssociations';
 import { roboostRecordLeftPanelCollapsedState } from '@/roboost-app/states/roboostRecordLeftPanelCollapsedState';
 import { roboostRecordRightPanelCollapsedState } from '@/roboost-app/states/roboostRecordRightPanelCollapsedState';
 import { formatRoboostFieldValue } from '@/roboost-app/utils/formatRoboostFieldValue';
@@ -148,17 +153,37 @@ const RoboostRecordPageContent = ({
   const [isRightOpenedOnNarrow, setIsRightOpenedOnNarrow] = useState(false);
   const isSidePanelOpened = useAtomStateValue(isSidePanelOpenedState);
   const layout = useRoboostRecordLayout(objectNameSingular);
-
-  const sections = useRoboostPropertySections(objectMetadataItem);
-  const associations = getRoboostAssociations(
-    objectMetadataItem,
-    objectMetadataItems,
-    t`Attachments`,
-  );
+  const {
+    layout: recordLayout,
+    associations,
+    isReady: isLayoutReady,
+  } = useRoboostRecordLayoutConfig(objectMetadataItem, objectMetadataItems);
 
   const activeFields = objectMetadataItem.fields.filter(
     (field) => field.isActive,
   );
+  const findActiveField = (name: string) =>
+    activeFields.find((field) => field.name === name);
+  const cards = recordLayout.left.map((card) => ({
+    ...card,
+    fields: card.fieldNames.map(findActiveField).filter(isDefined),
+  }));
+  const logicFieldByName = new Map(
+    buildConditionalLogicFields(activeFields).map((field) => [
+      field.name,
+      field,
+    ]),
+  );
+  const logicFields = [
+    ...recordLayout.left.flatMap((card) =>
+      getRoboostCardLogicFieldNames(card.logic),
+    ),
+    ...recordLayout.right.flatMap((card) =>
+      getRoboostCardLogicFieldNames(card.logic),
+    ),
+  ]
+    .map(findActiveField)
+    .filter(isDefined);
   const ownerField = OWNER_FIELD_NAMES.map((name) =>
     activeFields.find(
       (field) =>
@@ -186,7 +211,8 @@ const RoboostRecordPageContent = ({
     ...headerFields,
     ...(isDefined(ownerField) ? [ownerField] : []),
     ...manyToOneFields,
-    ...sections.flatMap((section) => section.fields),
+    ...cards.flatMap((card) => card.fields),
+    ...logicFields,
   ];
 
   const { record, loading, refetch } = useFindOneRecord({
@@ -231,6 +257,8 @@ const RoboostRecordPageContent = ({
   const propertiesSettingsPath = getSettingsPropertiesPath({
     objectNamePlural: objectMetadataItem.namePlural,
   });
+  const recordViewSettingsPath =
+    getRoboostRecordViewSettingsPath(objectNameSingular);
 
   const recordName =
     getRoboostRecordLabel(loadedRecord, objectMetadataItem) ||
@@ -267,13 +295,10 @@ const RoboostRecordPageContent = ({
       onSelect: () => layout.resetToDefault(),
     },
     {
-      id: 'save-default',
-      label: t`Make this order the default for everyone`,
-      icon: 'pin',
-      hint: t`Admins only`,
-      onSelect: () => {
-        layout.saveAsDefault().catch(() => {});
-      },
+      id: 'edit-layout',
+      label: t`Edit record view`,
+      icon: 'external-link',
+      href: recordViewSettingsPath,
     },
   ];
 
@@ -297,14 +322,32 @@ const RoboostRecordPageContent = ({
     },
   });
 
+  const visibleCards = isLayoutReady
+    ? cards.filter((card) =>
+        isRoboostCardVisible({
+          logic: card.logic,
+          record: loadedRecord,
+          fieldByName: logicFieldByName,
+        }),
+      )
+    : [];
+  const visibleAssociationCards = recordLayout.right.filter(
+    (card) =>
+      !card.isHidden &&
+      isRoboostCardVisible({
+        logic: card.logic,
+        record: loadedRecord,
+        fieldByName: logicFieldByName,
+      }),
+  );
   const leftIds = layout.orderIds(
     'left',
-    sections.map((section) => section.id),
+    visibleCards.map((card) => card.id),
   );
   const leftHandlers = dragHandlers('left', leftIds);
   const rightIds = layout.orderIds(
     'right',
-    associations.map((association) => association.id),
+    visibleAssociationCards.map((card) => card.id),
   );
   const rightHandlers = dragHandlers('right', rightIds);
 
@@ -380,35 +423,33 @@ const RoboostRecordPageContent = ({
           moreEntries={[]}
         />
       </section>
-      {leftIds.map((sectionId, index) => {
-        const section = sections.find(
-          (candidate) => candidate.id === sectionId,
-        );
+      {leftIds.map((cardId, index) => {
+        const card = visibleCards.find((candidate) => candidate.id === cardId);
 
-        if (!isDefined(section)) {
+        if (!isDefined(card)) {
           return null;
         }
 
         return (
           <RoboostPropertyGroupContainer
-            key={section.id}
-            id={section.id}
-            title={section.title}
-            fields={section.fields}
+            key={card.id}
+            id={card.id}
+            title={card.title}
+            fields={card.fields}
             record={loadedRecord}
             objectMetadataItem={objectMetadataItem}
             objectMetadataItems={objectMetadataItems}
             defaultOpen={index < 2}
-            propertiesSettingsPath={propertiesSettingsPath}
+            propertiesSettingsPath={recordViewSettingsPath}
             settingsEntries={containerSettings('left', [
               {
                 id: 'properties',
-                label: t`Property groups settings`,
+                label: t`Properties settings`,
                 icon: 'external-link',
                 href: propertiesSettingsPath,
               },
             ])}
-            isDropTarget={dropTargetId === `left:${section.id}`}
+            isDropTarget={dropTargetId === `left:${card.id}`}
             onSaved={() => refetch()}
             onDragStart={leftHandlers.onDragStart}
             onDragOver={leftHandlers.onDragOver}
@@ -486,6 +527,10 @@ const RoboostRecordPageContent = ({
             ])}
             isDropTarget={isDropTarget}
             onSourceRecordChanged={() => refetch()}
+            cardFieldNames={
+              visibleAssociationCards.find((card) => card.id === association.id)
+                ?.fieldNames
+            }
             onDragStart={rightHandlers.onDragStart}
             onDragOver={rightHandlers.onDragOver}
             onDrop={rightHandlers.onDrop}
@@ -525,7 +570,8 @@ const RoboostRecordPageContent = ({
               setMainTab('activities');
               setSubTab(tab);
             }}
-            customizePath={propertiesSettingsPath}
+            customizePath={recordViewSettingsPath}
+            overviewSections={recordLayout.overview}
             members={members.map((member) => ({
               id: member.id,
               name: getRoboostPersonName(member.name),

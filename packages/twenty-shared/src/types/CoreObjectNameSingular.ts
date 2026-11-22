@@ -40,6 +40,7 @@ export enum CoreObjectNameSingular {
   PropertyGroupMembership = 'propertyGroupMembership',
   PropertyLogicRule = 'propertyLogicRule',
   PropertyCreation = 'propertyCreation',
+  RecordLayout = 'recordLayout',
   Note = 'note',
   NoteTarget = 'noteTarget',
   Opportunity = 'opportunity',

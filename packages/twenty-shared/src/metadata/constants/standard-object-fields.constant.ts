@@ -1676,6 +1676,23 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: 'ac1dbdf2-ff6e-429d-8df5-855cae248d73',
     },
   },
+  recordLayout: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.recordLayout,
+    ),
+    objectMetadataId: {
+      universalIdentifier: 'fc8189cb-bceb-44c3-a9c9-05656d16dea9',
+    },
+    roleId: {
+      universalIdentifier: 'a1bf892d-0090-42ff-a6cc-1e12e8dfa3c1',
+    },
+    teamId: {
+      universalIdentifier: '1f1dbcd7-b2e7-4949-9f27-9726a0f0fa7a',
+    },
+    layout: {
+      universalIdentifier: '87a3d07e-3af6-422a-b406-10e2f7fbecdd',
+    },
+  },
   messageChannelMessageAssociation: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

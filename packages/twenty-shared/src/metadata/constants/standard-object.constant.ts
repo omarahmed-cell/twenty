@@ -1075,6 +1075,11 @@ export const STANDARD_OBJECTS = {
     fields: STANDARD_OBJECT_FIELDS.propertyCreation,
     indexes: {},
   },
+  recordLayout: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.recordLayout,
+    fields: STANDARD_OBJECT_FIELDS.recordLayout,
+    indexes: {},
+  },
   messageChannelMessageAssociation: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

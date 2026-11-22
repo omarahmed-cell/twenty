@@ -12,6 +12,7 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { Link } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
+import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 export type RoboostAssociationRecord = Record<string, unknown> & { id: string };
 
@@ -24,14 +25,33 @@ const LINE_FIELD_NAMES_BY_OBJECT: Record<string, string[]> = {
   service: ['pipeline', 'createdAt'],
 };
 
+// Configured fields: the first dropdown becomes the tag, the rest are lines; otherwise the built-in pick
 export const getRoboostAssociationCardFields = (
   objectMetadataItem: EnrichedObjectMetadataItem,
-) => {
+  configuredFieldNames?: string[],
+): {
+  tagField: FieldMetadataItem | undefined;
+  lineFields: FieldMetadataItem[];
+} => {
   const activeFields = objectMetadataItem.fields.filter(
     (field) => field.isActive,
   );
   const findField = (name: string) =>
     activeFields.find((field) => field.name === name);
+
+  if (isDefined(configuredFieldNames)) {
+    const configuredFields = configuredFieldNames
+      .map(findField)
+      .filter(isDefined);
+    const tagField = configuredFields.find(
+      (field) => field.type === FieldMetadataType.SELECT,
+    );
+
+    return {
+      tagField,
+      lineFields: configuredFields.filter((field) => field !== tagField),
+    };
+  }
 
   const tagField = TAG_FIELD_NAMES.map(findField).find(isDefined);
   const lineFields = (

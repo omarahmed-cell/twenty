@@ -48,6 +48,7 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
   propertyGroupMembership: [{ name: 'id', type: FieldMetadataType.UUID }],
   propertyLogicRule: [{ name: 'id', type: FieldMetadataType.UUID }],
   propertyCreation: [{ name: 'id', type: FieldMetadataType.UUID }],
+  recordLayout: [{ name: 'id', type: FieldMetadataType.UUID }],
   messageParticipant: [{ name: 'handle', type: FieldMetadataType.TEXT }],
   messageSuppression: [],
   messageThread: [{ name: 'subject', type: FieldMetadataType.TEXT }],

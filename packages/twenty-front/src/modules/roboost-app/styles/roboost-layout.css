@@ -1,0 +1,462 @@
+/* Settings → Layout (Forms + Record view editor) */
+.rb-layout-tabs {
+  margin: 10px 0 18px;
+}
+.rb-layout-subtitle {
+  font: 600 18px/24px var(--font-display);
+  margin: 0;
+}
+.rb-rv-list {
+  max-width: 900px;
+}
+.rb-rv-object .rb-forms-name {
+  font-weight: 600;
+}
+.rb-rv-object a.rb-btn {
+  text-decoration: none;
+}
+
+/* Full-screen editor */
+.rb-rve {
+  background: var(--surface-sunken);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  inset: 0;
+  position: fixed;
+  z-index: 40;
+}
+.rb-rve-bar {
+  align-items: center;
+  background: var(--text);
+  color: var(--surface);
+  display: flex;
+  flex: none;
+  gap: 8px;
+  height: 56px;
+  padding: 0 16px;
+}
+.rb-rve-bar .rb-rve-bar-btn {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--surface) 55%, transparent);
+  border-radius: 999px;
+  color: var(--surface);
+}
+.rb-rve-bar .rb-rve-bar-btn:disabled {
+  opacity: 0.5;
+}
+.rb-rve-bar .rb-rve-bar-save {
+  background: var(--surface);
+  border-color: var(--surface);
+  border-radius: 999px;
+  color: var(--text);
+}
+.rb-rve-bar-icon {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--surface);
+  cursor: pointer;
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+.rb-rve-bar-icon:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.rb-rve-bar-icon:not(:disabled):hover {
+  background: color-mix(in srgb, var(--surface) 15%, transparent);
+}
+.rb-rve-bar-title {
+  flex: 1;
+  font: 600 17px/22px var(--font-display);
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-rve-bar-sep {
+  margin: 0 8px;
+  opacity: 0.5;
+}
+.rb-rve-bar-view {
+  font-weight: 500;
+}
+.rb-rve-bar-status {
+  font: 400 13px/16px var(--font-sans);
+  opacity: 0.85;
+}
+.rb-rve-bar-status.is-error {
+  color: var(--danger-soft);
+  opacity: 1;
+}
+.rb-rve-body {
+  display: grid;
+  flex: 1;
+  gap: 0;
+  grid-template-columns: minmax(300px, 0.9fr) minmax(380px, 1.4fr) minmax(300px, 0.9fr);
+  min-height: 0;
+}
+.rb-rve-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 20px 40px;
+}
+.rb-rve-middle {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.rb-rve-identity {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+.rb-rve-identity-top {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  gap: 12px;
+}
+.rb-rve-identity-name {
+  color: var(--text);
+  font: 600 17px/22px var(--font-display);
+}
+.rb-rve-identity-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+.rb-rve-identity-dot {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  height: 30px;
+  width: 30px;
+}
+.rb-rve-slot {
+  display: flex;
+  flex-direction: column;
+}
+.rb-rve-add-slot {
+  display: flex;
+  height: 30px;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.rb-rve-add {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 26px;
+  justify-content: center;
+  margin-top: 2px;
+  opacity: 0.45;
+  position: relative;
+  transition: opacity 0.12s ease;
+  width: 26px;
+}
+.rb-rve-add-slot:hover .rb-rve-add,
+.rb-rve-add:focus-visible,
+.rb-rve-add[aria-expanded='true'] {
+  color: var(--text);
+  opacity: 1;
+}
+.rb-rve-add:hover::after {
+  background: var(--text);
+  border-radius: var(--radius-md);
+  bottom: calc(100% + 6px);
+  color: var(--surface);
+  content: attr(data-tooltip);
+  font: 500 12px/16px var(--font-sans);
+  left: 50%;
+  padding: 5px 9px;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.rb-rve-card {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  cursor: grab;
+  display: flex;
+  gap: 8px;
+  min-height: 64px;
+  padding: 12px 12px 12px 8px;
+}
+.rb-rve-card.is-dragging {
+  opacity: 0.45;
+}
+.rb-rve-card.is-drop-target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.rb-rve-card.is-hidden .rb-rve-card-main {
+  opacity: 0.55;
+}
+.rb-rve-grip {
+  color: var(--text-muted);
+  display: inline-flex;
+  flex: none;
+}
+.rb-rve-card-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rb-rve-card-title {
+  align-items: center;
+  display: flex;
+  font: 600 14px/18px var(--font-sans);
+  gap: 6px;
+  min-width: 0;
+}
+.rb-rve-card-title > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-rve-card-sub {
+  color: var(--text-secondary);
+  font: 400 13px/17px var(--font-sans);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-rve-logic-badge,
+.rb-rve-hidden-badge {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: none;
+  font: 500 11px/16px var(--font-sans);
+  gap: 3px;
+  padding: 0 7px;
+}
+.rb-rve-logic-badge {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.rb-rve-hidden-badge {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.rb-rve-tabs {
+  margin-bottom: 16px;
+}
+.rb-rve-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rb-rve-timeline {
+  align-items: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  display: flex;
+  font: 500 14px/18px var(--font-sans);
+  gap: 8px;
+  justify-content: center;
+  min-height: 220px;
+}
+
+/* Add / edit card modal */
+.rb-rve-modal .rb-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rb-rve-modal-name {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rb-rve-picker {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+.rb-rve-picker-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.rb-rve-picker-list {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+}
+.rb-rve-picker-item {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  font: 400 14px/18px var(--font-sans);
+  gap: 8px;
+  padding: 7px 8px;
+  text-align: left;
+}
+.rb-rve-picker-item:hover {
+  background: var(--surface-hover);
+}
+.rb-rve-picked {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: grab;
+  display: flex;
+  gap: 6px;
+  padding: 5px 6px 5px 8px;
+}
+.rb-rve-picked.is-dragging {
+  opacity: 0.5;
+}
+.rb-rve-picked-name {
+  flex: 1;
+  font: 500 14px/18px var(--font-sans);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Conditional logic pop-up */
+.rb-rve-logic-scrim {
+  inset: 0;
+  position: fixed;
+  z-index: 60;
+}
+.rb-rve-logic {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.18));
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 24px);
+  position: fixed;
+}
+.rb-rve-logic-head {
+  align-items: center;
+  display: flex;
+  font: 600 18px/24px var(--font-display);
+  justify-content: space-between;
+  padding: 16px 18px 8px;
+}
+.rb-rve-logic-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 4px 18px 12px;
+}
+.rb-rve-logic-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+.rb-rve-logic-or {
+  color: var(--text-secondary);
+  font: 600 12px/16px var(--font-sans);
+  text-align: center;
+}
+.rb-rve-logic-cond {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rb-rve-logic-cond-head {
+  align-items: center;
+  display: flex;
+  font: 600 14px/18px var(--font-sans);
+}
+.rb-rve-logic-values {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rb-rve-logic-add-value {
+  min-width: 150px;
+}
+.rb-rve-tag-x {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  margin-left: 2px;
+  padding: 0;
+}
+.rb-rve-logic-link {
+  align-items: center;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--accent-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: 500 13px/18px var(--font-sans);
+  gap: 4px;
+  padding: 2px 0;
+}
+.rb-rve-logic-then {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font: 600 14px/18px var(--font-sans);
+}
+.rb-rve-logic-summary {
+  color: var(--text);
+  font: 400 14px/20px var(--font-sans);
+  margin: 0;
+}
+.rb-rve-logic-summary b {
+  font-weight: 600;
+}
+.rb-rve-logic-foot {
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px;
+}

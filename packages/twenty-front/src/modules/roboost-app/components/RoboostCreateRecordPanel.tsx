@@ -1,3 +1,4 @@
+import { getRoboostFormsSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
@@ -141,7 +142,7 @@ const RoboostCreateRecordForm = ({
       <div className="rb-cpanel-editform">
         <Link
           className="rb-link"
-          to={`/settings/roboost-forms/${objectMetadataItem.nameSingular}`}
+          to={getRoboostFormsSettingsPath(objectMetadataItem.nameSingular)}
           onClick={onClose}
         >
           {t`Edit this form`} <Icon name="external-link" size={12} />

@@ -19,6 +19,7 @@ import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
+import { getRoboostFormsSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import { Link, useParams } from 'react-router-dom';
 import { isDefined } from 'twenty-shared/utils';
 
@@ -338,7 +339,7 @@ const RoboostFormEditor = ({
   );
 };
 
-// Settings → Forms: the create form of each object, saved for the whole workspace
+// Settings → Layout → Forms: the create form of each object, saved for the whole workspace
 export const RoboostFormsSettingsPage = () => {
   const { t } = useLingui();
   const { objectNameSingular } = useParams<{ objectNameSingular?: string }>();
@@ -362,19 +363,8 @@ export const RoboostFormsSettingsPage = () => {
     ) ?? formObjects[0];
 
   return (
-    <div className="rb-ui rb-forms-page">
-      <div className="rb-forms-crumbs">
-        <Link to="/settings/profile">{t`Settings`}</Link>
-        <span>/</span>
-        <Link to="/settings/roboost-forms">{t`Forms`}</Link>
-        {isDefined(selected) && (
-          <>
-            <span>/</span>
-            <b>{selected.item.labelPlural}</b>
-          </>
-        )}
-      </div>
-      <h1 className="rb-forms-title">{t`Create forms`}</h1>
+    <>
+      <h2 className="rb-layout-subtitle">{t`Create forms`}</h2>
       <p className="rb-forms-sub">
         {t`Choose which fields appear when a rep creates a record, their order, and which are required.`}
       </p>
@@ -384,7 +374,7 @@ export const RoboostFormsSettingsPage = () => {
           {formObjects.map(({ icon, item }) => (
             <Link
               key={item.nameSingular}
-              to={`/settings/roboost-forms/${item.nameSingular}`}
+              to={getRoboostFormsSettingsPath(item.nameSingular)}
               className={cx(
                 'rb-forms-object',
                 item.nameSingular === selected?.item.nameSingular && 'is-on',
@@ -402,6 +392,6 @@ export const RoboostFormsSettingsPage = () => {
           />
         )}
       </div>
-    </div>
+    </>
   );
 };

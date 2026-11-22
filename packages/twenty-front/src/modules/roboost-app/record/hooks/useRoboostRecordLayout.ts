@@ -17,15 +17,13 @@ const sortByOrder = (ids: string[], order: string[]) => {
   );
 };
 
-// Container order per object: the member's own order, else the admin default, else the natural order
+// Container order per object: the member's own order, else the order of Settings > Layout > Record view
 export const useRoboostRecordLayout = (objectNameSingular: string) => {
-  const { getUserVar, getWorkspaceDefault, setUserVar, setWorkspaceDefault } =
-    useRoboostUserVars();
+  const { getUserVar, setUserVar } = useRoboostUserVars();
   const key = `roboost.recordLayout.${objectNameSingular}`;
 
   const userOrder = getUserVar<RoboostRecordLayoutOrder>(key);
-  const defaultOrder = getWorkspaceDefault<RoboostRecordLayoutOrder>(key);
-  const order = userOrder ?? defaultOrder ?? EMPTY_ORDER;
+  const order = userOrder ?? EMPTY_ORDER;
 
   const orderIds = (side: RoboostRecordPanelSide, ids: string[]) =>
     sortByOrder(ids, order[side] ?? []);
@@ -53,13 +51,10 @@ export const useRoboostRecordLayout = (objectNameSingular: string) => {
 
   const resetToDefault = () => setUserVar(key, null);
 
-  const saveAsDefault = () => setWorkspaceDefault(key, order);
-
   return {
     orderIds,
     move,
     resetToDefault,
-    saveAsDefault,
     hasPersonalOrder: isDefined(userOrder),
   };
 };

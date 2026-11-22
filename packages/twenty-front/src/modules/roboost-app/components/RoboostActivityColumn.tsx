@@ -1,3 +1,4 @@
+import { type RoboostLayoutOverviewSection } from '@/roboost-app/layout/types/RoboostRecordLayout';
 import { RoboostFeedItemView } from '@/roboost-app/components/RoboostFeedItemView';
 import {
   type RoboostFeedItem,
@@ -14,7 +15,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-export type RoboostRecordMainTab = 'overview' | 'activities' | 'intelligence';
+export type RoboostRecordMainTab = 'overview' | 'activities';
 export type RoboostActivitySubTab =
   | 'all'
   | 'notes'
@@ -219,6 +220,7 @@ type RoboostActivityColumnProps = {
   onSubTabChange: (tab: RoboostActivitySubTab) => void;
   customizePath: string;
   members: { id: string; name: string }[];
+  overviewSections: RoboostLayoutOverviewSection[];
 };
 
 export const RoboostActivityColumn = ({
@@ -230,6 +232,7 @@ export const RoboostActivityColumn = ({
   onSubTabChange,
   customizePath,
   members,
+  overviewSections,
 }: RoboostActivityColumnProps) => {
   const { t } = useLingui();
   const [search, setSearch] = useState('');
@@ -379,7 +382,6 @@ export const RoboostActivityColumn = ({
             tabs={[
               { id: 'overview', label: t`Overview` },
               { id: 'activities', label: t`Activities`, count: items.length },
-              { id: 'intelligence', label: t`Intelligence` },
             ]}
             value={mainTab}
             onChange={(id) => onMainTabChange(id as RoboostRecordMainTab)}
@@ -388,30 +390,31 @@ export const RoboostActivityColumn = ({
         <StyledCustomize to={customizePath}>{t`Customize`}</StyledCustomize>
       </StyledTabsRow>
 
-      {mainTab === 'intelligence' && (
-        <StyledEmpty>
-          {t`Intelligence for this record will appear here once account insights are connected.`}
-        </StyledEmpty>
-      )}
-
-      {mainTab === 'overview' && (
-        <>
-          <StyledSectionTitle>{t`Open tasks`}</StyledSectionTitle>
-          {openTasks.length > 0 ? (
-            renderFeed(openTasks)
-          ) : (
-            <StyledEmpty>{t`No open tasks.`}</StyledEmpty>
-          )}
-          <StyledSectionTitle>{t`Latest activity`}</StyledSectionTitle>
-          {items.length > 0 ? (
-            renderFeed(items.slice(0, OVERVIEW_ITEM_COUNT))
-          ) : (
-            <StyledEmpty>
-              {loading ? t`Loading activity…` : t`No activity yet.`}
-            </StyledEmpty>
-          )}
-        </>
-      )}
+      {mainTab === 'overview' &&
+        overviewSections
+          .filter((section) => !section.isHidden)
+          .map((section) => (
+            <Fragment key={section.id}>
+              <StyledSectionTitle>{section.title}</StyledSectionTitle>
+              {section.id === 'openTasks' &&
+                (openTasks.length > 0 ? (
+                  renderFeed(openTasks)
+                ) : (
+                  <StyledEmpty>{t`No open tasks.`}</StyledEmpty>
+                ))}
+              {section.id === 'pinnedActivities' && (
+                <StyledEmpty>{t`No pinned activities yet.`}</StyledEmpty>
+              )}
+              {section.id === 'latestActivity' &&
+                (items.length > 0 ? (
+                  renderFeed(items.slice(0, OVERVIEW_ITEM_COUNT))
+                ) : (
+                  <StyledEmpty>
+                    {loading ? t`Loading activity…` : t`No activity yet.`}
+                  </StyledEmpty>
+                ))}
+            </Fragment>
+          ))}
 
       {mainTab === 'activities' && (
         <>

@@ -43,6 +43,7 @@ export const STANDARD_OBJECT_ICONS = {
   propertyGroupMembership: 'IconFolderPlus',
   propertyLogicRule: 'IconListCheck',
   propertyCreation: 'IconUserPlus',
+  recordLayout: 'IconLayoutSidebar',
   person: 'IconUser',
   service: 'IconBriefcase',
   product: 'IconPackage',

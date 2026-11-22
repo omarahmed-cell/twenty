@@ -1,3 +1,4 @@
+import { ROBOOST_LAYOUT_SETTINGS_PATH } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import {
   type NavGroup,
   type NavItem,
@@ -56,11 +57,11 @@ export const RoboostSettingsSideNav = () => {
     label: t`Roboost CRM`,
     items: [
       {
-        id: 'roboost-forms',
-        label: t`Forms`,
-        icon: 'list',
-        href: '/settings/roboost-forms',
-        active: pathname.startsWith('/settings/roboost-forms'),
+        id: 'roboost-layout',
+        label: t`Layout`,
+        icon: 'columns',
+        href: ROBOOST_LAYOUT_SETTINGS_PATH,
+        active: pathname.startsWith(ROBOOST_LAYOUT_SETTINGS_PATH),
       },
     ],
   };

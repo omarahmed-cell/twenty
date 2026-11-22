@@ -59,6 +59,7 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   propertyGroupMembership: '2214aef3-fea1-435d-ae7f-5214dc1c63fe',
   propertyLogicRule: '82c97370-4fe4-49a9-ad8e-f9910b85273b',
   propertyCreation: 'affcb06c-a531-4034-9e3f-35ac7bc95410',
+  recordLayout: '68fccb95-cd12-4bd0-b50e-aaf174ea8beb',
   messageCampaign: '238acb94-dd4c-4036-bc55-19b99d821efd',
   shortLink: '22c96608-d1b1-49a2-b328-3e738d61d82d',
   messageParticipant: '20202020-a433-4456-aa2d-fd9cb26b774a',

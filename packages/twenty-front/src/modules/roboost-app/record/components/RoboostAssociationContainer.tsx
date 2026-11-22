@@ -43,6 +43,7 @@ type RoboostAssociationContainerProps = {
   onDrop: (id: string) => void;
   onDragEnd: () => void;
   onSourceRecordChanged: () => void;
+  cardFieldNames?: string[];
 };
 
 export const RoboostAssociationContainer = ({
@@ -58,6 +59,7 @@ export const RoboostAssociationContainer = ({
   onDrop,
   onDragEnd,
   onSourceRecordChanged,
+  cardFieldNames,
 }: RoboostAssociationContainerProps) => {
   const { t } = useLingui();
   const { updateOneRecord } = useUpdateOneRecord();
@@ -69,7 +71,10 @@ export const RoboostAssociationContainer = ({
 
   const target = association.targetObjectMetadataItem;
   const targetLabel = target.labelSingular.toLowerCase();
-  const { tagField, lineFields } = getRoboostAssociationCardFields(target);
+  const { tagField, lineFields } = getRoboostAssociationCardFields(
+    target,
+    cardFieldNames,
+  );
   const labelField = target.fields.find(
     (field) => field.name === getRoboostLabelIdentifierFieldName(target),
   );
