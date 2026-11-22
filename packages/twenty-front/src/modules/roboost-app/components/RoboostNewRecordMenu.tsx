@@ -40,10 +40,26 @@ export const RoboostNewRecordMenu = () => {
     },
   );
 
+  const hasPerson = objectMetadataItems.some(
+    (item) => item.nameSingular === 'person' && item.isActive,
+  );
+  const quickLeadEntries: MenuEntry[] = hasPerson
+    ? [
+        { id: 'quick-lead-separator', isSeparator: true },
+        {
+          id: 'quick-lead',
+          label: t`Quick lead`,
+          icon: 'user',
+          hint: t`Contact and company`,
+          onSelect: () => openCreatePanel({ objectNameSingular: 'person' }),
+        },
+      ]
+    : [];
+
   return (
     <Menu
       align="right"
-      entries={entries}
+      entries={[...entries, ...quickLeadEntries]}
       trigger={({ toggle, isOpen }) => (
         <Button
           variant="primary"

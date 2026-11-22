@@ -6,6 +6,9 @@ export type RoboostCreatePanelRequest = {
   presetValues?: Record<string, unknown>;
   // Activities created from a record are linked to it through their junction object
   linkToRecord?: { objectNameSingular: string; recordId: string };
+  // Prefilled, editable form values (Clone)
+  initialValues?: Record<string, unknown>;
+  initialRelatedRecords?: Record<string, { id: string; label: string } | null>;
 };
 
 export const roboostCreatePanelState =

@@ -24,6 +24,7 @@ import {
 } from '@/roboost-app/list/components/RoboostListTable';
 import { RoboostListToolbar } from '@/roboost-app/list/components/RoboostListToolbar';
 import { RoboostViewTabs } from '@/roboost-app/list/components/RoboostViewTabs';
+import { RoboostListNavigationEffect } from '@/roboost-app/list/components/RoboostListNavigationEffect';
 import { useRoboostViewColumns } from '@/roboost-app/list/hooks/useRoboostViewColumns';
 import {
   EMPTY_ROBOOST_LIST_FILTERS,
@@ -196,6 +197,7 @@ export const RoboostObjectListPage = ({
     recordGqlFields,
   });
 
+  const recordIds = records.map((record) => record.id);
   const pageCount = Math.max(1, Math.ceil(totalCount / pageSize));
   const objectLabelLower = objectMetadataItem.labelPlural.toLowerCase();
   const countLabel = hasLoaded
@@ -277,6 +279,10 @@ export const RoboostObjectListPage = ({
 
   return (
     <SpreadsheetImportProvider>
+      <RoboostListNavigationEffect
+        objectNameSingular={objectMetadataItem.nameSingular}
+        recordIds={recordIds}
+      />
       <div className="rb-list-page">
         <div className="rb-page-head">
           <div>

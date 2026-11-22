@@ -17,6 +17,7 @@ import '@/roboost-ui/styles/roboost-tokens.css';
 import '@/roboost-ui/styles/roboost-ui.css';
 import '@/roboost-app/styles/roboost-app.css';
 import '@/roboost-app/styles/roboost-record.css';
+import '@/roboost-app/styles/roboost-search.css';
 
 const renderApp = () => {
   const root = ReactDOM.createRoot(

@@ -19,6 +19,9 @@ import { useRoboostPropertySections } from '@/roboost-app/hooks/useRoboostProper
 import { getRoboostListRecordGqlFields } from '@/roboost-app/list/utils/getRoboostListRecordGqlFields';
 import { RoboostAssociationContainer } from '@/roboost-app/record/components/RoboostAssociationContainer';
 import { RoboostAttachmentsContainer } from '@/roboost-app/record/components/RoboostAttachmentsContainer';
+import { RoboostRecordActionsMenu } from '@/roboost-app/record/components/RoboostRecordActionsMenu';
+import { RoboostRecordPager } from '@/roboost-app/record/components/RoboostRecordPager';
+import { RoboostRecentRecordEffect } from '@/roboost-app/search/components/RoboostRecentRecordEffect';
 import { RoboostPropertyGroupContainer } from '@/roboost-app/record/components/RoboostPropertyGroupContainer';
 import {
   type RoboostRecordPanelSide,
@@ -36,8 +39,10 @@ import {
 } from '@/roboost-app/utils/getRoboostPersonName';
 import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Icon } from '@/roboost-ui/components/Icon';
-import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
+import { type MenuEntry } from '@/roboost-ui/components/Menu';
 import { RecordLayout } from '@/roboost-ui/components/RecordLayout';
+import { isSidePanelOpenedState } from '@/side-panel/states/isSidePanelOpenedState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { getSettingsPropertiesPath } from '@/settings/data-model/properties/utils/getSettingsPropertiesPath';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useLingui } from '@lingui/react/macro';
@@ -141,6 +146,7 @@ const RoboostRecordPageContent = ({
     setRoboostRecordRightPanelCollapsed,
   ] = useAtomState(roboostRecordRightPanelCollapsedState);
   const [isRightOpenedOnNarrow, setIsRightOpenedOnNarrow] = useState(false);
+  const isSidePanelOpened = useAtomStateValue(isSidePanelOpenedState);
   const layout = useRoboostRecordLayout(objectNameSingular);
 
   const sections = useRoboostPropertySections(objectMetadataItem);
@@ -225,7 +231,6 @@ const RoboostRecordPageContent = ({
   const propertiesSettingsPath = getSettingsPropertiesPath({
     objectNamePlural: objectMetadataItem.namePlural,
   });
-  const objectSettingsPath = `/settings/objects/${objectMetadataItem.namePlural}`;
 
   const recordName =
     getRoboostRecordLabel(loadedRecord, objectMetadataItem) ||
@@ -245,7 +250,8 @@ const RoboostRecordPageContent = ({
   const isNarrow =
     typeof window !== 'undefined' && window.innerWidth < NARROW_VIEWPORT_WIDTH;
   const isRightCollapsed =
-    roboostRecordRightPanelCollapsed || (isNarrow && !isRightOpenedOnNarrow);
+    roboostRecordRightPanelCollapsed ||
+    ((isNarrow || isSidePanelOpened) && !isRightOpenedOnNarrow);
 
   const containerSettings = (
     side: RoboostRecordPanelSide,
@@ -302,21 +308,6 @@ const RoboostRecordPageContent = ({
   );
   const rightHandlers = dragHandlers('right', rightIds);
 
-  const actionsEntries: MenuEntry[] = [
-    {
-      id: 'classic',
-      label: t`Open classic record page`,
-      icon: 'external-link',
-      href: classicPagePath,
-    },
-    {
-      id: 'fields',
-      label: t`${objectMetadataItem.labelSingular} fields settings`,
-      icon: 'settings',
-      href: objectSettingsPath,
-    },
-  ];
-
   // Modules not built yet stay visible and do nothing
   const quickActionMoreEntries: MenuEntry[] = [
     {
@@ -343,21 +334,17 @@ const RoboostRecordPageContent = ({
             {objectMetadataItem.labelPlural}
           </Link>
           <span className="rb-sp" />
-          <Menu
-            align="right"
-            minWidth={240}
-            entries={actionsEntries}
-            trigger={({ toggle, isOpen }) => (
-              <button
-                type="button"
-                className="rb-rc-actbtn"
-                aria-expanded={isOpen}
-                onClick={toggle}
-              >
-                {t`Actions`}
-                <Icon name="caret" size={12} />
-              </button>
-            )}
+          <RoboostRecordPager
+            objectNameSingular={objectNameSingular}
+            recordId={recordId}
+          />
+          <RoboostRecordActionsMenu
+            objectMetadataItem={objectMetadataItem}
+            objectMetadataItems={objectMetadataItems}
+            record={loadedRecord}
+            recordName={recordName}
+            classicPagePath={classicPagePath}
+            onSaved={() => refetch()}
           />
           <button
             type="button"
@@ -532,6 +519,11 @@ const RoboostRecordPageContent = ({
   return (
     <div className="rb-recpage">
       <RoboostTopBarTitleEffect title={recordName} />
+      <RoboostRecentRecordEffect
+        objectNameSingular={objectNameSingular}
+        recordId={recordId}
+        label={recordName}
+      />
       <RecordLayout
         isBare
         leftCollapsed={roboostRecordLeftPanelCollapsed}

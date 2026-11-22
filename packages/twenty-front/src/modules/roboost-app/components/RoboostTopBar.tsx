@@ -6,7 +6,9 @@ import { getRoboostPersonName } from '@/roboost-app/utils/getRoboostPersonName';
 import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu } from '@/roboost-ui/components/Menu';
-import { useOpenRecordsSearchPageInSidePanel } from '@/side-panel/hooks/useOpenRecordsSearchPageInSidePanel';
+import { RoboostSearchPopup } from '@/roboost-app/search/components/RoboostSearchPopup';
+import { roboostSearchOpenState } from '@/roboost-app/search/states/roboostSearchOpenState';
+import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
@@ -16,7 +18,9 @@ export const RoboostTopBar = () => {
   const { t } = useLingui();
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
   const roboostTopBarTitle = useAtomStateValue(roboostTopBarTitleState);
-  const { openRecordsSearchPage } = useOpenRecordsSearchPageInSidePanel();
+  const [roboostSearchOpen, setRoboostSearchOpen] = useAtomState(
+    roboostSearchOpenState,
+  );
   const { signOut } = useAuth();
 
   const memberName = getRoboostPersonName(currentWorkspaceMember?.name);
@@ -32,11 +36,15 @@ export const RoboostTopBar = () => {
         <button
           type="button"
           className="rb-topbar-search-button"
-          onClick={openRecordsSearchPage}
+          aria-expanded={roboostSearchOpen}
+          onClick={() => setRoboostSearchOpen(true)}
         >
           <Icon name="search" size={16} />
           <span className="rb-truncate">{t`Search Roboost CRM`}</span>
         </button>
+        {roboostSearchOpen && (
+          <RoboostSearchPopup onClose={() => setRoboostSearchOpen(false)} />
+        )}
       </div>
       <span className="rb-topbar-spacer" />
       <RoboostNewRecordMenu />

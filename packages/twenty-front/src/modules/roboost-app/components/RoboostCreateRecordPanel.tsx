@@ -22,6 +22,8 @@ type RoboostCreateRecordFormProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   presetValues: Record<string, unknown>;
   linkToRecord?: { objectNameSingular: string; recordId: string };
+  initialValues?: Record<string, unknown>;
+  initialRelatedRecords?: Record<string, { id: string; label: string } | null>;
   onClose: () => void;
 };
 
@@ -29,6 +31,8 @@ const RoboostCreateRecordForm = ({
   objectMetadataItem,
   presetValues,
   linkToRecord,
+  initialValues,
+  initialRelatedRecords,
   onClose,
 }: RoboostCreateRecordFormProps) => {
   const { t } = useLingui();
@@ -47,10 +51,12 @@ const RoboostCreateRecordForm = ({
       ? junctionObjectNameSingular
       : objectMetadataItem.nameSingular,
   });
-  const [values, setValues] = useState<Record<string, unknown>>({});
+  const [values, setValues] = useState<Record<string, unknown>>(
+    initialValues ?? {},
+  );
   const [relatedRecords, setRelatedRecords] = useState<
     Record<string, { id: string; label: string } | null>
-  >({});
+  >(initialRelatedRecords ?? {});
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastCreated, setLastCreated] = useState<{
@@ -259,6 +265,8 @@ export const RoboostCreateRecordPanel = () => {
         objectMetadataItem={objectMetadataItem}
         presetValues={roboostCreatePanel.presetValues ?? {}}
         linkToRecord={roboostCreatePanel.linkToRecord}
+        initialValues={roboostCreatePanel.initialValues}
+        initialRelatedRecords={roboostCreatePanel.initialRelatedRecords}
         onClose={close}
       />
     </div>,

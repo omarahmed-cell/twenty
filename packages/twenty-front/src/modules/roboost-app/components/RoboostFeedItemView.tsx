@@ -3,8 +3,10 @@ import { RoboostActivityCard } from '@/roboost-app/components/RoboostActivityCar
 import { type RoboostFeedItem } from '@/roboost-app/types/RoboostFeedItem';
 import { formatRoboostDateTime } from '@/roboost-app/utils/formatRoboostDateTime';
 import { EmailCard } from '@/roboost-ui/components/EmailCard';
+import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
+import { isDefined } from 'twenty-shared/utils';
 
 type RoboostFeedItemViewProps = {
   item: RoboostFeedItem;
@@ -18,7 +20,11 @@ export const RoboostFeedItemView = ({
   onToggleExpanded,
 }: RoboostFeedItemViewProps) => {
   const { t } = useLingui();
+  const { openRecordInSidePanel } = useOpenRecordInSidePanel();
   const time = formatRoboostDateTime(item.date);
+  const recordId = item.id.slice(item.id.indexOf('-') + 1);
+  const openInSidePanel = (objectNameSingular: string) => () =>
+    openRecordInSidePanel({ recordId, objectNameSingular });
   const description = isNonEmptyString(item.body.trim())
     ? item.body
     : undefined;
@@ -75,6 +81,15 @@ export const RoboostFeedItemView = ({
         <RoboostActivityCard
           icon="mail"
           tone="info"
+          onOpen={
+            isDefined(item.email)
+              ? () =>
+                  openRecordInSidePanel({
+                    recordId: item.email?.id ?? '',
+                    objectNameSingular: 'email',
+                  })
+              : undefined
+          }
           title={
             <>
               <b>{item.title}</b> {verb} “{item.body}”
@@ -90,6 +105,7 @@ export const RoboostFeedItemView = ({
         <RoboostActivityCard
           icon="note"
           tone="accent"
+          onOpen={openInSidePanel('note')}
           title={
             <>
               <b>{t`Note`}</b>
@@ -108,6 +124,7 @@ export const RoboostFeedItemView = ({
         <RoboostActivityCard
           icon="tasks"
           tone="neutral"
+          onOpen={openInSidePanel('task')}
           title={
             <>
               <b>{t`Task`}</b> — {item.title}
@@ -129,6 +146,7 @@ export const RoboostFeedItemView = ({
         <RoboostActivityCard
           icon="phone"
           tone="success"
+          onOpen={openInSidePanel('call')}
           title={
             <>
               <b>{t`Call`}</b>
@@ -147,6 +165,7 @@ export const RoboostFeedItemView = ({
         <RoboostActivityCard
           icon="calendar"
           tone="info"
+          onOpen={openInSidePanel('calendarEvent')}
           title={
             <>
               <b>{t`Meeting`}</b> — {item.title}

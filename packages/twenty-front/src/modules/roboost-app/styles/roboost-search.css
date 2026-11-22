@@ -1,0 +1,185 @@
+/* Top-bar search pop-up (Record-Search.dc.html) */
+.rb-search-scrim {
+  background: transparent;
+  inset: 0;
+  position: fixed;
+  z-index: 70;
+}
+.rb-searchbox {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+  max-width: 52vw;
+  min-width: 360px;
+  overflow: hidden;
+  position: fixed;
+  width: 460px;
+  z-index: 80;
+}
+.rb-sb-top {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 14px;
+}
+.rb-sb-top .rb-input-wrap {
+  width: 100%;
+}
+.rb-sb-top .rb-input:focus {
+  box-shadow: none;
+}
+.rb-sb-chips {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 14px;
+}
+.rb-sbchip {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: 500 12px/16px var(--font-sans);
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+.rb-sbchip:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.rb-sbchip.is-on {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent-text);
+}
+.rb-sb-reclabel {
+  color: var(--text-muted);
+  font: 600 11px/14px var(--font-sans);
+  letter-spacing: 0.06em;
+  padding: 10px 14px 4px;
+  text-transform: uppercase;
+}
+.rb-sb-recent {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 4px 6px 6px;
+}
+.rb-sritem {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+}
+.rb-sritem.is-active {
+  background: var(--surface-hover);
+}
+.rb-sr-ic {
+  align-items: center;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  display: flex;
+  flex: none;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+.rb-sr-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.rb-sr-name {
+  color: var(--text);
+  font: 500 13px/16px var(--font-sans);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-sr-sub {
+  color: var(--text-muted);
+  font: 400 12px/15px var(--font-sans);
+  margin-top: 1px;
+}
+.rb-sb-empty {
+  color: var(--text-muted);
+  font: 400 13px/18px var(--font-sans);
+  padding: 12px 10px;
+}
+.rb-sb-foot {
+  align-items: center;
+  background: var(--surface-sunken);
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  display: flex;
+  font: 400 12px/16px var(--font-sans);
+  gap: 18px;
+  padding: 9px 14px;
+}
+.rb-kbd {
+  align-items: center;
+  display: inline-flex;
+  gap: 5px;
+}
+.rb-kbd b {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  display: inline-flex;
+  font: 600 11px/1 var(--font-sans);
+  height: 18px;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 4px;
+}
+
+/* Record pager and all-properties modal */
+.rb-pager {
+  align-items: center;
+  display: inline-flex;
+}
+.rb-rc-iconbtn.is-disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+.rb-allprops {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rb-allprops-list {
+  display: grid;
+  gap: 12px 18px;
+  grid-template-columns: 1fr 1fr;
+  max-height: 56vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Twenty's side panel (notes, tasks, emails) inside the Roboost frame */
+html[data-theme] [data-side-panel] {
+  font-family: var(--font-sans);
+}
+html[data-theme] [data-side-panel] > div {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}

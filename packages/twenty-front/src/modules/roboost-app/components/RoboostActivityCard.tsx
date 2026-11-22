@@ -15,6 +15,14 @@ const StyledCard = styled.div`
   display: flex;
   gap: 12px;
   padding: 12px 14px;
+
+  &[role='button'] {
+    cursor: pointer;
+  }
+
+  &[role='button']:hover {
+    border-color: ${ROBOOST_UI_THEME.borderStrong};
+  }
 `;
 
 const StyledIcon = styled.span<{ tone: RoboostTone }>`
@@ -76,6 +84,7 @@ export type RoboostActivityCardProps = {
   title: ReactNode;
   time: ReactNode;
   description?: ReactNode;
+  onOpen?: () => void;
 };
 
 export const RoboostActivityCard = ({
@@ -84,8 +93,22 @@ export const RoboostActivityCard = ({
   title,
   time,
   description,
+  onOpen,
 }: RoboostActivityCardProps) => (
-  <StyledCard>
+  <StyledCard
+    role={onOpen !== undefined ? 'button' : undefined}
+    tabIndex={onOpen !== undefined ? 0 : undefined}
+    onClick={onOpen}
+    onKeyDown={(event) => {
+      if (
+        onOpen !== undefined &&
+        (event.key === 'Enter' || event.key === ' ')
+      ) {
+        event.preventDefault();
+        onOpen();
+      }
+    }}
+  >
     <StyledIcon tone={tone}>
       <Icon name={icon} size={16} />
     </StyledIcon>

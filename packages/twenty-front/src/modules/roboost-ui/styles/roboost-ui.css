@@ -2220,3 +2220,15 @@
   aspect-ratio: 1;
   border-radius: 50%;
 }
+
+/* Menus render in a body portal with fixed coordinates */
+.rb-menu.rb-menu-portal {
+  bottom: auto;
+  left: auto;
+  max-height: min(72vh, 560px);
+  overflow-y: auto;
+  position: fixed;
+  right: auto;
+  top: auto;
+  z-index: 90;
+}
