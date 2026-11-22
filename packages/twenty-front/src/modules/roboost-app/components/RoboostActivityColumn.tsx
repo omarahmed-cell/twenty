@@ -3,7 +3,8 @@ import {
   type RoboostFeedItem,
   type RoboostFeedKind,
 } from '@/roboost-app/types/RoboostFeedItem';
-import { type RoboostDateRange } from '@/roboost-app/types/RoboostCompanyListFilters';
+import { type RoboostDateRange } from '@/roboost-app/list/types/RoboostListFilters';
+import { getRoboostRangeStart } from '@/roboost-app/list/utils/getRoboostRangeStart';
 import { FilterChip } from '@/roboost-ui/components/FilterChip';
 import { Input } from '@/roboost-ui/components/Input';
 import { Tabs } from '@/roboost-ui/components/Tabs';
@@ -34,12 +35,12 @@ const KINDS_BY_SUB_TAB: Record<
   meetings: ['meeting'],
 };
 
-const DAYS_BY_RANGE: Record<Exclude<RoboostDateRange, 'any'>, number> = {
-  last7: 7,
-  last30: 30,
-  last90: 90,
-  last365: 365,
-};
+type RoboostActivityDateRange =
+  | Extract<
+      RoboostDateRange,
+      'any' | 'today' | 'last7' | 'last30' | 'thisQuarter'
+    >
+  | 'custom';
 
 const OVERVIEW_ITEM_COUNT = 5;
 
@@ -151,6 +152,18 @@ const StyledClearAll = styled.button`
   font-weight: 500;
 `;
 
+const StyledCustomRange = styled.div`
+  align-items: center;
+  color: ${ROBOOST_UI_THEME.textSecondary};
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+`;
+
+const StyledDateInput = styled.div`
+  width: 150px;
+`;
+
 const StyledMonth = styled.p`
   color: ${ROBOOST_UI_THEME.textMuted};
   font-size: 11px;
@@ -221,9 +234,13 @@ export const RoboostActivityColumn = ({
   const { t } = useLingui();
   const [search, setSearch] = useState('');
   const [kinds, setKinds] = useState<RoboostFeedKind[]>([]);
-  const [dateRange, setDateRange] = useState<RoboostDateRange>('any');
-  const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<RoboostActivityDateRange>('any');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
+  const [creatorId, setCreatorId] = useState<string | null>(null);
   const [showTracking, setShowTracking] = useState(true);
+  const [showCanceledMeetings, setShowCanceledMeetings] = useState(true);
+  const [showCompletedTasks, setShowCompletedTasks] = useState(true);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
   const kindLabels: Record<RoboostFeedKind, string> = {
@@ -235,12 +252,13 @@ export const RoboostActivityColumn = ({
     meeting: t`Meetings`,
   };
 
-  const dateRangeLabels: Record<RoboostDateRange, string> = {
+  const dateRangeLabels: Record<RoboostActivityDateRange, string> = {
     any: t`Any time`,
+    today: t`Today`,
     last7: t`Last 7 days`,
     last30: t`Last 30 days`,
-    last90: t`Last 90 days`,
-    last365: t`Last 12 months`,
+    thisQuarter: t`This quarter`,
+    custom: t`Custom range`,
   };
 
   const subTabs: { id: RoboostActivitySubTab; label: string }[] = [
@@ -252,7 +270,16 @@ export const RoboostActivityColumn = ({
     { id: 'meetings', label: t`Meetings` },
   ];
 
-  const now = Date.now();
+  const rangeStart =
+    dateRange === 'custom'
+      ? customFrom
+      : dateRange === 'any'
+        ? undefined
+        : getRoboostRangeStart(dateRange, new Date());
+  const rangeEnd =
+    dateRange === 'custom' && customTo !== ''
+      ? `${customTo}T23:59:59.999`
+      : undefined;
   const normalizedSearch = search.trim().toLowerCase();
   const subTabKinds = KINDS_BY_SUB_TAB[subTab];
 
@@ -266,15 +293,24 @@ export const RoboostActivityColumn = ({
     if (!showTracking && item.kind === 'tracking') {
       return false;
     }
-    if (ownerId !== null && item.ownerId !== ownerId) {
+    if (creatorId !== null && item.creatorId !== creatorId) {
       return false;
     }
-    if (dateRange !== 'any') {
-      const itemTime = new Date(item.date).getTime();
+    if (!showCanceledMeetings && item.isCanceled === true) {
+      return false;
+    }
+    if (!showCompletedTasks && item.kind === 'task' && item.status === 'DONE') {
+      return false;
+    }
+    const itemTime = new Date(item.date).getTime();
 
-      if (itemTime < now - DAYS_BY_RANGE[dateRange] * 24 * 60 * 60 * 1000) {
-        return false;
-      }
+    if (
+      (rangeStart !== undefined &&
+        rangeStart !== '' &&
+        itemTime < new Date(rangeStart).getTime()) ||
+      (rangeEnd !== undefined && itemTime > new Date(rangeEnd).getTime())
+    ) {
+      return false;
     }
 
     return (
@@ -292,8 +328,10 @@ export const RoboostActivityColumn = ({
   const hasFilters =
     kinds.length > 0 ||
     dateRange !== 'any' ||
-    ownerId !== null ||
-    !showTracking;
+    creatorId !== null ||
+    !showTracking ||
+    !showCanceledMeetings ||
+    !showCompletedTasks;
 
   const renderFeed = (feedItems: RoboostFeedItem[]) => {
     let previousMonth = '';
@@ -351,7 +389,7 @@ export const RoboostActivityColumn = ({
 
       {mainTab === 'intelligence' && (
         <StyledEmpty>
-          {t`Intelligence for this company will appear here once account insights are connected.`}
+          {t`Intelligence for this record will appear here once account insights are connected.`}
         </StyledEmpty>
       )}
 
@@ -408,7 +446,7 @@ export const RoboostActivityColumn = ({
           </StyledTools>
           <StyledChips>
             <FilterChip
-              label={t`Activity`}
+              label={t`Activity type`}
               value={
                 kinds.length === 0
                   ? undefined
@@ -436,37 +474,40 @@ export const RoboostActivityColumn = ({
                 dateRange === 'any' ? undefined : dateRangeLabels[dateRange]
               }
               isActive={dateRange !== 'any'}
-              entries={(Object.keys(dateRangeLabels) as RoboostDateRange[]).map(
-                (range) => ({
-                  id: range,
-                  label: dateRangeLabels[range],
-                  isSelected: range === dateRange,
-                  onSelect: () => setDateRange(range),
-                }),
-              )}
+              entries={(
+                Object.keys(dateRangeLabels) as RoboostActivityDateRange[]
+              ).map((range) => ({
+                id: range,
+                label: dateRangeLabels[range],
+                isSelected: range === dateRange,
+                onSelect: () => setDateRange(range),
+              }))}
             />
             <FilterChip
-              label={t`Activity assigned to`}
-              value={members.find((member) => member.id === ownerId)?.name}
-              isActive={ownerId !== null}
+              label={t`Created by`}
+              value={members.find((member) => member.id === creatorId)?.name}
+              isActive={creatorId !== null}
               entries={[
                 {
                   id: 'anyone',
                   label: t`Anyone`,
-                  isSelected: ownerId === null,
-                  onSelect: () => setOwnerId(null),
+                  isSelected: creatorId === null,
+                  onSelect: () => setCreatorId(null),
                 },
                 ...members.map((member) => ({
                   id: member.id,
                   label: member.name,
-                  isSelected: member.id === ownerId,
-                  onSelect: () => setOwnerId(member.id),
+                  isSelected: member.id === creatorId,
+                  onSelect: () => setCreatorId(member.id),
                 })),
               ]}
             />
             <FilterChip
               label={t`More`}
-              isActive={!showTracking}
+              isActive={
+                !showTracking || !showCanceledMeetings || !showCompletedTasks
+              }
+              keepOpenOnSelect
               entries={[
                 {
                   id: 'tracking',
@@ -474,16 +515,56 @@ export const RoboostActivityColumn = ({
                   isSelected: showTracking,
                   onSelect: () => setShowTracking(!showTracking),
                 },
+                {
+                  id: 'canceled',
+                  label: t`Show cancelled meetings`,
+                  isSelected: showCanceledMeetings,
+                  onSelect: () =>
+                    setShowCanceledMeetings(!showCanceledMeetings),
+                },
+                {
+                  id: 'completed',
+                  label: t`Show completed tasks`,
+                  isSelected: showCompletedTasks,
+                  onSelect: () => setShowCompletedTasks(!showCompletedTasks),
+                },
               ]}
             />
+            {dateRange === 'custom' && (
+              <StyledCustomRange>
+                <StyledDateInput>
+                  <Input
+                    size="sm"
+                    type="date"
+                    aria-label={t`From`}
+                    value={customFrom}
+                    onChange={(event) => setCustomFrom(event.target.value)}
+                  />
+                </StyledDateInput>
+                {t`to`}
+                <StyledDateInput>
+                  <Input
+                    size="sm"
+                    type="date"
+                    aria-label={t`To`}
+                    value={customTo}
+                    onChange={(event) => setCustomTo(event.target.value)}
+                  />
+                </StyledDateInput>
+              </StyledCustomRange>
+            )}
             {hasFilters && (
               <StyledClearAll
                 type="button"
                 onClick={() => {
                   setKinds([]);
                   setDateRange('any');
-                  setOwnerId(null);
+                  setCustomFrom('');
+                  setCustomTo('');
+                  setCreatorId(null);
                   setShowTracking(true);
+                  setShowCanceledMeetings(true);
+                  setShowCompletedTasks(true);
                 }}
               >
                 {t`Clear all`}

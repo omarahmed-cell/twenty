@@ -2,7 +2,7 @@ import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 
-import { RoboostCompanyRecordPage } from '@/roboost-app/components/RoboostCompanyRecordPage';
+import { RoboostRecordPage } from '@/roboost-app/record/components/RoboostRecordPage';
 import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { WorkspaceRouteUnavailable } from '@/ui/layout/page/components/WorkspaceRouteUnavailable';
 import { findCoreObjectShowPage } from '@/object-core/utils/findCoreObjectShowPage';
@@ -14,6 +14,14 @@ import {
   type RecordShowPageParameters,
   RecordShowPageContent,
 } from '~/pages/object-record/RecordShowPageContent';
+
+const ROBOOST_CLASSIC_ONLY_OBJECTS = new Set<string>([
+  CoreObjectNameSingular.Workflow,
+  CoreObjectNameSingular.WorkflowVersion,
+  CoreObjectNameSingular.WorkflowRun,
+  CoreObjectNameSingular.Dashboard,
+  CoreObjectNameSingular.AgentChatThread,
+]);
 
 export const RecordShowPage = () => {
   const parameters = useParams<RecordShowPageParameters>();
@@ -38,14 +46,16 @@ export const RecordShowPage = () => {
     isRoboostUiEnabled &&
     !isInSidePanel &&
     isRouteObjectMetadataAvailable &&
-    parameters.objectNameSingular === CoreObjectNameSingular.Company &&
+    isDefined(parameters.objectNameSingular) &&
+    !ROBOOST_CLASSIC_ONLY_OBJECTS.has(parameters.objectNameSingular) &&
     isDefined(parameters.objectRecordId) &&
     searchParams.get('view') !== 'classic'
   ) {
     return (
-      <RoboostCompanyRecordPage
+      <RoboostRecordPage
         key={parameters.objectRecordId}
-        companyId={parameters.objectRecordId}
+        objectNameSingular={parameters.objectNameSingular}
+        recordId={parameters.objectRecordId}
       />
     );
   }

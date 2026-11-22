@@ -111,6 +111,7 @@ export const useRoboostActivityFeed = ({
       status: true,
       dueAt: true,
       createdAt: true,
+      createdBy: true,
       assignee: MEMBER_FIELDS,
     },
   });
@@ -177,6 +178,7 @@ export const useRoboostActivityFeed = ({
       body: `${email.bodyPreview ?? ''} ${email.bodyMarkdown ?? ''}`,
       ownerId: email.loggedById,
       ownerName: email.loggedByName,
+      creatorId: email.loggedById,
       meta: '',
       email,
     });
@@ -206,6 +208,7 @@ export const useRoboostActivityFeed = ({
         body: subject,
         ownerId: email.loggedById,
         ownerName: email.loggedByName,
+        creatorId: email.loggedById,
         meta: `${t`Email tracking`} · ${details.join(', ')}`,
         email,
       });
@@ -221,6 +224,7 @@ export const useRoboostActivityFeed = ({
       body: getMarkdown(record.bodyV2),
       ownerId: getActorId(record.createdBy),
       ownerName: getActorName(record.createdBy),
+      creatorId: getActorId(record.createdBy),
       meta: '',
     });
   }
@@ -236,6 +240,7 @@ export const useRoboostActivityFeed = ({
       body: getMarkdown(record.bodyV2),
       ownerId: getRelatedId(record.assignee),
       ownerName: assigneeName,
+      creatorId: getActorId(record.createdBy),
       meta: getTaskStatusLabel(asString(record.status)),
       status: asString(record.status),
     });
@@ -250,6 +255,7 @@ export const useRoboostActivityFeed = ({
       body: getMarkdown(record.bodyV2),
       ownerId: getActorId(record.createdBy),
       ownerName: getActorName(record.createdBy),
+      creatorId: getActorId(record.createdBy),
       meta: [asString(record.direction), asString(record.outcome)]
         .filter(isNonEmptyString)
         .join(' · '),
@@ -265,6 +271,8 @@ export const useRoboostActivityFeed = ({
       body: asString(record.description) ?? '',
       ownerId: null,
       ownerName: '',
+      creatorId: null,
+      isCanceled: record.isCanceled === true,
       meta: [
         record.isCanceled === true ? t`Cancelled` : '',
         asString(record.location) ?? '',

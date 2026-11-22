@@ -11,14 +11,14 @@ import { CoreObjectNameSingular } from 'twenty-shared/types';
 
 const StyledRow = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 4px;
+  margin-top: 14px;
 `;
 
 const StyledAction = styled.button`
   align-items: center;
   background: transparent;
-  border: 1px solid ${ROBOOST_UI_THEME.border};
-  border-radius: ${ROBOOST_UI_THEME.radiusSm};
+  border: none;
   color: ${ROBOOST_UI_THEME.textSecondary};
   cursor: pointer;
   display: flex;
@@ -27,19 +27,21 @@ const StyledAction = styled.button`
   font-family: ${ROBOOST_UI_THEME.fontSans};
   font-size: 11px;
   font-weight: 500;
-  gap: 5px;
+  gap: 6px;
   line-height: 13px;
   min-width: 0;
-  padding: 8px 2px;
+  padding: 4px 1px;
 
-  &:hover:not(:disabled) {
-    background: ${ROBOOST_UI_THEME.surfaceHover};
-    border-color: ${ROBOOST_UI_THEME.borderStrong};
-    color: ${ROBOOST_UI_THEME.text};
+  > span:last-child {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &:hover:not(:disabled) > span:first-child {
     background: ${ROBOOST_UI_THEME.accentSoft};
+    border-color: ${ROBOOST_UI_THEME.accentBorder};
     color: ${ROBOOST_UI_THEME.accentText};
   }
 
@@ -51,13 +53,14 @@ const StyledAction = styled.button`
 
 const StyledActionIcon = styled.span`
   align-items: center;
-  background: ${ROBOOST_UI_THEME.surfaceSunken};
+  background: ${ROBOOST_UI_THEME.surface};
+  border: 1px solid ${ROBOOST_UI_THEME.borderStrong};
   border-radius: 999px;
   color: ${ROBOOST_UI_THEME.textSecondary};
   display: flex;
-  height: 30px;
+  height: 34px;
   justify-content: center;
-  width: 30px;
+  width: 34px;
 `;
 
 const StyledMoreAnchor = styled.div`

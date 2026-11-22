@@ -31,6 +31,8 @@ export type RoboostFeedItem = {
   body: string;
   ownerId: string | null;
   ownerName: string;
+  creatorId: string | null;
+  isCanceled?: boolean;
   meta: string;
   status?: string | null;
   email?: RoboostFeedEmail;
