@@ -59,7 +59,7 @@ export const RoboostBoardColumn = ({
     and: [filter, { stage: { eq: stage.value } }],
   };
 
-  const { records, totalCount } = useFindManyRecords<ObjectRecord>({
+  const { records, totalCount, loading } = useFindManyRecords<ObjectRecord>({
     objectNameSingular: objectMetadataItem.nameSingular,
     filter: columnFilter,
     recordGqlFields,
@@ -151,7 +151,9 @@ export const RoboostBoardColumn = ({
           />
         ))}
         {records.length === 0 && (
-          <div className="rb-bcol-empty">{t`Nothing in this stage.`}</div>
+          <div className="rb-bcol-empty">
+            {loading ? t`Loading…` : t`Nothing in this stage.`}
+          </div>
         )}
         {(totalCount ?? 0) > records.length && (
           <div className="rb-bcol-more">
