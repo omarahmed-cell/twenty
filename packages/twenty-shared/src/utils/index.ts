@@ -497,3 +497,12 @@ export {
 } from './variable-resolver';
 export { getViewLayoutFromViewType } from './views/getViewLayoutFromViewType';
 export { isWidgetViewType } from './views/isWidgetViewType';
+export type { WorkingDaysConfig } from './working-days/working-days';
+export {
+  DEFAULT_WORKING_DAYS_CONFIG,
+  isWorkingDay,
+  setWorkDayStartTime,
+  moveToWorkingDay,
+  nextBusinessDay,
+  addBusinessDays,
+} from './working-days/working-days';

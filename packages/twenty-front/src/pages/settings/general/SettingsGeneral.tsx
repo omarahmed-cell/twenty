@@ -10,6 +10,7 @@ import { SettingsWorkspaceDomainCard } from '@/settings/domains/components/Setti
 import { SettingsLogs } from '@/settings/event-logs/components/SettingsLogs';
 import { SettingsOpenLogConsoleCard } from '@/settings/event-logs/components/SettingsOpenLogConsoleCard';
 import { DeleteWorkspace } from '@/settings/profile/components/DeleteWorkspace';
+import { RoboostWorkingDaysSettings } from '@/roboost-app/activity/components/RoboostWorkingDaysSettings';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { SettingsSecuritySettings } from '@/settings/security/components/SettingsSecuritySettings';
 import { NameField } from '@/settings/workspace/components/NameField';
@@ -82,6 +83,13 @@ export const SettingsGeneral = () => {
             description={t`Name of your workspace`}
           />
           <NameField />
+        </Section.Root>
+        <Section.Root>
+          <Section.Header
+            title={t`Working days`}
+            description={t`Due dates set "in N business days" skip the other days, and times default to the start of the work day.`}
+          />
+          <RoboostWorkingDaysSettings />
         </Section.Root>
         {isMultiWorkspaceEnabled && (
           <Section.Root>

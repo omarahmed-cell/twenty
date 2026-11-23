@@ -64,6 +64,12 @@ export const useRoboostSaveActivity = () => {
     ),
   };
 
+  const isTaskTypeTodoAvailable =
+    objectMetadataItems
+      .find((item) => item.nameSingular === 'task')
+      ?.fields.find((field) => field.name === 'taskType' && field.isActive)
+      ?.options?.some((option) => option.value === 'TODO') === true;
+
   const isTypeAvailable = (type: RoboostActivityType) =>
     availableObjectNames.has(ROBOOST_ACTIVITY_OBJECT_BY_TYPE[type]) &&
     availableObjectNames.has(`${ROBOOST_ACTIVITY_OBJECT_BY_TYPE[type]}Target`);
@@ -109,6 +115,7 @@ export const useRoboostSaveActivity = () => {
           title: followUp.title,
           dueAt: followUp.dueAt,
           status: 'TODO',
+          ...(isTaskTypeTodoAvailable ? { taskType: 'TODO' } : {}),
           ...(isDefined(currentWorkspaceMember)
             ? { assigneeId: currentWorkspaceMember.id }
             : {}),

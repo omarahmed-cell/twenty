@@ -11,13 +11,20 @@ import {
   type RoboostActivityType,
   roboostActivityComposerState,
 } from '@/roboost-app/activity/states/roboostActivityComposerState';
-import { addRoboostBusinessDays } from '@/roboost-app/activity/utils/addRoboostBusinessDays';
+import {
+  RoboostDueDatePicker,
+  type RoboostDueDateValue,
+  toRoboostDueDate,
+} from '@/roboost-app/activity/components/RoboostDueDatePicker';
+import { useRoboostWorkingDays } from '@/roboost-app/activity/hooks/useRoboostWorkingDays';
+import { ROBOOST_DEFAULT_DUE_DATE_OPTION } from '@/roboost-app/activity/utils/getRoboostDueDate';
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
 import { Button } from '@/roboost-ui/components/Button';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Input } from '@/roboost-ui/components/Input';
-import { Menu } from '@/roboost-ui/components/Menu';
 import { Select } from '@/roboost-ui/components/Select';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
@@ -29,7 +36,7 @@ import { isDefined } from 'twenty-shared/utils';
 
 type RoboostComposerSize = 'normal' | 'expanded' | 'minimised';
 
-const FOLLOW_UP_DAY_OPTIONS = [1, 2, 3, 5, 7];
+const REMINDER_OPTIONS = ['none', 'atDue', 'minutes30', 'hour1', 'day1'];
 const CHANNEL_BY_TYPE: Partial<Record<RoboostActivityType, string>> = {
   whatsapp: 'WHATSAPP',
   linkedin: 'LINKEDIN',
@@ -61,6 +68,7 @@ const RoboostActivityComposerForm = ({
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [selects, setSelects] = useState<Record<string, string>>({});
+  const [hasAppliedTaskDefaults, setHasAppliedTaskDefaults] = useState(false);
   const [activityDate, setActivityDate] = useState(
     toLocalInputValue(new Date()),
   );
@@ -68,10 +76,31 @@ const RoboostActivityComposerForm = ({
     toLocalInputValue(new Date(Date.now() + 30 * 60000)),
   );
   const [location, setLocation] = useState('');
-  const [assigneeId, setAssigneeId] = useState<string | null>(null);
-  const [assigneeLabel, setAssigneeLabel] = useState('');
+  const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
+  const { workingDays } = useRoboostWorkingDays();
+  const defaultDueValue: RoboostDueDateValue = {
+    option: ROBOOST_DEFAULT_DUE_DATE_OPTION,
+    customDate: toLocalInputValue(new Date()).slice(0, 10),
+    time: workingDays.startTime,
+  };
+  const [dueValue, setDueValue] =
+    useState<RoboostDueDateValue>(defaultDueValue);
+  const [reminder, setReminder] = useState('none');
+  // Whoever creates an activity owns it until they pick someone else
+  const [assigneeId, setAssigneeId] = useState<string | null>(
+    currentWorkspaceMember?.id ?? null,
+  );
+  const [assigneeLabel, setAssigneeLabel] = useState(
+    [
+      currentWorkspaceMember?.name?.firstName,
+      currentWorkspaceMember?.name?.lastName,
+    ]
+      .filter(isNonEmptyString)
+      .join(' '),
+  );
   const [hasFollowUp, setHasFollowUp] = useState(false);
-  const [followUpDays, setFollowUpDays] = useState(3);
+  const [followUpValue, setFollowUpValue] =
+    useState<RoboostDueDateValue>(defaultDueValue);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,10 +151,17 @@ const RoboostActivityComposerForm = ({
     sms: t`What was said by SMS…`,
   };
 
-  const followUpDate = addRoboostBusinessDays(new Date(), followUpDays);
-  const followUpDayName = new Intl.DateTimeFormat(undefined, {
-    weekday: 'short',
-  }).format(followUpDate);
+  // Task type starts as To do once the options are known
+  if (
+    type === 'task' &&
+    !hasAppliedTaskDefaults &&
+    isDefined(objectMetadataItem)
+  ) {
+    setHasAppliedTaskDefaults(true);
+    if (getOptions('taskType').some(({ value }) => value === 'TODO')) {
+      setSelects((current) => ({ taskType: 'TODO', ...current }));
+    }
+  }
 
   const needsTitle = type === 'task' || type === 'meeting';
   const canSave =
@@ -166,9 +202,15 @@ const RoboostActivityComposerForm = ({
         return {
           title: title.trim(),
           bodyV2,
-          dueAt: dateIso,
-          status: isNonEmptyString(selects.status) ? selects.status : 'TODO',
-          ...(isDefined(assigneeId) ? { assigneeId } : {}),
+          dueAt: toRoboostDueDate(dueValue, workingDays).toISOString(),
+          status: 'TODO',
+          assigneeId,
+          ...(isNonEmptyString(selects.taskType)
+            ? { taskType: selects.taskType }
+            : {}),
+          ...(isNonEmptyString(selects.priority)
+            ? { priority: selects.priority }
+            : {}),
         };
       case 'meeting':
         return {
@@ -204,7 +246,7 @@ const RoboostActivityComposerForm = ({
         targets,
         followUp: hasFollowUp
           ? {
-              dueAt: followUpDate.toISOString(),
+              dueAt: toRoboostDueDate(followUpValue, workingDays).toISOString(),
               title: t`Follow up with ${targets[0]?.label ?? t`this record`}`,
             }
           : undefined,
@@ -238,8 +280,16 @@ const RoboostActivityComposerForm = ({
     window.addEventListener('pointerup', stop);
   };
 
-  const selectField = (fieldName: string, label: string) => {
-    const options = getOptions(fieldName);
+  const selectField = (
+    fieldName: string,
+    label: string,
+    noneLabel?: string,
+  ) => {
+    const fieldOptions = getOptions(fieldName);
+    const options =
+      noneLabel !== undefined && fieldOptions.length > 0
+        ? [{ value: '', label: noneLabel }, ...fieldOptions]
+        : fieldOptions;
 
     if (options.length === 0) {
       return null;
@@ -250,7 +300,9 @@ const RoboostActivityComposerForm = ({
         <span className="rb-act-label">{label}</span>
         <Select
           aria-label={label}
-          value={selects[fieldName]}
+          value={
+            selects[fieldName] ?? (noneLabel !== undefined ? '' : undefined)
+          }
           placeholder={t`Select ${label.toLowerCase()}`}
           options={options}
           onChange={(value) => setSelects({ ...selects, [fieldName]: value })}
@@ -374,8 +426,34 @@ const RoboostActivityComposerForm = ({
                 )}
                 {type === 'task' && (
                   <>
-                    {dateField(t`Due date`, activityDate, setActivityDate)}
-                    {selectField('status', t`Status`)}
+                    <div className="rb-act-field rb-act-field-wide">
+                      <span className="rb-act-label">{t`Due date`}</span>
+                      <RoboostDueDatePicker
+                        value={dueValue}
+                        onChange={setDueValue}
+                        workingDays={workingDays}
+                      />
+                    </div>
+                    {selectField('taskType', t`Task type`)}
+                    {selectField('priority', t`Priority`, t`None`)}
+                    <label className="rb-act-field">
+                      <span className="rb-act-label">{t`Reminder`}</span>
+                      <Select
+                        aria-label={t`Reminder`}
+                        value={reminder}
+                        options={REMINDER_OPTIONS.map((option) => ({
+                          value: option,
+                          label: {
+                            none: t`No reminder`,
+                            atDue: t`At the due time`,
+                            minutes30: t`30 minutes before`,
+                            hour1: t`1 hour before`,
+                            day1: t`1 day before`,
+                          }[option] as string,
+                        }))}
+                        onChange={setReminder}
+                      />
+                    </label>
                     <div className="rb-act-field">
                       <span className="rb-act-label">{t`Assigned to`}</span>
                       <RoboostRecordPicker
@@ -426,33 +504,14 @@ const RoboostActivityComposerForm = ({
                 <span>
                   {t`Create a`} <b>{t`To-do`}</b> {t`task to follow up`}
                 </span>
-                <Menu
-                  placement="above"
-                  entries={FOLLOW_UP_DAY_OPTIONS.map((days) => ({
-                    id: String(days),
-                    label:
-                      days === 1
-                        ? t`In 1 business day`
-                        : t`In ${days} business days`,
-                    isSelected: days === followUpDays,
-                    onSelect: () => {
-                      setFollowUpDays(days);
-                      setHasFollowUp(true);
-                    },
-                  }))}
-                  trigger={({ toggle, isOpen }) => (
-                    <button
-                      type="button"
-                      className="rb-act-inline"
-                      aria-expanded={isOpen}
-                      onClick={toggle}
-                    >
-                      {followUpDays === 1
-                        ? t`In 1 business day (${followUpDayName})`
-                        : t`In ${followUpDays} business days (${followUpDayName})`}
-                      <Icon name="caret" size={12} />
-                    </button>
-                  )}
+                <RoboostDueDatePicker
+                  className="rb-act-followup-due"
+                  value={followUpValue}
+                  onChange={(value) => {
+                    setFollowUpValue(value);
+                    setHasFollowUp(true);
+                  }}
+                  workingDays={workingDays}
                 />
               </div>
             )}

@@ -170,6 +170,8 @@ export class EmailRecordService {
           replyCount: 0,
           deliveryError: input.deliveryError ?? null,
           loggedById: input.loggedByWorkspaceMemberId ?? null,
+          // The member who sent or logged the email owns it, as in the CRM's other activities
+          assignedToId: input.loggedByWorkspaceMemberId ?? null,
           createdBy: input.createdBy,
         });
 

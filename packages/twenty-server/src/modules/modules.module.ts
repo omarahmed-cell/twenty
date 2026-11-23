@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { MessagingQueryHookModule } from 'src/modules/messaging/common/query-hooks/messaging-query-hook.module';
 import { CalendarQueryHookModule } from 'src/modules/calendar/common/query-hooks/calendar-query-hook.module';
+import { ActivityAssigneeQueryHookModule } from 'src/modules/activity-assignee/query-hooks/activity-assignee-query-hook.module';
 import { CallRecordingQueryHookModule } from 'src/modules/call-recording/query-hooks/call-recording-query-hook.module';
 import { DashboardQueryHookModule } from 'src/modules/dashboard/query-hooks/dashboard-query-hook.module';
 import { BlocklistQueryHookModule } from 'src/modules/blocklist/query-hooks/blocklist-query-hook.module';
@@ -65,6 +66,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     SendEmailModule,
     MessagingQueryHookModule,
     CalendarQueryHookModule,
+    ActivityAssigneeQueryHookModule,
     CallRecordingQueryHookModule,
     DashboardQueryHookModule,
     BlocklistQueryHookModule,

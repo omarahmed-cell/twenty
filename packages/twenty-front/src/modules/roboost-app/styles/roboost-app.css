@@ -1004,3 +1004,60 @@
   color: var(--text-muted);
   font-size: 12px;
 }
+
+/* Settings > General: working days */
+.rb-workdays {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rb-workdays-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+.rb-workdays-start {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  gap: 10px;
+}
+.rb-workdays-start .rb-input {
+  width: 130px;
+}
+.rb-workdays-foot {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+.rb-workdays-note {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.rb-workdays-note.is-error {
+  color: var(--danger-text);
+}
+
+/* Task due date: quick pick + optional custom date + time */
+.rb-act-field-wide {
+  grid-column: span 2;
+}
+.rb-due {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+.rb-due .rb-due-option {
+  flex: 1;
+  min-width: 0;
+}
+.rb-due > .rb-input,
+.rb-due > :not(.rb-due-option) {
+  flex: none;
+  width: 120px;
+}
+.rb-act-followup-due {
+  flex: 1;
+  max-width: 420px;
+}
