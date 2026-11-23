@@ -4,7 +4,7 @@ import { type RoboostMeetingAttendeeDraft } from '@/roboost-app/meeting/componen
 import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 
-type NamedRecord = { id: string; name?: unknown };
+type NamedRecord = { __typename: string; id: string; name?: unknown };
 type PersonRecord = NamedRecord & {
   companyId?: string | null;
   emails?: { primaryEmail?: string | null } | null;

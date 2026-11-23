@@ -27,6 +27,7 @@ const CONTACTS_PAGE_SIZE = 10;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type PersonRecord = {
+  __typename: string;
   id: string;
   name?: { firstName?: string | null; lastName?: string | null } | null;
   emails?: { primaryEmail?: string | null } | null;

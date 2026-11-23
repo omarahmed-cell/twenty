@@ -67,6 +67,7 @@ import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { TaskCalculatedFieldsModule } from 'src/modules/task-calculated-fields/task-calculated-fields.module';
 import { UnifiedEmailModule } from 'src/modules/unified-email/unified-email.module';
+import { MeetingCalendarSyncModule } from 'src/modules/meeting/calendar-sync/meeting-calendar-sync.module';
 import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
 import { MessagingImportManagerModule } from 'src/modules/messaging/message-import-manager/messaging-import-manager.module';
 import { WorkflowRunQueueModule } from 'src/modules/workflow/workflow-runner/workflow-run-queue/workflow-run-queue.module';
@@ -89,6 +90,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     PersonCalculatedFieldsModule,
     TaskCalculatedFieldsModule,
     UnifiedEmailModule,
+    MeetingCalendarSyncModule,
     OpportunityCalculatedFieldsModule,
     ActorLinkModule,
     WorkspaceMemberPreCreateModule,

@@ -358,3 +358,82 @@
     flex-basis: 360px;
   }
 }
+
+/* Timeline meeting card */
+.rb-mtgc-with {
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-top: 2px;
+}
+.rb-mtgc-canceled {
+  background: var(--surface-hover);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  padding: 1px 6px;
+}
+.rb-mtgc-owner {
+  align-items: center;
+  color: var(--text);
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+.rb-mtgc-divider {
+  align-self: stretch;
+  background: var(--text);
+  width: 1px;
+}
+.rb-mtgc-details {
+  align-items: center;
+  align-self: flex-start;
+  display: inline-flex;
+  font-weight: 600;
+  gap: 6px;
+}
+.rb-mtgc-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rb-mtgc-desc .rb-actx-body {
+  margin: 0;
+  padding: 0;
+}
+.rb-mtgc-value {
+  color: var(--text);
+  font: 400 13px/18px var(--font-sans);
+  min-width: 0;
+}
+.rb-mtgc-attendees {
+  font: 600 13px/18px var(--font-sans);
+  padding: 0;
+  text-align: left;
+}
+.rb-mtgc-attendee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  min-width: 260px;
+  overflow-y: auto;
+  padding: 6px;
+}
+.rb-mtgc-attendee {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 6px 8px;
+}
+.rb-mtgc-response {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  font-size: 12px;
+}
+.rb-mtgc.rb-mtg-form {
+  padding-right: 0;
+}

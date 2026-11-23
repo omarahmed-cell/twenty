@@ -1,4 +1,5 @@
 import { RoboostActivityCard } from '@/roboost-app/components/RoboostActivityCard';
+import { RoboostMeetingItemCard } from '@/roboost-app/meeting/components/RoboostMeetingItemCard';
 import { RoboostActivityItemCard } from '@/roboost-app/timeline/components/RoboostActivityItemCard';
 import { RoboostEmailItemCard } from '@/roboost-app/timeline/components/RoboostEmailItemCard';
 import { type RoboostEmailContact } from '@/roboost-app/timeline/hooks/useRoboostEmailContacts';
@@ -151,14 +152,17 @@ export const RoboostFeedItemView = ({
         </>,
       );
     case 'meeting':
-      return activityCard(
-        'calendar',
-        'info',
-        <>
-          <b>{t`Meeting`}</b> · {item.title}
-          {isNonEmptyString(item.meta) ? ` · ${item.meta}` : ''}
-        </>,
-      );
+      return isDefined(item.recordId) ? (
+        <RoboostMeetingItemCard
+          recordId={item.recordId}
+          time={time}
+          isExpanded={isExpanded}
+          onToggleExpanded={onToggleExpanded}
+          isPinned={isPinned}
+          onTogglePin={onTogglePin}
+          onChanged={onChanged}
+        />
+      ) : null;
     case 'communication':
       return activityCard(
         COMMUNICATION_ICON_BY_TYPE_KEY[item.typeKey] ?? 'whatsapp',

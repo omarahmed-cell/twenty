@@ -21,6 +21,7 @@ import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
 import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
+import { MeetingGooglePushService } from 'src/modules/meeting/scheduling/services/meeting-google-push.service';
 import { MeetingSchedulingService } from 'src/modules/meeting/scheduling/services/meeting-scheduling.service';
 
 @ObjectType('MeetingCalendarSlot')
@@ -140,7 +141,25 @@ class SavedMeetingDTO {
 export class MeetingSchedulingResolver {
   constructor(
     private readonly meetingSchedulingService: MeetingSchedulingService,
+    private readonly meetingGooglePushService: MeetingGooglePushService,
   ) {}
+
+  @Mutation(() => Boolean)
+  async cancelMeetingInGoogle(
+    @AuthWorkspace() workspace: WorkspaceEntity,
+    @Args('meetingId', { type: () => String }) meetingId: string,
+  ): Promise<boolean> {
+    try {
+      return await this.meetingGooglePushService.cancelMeeting(
+        workspace.id,
+        meetingId,
+      );
+    } catch (error) {
+      throw new BadRequestException(
+        `Google Calendar refused the cancellation: ${(error as Error).message}`,
+      );
+    }
+  }
 
   @Query(() => MeetingHostCalendarDTO)
   async meetingHostCalendar(

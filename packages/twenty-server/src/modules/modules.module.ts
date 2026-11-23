@@ -28,6 +28,7 @@ import { FieldSyncModule } from 'src/modules/field-sync/field-sync.module';
 import { SegmentModule } from 'src/modules/segment/segment.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
 import { MeetingSchedulingModule } from 'src/modules/meeting/scheduling/meeting-scheduling.module';
+import { MeetingCalendarSyncModule } from 'src/modules/meeting/calendar-sync/meeting-calendar-sync.module';
 import { MeetingQueryHookModule } from 'src/modules/meeting/query-hooks/meeting-query-hook.module';
 import { EmailQueryHookModule } from 'src/modules/email/query-hooks/email-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
@@ -94,6 +95,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     EmailQueryHookModule,
     MeetingQueryHookModule,
     MeetingSchedulingModule,
+    MeetingCalendarSyncModule,
     NoteQueryHookModule,
     TaskQueryHookModule,
     TimelineQueryHookModule,

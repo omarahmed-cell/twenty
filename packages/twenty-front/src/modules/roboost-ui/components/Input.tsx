@@ -25,7 +25,8 @@ export type InputProps = {
     | 'url'
     | 'datetime-local'
     | 'tel'
-    | 'date';
+    | 'date'
+    | 'time';
   name?: string;
   className?: string;
   inputRef?: Ref<HTMLInputElement>;

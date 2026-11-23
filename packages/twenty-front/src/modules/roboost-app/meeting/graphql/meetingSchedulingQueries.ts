@@ -29,3 +29,9 @@ export const SAVE_MEETING = gql`
     }
   }
 `;
+
+export const CANCEL_MEETING_IN_GOOGLE = gql`
+  mutation CancelMeetingInGoogle($meetingId: String!) {
+    cancelMeetingInGoogle(meetingId: $meetingId)
+  }
+`;
