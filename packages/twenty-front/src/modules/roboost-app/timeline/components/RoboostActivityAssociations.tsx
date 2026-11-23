@@ -2,6 +2,7 @@ import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadat
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { useDeleteOneRecord } from '@/object-record/hooks/useDeleteOneRecord';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
+import { findTargetFieldInfo } from '@/object-record/record-field/ui/utils/junction/findTargetFieldInfo';
 import { getRoboostRecordLabel } from '@/roboost-app/fields/getRoboostRecordLabel';
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
 import { Icon } from '@/roboost-ui/components/Icon';
@@ -12,7 +13,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { capitalize, isDefined } from 'twenty-shared/utils';
-import { RelationType } from '~/generated-metadata/graphql';
 
 type JunctionRecord = Record<string, unknown> & {
   id: string;
@@ -37,15 +37,33 @@ export const RoboostActivityAssociations = ({
   const junctionMetadataItem = objectMetadataItems.find(
     (item) => item.nameSingular === junctionName,
   );
-  const targetFields = (junctionMetadataItem?.fields ?? []).filter(
-    (field) =>
-      field.isActive &&
-      field.name.startsWith('target') &&
-      field.relation?.type === RelationType.MANY_TO_ONE,
-  );
-  const targetObjectNames = targetFields
-    .map((field) => field.relation?.targetObjectMetadata.nameSingular)
-    .filter(isDefined);
+  // Junctions link through one morph "target" field; each linkable object gets its own targetXxx field
+  const targets = isDefined(junctionMetadataItem)
+    ? objectMetadataItems
+        .filter(
+          (item) =>
+            item.isActive &&
+            item.isSystem !== true &&
+            item.nameSingular !== objectNameSingular,
+        )
+        .flatMap((item) => {
+          const info = findTargetFieldInfo(
+            junctionMetadataItem.fields,
+            item.id,
+            objectMetadataItems,
+          );
+
+          return isDefined(info?.joinColumnName)
+            ? [
+                {
+                  objectMetadataItem: item,
+                  fieldName: info.fieldName,
+                  joinColumnName: info.joinColumnName,
+                },
+              ]
+            : [];
+        })
+    : [];
 
   // Record hooks throw for an unknown object even when skipped, so fall back to a junction that always exists
   const queriedJunctionName = isDefined(junctionMetadataItem)
@@ -58,7 +76,7 @@ export const RoboostActivityAssociations = ({
     recordGqlFields: {
       id: true,
       ...Object.fromEntries(
-        targetFields.map((field) => [field.name, { id: true, name: true }]),
+        targets.map((target) => [target.fieldName, { id: true, name: true }]),
       ),
     },
     skip: !isDefined(junctionMetadataItem),
@@ -71,36 +89,30 @@ export const RoboostActivityAssociations = ({
   });
 
   const links = records.flatMap((record) =>
-    targetFields.flatMap((field) => {
-      const target = record[field.name] as
+    targets.flatMap((target) => {
+      const linked = record[target.fieldName] as
         | (Record<string, unknown> & { id: string })
         | null
         | undefined;
-      const targetObjectNameSingular =
-        field.relation?.targetObjectMetadata.nameSingular;
 
-      if (!isDefined(target) || !isDefined(targetObjectNameSingular)) {
-        return [];
-      }
-      const targetMetadataItem = objectMetadataItems.find(
-        (item) => item.nameSingular === targetObjectNameSingular,
-      );
-
-      return [
-        {
-          junctionId: record.id,
-          targetId: target.id,
-          objectNameSingular: targetObjectNameSingular,
-          objectLabel: targetMetadataItem?.labelSingular ?? '',
-          label: getRoboostRecordLabel(target, targetMetadataItem),
-        },
-      ];
+      return isDefined(linked)
+        ? [
+            {
+              junctionId: record.id,
+              targetId: linked.id,
+              objectNameSingular: target.objectMetadataItem.nameSingular,
+              objectLabel: target.objectMetadataItem.labelSingular,
+              label: getRoboostRecordLabel(linked, target.objectMetadataItem),
+            },
+          ]
+        : [];
     }),
   );
 
-  const pickerOptions = objectMetadataItems
-    .filter((item) => targetObjectNames.includes(item.nameSingular))
-    .map((item) => ({ value: item.nameSingular, label: item.labelSingular }));
+  const pickerOptions = targets.map((target) => ({
+    value: target.objectMetadataItem.nameSingular,
+    label: target.objectMetadataItem.labelSingular,
+  }));
 
   if (!isDefined(junctionMetadataItem)) {
     return null;
@@ -174,7 +186,11 @@ export const RoboostActivityAssociations = ({
                   }
                   await createOneRecord({
                     [`${objectNameSingular}Id`]: recordId,
-                    [`target${capitalize(pickerObject)}Id`]: record.id,
+                    [targets.find(
+                      (target) =>
+                        target.objectMetadataItem.nameSingular === pickerObject,
+                    )?.joinColumnName ?? `target${capitalize(pickerObject)}Id`]:
+                      record.id,
                   });
                   await refetch();
                 }}
