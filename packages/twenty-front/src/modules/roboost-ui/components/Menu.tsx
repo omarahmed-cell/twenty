@@ -92,8 +92,12 @@ export const Menu = ({
     onClose: () => setIsOpen(false),
   });
 
+  // The list lives in a body portal, so focus moving into it (the search box) is not leaving the menu
   const closeWhenFocusLeaves = (event: FocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
+    if (
+      !event.currentTarget.contains(event.relatedTarget) &&
+      menuRef.current?.contains(event.relatedTarget) !== true
+    ) {
       setIsOpen(false);
     }
   };
