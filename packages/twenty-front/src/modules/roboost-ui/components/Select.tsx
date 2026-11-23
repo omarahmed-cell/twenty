@@ -85,6 +85,7 @@ export const Select = ({
   useRoboostCloseOnOutsideScroll({
     isOpen,
     popoverRef: menuRef,
+    onReposition: updatePosition,
     onClose: () => setIsOpen(false),
   });
 
@@ -155,32 +156,34 @@ export const Select = ({
             }}
           >
             {showSearch && <MenuSearch value={search} onChange={setSearch} />}
-            {visibleOptions.map((option) => (
-              <div
-                key={option.value}
-                role="option"
-                className="rb-menu-item"
-                aria-selected={option.value === currentValue}
-                onClick={() => choose(option)}
-              >
-                {option.description !== undefined ? (
-                  <span className="rb-menu-label rb-menu-two-line">
-                    <span className="rb-menu-label-main">{option.label}</span>
-                    <span className="rb-menu-label-sub">
-                      {option.description}
+            <div className="rb-menu-list">
+              {visibleOptions.map((option) => (
+                <div
+                  key={option.value}
+                  role="option"
+                  className="rb-menu-item"
+                  aria-selected={option.value === currentValue}
+                  onClick={() => choose(option)}
+                >
+                  {option.description !== undefined ? (
+                    <span className="rb-menu-label rb-menu-two-line">
+                      <span className="rb-menu-label-main">{option.label}</span>
+                      <span className="rb-menu-label-sub">
+                        {option.description}
+                      </span>
                     </span>
-                  </span>
-                ) : (
-                  <span className="rb-menu-label">{option.label}</span>
-                )}
-                {option.value === currentValue && (
-                  <Icon name="check" size={16} />
-                )}
-              </div>
-            ))}
-            {visibleOptions.length === 0 && (
-              <div className="rb-menu-empty">{t`No matches`}</div>
-            )}
+                  ) : (
+                    <span className="rb-menu-label">{option.label}</span>
+                  )}
+                  {option.value === currentValue && (
+                    <Icon name="check" size={16} />
+                  )}
+                </div>
+              ))}
+              {visibleOptions.length === 0 && (
+                <div className="rb-menu-empty">{t`No matches`}</div>
+              )}
+            </div>
           </div>,
           document.body,
         )}

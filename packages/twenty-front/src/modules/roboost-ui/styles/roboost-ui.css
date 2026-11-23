@@ -2227,34 +2227,63 @@
   z-index: 90;
 }
 
-/* ---------- Dropdowns: search, two-line rows, own scrollbar ---------- */
+/* ---------- Dropdowns: fixed search on top, only the list scrolls ---------- */
 .rb-menu.rb-menu-portal {
   border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: var(--space-1);
+}
+.rb-menu-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   scrollbar-color: var(--border-strong) transparent;
   scrollbar-width: thin;
 }
-.rb-menu.rb-menu-portal::-webkit-scrollbar {
+.rb-menu-list::-webkit-scrollbar {
   width: 8px;
 }
-.rb-menu.rb-menu-portal::-webkit-scrollbar-thumb {
+.rb-menu-list::-webkit-scrollbar-thumb {
   background: var(--border-strong);
   border-radius: 999px;
+}
+.rb-menu-portal > :not(.rb-menu-list) {
+  flex: none;
+}
+.rb-menu-portal .rb-menu-item {
+  flex: none;
+  max-width: 100%;
+  min-width: 0;
+}
+.rb-menu-portal .rb-menu-label-main,
+.rb-menu-portal .rb-menu-label {
+  max-width: 100%;
+  white-space: nowrap;
+}
+.rb-menu-portal .rb-menu-two-line {
+  min-width: 0;
 }
 .rb-menu-search {
   align-items: center;
   background: var(--surface);
   display: flex;
-  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-1)) var(--space-1);
-  padding: var(--space-2);
-  position: sticky;
-  top: calc(-1 * var(--space-1));
-  z-index: 1;
+  flex: none;
+  margin-bottom: var(--space-1);
+  padding: var(--space-1);
+}
+.rb-menu-search {
+  position: relative;
 }
 .rb-menu-search .rb-icon {
   color: var(--text-muted);
-  margin-left: -30px;
   pointer-events: none;
+  position: absolute;
+  right: calc(var(--space-1) + 12px);
 }
 .rb-menu-search-input {
   background: var(--surface);
@@ -2265,8 +2294,10 @@
   font: 400 14px/18px var(--font-sans);
   height: 34px;
   min-width: 0;
+  box-sizing: border-box;
   outline: none;
   padding: 0 34px 0 14px;
+  width: 100%;
 }
 .rb-menu-search-input:focus {
   border-color: var(--accent);
@@ -2367,4 +2398,27 @@
 .rb-segmented-btn:disabled {
   color: var(--text-disabled);
   cursor: default;
+}
+
+/* ---------- Multi-select dropdown: checkbox rows + Cancel/Save ---------- */
+.rb-multi-menu .rb-multi-item {
+  padding: 0;
+}
+.rb-multi-menu .rb-multi-item .rb-check {
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+}
+.rb-multi-menu .rb-multi-item .rb-check > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+}
+.rb-multi-actions {
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin: var(--space-1) calc(-1 * var(--space-1)) calc(-1 * var(--space-1));
+  padding: var(--space-2) var(--space-3);
 }

@@ -32,6 +32,7 @@ export const Popover = ({
   useRoboostCloseOnOutsideScroll({
     isOpen,
     popoverRef: panelRef,
+    onReposition: updatePosition,
     onClose: close,
   });
 

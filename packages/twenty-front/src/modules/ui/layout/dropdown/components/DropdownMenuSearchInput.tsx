@@ -13,20 +13,27 @@ const StyledDropdownMenuSearchInputContainer = styled.div`
   display: flex;
   flex-direction: row;
   min-height: calc(36px - 2 * var(--vertical-padding));
-  padding: var(--vertical-padding) 0;
+  padding: var(--vertical-padding);
 
   width: 100%;
 `;
 
 const StyledInput = styled.input`
   background-color: transparent;
-  background-color: transparent;
-  border: none;
+  border: 1px solid ${themeCssVariables.border.color.strong};
+  border-radius: ${themeCssVariables.border.radius.pill};
+  box-sizing: border-box;
   color: ${themeCssVariables.font.color.primary};
   font-family: ${themeCssVariables.font.family};
   font-size: ${themeCssVariables.font.size.sm};
   font-size: inherit;
   font-weight: inherit;
+  height: 32px;
+  min-width: 0;
+
+  &:focus {
+    border-color: ${themeCssVariables.color.blue};
+  }
 
   &::placeholder,
   &::-webkit-input-placeholder {
@@ -36,7 +43,7 @@ const StyledInput = styled.input`
   }
 
   outline: none;
-  padding: ${themeCssVariables.spacing[0]} ${themeCssVariables.spacing[2]};
+  padding: ${themeCssVariables.spacing[0]} ${themeCssVariables.spacing[3]};
   width: 100%;
 
   &[type='number']::-webkit-outer-spin-button,

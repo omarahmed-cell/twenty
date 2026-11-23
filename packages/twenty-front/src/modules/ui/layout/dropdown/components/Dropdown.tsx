@@ -21,6 +21,7 @@ import {
   autoUpdate,
   flip,
   offset,
+  shift,
   size,
   useFloating,
 } from '@floating-ui/react';
@@ -148,11 +149,22 @@ export const Dropdown = ({
     },
   };
 
+  // Roboost design: every menu opens under its trigger, aligned to its left edge
+  const leftAlignedPlacement: Placement =
+    dropdownPlacement === 'bottom-end' || dropdownPlacement === 'bottom'
+      ? 'bottom-start'
+      : dropdownPlacement === 'top-end' || dropdownPlacement === 'top'
+        ? 'top-start'
+        : dropdownPlacement;
+
   const { refs, floatingStyles, placement } = useFloating({
-    placement: dropdownPlacement,
+    placement: leftAlignedPlacement,
     middleware: [
       ...offsetMiddleware,
       flip({
+        ...boundaryOptions,
+      }),
+      shift({
         ...boundaryOptions,
       }),
       size({

@@ -89,6 +89,7 @@ export const Menu = ({
   useRoboostCloseOnOutsideScroll({
     isOpen,
     popoverRef: menuRef,
+    onReposition: updatePosition,
     onClose: () => setIsOpen(false),
   });
 
@@ -139,88 +140,93 @@ export const Menu = ({
               />
             )}
             {header}
-            {visibleEntries.map((entry) => {
-              if ('isSeparator' in entry) {
-                return <div key={entry.id} className="rb-menu-sep" />;
-              }
+            <div className="rb-menu-list">
+              {visibleEntries.map((entry) => {
+                if ('isSeparator' in entry) {
+                  return <div key={entry.id} className="rb-menu-sep" />;
+                }
 
-              if ('heading' in entry) {
-                return (
-                  <div key={entry.id} className="rb-menu-heading">
-                    {entry.heading}
-                  </div>
-                );
-              }
+                if ('heading' in entry) {
+                  return (
+                    <div key={entry.id} className="rb-menu-heading">
+                      {entry.heading}
+                    </div>
+                  );
+                }
 
-              const content = (
-                <>
-                  {entry.icon !== undefined && (
-                    <Icon name={entry.icon} size={16} />
-                  )}
-                  {'description' in entry && entry.description !== undefined ? (
-                    <span className="rb-menu-label rb-menu-two-line">
-                      <span className="rb-menu-label-main">{entry.label}</span>
-                      <span className="rb-menu-label-sub">
-                        {entry.description}
+                const content = (
+                  <>
+                    {entry.icon !== undefined && (
+                      <Icon name={entry.icon} size={16} />
+                    )}
+                    {'description' in entry &&
+                    entry.description !== undefined ? (
+                      <span className="rb-menu-label rb-menu-two-line">
+                        <span className="rb-menu-label-main">
+                          {entry.label}
+                        </span>
+                        <span className="rb-menu-label-sub">
+                          {entry.description}
+                        </span>
                       </span>
-                    </span>
-                  ) : (
-                    <span className="rb-menu-label">{entry.label}</span>
-                  )}
-                  {'hint' in entry && entry.hint !== undefined && (
-                    <span className="rb-menu-hint">{entry.hint}</span>
-                  )}
-                  {'isSelected' in entry && entry.isSelected === true && (
-                    <Icon name="check" size={16} />
-                  )}
-                </>
-              );
+                    ) : (
+                      <span className="rb-menu-label">{entry.label}</span>
+                    )}
+                    {'hint' in entry && entry.hint !== undefined && (
+                      <span className="rb-menu-hint">{entry.hint}</span>
+                    )}
+                    {'isSelected' in entry && entry.isSelected === true && (
+                      <Icon name="check" size={16} />
+                    )}
+                  </>
+                );
 
-              if ('href' in entry) {
+                if ('href' in entry) {
+                  return (
+                    <Link
+                      key={entry.id}
+                      to={entry.href}
+                      role="menuitem"
+                      className="rb-menu-item"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {content}
+                    </Link>
+                  );
+                }
+
                 return (
-                  <Link
+                  <button
                     key={entry.id}
-                    to={entry.href}
-                    role="menuitem"
-                    className="rb-menu-item"
-                    onClick={() => setIsOpen(false)}
+                    type="button"
+                    role={
+                      entry.isSelected !== undefined
+                        ? 'menuitemcheckbox'
+                        : 'menuitem'
+                    }
+                    aria-checked={entry.isSelected}
+                    aria-disabled={entry.isDisabled}
+                    className={cx(
+                      'rb-menu-item',
+                      entry.isDanger === true && 'rb-menu-item-danger',
+                      entry.isDisabled === true && 'is-disabled',
+                    )}
+                    aria-selected={entry.isSelected}
+                    onClick={() => {
+                      entry.onSelect();
+                      if (!keepOpenOnSelect) {
+                        setIsOpen(false);
+                      }
+                    }}
                   >
                     {content}
-                  </Link>
+                  </button>
                 );
-              }
-
-              return (
-                <button
-                  key={entry.id}
-                  type="button"
-                  role={
-                    entry.isSelected !== undefined
-                      ? 'menuitemcheckbox'
-                      : 'menuitem'
-                  }
-                  aria-checked={entry.isSelected}
-                  aria-disabled={entry.isDisabled}
-                  className={cx(
-                    'rb-menu-item',
-                    entry.isDanger === true && 'rb-menu-item-danger',
-                    entry.isDisabled === true && 'is-disabled',
-                  )}
-                  aria-selected={entry.isSelected}
-                  onClick={() => {
-                    entry.onSelect();
-                    if (!keepOpenOnSelect) {
-                      setIsOpen(false);
-                    }
-                  }}
-                >
-                  {content}
-                </button>
-              );
-            })}
-            {showSearch && visibleEntries.length === 0 && (
-              <div className="rb-menu-empty">{t`No matches`}</div>
-            )}
+              })}
+              {showSearch && visibleEntries.length === 0 && (
+                <div className="rb-menu-empty">{t`No matches`}</div>
+              )}
+            </div>
             {footer}
           </div>,
           document.body,

@@ -13,7 +13,12 @@ import { type FocusEvent, useState } from 'react';
 const NOT_EDITED = Symbol('notEdited');
 
 // Picking from a list is the whole edit, so these save on choice instead of waiting for Save
-const SAVE_ON_CHOICE_KINDS = new Set(['select', 'rating', 'relation']);
+const SAVE_ON_CHOICE_KINDS = new Set([
+  'select',
+  'multiSelect',
+  'rating',
+  'relation',
+]);
 
 type RoboostListEditableCellProps = {
   field: FieldMetadataItem;
@@ -142,6 +147,7 @@ export const RoboostListEditableCell = ({
         field={field}
         value={currentDraft}
         autoOpen
+        onCancel={() => setIsEditing(false)}
         relatedRecord={
           draftRelated !== undefined
             ? draftRelated

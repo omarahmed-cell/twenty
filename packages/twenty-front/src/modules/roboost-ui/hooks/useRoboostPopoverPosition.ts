@@ -4,11 +4,12 @@ import { isDefined } from 'twenty-shared/utils';
 const GAP = 4;
 const VIEWPORT_MARGIN = 8;
 const MAX_HEIGHT = 360;
-const MIN_COMFORTABLE_HEIGHT = 220;
+const MIN_HEIGHT_BELOW = 160;
+const ESTIMATED_MIN_WIDTH = 240;
 
 type PopoverPlacement = 'below' | 'above';
 
-// Opens under its control, or above when there is more room there, and never covers the control
+// Opens under its control, left edges aligned; above only when there is no room below
 export const useRoboostPopoverPosition = ({
   anchorRef,
   align = 'left',
@@ -33,21 +34,22 @@ export const useRoboostPopoverPosition = ({
     const spaceAbove = rect.top - GAP - VIEWPORT_MARGIN;
     const opensAbove =
       placement === 'above'
-        ? spaceAbove >= MIN_COMFORTABLE_HEIGHT || spaceAbove > spaceBelow
-        : spaceBelow < MIN_COMFORTABLE_HEIGHT && spaceAbove > spaceBelow;
+        ? spaceAbove >= MIN_HEIGHT_BELOW || spaceAbove > spaceBelow
+        : spaceBelow < MIN_HEIGHT_BELOW && spaceAbove > spaceBelow;
+    const width = Math.max(
+      ESTIMATED_MIN_WIDTH,
+      matchAnchorWidth ? rect.width : 0,
+    );
+    const overflowsRight =
+      rect.left + width > window.innerWidth - VIEWPORT_MARGIN;
 
     setPosition({
       ...(opensAbove
         ? { bottom: window.innerHeight - rect.top + GAP }
         : { top: rect.bottom + GAP }),
-      ...(align === 'right'
+      ...(align === 'right' || overflowsRight
         ? { right: Math.max(VIEWPORT_MARGIN, window.innerWidth - rect.right) }
-        : {
-            left: Math.max(
-              VIEWPORT_MARGIN,
-              Math.min(rect.left, window.innerWidth - 240 - VIEWPORT_MARGIN),
-            ),
-          }),
+        : { left: Math.max(VIEWPORT_MARGIN, rect.left) }),
       maxHeight: Math.min(MAX_HEIGHT, opensAbove ? spaceAbove : spaceBelow),
       ...(matchAnchorWidth ? { minWidth: rect.width } : {}),
     });

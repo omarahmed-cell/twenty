@@ -61,6 +61,7 @@ export const RoboostRecordPicker = ({
   useRoboostCloseOnOutsideScroll({
     isOpen,
     popoverRef: menuRef,
+    onReposition: updatePosition,
     onClose: () => setIsOpen(false),
   });
 
@@ -165,54 +166,56 @@ export const RoboostRecordPicker = ({
             }}
           >
             <MenuSearch value={search} onChange={setSearch} />
-            {isClearable && isNonEmptyString(selectedLabel) && (
-              <button
-                type="button"
-                className="rb-menu-item"
-                onClick={() => {
-                  onSelect(null);
-                  setIsOpen(false);
-                }}
-              >
-                <Icon name="x" size={16} />
-                <span className="rb-menu-label">{t`Clear`}</span>
-              </button>
-            )}
-            {records.map((record) => {
-              const label = getRoboostRecordLabel(record, objectMetadataItem);
-              const subtitle = getRecordSubtitle(record);
-
-              return (
+            <div className="rb-menu-list">
+              {isClearable && isNonEmptyString(selectedLabel) && (
                 <button
-                  key={record.id}
                   type="button"
                   className="rb-menu-item"
-                  role="option"
-                  aria-selected={label === selectedLabel}
                   onClick={() => {
-                    onSelect({ id: record.id, label });
+                    onSelect(null);
                     setIsOpen(false);
                   }}
                 >
-                  <Avatar
-                    name={label}
-                    src={(record.avatarUrl as string | undefined) ?? null}
-                    size="xs"
-                  />
-                  {subtitle !== undefined ? (
-                    <span className="rb-menu-label rb-menu-two-line">
-                      <span className="rb-menu-label-main">{label}</span>
-                      <span className="rb-menu-label-sub">{subtitle}</span>
-                    </span>
-                  ) : (
-                    <span className="rb-menu-label">{label}</span>
-                  )}
+                  <Icon name="x" size={16} />
+                  <span className="rb-menu-label">{t`Clear`}</span>
                 </button>
-              );
-            })}
-            {!loading && records.length === 0 && (
-              <div className="rb-menu-empty">{t`No matches`}</div>
-            )}
+              )}
+              {records.map((record) => {
+                const label = getRoboostRecordLabel(record, objectMetadataItem);
+                const subtitle = getRecordSubtitle(record);
+
+                return (
+                  <button
+                    key={record.id}
+                    type="button"
+                    className="rb-menu-item"
+                    role="option"
+                    aria-selected={label === selectedLabel}
+                    onClick={() => {
+                      onSelect({ id: record.id, label });
+                      setIsOpen(false);
+                    }}
+                  >
+                    <Avatar
+                      name={label}
+                      src={(record.avatarUrl as string | undefined) ?? null}
+                      size="xs"
+                    />
+                    {subtitle !== undefined ? (
+                      <span className="rb-menu-label rb-menu-two-line">
+                        <span className="rb-menu-label-main">{label}</span>
+                        <span className="rb-menu-label-sub">{subtitle}</span>
+                      </span>
+                    ) : (
+                      <span className="rb-menu-label">{label}</span>
+                    )}
+                  </button>
+                );
+              })}
+              {!loading && records.length === 0 && (
+                <div className="rb-menu-empty">{t`No matches`}</div>
+              )}
+            </div>
           </div>,
           document.body,
         )}

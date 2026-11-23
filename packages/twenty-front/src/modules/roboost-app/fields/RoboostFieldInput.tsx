@@ -5,6 +5,7 @@ import { getRoboostRecordLabel } from '@/roboost-app/fields/getRoboostRecordLabe
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Input } from '@/roboost-ui/components/Input';
+import { MultiSelect } from '@/roboost-ui/components/MultiSelect';
 import { Select } from '@/roboost-ui/components/Select';
 import { useLingui } from '@lingui/react/macro';
 import { isNumber, isString } from '@sniptt/guards';
@@ -25,6 +26,8 @@ export type RoboostFieldInputProps = {
   invalid?: boolean;
   // Opens the dropdown straight away when the editor appears (record properties, table cells)
   autoOpen?: boolean;
+  // A dropdown closed without choosing (Cancel, Escape, click outside)
+  onCancel?: () => void;
 };
 
 const toDateInput = (value: unknown, withTime: boolean) => {
@@ -53,6 +56,7 @@ export const RoboostFieldInput = ({
   placeholder,
   invalid,
   autoOpen = false,
+  onCancel,
 }: RoboostFieldInputProps) => {
   const { t } = useLingui();
   const { objectMetadataItems } = useObjectMetadataItems();
@@ -119,25 +123,18 @@ export const RoboostFieldInput = ({
       const selected = Array.isArray(value) ? (value as string[]) : [];
 
       return (
-        <div className="rb-multi-select">
-          {[...(field.options ?? [])]
+        <MultiSelect
+          aria-label={field.label}
+          autoOpen={autoOpen}
+          style={{ width: '100%' }}
+          value={selected}
+          placeholder={placeholder ?? t`Select…`}
+          options={[...(field.options ?? [])]
             .sort((first, second) => first.position - second.position)
-            .map((option) => (
-              <Checkbox
-                key={option.value}
-                checked={selected.includes(option.value)}
-                onChange={(checked) =>
-                  onChange(
-                    checked
-                      ? [...selected, option.value]
-                      : selected.filter((item) => item !== option.value),
-                  )
-                }
-              >
-                {option.label}
-              </Checkbox>
-            ))}
-        </div>
+            .map((option) => ({ value: option.value, label: option.label }))}
+          onChange={onChange}
+          onCancel={onCancel}
+        />
       );
     }
     case 'date':

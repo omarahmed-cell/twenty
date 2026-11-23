@@ -27,10 +27,11 @@ const StyledScrollableContainer = styled.div<{ maxHeight?: number }>`
 
   display: flex;
   max-height: ${({ maxHeight }) => (maxHeight ? `${maxHeight}px` : 'none')};
+  overflow-x: hidden;
   overflow-y: auto;
 
-  scrollbar-color: ${themeCssVariables.border.color.medium} transparent;
-  scrollbar-width: 4px;
+  scrollbar-color: ${themeCssVariables.border.color.strong} transparent;
+  scrollbar-width: thin;
   width: 100%;
 
   *::-webkit-scrollbar-thumb {
