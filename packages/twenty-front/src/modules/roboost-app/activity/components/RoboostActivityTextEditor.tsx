@@ -9,6 +9,7 @@ type RoboostActivityTextEditorProps = {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
+  autoFocus?: boolean;
 };
 
 // Markdown text area; the server turns the markdown into rich text
@@ -16,6 +17,7 @@ export const RoboostActivityTextEditor = ({
   value,
   placeholder,
   onChange,
+  autoFocus = false,
 }: RoboostActivityTextEditorProps) => {
   const { t } = useLingui();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -96,6 +98,7 @@ export const RoboostActivityTextEditor = ({
       <textarea
         ref={textareaRef}
         className="rb-act-textarea"
+        autoFocus={autoFocus}
         value={value}
         placeholder={placeholder}
         aria-label={placeholder}

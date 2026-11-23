@@ -2,6 +2,7 @@ import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 
+import { RoboostMeetingRecordPage } from '@/roboost-app/meeting/components/RoboostMeetingRecordPage';
 import { RoboostRecordPage } from '@/roboost-app/record/components/RoboostRecordPage';
 import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { WorkspaceRouteUnavailable } from '@/ui/layout/page/components/WorkspaceRouteUnavailable';
@@ -51,6 +52,15 @@ export const RecordShowPage = () => {
     isDefined(parameters.objectRecordId) &&
     searchParams.get('view') !== 'classic'
   ) {
+    if (parameters.objectNameSingular === CoreObjectNameSingular.Meeting) {
+      return (
+        <RoboostMeetingRecordPage
+          key={parameters.objectRecordId}
+          recordId={parameters.objectRecordId}
+        />
+      );
+    }
+
     return (
       <RoboostRecordPage
         key={parameters.objectRecordId}
