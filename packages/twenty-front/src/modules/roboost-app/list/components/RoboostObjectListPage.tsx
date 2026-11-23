@@ -12,7 +12,12 @@ import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCre
 import { useRoboostPagedRecords } from '@/roboost-app/hooks/useRoboostPagedRecords';
 import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
 import { useRoboostViewQueryVariables } from '@/roboost-app/hooks/useRoboostViewQueryVariables';
-import { RoboostAdvancedFiltersModal } from '@/roboost-app/list/components/RoboostAdvancedFiltersModal';
+import { RoboostAdvancedFiltersPanel } from '@/roboost-app/filters/components/RoboostAdvancedFiltersPanel';
+import { useRoboostCreateView } from '@/roboost-app/list/hooks/useRoboostCreateView';
+import { useRoboostSavedViewState } from '@/roboost-app/list/hooks/useRoboostSavedViewState';
+import { isSameRoboostViewState } from '@/roboost-app/list/utils/isSameRoboostViewState';
+import { Input } from '@/roboost-ui/components/Input';
+import { useToast } from 'twenty-ui/components/feedback';
 import { RoboostColumnsModal } from '@/roboost-app/list/components/RoboostColumnsModal';
 import {
   ROBOOST_PAGE_SIZE_OPTIONS,
@@ -114,6 +119,15 @@ export const RoboostObjectListPage = ({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [isFilterRowOpen, setIsFilterRowOpen] = useState(true);
+  const [loadedViewId, setLoadedViewId] = useState<string | null>(null);
+  const [namingViewMode, setNamingViewMode] = useState<
+    'create' | 'clone' | null
+  >(null);
+  const [viewName, setViewName] = useState('');
+  const [isSavingView, setIsSavingView] = useState(false);
+  const { enqueueToast } = useToast();
+  const { createView } = useRoboostCreateView(objectMetadataItem);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isCardSettingsOpen, setIsCardSettingsOpen] = useState(false);
@@ -133,6 +147,51 @@ export const RoboostObjectListPage = ({
     views.find((view) => view.id === searchParams.get('viewId')) ??
     views.find((view) => view.key === ViewKey.INDEX) ??
     views[0];
+
+  const { savedState, saveViewState } = useRoboostSavedViewState(activeView);
+
+  // Opening a view brings back its last saved filters and sort
+  if (isDefined(activeView) && activeView.id !== loadedViewId) {
+    setLoadedViewId(activeView.id);
+    setFilters(savedState.filters);
+    setSort(savedState.sort);
+  }
+  const isViewDirty = !isSameRoboostViewState({ filters, sort }, savedState);
+
+  const saveView = async () => {
+    setIsSavingView(true);
+    try {
+      await saveViewState({ filters, sort });
+      enqueueToast({ status: 'success', children: t`View saved` });
+    } catch {
+      enqueueToast({
+        status: 'error',
+        children: t`Only admins can save a shared view. Use Clone to new view to keep these changes.`,
+      });
+    } finally {
+      setIsSavingView(false);
+    }
+  };
+
+  const resetView = () => {
+    setFilters(savedState.filters);
+    setSort(savedState.sort);
+    setPage(1);
+  };
+
+  const submitViewName = async () => {
+    const mode = namingViewMode;
+
+    setNamingViewMode(null);
+    const viewId = await createView({
+      name: viewName,
+      sourceView: activeView,
+      state: mode === 'clone' ? { filters, sort } : undefined,
+    });
+
+    setViewName('');
+    changeView(viewId);
+  };
 
   const { filter: viewFilter, orderBy: viewOrderBy } =
     useRoboostViewQueryVariables({ view: activeView, objectMetadataItem });
@@ -234,7 +293,6 @@ export const RoboostObjectListPage = ({
 
     nextSearchParams.set('viewId', viewId);
     setSearchParams(nextSearchParams);
-    setSort(null);
     resetPaging();
   };
 
@@ -402,7 +460,12 @@ export const RoboostObjectListPage = ({
             views={views}
             activeViewId={activeView?.id}
             activeCount={hasLoaded ? totalCount : undefined}
+            isDirty={isViewDirty}
             onChange={changeView}
+            onCreate={() => setNamingViewMode('create')}
+            onClone={() => setNamingViewMode('clone')}
+            onSave={saveView}
+            onReset={resetView}
           />
           <RoboostListToolbar
             objectMetadataItem={objectMetadataItem}
@@ -424,6 +487,8 @@ export const RoboostObjectListPage = ({
               setPage(1);
             }}
             onOpenAdvanced={() => setIsAdvancedOpen(true)}
+            isFilterRowOpen={isFilterRowOpen}
+            onToggleFilterRow={() => setIsFilterRowOpen(!isFilterRowOpen)}
             onOpenColumns={() => setIsColumnsOpen(true)}
             displayToggle={
               isBoardObject ? (
@@ -576,6 +641,10 @@ export const RoboostObjectListPage = ({
               onRefresh={() => refetch()}
               onExport={exportRecords}
               isExporting={isExporting}
+              isDirty={isViewDirty}
+              isSaving={isSavingView}
+              onSave={saveView}
+              onClone={() => setNamingViewMode('clone')}
             />
           )}
         </div>
@@ -606,17 +675,49 @@ export const RoboostObjectListPage = ({
         />
       )}
       {isAdvancedOpen && (
-        <RoboostAdvancedFiltersModal
+        <RoboostAdvancedFiltersPanel
           objectMetadataItem={objectMetadataItem}
           value={filters.advanced}
           onClose={() => setIsAdvancedOpen(false)}
           onApply={(advanced) => {
-            setIsAdvancedOpen(false);
             setFilters({ ...filters, advanced });
             resetPaging();
           }}
         />
       )}
+      <Modal
+        open={namingViewMode !== null}
+        title={
+          namingViewMode === 'clone' ? t`Clone to new view` : t`Create view`
+        }
+        subtitle={
+          namingViewMode === 'clone'
+            ? t`The new view keeps the current columns, filters and sort.`
+            : t`It starts with the columns of the current view.`
+        }
+        onClose={() => setNamingViewMode(null)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setNamingViewMode(null)}>
+              {t`Cancel`}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={viewName.trim() === ''}
+              onClick={submitViewName}
+            >
+              {namingViewMode === 'clone' ? t`Clone` : t`Create view`}
+            </Button>
+          </>
+        }
+      >
+        <Input
+          value={viewName}
+          placeholder={t`View name`}
+          aria-label={t`View name`}
+          onChange={(event) => setViewName(event.target.value)}
+        />
+      </Modal>
       <Modal
         open={isDeleteOpen}
         tone="danger"

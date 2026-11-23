@@ -137,10 +137,15 @@ describe('mapRoboostTimelineUpdates', () => {
 
   it('skips rows that only repeat an activity card', () => {
     const items = map([
-      row('note-link', 'linked', {}, {
-        linkedRecordId: 'note-1',
-        linkedObjectMetadataId: 'note-object',
-      }),
+      row(
+        'note-link',
+        'linked',
+        {},
+        {
+          linkedRecordId: 'note-1',
+          linkedObjectMetadataId: 'note-object',
+        },
+      ),
       row('person-link', 'linked', {}, {
         linkedRecordId: 'person-1',
         linkedObjectMetadataId: 'person-object',

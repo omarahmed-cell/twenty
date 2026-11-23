@@ -8,15 +8,24 @@ import {
 
 describe('getOperandLabel', () => {
   const testCases = [
-    [ViewFilterOperand.CONTAINS, 'Contains'],
-    [ViewFilterOperand.DOES_NOT_CONTAIN, "Doesn't contain"],
-    [ViewFilterOperand.GREATER_THAN_OR_EQUAL, 'Greater than or equal'],
-    [ViewFilterOperand.LESS_THAN_OR_EQUAL, 'Less than or equal'],
-    [ViewFilterOperand.IS, 'Is'],
-    [ViewFilterOperand.IS_NOT, 'Is not'],
-    [ViewFilterOperand.IS_NOT_NULL, 'Is not null'],
+    [ViewFilterOperand.CONTAINS, 'contains any of'],
+    [ViewFilterOperand.DOES_NOT_CONTAIN, "doesn't contain any of"],
+    [ViewFilterOperand.GREATER_THAN_OR_EQUAL, 'is more than or equal to'],
+    [ViewFilterOperand.LESS_THAN_OR_EQUAL, 'is less than or equal to'],
+    [ViewFilterOperand.IS, 'is equal to'],
+    [ViewFilterOperand.IS_NOT, 'is not equal to'],
+    [ViewFilterOperand.IS_NOT_NULL, 'is known'],
     [undefined, ''], // undefined operand
   ];
+
+  it('reads list filters as any of / none of', () => {
+    expect(getOperandLabel(ViewFilterOperand.IS, null, 'SELECT')).toBe(
+      'is any of',
+    );
+    expect(getOperandLabel(ViewFilterOperand.IS_NOT, null, 'RELATION')).toBe(
+      'is none of',
+    );
+  });
 
   testCases.forEach(([operand, expectedLabel]) => {
     const formattedOperand = capitalize(operand || 'undefined');
@@ -34,7 +43,7 @@ describe('getOperandLabelShort', () => {
     [ViewFilterOperand.CONTAINS, ': '],
     [ViewFilterOperand.IS_NOT, ': Not'],
     [ViewFilterOperand.DOES_NOT_CONTAIN, ': Not'],
-    [ViewFilterOperand.IS_NOT_NULL, ': NotNull'],
+    [ViewFilterOperand.IS_NOT_NULL, ': is known'],
     [ViewFilterOperand.GREATER_THAN_OR_EQUAL, '\u00A0≥ '],
     [ViewFilterOperand.LESS_THAN_OR_EQUAL, '\u00A0≤ '],
     [undefined, ': '], // undefined operand

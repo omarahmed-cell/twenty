@@ -1,3 +1,4 @@
+import { getConditionalLogicOperatorLabel } from '@/settings/data-model/conditional-logic/utils/getConditionalLogicOperatorLabel';
 import { t } from '@lingui/core/macro';
 import { type RoboostCardLogic } from '@/roboost-app/layout/types/RoboostRecordLayout';
 import {
@@ -13,48 +14,7 @@ import { FieldMetadataType } from 'twenty-shared/types';
 
 export const getRoboostOperatorLabel = (
   operator: ConditionalLogicOperator,
-): string => {
-  switch (operator) {
-    case 'IS_KNOWN':
-      return t`is not empty`;
-    case 'IS_UNKNOWN':
-      return t`is empty`;
-    case 'IS_EQUAL_TO':
-      return t`equals`;
-    case 'IS_NOT_EQUAL_TO':
-      return t`does not equal`;
-    case 'CONTAINS':
-      return t`contains`;
-    case 'IS_ANY_OF':
-      return t`is any of`;
-    case 'IS_NONE_OF':
-      return t`is none of`;
-    case 'CONTAINS_ANY_OF':
-      return t`contains any of`;
-    case 'CONTAINS_ALL_OF':
-      return t`contains all of`;
-    case 'CONTAINS_NONE_OF':
-      return t`contains none of`;
-    case 'GREATER_THAN':
-      return t`is greater than`;
-    case 'LESS_THAN':
-      return t`is less than`;
-    case 'GREATER_THAN_OR_EQUAL':
-      return t`is at least`;
-    case 'LESS_THAN_OR_EQUAL':
-      return t`is at most`;
-    case 'IS_BEFORE':
-      return t`is before`;
-    case 'IS_AFTER':
-      return t`is after`;
-    case 'IS_ON':
-      return t`is on`;
-    case 'IS_YES':
-      return t`is Yes`;
-    case 'IS_NO':
-      return t`is No`;
-  }
-};
+): string => getConditionalLogicOperatorLabel(operator);
 
 // A related record's id has no readable value to type, so relations only test for emptiness
 export const getRoboostCardLogicOperators = (

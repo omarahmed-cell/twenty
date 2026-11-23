@@ -74,7 +74,11 @@ export const AdvancedFilterRecordFilterOperandSelectContent = ({
         <SelectControl
           selectedOption={{
             label: isDefined(filter.operand)
-              ? getOperandLabel(filter.operand, timeZoneAbbreviation)
+              ? getOperandLabel(
+                  filter.operand,
+                  timeZoneAbbreviation,
+                  filter.type,
+                )
               : t`Select operand`,
             value: null,
           }}
@@ -92,7 +96,11 @@ export const AdvancedFilterRecordFilterOperandSelectContent = ({
               selected={filter.operand === filterOperand}
               onSelect={() => handleOperandChange(filterOperand)}
             >
-              {getOperandLabel(filterOperand, timeZoneAbbreviation)}
+              {getOperandLabel(
+                filterOperand,
+                timeZoneAbbreviation,
+                filter.type,
+              )}
             </Dropdown.OptionItem>
           ))}
         </Dropdown.Section>

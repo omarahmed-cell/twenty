@@ -16,6 +16,10 @@ type RoboostListFooterProps = {
   onRefresh: () => void;
   onExport: () => void;
   isExporting: boolean;
+  isDirty?: boolean;
+  isSaving?: boolean;
+  onSave?: () => void;
+  onClone?: () => void;
 };
 
 const getVisiblePages = (page: number, pageCount: number) => {
@@ -41,6 +45,10 @@ export const RoboostListFooter = ({
   onRefresh,
   onExport,
   isExporting,
+  isDirty = false,
+  isSaving = false,
+  onSave,
+  onClone,
 }: RoboostListFooterProps) => {
   const { t } = useLingui();
   const visiblePages = getVisiblePages(page, pageCount);
@@ -119,6 +127,27 @@ export const RoboostListFooter = ({
           <Icon name="download" size={14} />
           {isExporting ? t`Exporting…` : t`Export`}
         </button>
+        {onClone !== undefined && (
+          <button
+            type="button"
+            className="rb-icon-btn"
+            aria-label={t`Clone to new view`}
+            title={t`Clone to new view`}
+            onClick={onClone}
+          >
+            <Icon name="copy" size={16} />
+          </button>
+        )}
+        {isDirty && onSave !== undefined && (
+          <button
+            type="button"
+            className="rb-hbtn rb-hbtn-accent"
+            disabled={isSaving}
+            onClick={onSave}
+          >
+            {isSaving ? t`Saving…` : t`Save`}
+          </button>
+        )}
       </span>
     </div>
   );

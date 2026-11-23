@@ -1,3 +1,7 @@
+import { type RoboostFilterOperator } from '@/roboost-app/filters/types/RoboostFilterOperator';
+import { type RoboostFilterRuleValue } from '@/roboost-app/filters/utils/buildRoboostFilterRule';
+import { type RecordGqlOperationFilter } from 'twenty-shared/types';
+
 export type RoboostDateRange =
   | 'any'
   | 'today'
@@ -7,30 +11,32 @@ export type RoboostDateRange =
   | 'last90'
   | 'last365';
 
-export type RoboostFilterOperand =
-  | 'contains'
-  | 'doesNotContain'
-  | 'is'
-  | 'isNot'
-  | 'isAnyOf'
-  | 'isNoneOf'
-  | 'greaterThan'
-  | 'lessThan'
-  | 'before'
-  | 'after'
-  | 'isEmpty'
-  | 'isNotEmpty';
-
 export type RoboostFilterRule = {
   id: string;
   fieldName: string;
-  operand: RoboostFilterOperand;
-  value: string | string[] | null;
+  operator: RoboostFilterOperator;
+  value: RoboostFilterRuleValue;
+  // Display names of picked records, so relation chips never show bare ids
+  labels?: Record<string, string>;
+};
+
+// Rules in a group must all match; a record matches when any group does
+export type RoboostFilterGroup = {
+  id: string;
+  rules: RoboostFilterRule[];
+};
+
+// Conditions on a related object's fields, resolved to the matching record ids when applied
+export type RoboostAssociationFilter = {
+  id: string;
+  relationFieldName: string;
+  rules: RoboostFilterRule[];
+  resolvedFilter: RecordGqlOperationFilter | null;
 };
 
 export type RoboostAdvancedFilter = {
-  conjunction: 'and' | 'or';
-  rules: RoboostFilterRule[];
+  groups: RoboostFilterGroup[];
+  associations: RoboostAssociationFilter[];
 };
 
 export type RoboostListFilters = {
@@ -49,5 +55,5 @@ export const EMPTY_ROBOOST_LIST_FILTERS: RoboostListFilters = {
   lastActivityWithin: 'any',
   selectValuesByFieldName: {},
   extraSelectFieldNames: [],
-  advanced: { conjunction: 'and', rules: [] },
+  advanced: { groups: [], associations: [] },
 };

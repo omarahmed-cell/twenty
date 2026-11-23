@@ -1,0 +1,185 @@
+/* List toolbar: search row, then the filter-chip row the Filter button shows or hides */
+.rb-ls-toolbar {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+.rb-ls-tools.rb-ls-filters {
+  background: var(--surface-sunken);
+  padding-bottom: 9px;
+  padding-top: 9px;
+}
+.rb-advlink {
+  align-items: center;
+  display: inline-flex;
+  gap: 5px;
+}
+.rb-advlink.is-on {
+  font-weight: 600;
+}
+
+/* View tabs: the tab is a wrapper so its menu button can sit beside the label */
+.rb-vtab {
+  padding: 0;
+}
+.rb-vtab.is-dragging {
+  opacity: 0.45;
+}
+.rb-vtab-btn {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 7px;
+  padding: 10px 12px 11px;
+}
+.rb-vtab.is-on .rb-vtab-btn {
+  padding-right: 4px;
+}
+.rb-vtab-menu {
+  align-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  margin-right: 6px;
+  width: 22px;
+}
+.rb-vtab-menu:hover,
+.rb-vtab-menu[aria-expanded='true'] {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* Advanced filters side panel */
+.rb-afp .rb-spanel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rb-afp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rb-afp-title {
+  color: var(--text);
+  font: 600 16px/22px var(--font-display);
+  margin: 0;
+}
+.rb-afp-sub {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: -6px 0 2px;
+}
+.rb-afp-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+.rb-afp-group-head {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+.rb-afp-group-head .rb-select {
+  flex: 1;
+  min-width: 0;
+}
+.rb-afp-and,
+.rb-afp-or {
+  color: var(--text-secondary);
+  font: 600 11px/14px var(--font-sans);
+  letter-spacing: 0.06em;
+  padding: 2px 0 6px;
+  text-transform: uppercase;
+}
+.rb-afp-or {
+  padding: 8px 0;
+  text-align: center;
+}
+.rb-afp-add {
+  align-items: center;
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  font: 500 13px/18px var(--font-sans);
+  gap: 6px;
+  padding: 5px 14px;
+}
+.rb-afp-add:hover {
+  background: var(--surface-hover);
+}
+.rb-afp-divider {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  font-weight: 600;
+  gap: 12px;
+  margin: 16px 0;
+}
+.rb-afp-divider::before,
+.rb-afp-divider::after {
+  background: var(--border);
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+
+/* One filter condition */
+.rb-frule {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rb-frule .rb-select,
+.rb-frule .rb-select-trigger {
+  width: 100%;
+}
+.rb-frule-head {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+.rb-frule-head .rb-frule-field {
+  flex: 1;
+  min-width: 0;
+}
+.rb-frule-values {
+  width: 100%;
+}
+.rb-frule-range {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+.rb-frule-range > * {
+  flex: 1;
+}
+.rb-frule-range > span {
+  flex: none;
+}
+.rb-frule-relation {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rb-frule-relation .rb-picker {
+  flex: 1;
+  min-width: 160px;
+}

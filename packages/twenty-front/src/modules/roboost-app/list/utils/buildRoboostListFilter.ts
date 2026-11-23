@@ -1,12 +1,10 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostLabelIdentifierFieldName } from '@/roboost-app/fields/getRoboostRecordLabel';
-import {
-  type RoboostFilterRule,
-  type RoboostListFilters,
-} from '@/roboost-app/list/types/RoboostListFilters';
+import { buildRoboostFilterRule } from '@/roboost-app/filters/utils/buildRoboostFilterRule';
+import { type RoboostListFilters } from '@/roboost-app/list/types/RoboostListFilters';
 import { getRoboostRangeStart } from '@/roboost-app/list/utils/getRoboostRangeStart';
-import { isNonEmptyString, isString } from '@sniptt/guards';
+import { isNonEmptyString } from '@sniptt/guards';
 import { type RecordGqlOperationFilter } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
@@ -34,120 +32,6 @@ const buildTextMatch = (
   return isDefined(subField)
     ? { [field.name]: { [subField]: { ilike: pattern } } }
     : { [field.name]: { ilike: pattern } };
-};
-
-const getEmptyCheckTarget = (field: FieldMetadataItem) => {
-  if (field.type === FieldMetadataType.RELATION) {
-    return { key: `${field.name}Id`, value: undefined };
-  }
-  const subField = TEXT_SUBFIELD_BY_TYPE[field.type];
-
-  return { key: field.name, value: subField };
-};
-
-const buildEmptyCheck = (
-  field: FieldMetadataItem,
-  isEmpty: boolean,
-): RecordGqlOperationFilter => {
-  const target = getEmptyCheckTarget(field);
-  const check = { is: isEmpty ? 'NULL' : 'NOT_NULL' };
-
-  return isDefined(target.value)
-    ? { [target.key]: { [target.value]: check } }
-    : { [target.key]: check };
-};
-
-const toList = (value: RoboostFilterRule['value']) =>
-  Array.isArray(value) ? value : isNonEmptyString(value) ? [value] : [];
-
-export const buildRoboostRuleFilter = (
-  rule: RoboostFilterRule,
-  field: FieldMetadataItem,
-): RecordGqlOperationFilter | undefined => {
-  if (rule.operand === 'isEmpty' || rule.operand === 'isNotEmpty') {
-    return buildEmptyCheck(field, rule.operand === 'isEmpty');
-  }
-  const value = rule.value;
-  const text = isString(value) ? value.trim() : '';
-
-  switch (field.type) {
-    case FieldMetadataType.SELECT:
-    case FieldMetadataType.RATING: {
-      const values = toList(value);
-
-      if (values.length === 0) {
-        return undefined;
-      }
-      const match = { [field.name]: { in: values } };
-
-      return rule.operand === 'isNoneOf' ? { not: match } : match;
-    }
-    case FieldMetadataType.MULTI_SELECT: {
-      const values = toList(value);
-
-      if (values.length === 0) {
-        return undefined;
-      }
-      const match = { [field.name]: { containsAny: values } };
-
-      return rule.operand === 'isNoneOf' ? { not: match } : match;
-    }
-    case FieldMetadataType.RELATION: {
-      const ids = toList(value);
-
-      if (ids.length === 0) {
-        return undefined;
-      }
-      const match = { [`${field.name}Id`]: { in: ids } };
-
-      return rule.operand === 'isNot' ? { not: match } : match;
-    }
-    case FieldMetadataType.BOOLEAN:
-      return { [field.name]: { eq: value === 'true' } };
-    case FieldMetadataType.NUMBER:
-    case FieldMetadataType.NUMERIC:
-    case FieldMetadataType.CURRENCY: {
-      if (!isNonEmptyString(text) || Number.isNaN(Number(text))) {
-        return undefined;
-      }
-      const number =
-        field.type === FieldMetadataType.CURRENCY
-          ? Number(text) * 1_000_000
-          : Number(text);
-      const comparison =
-        rule.operand === 'greaterThan'
-          ? { gte: number }
-          : rule.operand === 'lessThan'
-            ? { lte: number }
-            : { eq: number };
-
-      return field.type === FieldMetadataType.CURRENCY
-        ? { [field.name]: { amountMicros: comparison } }
-        : { [field.name]: comparison };
-    }
-    case FieldMetadataType.DATE:
-    case FieldMetadataType.DATE_TIME: {
-      if (!isNonEmptyString(text)) {
-        return undefined;
-      }
-      const iso =
-        field.type === FieldMetadataType.DATE
-          ? text
-          : new Date(text).toISOString();
-
-      return rule.operand === 'before'
-        ? { [field.name]: { lt: iso } }
-        : { [field.name]: { gte: iso } };
-    }
-    default: {
-      if (!isNonEmptyString(text)) {
-        return undefined;
-      }
-      const match = buildTextMatch(field, `%${text}%`);
-
-      return rule.operand === 'doesNotContain' ? { not: match } : match;
-    }
-  }
 };
 
 const combine = (
@@ -247,20 +131,40 @@ export const buildRoboostListFilter = ({
     }
   }
 
-  const advancedConditions = filters.advanced.rules
-    .map((rule) => {
-      const field = fieldsByName.get(rule.fieldName);
+  const groupFilters = filters.advanced.groups
+    .map((group) =>
+      combine(
+        group.rules
+          .map((rule) => {
+            const field = fieldsByName.get(rule.fieldName);
 
-      return isDefined(field) ? buildRoboostRuleFilter(rule, field) : undefined;
-    })
+            return isDefined(field)
+              ? buildRoboostFilterRule({
+                  field,
+                  operator: rule.operator,
+                  value: rule.value,
+                  now,
+                  selectOptionValues: (field.options ?? []).map(
+                    (option) => option.value,
+                  ),
+                })
+              : undefined;
+          })
+          .filter(isDefined),
+        'and',
+      ),
+    )
     .filter(isDefined);
-  const advancedFilter = combine(
-    advancedConditions,
-    filters.advanced.conjunction,
-  );
+  const propertiesFilter = combine(groupFilters, 'or');
 
-  if (isDefined(advancedFilter)) {
-    conditions.push(advancedFilter);
+  if (isDefined(propertiesFilter)) {
+    conditions.push(propertiesFilter);
+  }
+
+  for (const association of filters.advanced.associations) {
+    if (isDefined(association.resolvedFilter)) {
+      conditions.push(association.resolvedFilter);
+    }
   }
 
   return combine(conditions, 'and');

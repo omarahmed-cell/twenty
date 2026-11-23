@@ -37,7 +37,12 @@ type RoboostListToolbarProps = {
   onOpenAdvanced: () => void;
   onOpenColumns: () => void;
   displayToggle?: ReactNode;
+  isFilterRowOpen: boolean;
+  onToggleFilterRow: () => void;
 };
+
+// Record dates are system fields but are what people sort by most (HubSpot's Create date)
+const SORTABLE_SYSTEM_FIELD_NAMES = new Set(['createdAt', 'updatedAt']);
 
 const SORTABLE_TYPES = new Set<string>([
   FieldMetadataType.TEXT,
@@ -66,6 +71,8 @@ export const RoboostListToolbar = ({
   onOpenAdvanced,
   onOpenColumns,
   displayToggle,
+  isFilterRowOpen,
+  onToggleFilterRow,
 }: RoboostListToolbarProps) => {
   const { t } = useLingui();
   const fieldsByName = new Map(
@@ -167,7 +174,10 @@ export const RoboostListToolbar = ({
 
   const sortableFields = [...fieldsByName.values()]
     .filter(
-      (field) => SORTABLE_TYPES.has(field.type) && field.isSystem !== true,
+      (field) =>
+        SORTABLE_TYPES.has(field.type) &&
+        (field.isSystem !== true ||
+          SORTABLE_SYSTEM_FIELD_NAMES.has(field.name)),
     )
     .sort((first, second) => first.label.localeCompare(second.label));
 
@@ -178,149 +188,177 @@ export const RoboostListToolbar = ({
     Object.values(filters.selectValuesByFieldName).some(
       (values) => values.length > 0,
     );
-  const advancedCount = filters.advanced.rules.length;
+  const advancedCount =
+    filters.advanced.groups.reduce(
+      (count, group) => count + group.rules.length,
+      0,
+    ) +
+    filters.advanced.associations.filter((association) =>
+      isDefined(association.resolvedFilter),
+    ).length;
+  const chipCount =
+    (filters.ownerId !== 'any' ? 1 : 0) +
+    (filters.createdWithin !== 'any' ? 1 : 0) +
+    (filters.lastActivityWithin !== 'any' ? 1 : 0) +
+    Object.values(filters.selectValuesByFieldName).filter(
+      (values) => values.length > 0,
+    ).length;
+  const activeFilterCount = chipCount + advancedCount;
 
   return (
-    <div className="rb-ls-tools">
-      <div className="rb-tsearch">
-        <Input
-          variant="search"
-          size="sm"
-          value={search}
-          placeholder={
-            fieldsByName.has('domainName')
-              ? t`Search name, phone, or domain`
-              : t`Search ${objectMetadataItem.labelPlural.toLowerCase()}`
-          }
-          aria-label={t`Search`}
-          onChange={(event) => onSearchChange(event.target.value)}
-        />
-      </div>
-      <button
-        type="button"
-        className={cx('rb-chip', advancedCount > 0 && 'is-on')}
-        onClick={onOpenAdvanced}
-      >
-        <Icon name="filter" size={14} />
-        {advancedCount > 0 ? t`Filter (${advancedCount})` : t`Filter`}
-      </button>
-      <RoboostSortPopover
-        sortableFields={sortableFields}
-        sort={sort}
-        onSortChange={onSortChange}
-      />
-      <span className="rb-tdiv" />
-      {isDefined(ownerField) && (
-        <FilterChip
-          label={ownerField.label}
-          value={ownerLabel}
-          isActive={filters.ownerId !== 'any'}
-          entries={[
-            { id: 'any', label: t`Anyone` },
-            { id: 'me', label: t`Me` },
-            { id: 'none', label: t`No owner` },
-            ...members.map((member) => ({
-              id: member.id,
-              label: getRoboostPersonName(member.name),
-            })),
-          ].map((option) => ({
-            ...option,
-            isSelected: filters.ownerId === option.id,
-            onSelect: () => onFiltersChange({ ...filters, ownerId: option.id }),
-          }))}
-        />
-      )}
-      <FilterChip
-        label={t`Create date`}
-        value={
-          filters.createdWithin === 'any'
-            ? undefined
-            : dateRangeLabels[filters.createdWithin]
-        }
-        isActive={filters.createdWithin !== 'any'}
-        entries={dateEntries(filters.createdWithin, (range) =>
-          onFiltersChange({ ...filters, createdWithin: range }),
-        )}
-      />
-      {fieldsByName.has('lastActivityDate') && (
-        <FilterChip
-          label={t`Last activity date`}
-          value={
-            filters.lastActivityWithin === 'any'
-              ? undefined
-              : dateRangeLabels[filters.lastActivityWithin]
-          }
-          isActive={filters.lastActivityWithin !== 'any'}
-          entries={dateEntries(filters.lastActivityWithin, (range) =>
-            onFiltersChange({ ...filters, lastActivityWithin: range }),
-          )}
-        />
-      )}
-      {isDefined(statusField) && renderSelectChip(statusField)}
-      {filters.extraSelectFieldNames
-        .map((fieldName) => fieldsByName.get(fieldName))
-        .filter(isDefined)
-        .map(renderSelectChip)}
-      <Menu
-        entries={addableFields.map((field) => ({
-          id: field.name,
-          label: field.label,
-          onSelect: () =>
-            onFiltersChange({
-              ...filters,
-              extraSelectFieldNames: [
-                ...filters.extraSelectFieldNames,
-                field.name,
-              ],
-            }),
-        }))}
-        trigger={({ toggle, isOpen }) => (
-          <button
-            type="button"
-            className="rb-chip rb-chip-square"
-            aria-label={t`Add filter`}
-            aria-expanded={isOpen}
-            onClick={toggle}
-          >
-            <Icon name="plus" size={14} strokeWidth={2} />
-          </button>
-        )}
-      />
-      {hasChipFilters && (
+    <div className="rb-ls-toolbar">
+      <div className="rb-ls-tools">
+        <div className="rb-tsearch">
+          <Input
+            variant="search"
+            size="sm"
+            value={search}
+            placeholder={
+              fieldsByName.has('domainName')
+                ? t`Search name, phone, or domain`
+                : t`Search ${objectMetadataItem.labelPlural.toLowerCase()}`
+            }
+            aria-label={t`Search`}
+            onChange={(event) => onSearchChange(event.target.value)}
+          />
+        </div>
         <button
           type="button"
-          className="rb-link rb-clearall"
-          onClick={() =>
-            onFiltersChange({
-              ...filters,
-              ownerId: 'any',
-              createdWithin: 'any',
-              lastActivityWithin: 'any',
-              selectValuesByFieldName: {},
-            })
-          }
+          className={cx(
+            'rb-chip',
+            (isFilterRowOpen || activeFilterCount > 0) && 'is-on',
+          )}
+          aria-expanded={isFilterRowOpen}
+          onClick={onToggleFilterRow}
         >
-          {t`Clear all`}
+          <Icon name="filter" size={14} />
+          {activeFilterCount > 0 ? t`Filter (${activeFilterCount})` : t`Filter`}
         </button>
+        <RoboostSortPopover
+          sortableFields={sortableFields}
+          sort={sort}
+          onSortChange={onSortChange}
+        />
+        <span className="rb-sp" />
+        {displayToggle}
+        <button
+          type="button"
+          className="rb-icon-btn"
+          aria-label={t`Edit columns`}
+          title={t`Edit columns`}
+          onClick={onOpenColumns}
+        >
+          <Icon name="columns" size={16} />
+        </button>
+      </div>
+      {isFilterRowOpen && (
+        <div className="rb-ls-tools rb-ls-filters">
+          {isDefined(ownerField) && (
+            <FilterChip
+              label={ownerField.label}
+              value={ownerLabel}
+              isActive={filters.ownerId !== 'any'}
+              entries={[
+                { id: 'any', label: t`Anyone` },
+                { id: 'me', label: t`Me` },
+                { id: 'none', label: t`No owner` },
+                ...members.map((member) => ({
+                  id: member.id,
+                  label: getRoboostPersonName(member.name),
+                })),
+              ].map((option) => ({
+                ...option,
+                isSelected: filters.ownerId === option.id,
+                onSelect: () =>
+                  onFiltersChange({ ...filters, ownerId: option.id }),
+              }))}
+            />
+          )}
+          <FilterChip
+            label={t`Create date`}
+            value={
+              filters.createdWithin === 'any'
+                ? undefined
+                : dateRangeLabels[filters.createdWithin]
+            }
+            isActive={filters.createdWithin !== 'any'}
+            entries={dateEntries(filters.createdWithin, (range) =>
+              onFiltersChange({ ...filters, createdWithin: range }),
+            )}
+          />
+          {fieldsByName.has('lastActivityDate') && (
+            <FilterChip
+              label={t`Last activity date`}
+              value={
+                filters.lastActivityWithin === 'any'
+                  ? undefined
+                  : dateRangeLabels[filters.lastActivityWithin]
+              }
+              isActive={filters.lastActivityWithin !== 'any'}
+              entries={dateEntries(filters.lastActivityWithin, (range) =>
+                onFiltersChange({ ...filters, lastActivityWithin: range }),
+              )}
+            />
+          )}
+          {isDefined(statusField) && renderSelectChip(statusField)}
+          {filters.extraSelectFieldNames
+            .map((fieldName) => fieldsByName.get(fieldName))
+            .filter(isDefined)
+            .map(renderSelectChip)}
+          <Menu
+            entries={addableFields.map((field) => ({
+              id: field.name,
+              label: field.label,
+              onSelect: () =>
+                onFiltersChange({
+                  ...filters,
+                  extraSelectFieldNames: [
+                    ...filters.extraSelectFieldNames,
+                    field.name,
+                  ],
+                }),
+            }))}
+            trigger={({ toggle, isOpen }) => (
+              <button
+                type="button"
+                className="rb-chip rb-chip-square"
+                aria-label={t`Add filter`}
+                aria-expanded={isOpen}
+                onClick={toggle}
+              >
+                <Icon name="plus" size={14} strokeWidth={2} />
+              </button>
+            )}
+          />
+          {hasChipFilters && (
+            <button
+              type="button"
+              className="rb-link rb-clearall"
+              onClick={() =>
+                onFiltersChange({
+                  ...filters,
+                  ownerId: 'any',
+                  createdWithin: 'any',
+                  lastActivityWithin: 'any',
+                  selectValuesByFieldName: {},
+                })
+              }
+            >
+              {t`Clear all`}
+            </button>
+          )}
+          <button
+            type="button"
+            className={cx('rb-link rb-advlink', advancedCount > 0 && 'is-on')}
+            onClick={onOpenAdvanced}
+          >
+            <Icon name="sliders" size={14} />
+            {advancedCount > 0
+              ? t`Advanced filters (${advancedCount})`
+              : t`Advanced filters`}
+          </button>
+        </div>
       )}
-      <span className="rb-sp" />
-      <button
-        type="button"
-        className="rb-link rb-advlink"
-        onClick={onOpenAdvanced}
-      >
-        {t`Advanced filters`}
-      </button>
-      {displayToggle}
-      <button
-        type="button"
-        className="rb-icon-btn"
-        aria-label={t`Edit columns`}
-        title={t`Edit columns`}
-        onClick={onOpenColumns}
-      >
-        <Icon name="columns" size={16} />
-      </button>
     </div>
   );
 };
