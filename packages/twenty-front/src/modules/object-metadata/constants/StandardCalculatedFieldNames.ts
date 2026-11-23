@@ -6,7 +6,6 @@ export const STANDARD_CALCULATED_FIELD_NAMES = new Set([
   'dateEnteredCurrentStage',
   'dealProbability',
   'firstDealCreatedDate',
-  'hasMeetingTranscript',
   'isChildCompany',
   'isClosed',
   'isClosedLost',

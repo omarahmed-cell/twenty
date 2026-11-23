@@ -7,4 +7,5 @@ export const OPTIONAL_DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS = [
   'callTarget',
   'communicationTarget',
   'emailTarget',
+  'meetingTarget',
 ] as const satisfies (keyof typeof STANDARD_OBJECTS)[];

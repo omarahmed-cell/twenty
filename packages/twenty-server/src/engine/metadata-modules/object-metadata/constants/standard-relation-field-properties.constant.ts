@@ -47,6 +47,13 @@ export const STANDARD_RELATION_FIELD_PROPERTIES_BY_RELATION_OBJECT = {
     }),
     icon: 'IconMail',
   },
+  meetingTarget: {
+    label: msg({
+      message: `Meetings`,
+      context: 'fieldMetadata.label',
+    }),
+    icon: 'IconCalendarEvent',
+  },
 } satisfies Record<
   | (typeof DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS)[number]
   | (typeof OPTIONAL_DEFAULT_RELATIONS_OBJECTS_STANDARD_IDS)[number],

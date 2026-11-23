@@ -8,7 +8,6 @@ import { DashboardQueryHookModule } from 'src/modules/dashboard/query-hooks/dash
 import { BlocklistQueryHookModule } from 'src/modules/blocklist/query-hooks/blocklist-query-hook.module';
 import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/query-hooks/workspace-member-query-hook.module';
 import { ActivityTargetQueryHookModule } from 'src/modules/activity-target/query-hooks/activity-target-query-hook.module';
-import { CalendarEventAssignedToModule } from 'src/modules/calendar/calendar-event-assigned-to/calendar-event-assigned-to.module';
 import { CallQueryHookModule } from 'src/modules/call/query-hooks/call-query-hook.module';
 import { GoogleMeetRecordingModule } from 'src/modules/call-recording/google-meet/google-meet-recording.module';
 import { LineItemQueryHookModule } from 'src/modules/line-item/query-hooks/line-item-query-hook.module';
@@ -17,7 +16,6 @@ import { AssignedDateTrackingModule } from 'src/modules/assigned-date-tracking/a
 import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fields/company-calculated-fields.module';
 import { CompanyHierarchyModule } from 'src/modules/company-hierarchy/company-hierarchy.module';
 import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calculated-fields/opportunity-calculated-fields.module';
-import { MeetingFieldsModule } from 'src/modules/meeting-fields/meeting-fields.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { TaskCalculatedFieldsModule } from 'src/modules/task-calculated-fields/task-calculated-fields.module';
@@ -29,6 +27,7 @@ import { PropertiesModule } from 'src/modules/properties/properties.module';
 import { FieldSyncModule } from 'src/modules/field-sync/field-sync.module';
 import { SegmentModule } from 'src/modules/segment/segment.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
+import { MeetingQueryHookModule } from 'src/modules/meeting/query-hooks/meeting-query-hook.module';
 import { EmailQueryHookModule } from 'src/modules/email/query-hooks/email-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
 import { TaskQueryHookModule } from 'src/modules/task/query-hooks/task-query-hook.module';
@@ -72,7 +71,6 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     BlocklistQueryHookModule,
     WorkspaceMemberQueryHookModule,
     ActivityTargetQueryHookModule,
-    CalendarEventAssignedToModule,
     CallQueryHookModule,
     GoogleMeetRecordingModule,
     LineItemQueryHookModule,
@@ -84,7 +82,6 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     TaskCalculatedFieldsModule,
     UnifiedEmailModule,
     OpportunityCalculatedFieldsModule,
-    MeetingFieldsModule,
     PipelineModule,
     CompanyHierarchyModule,
     StageDateTrackingModule,
@@ -94,6 +91,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     SegmentModule,
     CommunicationQueryHookModule,
     EmailQueryHookModule,
+    MeetingQueryHookModule,
     NoteQueryHookModule,
     TaskQueryHookModule,
     TimelineQueryHookModule,

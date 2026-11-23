@@ -13,6 +13,7 @@ const ASSIGNEE_COLUMN_BY_ACTIVITY_OBJECT: Record<string, string> = {
   communication: 'assignedToId',
   email: 'assignedToId',
   calendarEvent: 'assignedToId',
+  meeting: 'hostId',
 };
 
 const OWNER_COLUMNS = [
@@ -98,7 +99,9 @@ export class WorkflowActivityOwnerAssigneeService {
 
         await activityRepository.update(
           { id: activityId, [assigneeColumn]: IsNull() },
-          { [assigneeColumn]: ownerId },
+          activityObjectName === 'meeting'
+            ? { hostId: ownerId, assignedToId: ownerId }
+            : { [assigneeColumn]: ownerId },
         );
       }
     }, buildSystemAuthContext(workspaceId));

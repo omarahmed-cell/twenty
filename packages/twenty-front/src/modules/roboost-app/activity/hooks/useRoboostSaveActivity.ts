@@ -16,7 +16,7 @@ export const ROBOOST_ACTIVITY_OBJECT_BY_TYPE: Record<
   note: 'note',
   call: 'call',
   task: 'task',
-  meeting: 'calendarEvent',
+  meeting: 'meeting',
   whatsapp: 'communication',
   linkedin: 'communication',
   sms: 'communication',
@@ -57,11 +57,8 @@ export const useRoboostSaveActivity = () => {
       'communicationTarget',
       availableObjectNames,
     ),
-    calendarEvent: useCreateIfAvailable('calendarEvent', availableObjectNames),
-    calendarEventTarget: useCreateIfAvailable(
-      'calendarEventTarget',
-      availableObjectNames,
-    ),
+    meeting: useCreateIfAvailable('meeting', availableObjectNames),
+    meetingTarget: useCreateIfAvailable('meetingTarget', availableObjectNames),
   };
 
   const isTaskTypeTodoAvailable =

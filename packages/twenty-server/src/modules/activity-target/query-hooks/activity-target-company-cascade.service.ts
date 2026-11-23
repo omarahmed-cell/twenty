@@ -24,6 +24,7 @@ export type ActivityTargetJunction = {
     | 'callTarget'
     | 'communicationTarget'
     | 'emailTarget'
+    | 'meetingTarget'
     | 'calendarEventTarget';
   activityIdFieldName:
     | 'noteId'
@@ -31,6 +32,7 @@ export type ActivityTargetJunction = {
     | 'callId'
     | 'communicationId'
     | 'emailId'
+    | 'meetingId'
     | 'calendarEventId';
   createdTargetDefaults?: Record<string, boolean>;
 };

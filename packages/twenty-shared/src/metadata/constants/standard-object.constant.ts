@@ -214,9 +214,6 @@ export const STANDARD_OBJECTS = {
       iCalUidIndex: {
         universalIdentifier: 'e38d1418-f994-4f0d-b0cd-41d4da240ea0',
       },
-      assignedToIdIndex: {
-        universalIdentifier: '432b9702-97f7-449c-a8db-a0916170cd83',
-      },
     },
     views: {
       allCalendarEvents: buildStandardObjectIndexView({
@@ -231,8 +228,6 @@ export const STANDARD_OBJECTS = {
           'location',
           'conferenceLink',
           'isCanceled',
-          'meetingOutcome',
-          'assignedTo',
           'createdAt',
         ],
       }),
@@ -247,15 +242,9 @@ export const STANDARD_OBJECTS = {
           'isFullDay',
           'isCanceled',
           'conferenceLink',
-          'recordedVideo',
-          'transcript',
           'location',
           'description',
           'calendarEventTargets',
-          'locationType',
-          'meetingType',
-          'meetingOutcome',
-          'assignedTo',
           'externalCreatedAt',
           'externalUpdatedAt',
           'iCalUid',
@@ -523,6 +512,164 @@ export const STANDARD_OBJECTS = {
         viewFieldGroupNames: {
           general: 'General',
         },
+      }),
+    },
+  },
+  meeting: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meeting,
+    fields: STANDARD_OBJECT_FIELDS.meeting,
+    indexes: {
+      searchVectorGinIndex: {
+        universalIdentifier: '88843312-49fb-4f3e-81ad-f5e8d3247929',
+      },
+      hostIdIndex: {
+        universalIdentifier: '4cdcbfaf-de41-4144-91ea-fb84bea43235',
+      },
+      assignedToIdIndex: {
+        universalIdentifier: 'c81ea6b0-87c2-4963-ba46-ee36d715ee50',
+      },
+      googleEventIdIndex: {
+        universalIdentifier: 'a8faa39e-220c-4f9d-b9e7-bcfec749c16f',
+      },
+      googleICalUidIndex: {
+        universalIdentifier: '5259531a-6fd1-4334-b821-d35062a05781',
+      },
+      startsAtIndex: {
+        universalIdentifier: 'f55896d4-4470-48dd-aad7-0d815d1605df',
+      },
+    },
+    views: {
+      allMeetings: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meeting,
+        fields: STANDARD_OBJECT_FIELDS.meeting,
+        viewFieldNames: [
+          'title',
+          'meetingTargets',
+          'startsAt',
+          'host',
+          'meetingType',
+          'meetingOutcome',
+          'locationType',
+          'source',
+          'createdBy',
+        ],
+      }),
+      meetingRecordPageFields: buildStandardObjectRecordPageFieldsView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meeting,
+        fields: STANDARD_OBJECT_FIELDS.meeting,
+        viewFieldNames: [
+          'meetingTargets',
+          'startsAt',
+          'endsAt',
+          'timezone',
+          'host',
+          'assignedTo',
+          'meetingType',
+          'meetingOutcome',
+          'locationType',
+          'location',
+          'meetLink',
+          'source',
+          'transcriptStatus',
+          'recordingUrl',
+          'geminiNotesUrl',
+          'transcriptDocUrl',
+          'hubspotId',
+          'createdAt',
+          'createdBy',
+          'attachments',
+          'timelineActivities',
+        ],
+        viewFieldGroupNames: {
+          general: 'General',
+        },
+      }),
+    },
+  },
+  meetingTarget: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meetingTarget,
+    fields: STANDARD_OBJECT_FIELDS.meetingTarget,
+    morphIds: {
+      targetMorphId: {
+        morphId:
+          STANDARD_OBJECT_FIELDS.meetingTarget.target.universalIdentifier,
+      },
+    },
+    indexes: {
+      meetingIdIndex: {
+        universalIdentifier: '89927715-9a97-41d0-a396-f420f493773c',
+      },
+      personIdIndex: {
+        universalIdentifier: '01192c17-4fb6-4f5c-8084-e6d86ac155d8',
+      },
+      companyIdIndex: {
+        universalIdentifier: 'f3a9f3b2-a685-439e-8092-12c5cc8c6166',
+      },
+      opportunityIdIndex: {
+        universalIdentifier: 'd908075b-69de-4c93-aa4c-9a3dc1e26209',
+      },
+      serviceIdIndex: {
+        universalIdentifier: 'cad51fe8-ff28-47df-9f7e-b0945fdfa943',
+      },
+      meetingPersonUniqueIndex: {
+        universalIdentifier: '59bcdc85-99a7-4710-8225-d1137839d053',
+      },
+      meetingCompanyUniqueIndex: {
+        universalIdentifier: '00597742-c94a-4624-a60b-27e2aa6630ca',
+      },
+      meetingOpportunityUniqueIndex: {
+        universalIdentifier: '660f90f1-d75b-4470-b779-eddfed5a6cbc',
+      },
+      meetingServiceUniqueIndex: {
+        universalIdentifier: 'be30625e-7ddc-4862-a1e6-ee4c843ed2c5',
+      },
+    },
+    views: {
+      allMeetingTargets: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meetingTarget,
+        fields: STANDARD_OBJECT_FIELDS.meetingTarget,
+        viewFieldNames: [
+          'id',
+          'meeting',
+          'targetPerson',
+          'targetCompany',
+          'targetOpportunity',
+          'targetService',
+        ],
+      }),
+    },
+  },
+  meetingAttendee: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meetingAttendee,
+    fields: STANDARD_OBJECT_FIELDS.meetingAttendee,
+    indexes: {
+      meetingIdIndex: {
+        universalIdentifier: '500b0235-c88b-40b5-b733-313c60871924',
+      },
+      personIdIndex: {
+        universalIdentifier: '37abde81-04ef-4496-ab34-2185233495f6',
+      },
+      workspaceMemberIdIndex: {
+        universalIdentifier: 'd351f72f-c0a9-4dd9-8251-b0f59da0a7bd',
+      },
+    },
+    views: {
+      allMeetingAttendees: buildStandardObjectIndexView({
+        objectUniversalIdentifier:
+          STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meetingAttendee,
+        fields: STANDARD_OBJECT_FIELDS.meetingAttendee,
+        viewFieldNames: [
+          'email',
+          'displayName',
+          'meeting',
+          'person',
+          'workspaceMember',
+          'responseStatus',
+          'isOrganizer',
+        ],
       }),
     },
   },

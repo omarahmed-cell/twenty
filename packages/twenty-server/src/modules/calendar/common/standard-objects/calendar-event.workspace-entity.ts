@@ -5,7 +5,6 @@ import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migr
 import { type CalendarChannelEventAssociationWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-channel-event-association.workspace-entity';
 import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-participant.workspace-entity';
 import { type CalendarEventTargetWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event-target.workspace-entity';
-import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 
 export class CalendarEventWorkspaceEntity extends BaseWorkspaceEntity {
   title: string | null;
@@ -20,16 +19,6 @@ export class CalendarEventWorkspaceEntity extends BaseWorkspaceEntity {
   iCalUid: string | null;
   conferenceSolution: string | null;
   conferenceLink: LinksMetadata;
-  recordedVideo: LinksMetadata | null;
-  transcript: LinksMetadata | null;
-  locationType: string | null;
-  meetingType: string | null;
-  meetingOutcome: string;
-  assignedTo: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
-  assignedToId: string | null;
-  hasMeetingTranscript: boolean | null;
-  hubspotHasTranscript: boolean | null;
-  meetingSource: string | null;
   calendarChannelEventAssociations: EntityRelation<
     CalendarChannelEventAssociationWorkspaceEntity[]
   >;

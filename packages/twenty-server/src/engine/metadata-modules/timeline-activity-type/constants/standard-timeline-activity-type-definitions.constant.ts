@@ -341,6 +341,67 @@ const STANDARD_TIMELINE_ACTIVITY_TYPE_DEFINITION_SOURCES: StandardTimelineActivi
       },
     },
     {
+      name: 'meetingLinked',
+      universalIdentifier: '4cca9842-e854-45a3-80b6-b09182041b9c',
+      label: msg({
+        message: `had a meeting`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconCalendarEvent',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'linked',
+        objectUniversalIdentifier: STANDARD_OBJECTS.meeting.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.meeting.fields.meetingTargets.universalIdentifier,
+          happensAtFieldUniversalIdentifier:
+            STANDARD_OBJECTS.meeting.fields.startsAt.universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'meetingUnlinked',
+      universalIdentifier: '12d08adb-01a4-47ff-816f-8f2ccae76a96',
+      label: msg({
+        message: `removed a meeting`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconUnlink',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'unlinked',
+        objectUniversalIdentifier: STANDARD_OBJECTS.meeting.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.meeting.fields.meetingTargets.universalIdentifier,
+        },
+      },
+    },
+    {
+      name: 'meetingUpdated',
+      universalIdentifier: '7f5b63ba-c9e0-4d69-856d-a770ee26591e',
+      label: msg({
+        message: `updated a meeting`,
+        context: 'timelineActivityType.label',
+      }),
+      icon: 'IconEditCircle',
+      frontComponentUniversalIdentifier: null,
+      emit: {
+        on: 'updated',
+        objectUniversalIdentifier: STANDARD_OBJECTS.meeting.universalIdentifier,
+        through: {
+          relationFieldUniversalIdentifier:
+            STANDARD_OBJECTS.meeting.fields.meetingTargets.universalIdentifier,
+          triggerFieldUniversalIdentifiers: [
+            STANDARD_OBJECTS.meeting.fields.title.universalIdentifier,
+            STANDARD_OBJECTS.meeting.fields.startsAt.universalIdentifier,
+            STANDARD_OBJECTS.meeting.fields.meetingOutcome.universalIdentifier,
+          ],
+        },
+      },
+    },
+    {
       name: 'emailOpened',
       universalIdentifier: '2756f602-f7c0-40ea-94d3-418bb21e66e7',
       label: msg({

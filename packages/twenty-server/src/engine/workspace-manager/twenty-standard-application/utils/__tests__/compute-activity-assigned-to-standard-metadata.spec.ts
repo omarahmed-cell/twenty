@@ -111,7 +111,7 @@ describe('Activity assigned to standard metadata build', () => {
   it('relabels the task and meeting assignee fields', () => {
     const labels = [
       STANDARD_OBJECTS.task.fields.assignee.universalIdentifier,
-      STANDARD_OBJECTS.calendarEvent.fields.assignedTo.universalIdentifier,
+      STANDARD_OBJECTS.meeting.fields.assignedTo.universalIdentifier,
     ]
       .map(
         (universalIdentifier) =>
@@ -122,6 +122,6 @@ describe('Activity assigned to standard metadata build', () => {
       .filter(isDefined)
       .map(({ label }) => label);
 
-    expect(labels).toEqual(['Activity assigned to', 'Activity assigned to']);
+    expect(labels).toEqual(['Activity assigned to', 'Assigned to']);
   });
 });

@@ -10,10 +10,6 @@ export const TIMELINE_CALENDAR_EVENT_GQL_FIELDS: RecordGqlFields = {
   location: true,
   description: true,
   conferenceLink: true,
-  meetingOutcome: true,
-  meetingType: true,
-  locationType: true,
-  assignedToId: true,
   createdBy: true,
   calendarEventParticipants: {
     id: true,

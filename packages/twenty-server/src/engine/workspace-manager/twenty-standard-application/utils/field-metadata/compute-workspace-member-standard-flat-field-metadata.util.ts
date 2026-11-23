@@ -1077,36 +1077,6 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
-  assignedCalendarEvents: createStandardRelationFieldFlatMetadata({
-    objectName,
-    workspaceId,
-    context: {
-      type: FieldMetadataType.RELATION,
-      morphId: null,
-      fieldName: 'assignedCalendarEvents',
-      label: i18nLabel(
-        msg({ message: `Assigned meetings`, context: 'fieldMetadata.label' }),
-      ),
-      description: i18nLabel(
-        msg({
-          message: `Meetings assigned to the workspace member`,
-          context: 'fieldMetadata.description',
-        }),
-      ),
-      icon: 'IconCalendarEvent',
-      isNullable: false,
-      isUIEditable: false,
-      targetObjectName: 'calendarEvent',
-      targetFieldName: 'assignedTo',
-      settings: {
-        relationType: RelationType.ONE_TO_MANY,
-      },
-    },
-    standardObjectMetadataRelatedEntityIds,
-    dependencyFlatEntityMaps,
-    twentyStandardApplicationId,
-    now,
-  }),
   assignedCalls: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,
@@ -1188,6 +1158,96 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
       isUIEditable: false,
       targetObjectName: 'email',
       targetFieldName: 'assignedTo',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  hostedMeetings: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'hostedMeetings',
+      label: i18nLabel(
+        msg({ message: `Hosted meetings`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Meetings hosted by the member`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'meeting',
+      targetFieldName: 'host',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  assignedMeetings: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'assignedMeetings',
+      label: i18nLabel(
+        msg({ message: `Assigned meetings`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Meetings assigned to the member`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarEvent',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'meeting',
+      targetFieldName: 'assignedTo',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  meetingAttendees: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'meetingAttendees',
+      label: i18nLabel(
+        msg({ message: `Meeting invitations`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Meetings the member attends`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsers',
+      isNullable: true,
+      isUIEditable: false,
+      targetObjectName: 'meetingAttendee',
+      targetFieldName: 'workspaceMember',
       settings: {
         relationType: RelationType.ONE_TO_MANY,
       },

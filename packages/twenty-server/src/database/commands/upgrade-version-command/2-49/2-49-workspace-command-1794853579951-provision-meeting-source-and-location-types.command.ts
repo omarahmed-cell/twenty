@@ -26,10 +26,12 @@ import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/works
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
+import { LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS } from 'src/database/commands/upgrade-version-command/2-49/utils/legacy-calendar-event-field-universal-identifiers.constant';
 
-type ProvisionMeetingSourceCommandOptions = ProvisionedWorkspaceCommandOptions & {
-  rollback?: boolean;
-};
+type ProvisionMeetingSourceCommandOptions =
+  ProvisionedWorkspaceCommandOptions & {
+    rollback?: boolean;
+  };
 
 type SelectOption = {
   id: string;
@@ -39,7 +41,10 @@ type SelectOption = {
   color: string;
 };
 
-const CALENDAR_EVENT_FIELDS = STANDARD_OBJECTS.calendarEvent.fields;
+const CALENDAR_EVENT_FIELDS = {
+  ...STANDARD_OBJECTS.calendarEvent.fields,
+  ...LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS,
+};
 
 const MEETING_FIELD_SEED_UNIVERSAL_IDENTIFIERS = [
   CALENDAR_EVENT_FIELDS.hasMeetingTranscript.universalIdentifier,
@@ -183,7 +188,8 @@ export class ProvisionMeetingSourceAndLocationTypesCommand extends ProvisionedWo
     const standardLocationTypeField =
       findFlatEntityByUniversalIdentifier<FlatFieldMetadata>({
         flatEntityMaps: standard.flatFieldMetadataMaps,
-        universalIdentifier: CALENDAR_EVENT_FIELDS.locationType.universalIdentifier,
+        universalIdentifier:
+          CALENDAR_EVENT_FIELDS.locationType.universalIdentifier,
       });
 
     const conversionCounts = await this.switchLocationTypeOptions({
@@ -191,7 +197,8 @@ export class ProvisionMeetingSourceAndLocationTypesCommand extends ProvisionedWo
       dataSource,
       dryRun,
       ownerFlatApplication: twentyStandardFlatApplication,
-      targetOptions: (standardLocationTypeField?.options ?? []) as SelectOption[],
+      targetOptions: (standardLocationTypeField?.options ??
+        []) as SelectOption[],
     });
 
     this.logger.log(
@@ -263,7 +270,8 @@ export class ProvisionMeetingSourceAndLocationTypesCommand extends ProvisionedWo
             fromToAllFlatEntityMaps: buildSeededStandardRollbackFromTo({
               existing,
               standard,
-              seedUniversalIdentifiers: MEETING_FIELD_SEED_UNIVERSAL_IDENTIFIERS,
+              seedUniversalIdentifiers:
+                MEETING_FIELD_SEED_UNIVERSAL_IDENTIFIERS,
             }),
           },
         );
@@ -293,14 +301,16 @@ export class ProvisionMeetingSourceAndLocationTypesCommand extends ProvisionedWo
     ownerFlatApplication: FlatApplication;
     targetOptions: SelectOption[];
   }): Promise<Record<string, number>> {
-    const { flatFieldMetadataMaps } = await this.workspaceCacheService.getOrRecompute(
-      workspaceId,
-      ['flatFieldMetadataMaps'],
-    );
-    const locationTypeField = findFlatEntityByUniversalIdentifier<FlatFieldMetadata>({
-      flatEntityMaps: flatFieldMetadataMaps,
-      universalIdentifier: CALENDAR_EVENT_FIELDS.locationType.universalIdentifier,
-    });
+    const { flatFieldMetadataMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'flatFieldMetadataMaps',
+      ]);
+    const locationTypeField =
+      findFlatEntityByUniversalIdentifier<FlatFieldMetadata>({
+        flatEntityMaps: flatFieldMetadataMaps,
+        universalIdentifier:
+          CALENDAR_EVENT_FIELDS.locationType.universalIdentifier,
+      });
 
     if (
       !isDefined(locationTypeField) ||

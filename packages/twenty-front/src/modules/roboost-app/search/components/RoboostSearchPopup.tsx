@@ -42,6 +42,7 @@ const ICON_BY_OBJECT: Record<string, RoboostIconName> = {
   call: 'phone',
   email: 'mail',
   calendarEvent: 'calendar',
+  meeting: 'calendar',
 };
 
 type RoboostSearchResult = {

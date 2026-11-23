@@ -61,7 +61,6 @@ import { GoogleMeetRecordingModule } from 'src/modules/call-recording/google-mee
 import { EmailingModule } from 'src/modules/emailing/emailing.module';
 import { FieldFormulaModule } from 'src/modules/field-formula/field-formula.module';
 import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calculated-fields/opportunity-calculated-fields.module';
-import { MeetingFieldsModule } from 'src/modules/meeting-fields/meeting-fields.module';
 import { ActorLinkModule } from 'src/modules/actor-link/actor-link.module';
 import { WorkspaceMemberPreCreateModule } from 'src/modules/workspace-member-pre-create/workspace-member-pre-create.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
@@ -91,7 +90,6 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     TaskCalculatedFieldsModule,
     UnifiedEmailModule,
     OpportunityCalculatedFieldsModule,
-    MeetingFieldsModule,
     ActorLinkModule,
     WorkspaceMemberPreCreateModule,
     PipelineModule,

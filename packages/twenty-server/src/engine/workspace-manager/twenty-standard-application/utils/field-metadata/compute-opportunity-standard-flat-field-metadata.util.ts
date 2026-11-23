@@ -846,6 +846,36 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  meetingTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'meetingTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Meetings`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Meetings tied to the opportunity`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMail',
+      isNullable: true,
+      targetObjectName: 'meetingTarget',
+      targetFieldName: 'targetOpportunity',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   segmentMembers: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

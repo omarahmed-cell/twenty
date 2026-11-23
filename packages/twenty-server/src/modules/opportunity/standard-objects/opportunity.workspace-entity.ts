@@ -7,6 +7,7 @@ import { type AttachmentWorkspaceEntity } from 'src/modules/attachment/standard-
 import { type CallTargetWorkspaceEntity } from 'src/modules/call/standard-objects/call-target.workspace-entity';
 import { type SegmentMemberWorkspaceEntity } from 'src/modules/segment/standard-objects/segment-member.workspace-entity';
 import { type CommunicationTargetWorkspaceEntity } from 'src/modules/communication/standard-objects/communication-target.workspace-entity';
+import { type MeetingTargetWorkspaceEntity } from 'src/modules/meeting/standard-objects/meeting-target.workspace-entity';
 import { type EmailTargetWorkspaceEntity } from 'src/modules/email/standard-objects/email-target.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type LineItemWorkspaceEntity } from 'src/modules/line-item/standard-objects/line-item.workspace-entity';
@@ -41,6 +42,7 @@ export class OpportunityWorkspaceEntity extends BaseWorkspaceEntity {
   segmentMembership: string[] | null;
   communicationTargets: EntityRelation<CommunicationTargetWorkspaceEntity[]>;
   emailTargets: EntityRelation<EmailTargetWorkspaceEntity[]>;
+  meetingTargets: EntityRelation<MeetingTargetWorkspaceEntity[]>;
   agentChatThreadTargets: EntityRelation<
     AgentChatThreadTargetWorkspaceEntity[]
   >;

@@ -32,6 +32,10 @@ import { ProvisionWorkspaceMemberAccessCommand } from 'src/database/commands/upg
 import { ProvisionTaskAndNoteFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795011565106-provision-task-and-note-fields.command';
 import { ProvisionEmailRecordPageFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795091235333-provision-email-record-page-fields.command';
 import { ProvisionRecordLayoutCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795360703833-provision-record-layout.command';
+import { ProvisionMeetingsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000000-provision-meetings.command';
+import { CopyCalendarEventsToMeetingsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000001-copy-calendar-events-to-meetings.command';
+import { TurnOffNativeCalendarSyncCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000003-turn-off-native-calendar-sync.command';
+import { RemoveLegacyCalendarEventMeetingFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000002-remove-legacy-calendar-event-meeting-fields.command';
 import { ProvisionActivityPinCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795388001616-provision-activity-pin.command';
 import { ProvisionEmailReplySyncCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795044442993-provision-email-reply-sync.command';
 import { ProvisionEmailTrackingCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795036985356-provision-email-tracking.command';
@@ -91,6 +95,10 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionEmailRecordPageFieldsCommand,
     ProvisionRecordLayoutCommand,
     ProvisionActivityPinCommand,
+    ProvisionMeetingsCommand,
+    CopyCalendarEventsToMeetingsCommand,
+    RemoveLegacyCalendarEventMeetingFieldsCommand,
+    TurnOffNativeCalendarSyncCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

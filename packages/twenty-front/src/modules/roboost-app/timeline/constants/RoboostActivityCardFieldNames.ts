@@ -10,12 +10,14 @@ export const ROBOOST_ACTIVITY_CARD_FIELD_NAMES: Record<string, string[]> = {
   ],
   communication: ['channelType', 'contacted', 'direction', 'activityDate'],
   task: ['status', 'dueAt', 'assignee', 'priority', 'taskType'],
-  calendarEvent: [
+  meeting: [
     'startsAt',
     'endsAt',
-    'location',
-    'meetingOutcome',
+    'host',
     'meetingType',
+    'meetingOutcome',
+    'locationType',
+    'location',
   ],
   note: ['activityDate', 'assignedTo'],
 };

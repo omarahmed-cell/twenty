@@ -4,9 +4,9 @@ export const RECORD_SOURCE_OBJECT_NAMES = [
   'opportunity',
   'service',
   'call',
-  'calendarEvent',
   'note',
   'task',
   'email',
   'communication',
+  'meeting',
 ] as const;

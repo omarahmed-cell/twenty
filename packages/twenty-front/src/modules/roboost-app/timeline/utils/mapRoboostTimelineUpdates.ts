@@ -18,6 +18,8 @@ const ACTIVITY_OBJECT_NAMES = new Set([
   'call',
   'communication',
   'calendarEvent',
+  'meeting',
+  'meetingAttendee',
   'email',
   'emailTrackingEvent',
   'message',

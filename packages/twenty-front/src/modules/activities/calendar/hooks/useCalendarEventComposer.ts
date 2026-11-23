@@ -2,7 +2,6 @@ import { getMissingCreateCalendarEventScopes } from '@/accounts/utils/hasMissing
 import { useCalendarEventTargetObjectMetadataItems } from '@/activities/calendar/hooks/useCalendarEventTargetObjectMetadataItems';
 import { useCreateCalendarEvent } from '@/activities/calendar/hooks/useCreateCalendarEvent';
 import { useCreateCalendarEventTargets } from '@/activities/calendar/hooks/useCreateCalendarEventTargets';
-import { useCalendarEventComposerCrmFields } from '@/activities/calendar/hooks/useCalendarEventComposerCrmFields';
 import { useRefetchTimelineCalendarEvents } from '@/activities/calendar/hooks/useRefetchTimelineCalendarEvents';
 import { isCalendarEventComposerCreatingState } from '@/activities/calendar/states/isCalendarEventComposerCreatingState';
 import { type CalendarEventComposerInitialValues } from '@/activities/calendar/types/CalendarEventComposerInitialValues';
@@ -43,8 +42,6 @@ export const useCalendarEventComposer = ({
   const { createCalendarEvent, loading: isCreating } = useCreateCalendarEvent();
   const { refetchTimelineCalendarEvents } = useRefetchTimelineCalendarEvents();
   const { createCalendarEventTargets } = useCreateCalendarEventTargets();
-  const { crmFields, setCrmField, saveCrmFields } =
-    useCalendarEventComposerCrmFields();
   const { enqueueToast } = useToast();
   const store = useStore();
   const isCalendarEventComposerCreating = useAtomStateValue(
@@ -261,17 +258,6 @@ export const useCalendarEventComposer = ({
         return;
       }
 
-      if (isDefined(calendarEventId)) {
-        try {
-          await saveCrmFields(calendarEventId);
-        } catch {
-          enqueueToast({
-            status: 'error',
-            children: t`Failed to save the meeting details`,
-          });
-        }
-      }
-
       // The event exists by now, so a link failure must not keep the composer open: a retry would duplicate it.
       // Without an id, persistence failed and the next provider sync recreates the event without these links.
       if (targets.length > 0) {
@@ -308,7 +294,6 @@ export const useCalendarEventComposer = ({
     connectedAccountId,
     createCalendarEvent,
     createCalendarEventTargets,
-    saveCrmFields,
     dates.endsAt,
     dates.startsAt,
     description,
@@ -333,7 +318,6 @@ export const useCalendarEventComposer = ({
     canCreate,
     canPickTargets,
     connectedAccountId,
-    crmFields,
     dates,
     description,
     handleCreate,
@@ -351,7 +335,6 @@ export const useCalendarEventComposer = ({
     setAddConferencing,
     setAttendees,
     setConnectedAccountId,
-    setCrmField,
     setDescription,
     setEndsAt,
     setLocation,

@@ -104,31 +104,6 @@ export const computeStandardCalendarEventViewFields = (
         size: 150,
       },
     }),
-    allCalendarEventsMeetingOutcome: createStandardViewFieldFlatMetadata({
-      ...args,
-      objectName: 'calendarEvent',
-      context: {
-        viewName: 'allCalendarEvents',
-        viewFieldName: 'meetingOutcome',
-        fieldName: 'meetingOutcome',
-        position: 8,
-        isVisible: true,
-        size: 150,
-      },
-    }),
-    allCalendarEventsAssignedTo: createStandardViewFieldFlatMetadata({
-      ...args,
-      objectName: 'calendarEvent',
-      context: {
-        viewName: 'allCalendarEvents',
-        viewFieldName: 'assignedTo',
-        fieldName: 'assignedTo',
-        position: 9,
-        isVisible: true,
-        size: 150,
-      },
-    }),
-
     calendarEventRecordPageFieldsTitle: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'calendarEvent',
@@ -211,34 +186,6 @@ export const computeStandardCalendarEventViewFields = (
           viewFieldGroupName: 'general',
         },
       }),
-    calendarEventRecordPageFieldsRecordedVideo:
-      createStandardViewFieldFlatMetadata({
-        ...args,
-        objectName: 'calendarEvent',
-        context: {
-          viewName: 'calendarEventRecordPageFields',
-          viewFieldName: 'recordedVideo',
-          fieldName: 'recordedVideo',
-          position: 5.25,
-          isVisible: true,
-          size: 150,
-          viewFieldGroupName: 'general',
-        },
-      }),
-    calendarEventRecordPageFieldsTranscript:
-      createStandardViewFieldFlatMetadata({
-        ...args,
-        objectName: 'calendarEvent',
-        context: {
-          viewName: 'calendarEventRecordPageFields',
-          viewFieldName: 'transcript',
-          fieldName: 'transcript',
-          position: 5.5,
-          isVisible: true,
-          size: 150,
-          viewFieldGroupName: 'general',
-        },
-      }),
     calendarEventRecordPageFieldsLocation: createStandardViewFieldFlatMetadata({
       ...args,
       objectName: 'calendarEvent',
@@ -277,62 +224,6 @@ export const computeStandardCalendarEventViewFields = (
           position: 8,
           isVisible: true,
           size: 200,
-          viewFieldGroupName: 'general',
-        },
-      }),
-    calendarEventRecordPageFieldsLocationType:
-      createStandardViewFieldFlatMetadata({
-        ...args,
-        objectName: 'calendarEvent',
-        context: {
-          viewName: 'calendarEventRecordPageFields',
-          viewFieldName: 'locationType',
-          fieldName: 'locationType',
-          position: 9,
-          isVisible: true,
-          size: 150,
-          viewFieldGroupName: 'general',
-        },
-      }),
-    calendarEventRecordPageFieldsMeetingType:
-      createStandardViewFieldFlatMetadata({
-        ...args,
-        objectName: 'calendarEvent',
-        context: {
-          viewName: 'calendarEventRecordPageFields',
-          viewFieldName: 'meetingType',
-          fieldName: 'meetingType',
-          position: 10,
-          isVisible: true,
-          size: 150,
-          viewFieldGroupName: 'general',
-        },
-      }),
-    calendarEventRecordPageFieldsMeetingOutcome:
-      createStandardViewFieldFlatMetadata({
-        ...args,
-        objectName: 'calendarEvent',
-        context: {
-          viewName: 'calendarEventRecordPageFields',
-          viewFieldName: 'meetingOutcome',
-          fieldName: 'meetingOutcome',
-          position: 11,
-          isVisible: true,
-          size: 150,
-          viewFieldGroupName: 'general',
-        },
-      }),
-    calendarEventRecordPageFieldsAssignedTo:
-      createStandardViewFieldFlatMetadata({
-        ...args,
-        objectName: 'calendarEvent',
-        context: {
-          viewName: 'calendarEventRecordPageFields',
-          viewFieldName: 'assignedTo',
-          fieldName: 'assignedTo',
-          position: 12,
-          isVisible: true,
-          size: 150,
           viewFieldGroupName: 'general',
         },
       }),

@@ -5,6 +5,7 @@ import { type CustomWorkspaceEntity } from 'src/engine/twenty-orm/custom.workspa
 import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
 import { type CallWorkspaceEntity } from 'src/modules/call/standard-objects/call.workspace-entity';
 import { type CommunicationWorkspaceEntity } from 'src/modules/communication/standard-objects/communication.workspace-entity';
+import { type MeetingWorkspaceEntity } from 'src/modules/meeting/standard-objects/meeting.workspace-entity';
 import { type EmailWorkspaceEntity } from 'src/modules/email/standard-objects/email.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
 import { type DashboardWorkspaceEntity } from 'src/modules/dashboard/standard-objects/dashboard.workspace-entity';
@@ -60,6 +61,8 @@ export class TimelineActivityWorkspaceEntity extends BaseWorkspaceEntity {
   targetEmail: EntityRelation<EmailWorkspaceEntity> | null;
   targetCommunicationId: string | null;
   targetEmailId: string | null;
+  targetMeeting: EntityRelation<MeetingWorkspaceEntity> | null;
+  targetMeetingId: string | null;
   custom: EntityRelation<CustomWorkspaceEntity>;
   targetCustom: EntityRelation<CustomWorkspaceEntity>;
 }

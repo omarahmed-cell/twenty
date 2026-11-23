@@ -5,7 +5,7 @@ export const ROBOOST_DEFAULT_CREATE_FIELDS: Record<string, string[]> = {
   opportunity: ['name', 'company', 'pointOfContact', 'amount', 'closeDate'],
   task: ['title', 'assignee', 'dueAt', 'status'],
   note: ['title'],
-  calendarEvent: ['title', 'startsAt', 'endsAt', 'location'],
+  meeting: ['title', 'startsAt', 'endsAt', 'host', 'meetingType', 'location'],
   call: ['title', 'direction', 'outcome'],
   communication: ['title'],
   service: ['name', 'company', 'opportunity', 'pointOfContact'],

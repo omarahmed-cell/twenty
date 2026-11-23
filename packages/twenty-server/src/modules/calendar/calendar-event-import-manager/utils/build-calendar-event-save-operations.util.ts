@@ -13,7 +13,6 @@ import {
 import { type CalendarChannelEventAssociationWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-channel-event-association.workspace-entity';
 import { type FetchedCalendarEvent } from 'src/modules/calendar/common/types/fetched-calendar-event.type';
 import { type FetchedParticipantWithCalendarEventId } from 'src/modules/calendar/common/types/fetched-participant-with-calendar-event-id.type';
-import { deriveCalendarEventLocationType } from 'src/modules/meeting-fields/utils/derive-calendar-event-location-type.util';
 
 export const buildCalendarEventSaveOperations = ({
   fetchedCalendarEvents,
@@ -106,15 +105,9 @@ export const buildCalendarEventSaveOperations = ({
       const newCalendarEventId = uuid();
 
       channelRoleByCalendarEventId.set(newCalendarEventId, 'ONLY_CHANNEL');
-      // Only new meetings get these: later syncs must not overwrite what a rep chose
       saveOperations.calendarEventsToInsert.push({
         id: newCalendarEventId,
         ...calendarEvent,
-        locationType: deriveCalendarEventLocationType({
-          conferenceLinkUrl: fetchedCalendarEvent.conferenceLinkUrl,
-          location: fetchedCalendarEvent.location,
-        }),
-        meetingSource: 'CALENDAR_SYNC',
       });
       saveOperations.associationsToInsert.push({
         calendarEventId: newCalendarEventId,

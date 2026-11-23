@@ -55,14 +55,6 @@ describe('Standard field writability', () => {
     STANDARD_OBJECTS.company.fields.sdrOwnerAssignedDate.universalIdentifier,
   ]);
 
-  const meetingServerWrittenFieldUniversalIdentifiers = new Set([
-    STANDARD_OBJECTS.calendarEvent.fields.hasMeetingTranscript
-      .universalIdentifier,
-    STANDARD_OBJECTS.calendarEvent.fields.hubspotHasTranscript
-      .universalIdentifier,
-    STANDARD_OBJECTS.calendarEvent.fields.meetingSource.universalIdentifier,
-  ]);
-
   const taskServerWrittenFieldUniversalIdentifiers = new Set([
     STANDARD_OBJECTS.task.fields.completedAt.universalIdentifier,
     STANDARD_OBJECTS.task.fields.isOverdue.universalIdentifier,
@@ -79,7 +71,6 @@ describe('Standard field writability', () => {
     ...personServerComputedFieldUniversalIdentifiers,
     ...companyAssignedDateFieldUniversalIdentifiers,
     ...opportunityServerWrittenFieldUniversalIdentifiers,
-    ...meetingServerWrittenFieldUniversalIdentifiers,
     ...taskServerWrittenFieldUniversalIdentifiers,
     ...workspaceMemberServerWrittenFieldUniversalIdentifiers,
   ]);
@@ -147,23 +138,6 @@ describe('Standard field writability', () => {
     expect(opportunityServerWrittenFlatFieldMetadatas).toHaveLength(14);
     expect(
       opportunityServerWrittenFlatFieldMetadatas.every(
-        (flatFieldMetadata) =>
-          flatFieldMetadata.writability === MetadataWritability.SYSTEM,
-      ),
-    ).toBe(true);
-  });
-
-  it('marks the server-written meeting fields as SYSTEM', () => {
-    const meetingServerWrittenFlatFieldMetadatas =
-      standardFlatFieldMetadatas.filter((flatFieldMetadata) =>
-        meetingServerWrittenFieldUniversalIdentifiers.has(
-          flatFieldMetadata.universalIdentifier,
-        ),
-      );
-
-    expect(meetingServerWrittenFlatFieldMetadatas).toHaveLength(3);
-    expect(
-      meetingServerWrittenFlatFieldMetadatas.every(
         (flatFieldMetadata) =>
           flatFieldMetadata.writability === MetadataWritability.SYSTEM,
       ),

@@ -63,6 +63,16 @@ const StyledScrollableContent = styled.div`
   }
 `;
 
+const NATIVE_OBJECTS_HIDDEN_BY_UNIFIED_MEETINGS: string[] = [
+  CoreObjectNameSingular.CalendarEvent,
+  'calendarEventParticipant',
+  'calendarChannelEventAssociation',
+  CoreObjectNameSingular.CalendarEventTarget,
+  CoreObjectNameSingular.MessageThread,
+  CoreObjectNameSingular.Message,
+  CoreObjectNameSingular.MessageParticipant,
+];
+
 export const SettingsObjectTable = ({
   objectMetadataItems,
   withSearchBar = true,
@@ -82,6 +92,9 @@ export const SettingsObjectTable = ({
   const [showSystemObjects, setShowSystemObjects] = useState(false);
   const isUnifiedEmailEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
+  const isUnifiedMeetingsEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_MEETINGS_ENABLED,
   );
 
   const { deleteOneObjectMetadataItem } = useDeleteOneObjectMetadataItem();
@@ -140,6 +153,16 @@ export const SettingsObjectTable = ({
           return false;
         }
 
+        // Native mailbox and calendar objects keep their data but are replaced by Emails and Meetings
+        if (
+          isUnifiedMeetingsEnabled &&
+          NATIVE_OBJECTS_HIDDEN_BY_UNIFIED_MEETINGS.includes(
+            item.objectMetadataItem.nameSingular,
+          )
+        ) {
+          return false;
+        }
+
         const isActive = item.objectMetadataItem.isActive;
         if (!isActive && !showDeactivated) {
           return false;
@@ -165,6 +188,7 @@ export const SettingsObjectTable = ({
       showDeactivated,
       showSystemObjects,
       isUnifiedEmailEnabled,
+      isUnifiedMeetingsEnabled,
     ],
   );
 

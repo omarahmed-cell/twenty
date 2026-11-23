@@ -11,5 +11,8 @@ export const getGoogleApisOauthScopes = () => {
     // Meet-created files only (recordings, transcripts, Gemini notes), never the rest of Drive
     'https://www.googleapis.com/auth/drive.meet.readonly',
     'https://www.googleapis.com/auth/meetings.space.readonly',
+    // Meetings: the host's busy slots in the Schedule pop-up, and transcript or Gemini notes docs shared with the host
+    'https://www.googleapis.com/auth/calendar.readonly',
+    'https://www.googleapis.com/auth/drive.readonly',
   ];
 };

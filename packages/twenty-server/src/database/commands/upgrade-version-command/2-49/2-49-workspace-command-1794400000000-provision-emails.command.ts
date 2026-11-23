@@ -22,6 +22,7 @@ import { type FlatObjectMetadata } from 'src/engine/metadata-modules/flat-object
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
+import { LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS } from 'src/database/commands/upgrade-version-command/2-49/utils/legacy-calendar-event-field-universal-identifiers.constant';
 
 type ProvisionEmailsCommandOptions = ProvisionedWorkspaceCommandOptions & {
   rollback?: boolean;
@@ -30,8 +31,10 @@ type ProvisionEmailsCommandOptions = ProvisionedWorkspaceCommandOptions & {
 const EMAILS_SEED_UNIVERSAL_IDENTIFIERS = [
   STANDARD_OBJECTS.email.universalIdentifier,
   STANDARD_OBJECTS.emailTarget.universalIdentifier,
-  STANDARD_OBJECTS.calendarEvent.fields.recordedVideo.universalIdentifier,
-  STANDARD_OBJECTS.calendarEvent.fields.transcript.universalIdentifier,
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.recordedVideo
+    .universalIdentifier,
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.transcript
+    .universalIdentifier,
 ];
 
 const RESERVED_FIELD_NAMES_BY_OBJECT_UNIVERSAL_IDENTIFIER: Record<
@@ -119,15 +122,13 @@ export class ProvisionEmailsCommand extends ProvisionedWorkspaceCommandRunner<Pr
       fromToAllFlatEntityMaps = buildSeededStandardRollbackFromTo({
         existing,
         standard,
-        seedUniversalIdentifiers:
-          EMAILS_SEED_UNIVERSAL_IDENTIFIERS,
+        seedUniversalIdentifiers: EMAILS_SEED_UNIVERSAL_IDENTIFIERS,
       });
     } else {
       const provision = buildSeededStandardAdditionsFromTo({
         existing,
         standard,
-        seedUniversalIdentifiers:
-          EMAILS_SEED_UNIVERSAL_IDENTIFIERS,
+        seedUniversalIdentifiers: EMAILS_SEED_UNIVERSAL_IDENTIFIERS,
       });
 
       if (countSeededStandardAdditions(provision.additions) === 0) {
@@ -167,18 +168,14 @@ export class ProvisionEmailsCommand extends ProvisionedWorkspaceCommandRunner<Pr
     );
   }
 
-  async up(
-    args: RunOnWorkspaceArgs<ProvisionEmailsCommandOptions>,
-  ) {
+  async up(args: RunOnWorkspaceArgs<ProvisionEmailsCommandOptions>) {
     await this.runOnWorkspace({
       ...args,
       options: { ...args.options, rollback: false },
     });
   }
 
-  async down(
-    args: RunOnWorkspaceArgs<ProvisionEmailsCommandOptions>,
-  ) {
+  async down(args: RunOnWorkspaceArgs<ProvisionEmailsCommandOptions>) {
     await this.runOnWorkspace({
       ...args,
       options: { ...args.options, rollback: true },

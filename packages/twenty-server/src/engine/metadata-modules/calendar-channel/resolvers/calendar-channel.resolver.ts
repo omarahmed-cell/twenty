@@ -14,6 +14,10 @@ import { CalendarChannelDTO } from 'src/engine/metadata-modules/calendar-channel
 import { UpdateCalendarChannelInput } from 'src/engine/metadata-modules/calendar-channel/dtos/update-calendar-channel.input';
 import { CalendarChannelGraphqlApiExceptionInterceptor } from 'src/engine/metadata-modules/calendar-channel/interceptors/calendar-channel-graphql-api-exception.interceptor';
 import { AuthGraphqlApiExceptionFilter } from 'src/engine/core-modules/auth/filters/auth-graphql-api-exception.filter';
+import {
+  CalendarChannelException,
+  CalendarChannelExceptionCode,
+} from 'src/engine/metadata-modules/calendar-channel/calendar-channel.exception';
 
 @UseGuards(
   AuthPrincipalGuard({
@@ -76,6 +80,17 @@ export class CalendarChannelResolver {
       userWorkspaceId,
       workspaceId: workspace.id,
     });
+
+    // Meetings come from the Meetings sync; Twenty's own calendar import and contact creation stay off
+    if (
+      input.update.isSyncEnabled === true ||
+      input.update.isContactAutoCreationEnabled === true
+    ) {
+      throw new CalendarChannelException(
+        'Calendar sync is turned off for this workspace',
+        CalendarChannelExceptionCode.INVALID_CALENDAR_CHANNEL_INPUT,
+      );
+    }
 
     return this.calendarChannelMetadataService.update({
       id: input.id,

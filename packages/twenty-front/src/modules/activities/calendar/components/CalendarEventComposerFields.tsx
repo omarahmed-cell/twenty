@@ -1,4 +1,3 @@
-import { CalendarEventComposerCrmFields } from '@/activities/calendar/components/CalendarEventComposerCrmFields';
 import { CalendarEventComposerTargetsInput } from '@/activities/calendar/components/CalendarEventComposerTargetsInput';
 import { CalendarEventLocationInput } from '@/activities/calendar/components/CalendarEventLocationInput';
 import { type useCalendarEventComposer } from '@/activities/calendar/hooks/useCalendarEventComposer';
@@ -259,10 +258,6 @@ export const CalendarEventComposerFields = ({
                 onChange={composerState.setDescription}
               />
             </ComposerFieldRow>
-            <CalendarEventComposerCrmFields
-              crmFields={composerState.crmFields}
-              onChange={composerState.setCrmField}
-            />
           </ComposerHeader>
         </DragDropProvider>
       </DragDropItemDndContext.Provider>

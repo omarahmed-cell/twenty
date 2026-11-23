@@ -181,3 +181,61 @@ export const buildSeededStandardRollbackFromTo = ({
     ]),
   ) as FromToAllUniversalFlatEntityMaps;
 };
+
+// Removes the given entities and everything that references them, e.g. the view fields of a removed field
+export const buildStandardRemovalFromTo = ({
+  existing,
+  universalIdentifiers,
+}: {
+  existing: ActivityObjectsFlatEntityMaps;
+  universalIdentifiers: string[];
+}): {
+  fromToAllFlatEntityMaps: FromToAllUniversalFlatEntityMaps;
+  removedUniversalIdentifiers: string[];
+} => {
+  const universalIdentifiersToRemove = new Set(
+    universalIdentifiers.filter((universalIdentifier) =>
+      ACTIVITY_OBJECTS_FLAT_ENTITY_MAPS_KEYS.some((mapsKey) =>
+        isDefined(existing[mapsKey].byUniversalIdentifier[universalIdentifier]),
+      ),
+    ),
+  );
+
+  let hasChanged = universalIdentifiersToRemove.size > 0;
+
+  while (hasChanged) {
+    hasChanged = false;
+
+    for (const mapsKey of ACTIVITY_OBJECTS_FLAT_ENTITY_MAPS_KEYS) {
+      for (const flatEntity of Object.values(
+        existing[mapsKey].byUniversalIdentifier,
+      ).filter(isDefined)) {
+        if (
+          !universalIdentifiersToRemove.has(flatEntity.universalIdentifier) &&
+          collectParentReferences(flatEntity).some((reference) =>
+            universalIdentifiersToRemove.has(reference),
+          )
+        ) {
+          universalIdentifiersToRemove.add(flatEntity.universalIdentifier);
+          hasChanged = true;
+        }
+      }
+    }
+  }
+
+  return {
+    removedUniversalIdentifiers: [...universalIdentifiersToRemove],
+    fromToAllFlatEntityMaps: Object.fromEntries(
+      ACTIVITY_OBJECTS_FLAT_ENTITY_MAPS_KEYS.map((mapsKey) => [
+        mapsKey,
+        {
+          from: existing[mapsKey],
+          to: removeFlatEntities(
+            existing[mapsKey] as FlatEntityMaps<SyncableFlatEntity>,
+            universalIdentifiersToRemove,
+          ),
+        },
+      ]),
+    ) as FromToAllUniversalFlatEntityMaps,
+  };
+};

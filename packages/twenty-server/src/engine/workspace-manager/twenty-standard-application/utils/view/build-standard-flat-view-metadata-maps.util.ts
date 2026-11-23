@@ -1,4 +1,7 @@
 import { computeStandardCommunicationViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-communication-views.util';
+import { computeStandardMeetingViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-meeting-views.util';
+import { computeStandardMeetingTargetViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-meeting-target-views.util';
+import { computeStandardMeetingAttendeeViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-meeting-attendee-views.util';
 import { computeStandardEmailViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-email-views.util';
 import { computeStandardCommunicationTargetViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-communication-target-views.util';
 import { computeStandardEmailTargetViews } from 'src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-email-target-views.util';
@@ -68,6 +71,9 @@ const STANDARD_FLAT_VIEW_METADATA_BUILDERS_BY_OBJECT_NAME = {
   email: computeStandardEmailViews,
   communicationTarget: computeStandardCommunicationTargetViews,
   emailTarget: computeStandardEmailTargetViews,
+  meeting: computeStandardMeetingViews,
+  meetingTarget: computeStandardMeetingTargetViews,
+  meetingAttendee: computeStandardMeetingAttendeeViews,
   callRecording: computeStandardCallRecordingViews,
   company: computeStandardCompanyViews,
   dashboard: computeStandardDashboardViews,

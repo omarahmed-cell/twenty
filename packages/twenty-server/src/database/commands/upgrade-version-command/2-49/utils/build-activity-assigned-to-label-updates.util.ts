@@ -3,11 +3,12 @@ import { isDefined } from 'twenty-shared/utils';
 
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
+import { LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS } from 'src/database/commands/upgrade-version-command/2-49/utils/legacy-calendar-event-field-universal-identifiers.constant';
 
 const PREVIOUS_LABEL_BY_UNIVERSAL_IDENTIFIER: Record<string, string> = {
   [STANDARD_OBJECTS.task.fields.assignee.universalIdentifier]: 'Assignee',
-  [STANDARD_OBJECTS.calendarEvent.fields.assignedTo.universalIdentifier]:
-    'Assigned to',
+  [LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.assignedTo
+    .universalIdentifier]: 'Assigned to',
 };
 
 // Only a label still at its previous default moves, so a workspace rename survives

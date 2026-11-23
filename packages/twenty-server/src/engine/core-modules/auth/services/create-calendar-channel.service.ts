@@ -53,6 +53,9 @@ export class CreateCalendarChannelService {
         syncStage: skipMessageChannelConfiguration
           ? CalendarChannelSyncStage.CALENDAR_EVENT_LIST_FETCH_PENDING
           : CalendarChannelSyncStage.PENDING_CONFIGURATION,
+        // The channel keeps the Google token for the Meetings jobs; Twenty's own calendar import stays off
+        isSyncEnabled: false,
+        isContactAutoCreationEnabled: false,
         workspaceId,
       } as CalendarChannelEntity);
 

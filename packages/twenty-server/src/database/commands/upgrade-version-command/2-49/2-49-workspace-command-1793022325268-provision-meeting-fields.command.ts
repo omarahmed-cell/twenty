@@ -23,18 +23,25 @@ import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/works
 import { computeTwentyStandardApplicationAllFlatEntityMaps } from 'src/engine/workspace-manager/twenty-standard-application/utils/twenty-standard-application-all-flat-entity-maps.constant';
 import { WorkspaceMigrationValidateBuildAndRunService } from 'src/engine/workspace-manager/workspace-migration/services/workspace-migration-validate-build-and-run-service';
 import { type FromToAllUniversalFlatEntityMaps } from 'src/engine/workspace-manager/workspace-migration/types/workspace-migration-orchestrator.type';
+import { LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS } from 'src/database/commands/upgrade-version-command/2-49/utils/legacy-calendar-event-field-universal-identifiers.constant';
 
 type ProvisionMeetingFieldsCommandOptions =
   ProvisionedWorkspaceCommandOptions & { rollback?: boolean };
 
 const MEETING_FIELD_UNIVERSAL_IDENTIFIERS = [
-  STANDARD_OBJECTS.calendarEvent.fields.locationType.universalIdentifier,
-  STANDARD_OBJECTS.calendarEvent.fields.meetingType.universalIdentifier,
-  STANDARD_OBJECTS.calendarEvent.fields.meetingOutcome.universalIdentifier,
-  STANDARD_OBJECTS.calendarEvent.fields.assignedTo.universalIdentifier,
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.locationType
+    .universalIdentifier,
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.meetingType
+    .universalIdentifier,
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.meetingOutcome
+    .universalIdentifier,
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.assignedTo
+    .universalIdentifier,
 ];
 
-const countFlatEntities = (flatEntitiesByMapsKey: ActivityObjectsFlatEntities) =>
+const countFlatEntities = (
+  flatEntitiesByMapsKey: ActivityObjectsFlatEntities,
+) =>
   Object.values(flatEntitiesByMapsKey).reduce(
     (total, flatEntities) => total + flatEntities.length,
     0,

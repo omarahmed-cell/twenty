@@ -81,6 +81,9 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
   const isUnifiedEmailEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
   );
+  const isUnifiedMeetingsEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_MEETINGS_ENABLED,
+  );
 
   return [
     {
@@ -124,6 +127,7 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
                   path: SettingsPath.AccountsCalendars,
                   Icon: IconCalendarEvent,
                   isHidden:
+                    isUnifiedMeetingsEnabled ||
                     !permissionFlagMap[PermissionFlagType.CONNECTED_ACCOUNTS],
                   indentationLevel: 2,
                 },

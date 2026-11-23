@@ -12,6 +12,7 @@ type StandardTargetObjectName =
   | 'callTarget'
   | 'communicationTarget'
   | 'emailTarget'
+  | 'meetingTarget'
   | 'messageThreadTarget'
   | 'noteTarget'
   | 'segmentMember'

@@ -1,4 +1,7 @@
 import { buildCommunicationStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-communication-standard-flat-index-metadata.util';
+import { buildMeetingStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-meeting-standard-flat-index-metadata.util';
+import { buildMeetingTargetStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-meeting-target-standard-flat-index-metadata.util';
+import { buildMeetingAttendeeStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-meeting-attendee-standard-flat-index-metadata.util';
 import { buildEmailStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-email-standard-flat-index-metadata.util';
 import { buildCommunicationTargetStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-communication-target-standard-flat-index-metadata.util';
 import { buildEmailTargetStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-email-target-standard-flat-index-metadata.util';
@@ -92,6 +95,9 @@ const STANDARD_FLAT_INDEX_METADATA_BUILDERS_BY_OBJECT_NAME = {
   email: buildEmailStandardFlatIndexMetadatas,
   communicationTarget: buildCommunicationTargetStandardFlatIndexMetadatas,
   emailTarget: buildEmailTargetStandardFlatIndexMetadatas,
+  meeting: buildMeetingStandardFlatIndexMetadatas,
+  meetingTarget: buildMeetingTargetStandardFlatIndexMetadatas,
+  meetingAttendee: buildMeetingAttendeeStandardFlatIndexMetadatas,
   callRecording: buildCallRecordingStandardFlatIndexMetadatas,
   company: buildCompanyStandardFlatIndexMetadatas,
   dashboard: buildDashboardStandardFlatIndexMetadatas,

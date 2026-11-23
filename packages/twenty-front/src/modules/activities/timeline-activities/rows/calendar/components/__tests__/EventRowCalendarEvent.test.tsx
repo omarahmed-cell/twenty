@@ -29,8 +29,8 @@ jest.mock('@/activities/calendar/components/CalendarEventRowDetails', () => ({
   CalendarEventRowDetails: ({
     calendarEvent,
   }: {
-    calendarEvent: { meetingOutcome: string | null };
-  }) => <div>Outcome {calendarEvent.meetingOutcome}</div>,
+    calendarEvent: { location: string | null };
+  }) => <div>Details {calendarEvent.location}</div>,
 }));
 jest.mock(
   '@/activities/timeline-activities/hooks/useTimelineChannelOwnerName',
@@ -85,7 +85,6 @@ describe('EventRowCalendarEvent', () => {
           primaryLinkUrl: 'https://meet.google.com/abc-defg-hij',
           primaryLinkLabel: '',
         },
-        meetingOutcome: 'COMPLETED',
         calendarEventParticipants: [
           {
             id: 'organizer-id',
@@ -120,7 +119,6 @@ describe('EventRowCalendarEvent', () => {
       'href',
       'https://meet.google.com/abc-defg-hij',
     );
-    expect(screen.getByText('Outcome COMPLETED')).toBeInTheDocument();
     expect(screen.queryByText('Agenda: pricing')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Expand details' }));

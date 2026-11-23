@@ -70,6 +70,12 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
   ],
   communicationTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
   emailTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
+  meeting: [{ name: 'title', type: FieldMetadataType.TEXT }],
+  meetingTarget: [{ name: 'id', type: FieldMetadataType.UUID }],
+  meetingAttendee: [
+    { name: 'email', type: FieldMetadataType.TEXT },
+    { name: 'displayName', type: FieldMetadataType.TEXT },
+  ],
   call: [
     { name: 'title', type: FieldMetadataType.TEXT },
     { name: 'bodyV2', type: FieldMetadataType.RICH_TEXT },

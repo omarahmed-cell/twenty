@@ -9,6 +9,7 @@ const ASSIGNEE_FIELD_BY_ACTIVITY_OBJECT: Record<string, string> = {
   communication: 'assignedToId',
   email: 'assignedToId',
   calendarEvent: 'assignedToId',
+  meeting: 'hostId',
 };
 
 // A member creating an activity owns it unless they picked someone; API keys (imports) keep what they send

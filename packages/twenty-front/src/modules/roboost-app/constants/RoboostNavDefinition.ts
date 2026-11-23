@@ -30,9 +30,9 @@ export const ROBOOST_NAV_DEFINITION: RoboostNavGroupDefinition[] = [
       { id: 'tasks', icon: 'tasks', objectNamePlural: 'tasks' },
       { id: 'notes', icon: 'note', objectNamePlural: 'notes' },
       {
-        id: 'calendarEvents',
+        id: 'meetings',
         icon: 'calendar',
-        objectNamePlural: 'calendarEvents',
+        objectNamePlural: 'meetings',
       },
       { id: 'emails', icon: 'mail', objectNamePlural: 'emails' },
       { id: 'calls', icon: 'phone', objectNamePlural: 'calls' },

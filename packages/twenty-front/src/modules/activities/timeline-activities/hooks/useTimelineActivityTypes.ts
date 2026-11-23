@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { type TimelineActivityType } from '@/activities/timeline-activities/types/TimelineActivityType';
 import { type TimelineActivityTypeMaps } from '@/activities/timeline-activities/types/TimelineActivityTypeMaps';
 import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
+import { isNativeCalendarTimelineActivityType } from '@/activities/timeline-activities/utils/isNativeCalendarTimelineActivityType';
 import { isNativeEmailTimelineActivityType } from '@/activities/timeline-activities/utils/isNativeEmailTimelineActivityType';
 import { isTimelineActivityAction } from 'twenty-shared/timeline';
 import {
@@ -15,6 +16,9 @@ export const useTimelineActivityTypes = () => {
   const { data } = useQuery(FindManyTimelineActivityTypesDocument);
   const isUnifiedEmailEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_UNIFIED_EMAIL_ENABLED,
+  );
+  const isUnifiedMeetingsEnabled = useIsFeatureEnabled(
+    FeatureFlagKey.IS_UNIFIED_MEETINGS_ENABLED,
   );
 
   const timelineActivityTypeMaps = useMemo<TimelineActivityTypeMaps>(() => {
@@ -53,9 +57,13 @@ export const useTimelineActivityTypes = () => {
           !(
             isUnifiedEmailEnabled &&
             isNativeEmailTimelineActivityType(timelineActivityType)
+          ) &&
+          !(
+            isUnifiedMeetingsEnabled &&
+            isNativeCalendarTimelineActivityType(timelineActivityType)
           ),
       ),
-    [timelineActivityTypeMaps, isUnifiedEmailEnabled],
+    [timelineActivityTypeMaps, isUnifiedEmailEnabled, isUnifiedMeetingsEnabled],
   );
 
   return {

@@ -103,6 +103,8 @@ describe('GoogleApiScopesService', () => {
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/drive.meet.readonly',
         'https://www.googleapis.com/auth/meetings.space.readonly',
+        'https://www.googleapis.com/auth/calendar.readonly',
+        'https://www.googleapis.com/auth/drive.readonly',
         'openid',
       ];
       const expectedScopes = getGoogleApisOauthScopes();

@@ -1,4 +1,7 @@
 import { buildCommunicationStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-communication-standard-flat-field-metadata.util';
+import { buildMeetingStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-meeting-standard-flat-field-metadata.util';
+import { buildMeetingTargetStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-meeting-target-standard-flat-field-metadata.util';
+import { buildMeetingAttendeeStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-meeting-attendee-standard-flat-field-metadata.util';
 import { buildEmailStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-email-standard-flat-field-metadata.util';
 import { buildCommunicationTargetStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-communication-target-standard-flat-field-metadata.util';
 import { buildEmailTargetStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-email-target-standard-flat-field-metadata.util';
@@ -101,6 +104,9 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   email: buildEmailStandardFlatFieldMetadatas,
   communicationTarget: buildCommunicationTargetStandardFlatFieldMetadatas,
   emailTarget: buildEmailTargetStandardFlatFieldMetadatas,
+  meeting: buildMeetingStandardFlatFieldMetadatas,
+  meetingTarget: buildMeetingTargetStandardFlatFieldMetadatas,
+  meetingAttendee: buildMeetingAttendeeStandardFlatFieldMetadatas,
   callRecording: buildCallRecordingStandardFlatFieldMetadatas,
   company: buildCompanyStandardFlatFieldMetadatas,
   dashboard: buildDashboardStandardFlatFieldMetadatas,

@@ -1,4 +1,5 @@
 import { computeStandardCommunicationViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-communication-view-field-groups.util';
+import { computeStandardMeetingViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-meeting-view-field-groups.util';
 import { computeStandardEmailViewFieldGroups } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field-group/compute-standard-email-view-field-groups.util';
 import { createEmptyFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/constant/create-empty-flat-entity-maps.constant';
 import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/types/flat-entity-maps.type';
@@ -44,6 +45,7 @@ const STANDARD_FLAT_VIEW_FIELD_GROUP_METADATA_BUILDERS_BY_OBJECT_NAME = {
   call: computeStandardCallViewFieldGroups,
   communication: computeStandardCommunicationViewFieldGroups,
   email: computeStandardEmailViewFieldGroups,
+  meeting: computeStandardMeetingViewFieldGroups,
   callRecording: computeStandardCallRecordingViewFieldGroups,
   company: computeStandardCompanyViewFieldGroups,
   message: computeStandardMessageViewFieldGroups,

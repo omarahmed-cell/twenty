@@ -559,6 +559,36 @@ export const buildServiceStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  meetingTargets: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'meetingTargets',
+      isSystemSideEffect: true,
+      label: i18nLabel(
+        msg({ message: `Meetings`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Meetings tied to the service`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconMail',
+      isNullable: true,
+      targetObjectName: 'meetingTarget',
+      targetFieldName: 'targetService',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   messageThreadTargets: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

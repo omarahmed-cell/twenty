@@ -1,11 +1,13 @@
 import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 
 import { buildActivityAssignedToLabelUpdates } from 'src/database/commands/upgrade-version-command/2-49/utils/build-activity-assigned-to-label-updates.util';
+import { LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS } from 'src/database/commands/upgrade-version-command/2-49/utils/legacy-calendar-event-field-universal-identifiers.constant';
 
 const TASK_ASSIGNEE_UNIVERSAL_IDENTIFIER =
   STANDARD_OBJECTS.task.fields.assignee.universalIdentifier;
 const MEETING_ASSIGNED_TO_UNIVERSAL_IDENTIFIER =
-  STANDARD_OBJECTS.calendarEvent.fields.assignedTo.universalIdentifier;
+  LEGACY_CALENDAR_EVENT_FIELD_UNIVERSAL_IDENTIFIERS.assignedTo
+    .universalIdentifier;
 
 const toMaps = (fields: { universalIdentifier: string; label: string }[]) =>
   ({

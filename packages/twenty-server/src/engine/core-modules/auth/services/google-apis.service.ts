@@ -287,7 +287,8 @@ export class GoogleAPIsService {
                   connectedAccountId: newOrExistingConnectedAccountId,
                   workspaceId,
                 },
-                { isSyncEnabled: true },
+                // Meetings come from the Meetings sync, never from Twenty's calendar import
+                { isSyncEnabled: false },
               );
           }
         },

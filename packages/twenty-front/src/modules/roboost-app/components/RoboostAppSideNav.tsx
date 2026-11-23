@@ -60,7 +60,7 @@ export const RoboostAppSideNav = () => {
   const staticLabels: Record<string, string> = {
     home: t`Home`,
     settings: t`Settings`,
-    calendarEvents: t`Meetings`,
+    meetings: t`Meetings`,
   };
 
   const groups: NavGroup[] = ROBOOST_NAV_DEFINITION.map((group) => ({

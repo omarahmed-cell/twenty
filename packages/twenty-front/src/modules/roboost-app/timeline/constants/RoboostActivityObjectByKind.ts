@@ -7,6 +7,6 @@ export const ROBOOST_ACTIVITY_OBJECT_BY_KIND: Partial<
   call: 'call',
   communication: 'communication',
   task: 'task',
-  meeting: 'calendarEvent',
+  meeting: 'meeting',
   email: 'email',
 };

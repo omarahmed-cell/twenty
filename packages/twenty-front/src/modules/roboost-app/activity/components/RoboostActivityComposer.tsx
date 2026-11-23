@@ -215,7 +215,9 @@ const RoboostActivityComposerForm = ({
       case 'meeting':
         return {
           title: title.trim(),
-          description: body,
+          internalNote: bodyV2,
+          source: 'LOGGED_MANUALLY',
+          transcriptStatus: 'NOT_RECORDED',
           startsAt: dateIso,
           endsAt: new Date(endDate).toISOString(),
           location,

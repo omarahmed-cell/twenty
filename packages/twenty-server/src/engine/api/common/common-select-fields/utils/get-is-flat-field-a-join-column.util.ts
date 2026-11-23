@@ -17,7 +17,8 @@ export const getIsFlatFieldAJoinColumn = ({
     flatField.name === 'taskTargets' ||
     flatField.name === 'callTargets' ||
     flatField.name === 'communicationTargets' ||
-    flatField.name === 'emailTargets';
+    flatField.name === 'emailTargets' ||
+    flatField.name === 'meetingTargets';
 
   return flatFieldIsJoinColumn || flatFieldIsActivityTarget;
 };

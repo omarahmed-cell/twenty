@@ -16,11 +16,12 @@ import { type CalendarEventParticipantWorkspaceEntity } from 'src/modules/calend
 import { type CallWorkspaceEntity } from 'src/modules/call/standard-objects/call.workspace-entity';
 import { type CommunicationWorkspaceEntity } from 'src/modules/communication/standard-objects/communication.workspace-entity';
 import { type CompanyWorkspaceEntity } from 'src/modules/company/standard-objects/company.workspace-entity';
+import { type MeetingWorkspaceEntity } from 'src/modules/meeting/standard-objects/meeting.workspace-entity';
+import { type MeetingAttendeeWorkspaceEntity } from 'src/modules/meeting/standard-objects/meeting-attendee.workspace-entity';
 import { type EmailWorkspaceEntity } from 'src/modules/email/standard-objects/email.workspace-entity';
 import { type MessageParticipantWorkspaceEntity } from 'src/modules/messaging/common/standard-objects/message-participant.workspace-entity';
 import { type NoteWorkspaceEntity } from 'src/modules/note/standard-objects/note.workspace-entity';
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
-import { type CalendarEventWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event.workspace-entity';
 import { type TaskWorkspaceEntity } from 'src/modules/task/standard-objects/task.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
 
@@ -98,10 +99,12 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   >;
   agentMessageReactions: Relation<AgentMessageReactionWorkspaceEntity[]>;
   ownedOpportunities: Relation<OpportunityWorkspaceEntity[]>;
-  assignedCalendarEvents: Relation<CalendarEventWorkspaceEntity[]>;
   assignedCalls: Relation<CallWorkspaceEntity[]>;
   assignedNotes: Relation<NoteWorkspaceEntity[]>;
   assignedEmails: Relation<EmailWorkspaceEntity[]>;
+  hostedMeetings: Relation<MeetingWorkspaceEntity[]>;
+  assignedMeetings: Relation<MeetingWorkspaceEntity[]>;
+  meetingAttendees: Relation<MeetingAttendeeWorkspaceEntity[]>;
   assignedCommunications: Relation<CommunicationWorkspaceEntity[]>;
   searchVector: string;
   numberFormat: string;

@@ -152,17 +152,19 @@ export const useRoboostActivityFeed = ({
 
   const meetings = useRoboostTargetedRecords({
     ...target,
-    junctionObjectNameSingular: CoreObjectNameSingular.CalendarEventTarget,
-    relationFieldName: 'calendarEvent',
+    junctionObjectNameSingular: CoreObjectNameSingular.MeetingTarget,
+    relationFieldName: 'meeting',
     recordGqlFields: {
       id: true,
       title: true,
-      description: true,
+      internalNote: true,
       startsAt: true,
       endsAt: true,
       location: true,
-      isCanceled: true,
+      meetingOutcome: true,
       createdAt: true,
+      createdBy: true,
+      host: MEMBER_FIELDS,
     },
   });
 
@@ -344,16 +346,16 @@ export const useRoboostActivityFeed = ({
       kind: 'meeting',
       typeKey: 'meetings',
       recordId: String(record.id),
-      objectNameSingular: 'calendarEvent',
+      objectNameSingular: 'meeting',
       date: asString(record.startsAt) ?? asString(record.createdAt) ?? '',
       title: asString(record.title) ?? '',
-      body: asString(record.description) ?? '',
-      ownerId: null,
-      ownerName: '',
-      creatorId: null,
-      isCanceled: record.isCanceled === true,
+      body: getMarkdown(record.internalNote),
+      ownerId: getRelatedId(record.host),
+      ownerName: getRelatedName(record.host),
+      creatorId: getActorId(record.createdBy),
+      isCanceled: record.meetingOutcome === 'CANCELED',
       meta: [
-        record.isCanceled === true ? t`Cancelled` : '',
+        record.meetingOutcome === 'CANCELED' ? t`Cancelled` : '',
         asString(record.location) ?? '',
       ]
         .filter(isNonEmptyString)
