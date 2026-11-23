@@ -336,3 +336,7 @@
   font-size: 12px;
   margin: 12px 0 0;
 }
+.rb-forms-addmodal-name .rb-forms-kind {
+  flex: none;
+  white-space: nowrap;
+}
