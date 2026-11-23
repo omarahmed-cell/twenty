@@ -15,6 +15,7 @@ export type RoboostFeedEmail = {
   subject: string | null;
   bodyPreview: string | null;
   bodyMarkdown: string | null;
+  bodyHtml: string | null;
   direction: string | null;
   from: string | null;
   to: string | null;

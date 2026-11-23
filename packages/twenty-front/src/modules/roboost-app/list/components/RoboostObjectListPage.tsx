@@ -156,11 +156,24 @@ export const RoboostObjectListPage = ({
     setFilters(savedState.filters);
     setSort(savedState.sort);
   }
-  const isViewDirty = !isSameRoboostViewState({ filters, sort }, savedState);
+  const {
+    columns,
+    applyColumns,
+    moveColumn,
+    addColumn,
+    removeColumn,
+    resizeColumn,
+    saveColumns,
+    resetColumns,
+    isDirty: areColumnsDirty,
+  } = useRoboostViewColumns({ view: activeView, objectMetadataItem });
+  const isViewDirty =
+    areColumnsDirty || !isSameRoboostViewState({ filters, sort }, savedState);
 
   const saveView = async () => {
     setIsSavingView(true);
     try {
+      await saveColumns();
       await saveViewState({ filters, sort });
       enqueueToast({ status: 'success', children: t`View saved` });
     } catch {
@@ -174,6 +187,7 @@ export const RoboostObjectListPage = ({
   };
 
   const resetView = () => {
+    resetColumns();
     setFilters(savedState.filters);
     setSort(savedState.sort);
     setPage(1);
@@ -186,18 +200,22 @@ export const RoboostObjectListPage = ({
     const viewId = await createView({
       name: viewName,
       sourceView: activeView,
+      columns: columns.map((column) => ({
+        fieldId: column.field.id,
+        size: column.size,
+      })),
       state: mode === 'clone' ? { filters, sort } : undefined,
     });
 
+    if (mode === 'clone') {
+      resetColumns();
+    }
     setViewName('');
     changeView(viewId);
   };
 
   const { filter: viewFilter, orderBy: viewOrderBy } =
     useRoboostViewQueryVariables({ view: activeView, objectMetadataItem });
-
-  const { columns, applyColumns, moveColumn, addColumn, removeColumn } =
-    useRoboostViewColumns({ view: activeView, objectMetadataItem });
 
   const frozenVarKey = `roboost.listFrozen.${activeView?.id ?? objectMetadataItem.id}`;
   const frozenCount = getUserVar<number>(frozenVarKey) ?? 1;
@@ -612,6 +630,7 @@ export const RoboostObjectListPage = ({
               selectedIds={selectedIds}
               onSelectionChange={setSelectedIds}
               onMoveColumn={moveColumn}
+              onResizeColumn={resizeColumn}
               onToggleColumn={(fieldId) =>
                 columns.some((column) => column.field.id === fieldId)
                   ? removeColumn(fieldId)
@@ -667,7 +686,7 @@ export const RoboostObjectListPage = ({
           onClose={() => setIsColumnsOpen(false)}
           onApply={async (fieldIds, nextFrozenCount) => {
             setIsColumnsOpen(false);
-            await applyColumns(fieldIds);
+            applyColumns(fieldIds);
             if (nextFrozenCount !== frozenCount) {
               await setUserVar(frozenVarKey, nextFrozenCount);
             }

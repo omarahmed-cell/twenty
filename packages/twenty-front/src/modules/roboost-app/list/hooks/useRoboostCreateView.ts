@@ -21,11 +21,14 @@ export const useRoboostCreateView = (
   const createView = async ({
     name,
     sourceView,
+    columns,
     state,
     visibility = ViewVisibility.WORKSPACE,
   }: {
     name: string;
     sourceView: View | undefined;
+    // The columns as shown, unsaved changes included; falls back to the source view's saved columns
+    columns?: { fieldId: string; size: number }[];
     state?: RoboostSavedViewState;
     visibility?: ViewVisibility;
   }) => {
@@ -44,15 +47,22 @@ export const useRoboostCreateView = (
       },
       objectMetadataItem.id,
     );
-    const inputs = (sourceView?.viewFields ?? [])
-      .filter((viewField) => viewField.isVisible)
-      .map((viewField) => ({
-        fieldMetadataId: viewField.fieldMetadataId,
-        viewId,
-        isVisible: true,
-        position: viewField.position,
-        size: viewField.size,
-      }));
+    const inputs = (
+      columns ??
+      (sourceView?.viewFields ?? [])
+        .filter((viewField) => viewField.isVisible)
+        .sort((first, second) => first.position - second.position)
+        .map((viewField) => ({
+          fieldId: viewField.fieldMetadataId,
+          size: viewField.size,
+        }))
+    ).map(({ fieldId, size }, position) => ({
+      fieldMetadataId: fieldId,
+      viewId,
+      isVisible: true,
+      position,
+      size,
+    }));
 
     if (inputs.length > 0) {
       await performViewFieldApiCreate({ inputs });

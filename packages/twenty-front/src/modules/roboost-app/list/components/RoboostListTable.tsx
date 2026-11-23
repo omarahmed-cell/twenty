@@ -13,13 +13,18 @@ import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { isString } from '@sniptt/guards';
-import { type CSSProperties, useState } from 'react';
+import {
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  useState,
+} from 'react';
 import { Link } from 'react-router-dom';
 import { AppPath } from 'twenty-shared/types';
 import { getAppPath } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 const CHECK_COLUMN_WIDTH = 44;
+const MIN_COLUMN_WIDTH = 80;
 
 export type RoboostListSort = { fieldName: string; direction: 'asc' | 'desc' };
 
@@ -36,6 +41,7 @@ type RoboostListTableProps = {
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
   onMoveColumn: (fromIndex: number, toIndex: number) => void;
+  onResizeColumn: (fieldId: string, size: number) => void;
   onToggleColumn: (fieldId: string) => void;
   onSaved: () => void;
   isLoading: boolean;
@@ -58,6 +64,7 @@ export const RoboostListTable = ({
   selectedIds,
   onSelectionChange,
   onMoveColumn,
+  onResizeColumn,
   onToggleColumn,
   onSaved,
   isLoading,
@@ -65,6 +72,44 @@ export const RoboostListTable = ({
   const { t } = useLingui();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const [resizing, setResizing] = useState<{
+    fieldId: string;
+    size: number;
+  } | null>(null);
+
+  const sizeOf = (column: RoboostListColumn) =>
+    resizing?.fieldId === column.field.id ? resizing.size : column.size;
+
+  // Width follows the pointer while dragging and lands in the view's unsaved changes on release
+  const startResize = (
+    event: ReactPointerEvent<HTMLSpanElement>,
+    column: RoboostListColumn,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startSize = column.size;
+    let latestSize = startSize;
+
+    const move = (moveEvent: PointerEvent) => {
+      latestSize = Math.max(
+        MIN_COLUMN_WIDTH,
+        Math.round(startSize + moveEvent.clientX - startX),
+      );
+      setResizing({ fieldId: column.field.id, size: latestSize });
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+      setResizing(null);
+      if (latestSize !== startSize) {
+        onResizeColumn(column.field.id, latestSize);
+      }
+    };
+
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+  };
   const labelFieldName = getRoboostLabelIdentifierFieldName(objectMetadataItem);
 
   const recordIds = records.map((record) => record.id);
@@ -73,16 +118,19 @@ export const RoboostListTable = ({
   const isSomeSelected = recordIds.some((id) => selectedIds.includes(id));
 
   const getStickyStyle = (columnIndex: number): CSSProperties | undefined => {
+    const width = sizeOf(columns[columnIndex]);
+    const sizeStyle = { width, minWidth: width, maxWidth: width };
+
     if (columnIndex >= frozenCount) {
-      return { minWidth: columns[columnIndex].size };
+      return sizeStyle;
     }
     const left =
       CHECK_COLUMN_WIDTH +
       columns
         .slice(0, columnIndex)
-        .reduce((sum, column) => sum + column.size, 0);
+        .reduce((sum, column) => sum + sizeOf(column), 0);
 
-    return { left, minWidth: columns[columnIndex].size };
+    return { left, ...sizeStyle };
   };
 
   const toggleRow = (id: string) =>
@@ -184,6 +232,19 @@ export const RoboostListTable = ({
                       </span>
                     )}
                   </span>
+                  <span
+                    className="rb-col-resize"
+                    role="separator"
+                    aria-orientation="vertical"
+                    aria-label={t`Resize ${column.field.label}`}
+                    draggable={false}
+                    onClick={(event) => event.stopPropagation()}
+                    onDragStart={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }}
+                    onPointerDown={(event) => startResize(event, column)}
+                  />
                 </th>
               );
             })}

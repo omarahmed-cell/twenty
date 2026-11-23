@@ -422,3 +422,41 @@
   gap: 6px;
   padding: 0 8px;
 }
+
+/* Email bodies rebuilt from HTML: keep the structure, let the card set fonts and colours */
+.rb-emailc-html {
+  overflow-x: auto;
+}
+.rb-emailc-html div,
+.rb-emailc-html p {
+  margin: 0 0 6px;
+}
+.rb-emailc-html table {
+  border-collapse: collapse;
+  max-width: 100%;
+}
+.rb-emailc-html td,
+.rb-emailc-html th {
+  padding: 2px 6px 2px 0;
+  vertical-align: top;
+}
+.rb-emailc-html img {
+  height: auto;
+  max-width: 100%;
+}
+.rb-emailc-html h1,
+.rb-emailc-html h2,
+.rb-emailc-html h3 {
+  font: 600 15px/21px var(--font-sans);
+  margin: 4px 0;
+}
+.rb-emailc-html blockquote {
+  border-left: 3px solid var(--border);
+  margin: 6px 0;
+  padding-left: 10px;
+}
+.rb-emailc-html hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 10px 0;
+}

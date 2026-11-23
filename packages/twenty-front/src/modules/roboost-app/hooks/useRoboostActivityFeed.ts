@@ -75,6 +75,13 @@ export const useRoboostActivityFeed = ({
       : (taskStatusOptions.find((option) => option.value === status)?.label ??
         status);
 
+  // bodyHtml is a workspace field holding the original HTML (HubSpot migration); not every workspace has it
+  const hasEmailHtml =
+    objectMetadataItems
+      .find((item) => item.nameSingular === CoreObjectNameSingular.Email)
+      ?.fields.some((field) => field.name === 'bodyHtml' && field.isActive) ===
+    true;
+
   const emails = useRoboostTargetedRecords({
     ...target,
     junctionObjectNameSingular: CoreObjectNameSingular.EmailTarget,
@@ -84,6 +91,7 @@ export const useRoboostActivityFeed = ({
       subject: true,
       bodyPreview: true,
       bodyV2: true,
+      ...(hasEmailHtml ? { bodyHtml: true } : {}),
       direction: true,
       from: true,
       to: true,
@@ -206,6 +214,7 @@ export const useRoboostActivityFeed = ({
       subject: asString(record.subject),
       bodyPreview: asString(record.bodyPreview),
       bodyMarkdown: getMarkdown(record.bodyV2),
+      bodyHtml: asString(record.bodyHtml),
       direction: asString(record.direction),
       from: asString(record.from),
       to: asString(record.to),

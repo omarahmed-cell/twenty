@@ -3,6 +3,7 @@ import {
   parseRoboostEmailAddresses,
   type RoboostEmailAddress,
 } from '@/roboost-app/timeline/utils/parseRoboostEmailAddresses';
+import { renderRoboostEmailHtml } from '@/roboost-app/timeline/utils/renderRoboostEmailHtml';
 import { renderRoboostEmailText } from '@/roboost-app/timeline/utils/renderRoboostEmailText';
 import { splitRoboostEmailBody } from '@/roboost-app/timeline/utils/splitRoboostEmailBody';
 import { type RoboostFeedEmail } from '@/roboost-app/types/RoboostFeedItem';
@@ -10,6 +11,7 @@ import { formatRoboostDateTime } from '@/roboost-app/utils/formatRoboostDateTime
 import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
+import { isNonEmptyString } from '@sniptt/guards';
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
@@ -77,6 +79,18 @@ export const RoboostEmailItemCard = ({
   const { main, quoted } = splitRoboostEmailBody(
     email.bodyMarkdown ?? email.bodyPreview ?? '',
   );
+  const html =
+    isExpanded && isNonEmptyString(email.bodyHtml)
+      ? renderRoboostEmailHtml(email.bodyHtml)
+      : null;
+  const mainContent =
+    html?.main ?? (main === '' ? null : renderRoboostEmailText(main));
+  const quotedContent =
+    html !== null
+      ? html.quoted
+      : quoted === ''
+        ? null
+        : renderRoboostEmailText(quoted);
   const otherThreadEmails = thread.filter((item) => item.id !== email.id);
   const toggle = () => onToggleExpanded(!isExpanded);
   const isOutgoing = email.direction !== 'INCOMING';
@@ -159,15 +173,23 @@ export const RoboostEmailItemCard = ({
       )}
       {isExpanded && (
         <div className="rb-emailc-body">
-          {main === '' ? (
+          {mainContent === null ? (
             <span className="rb-muted">{t`This email has no body.`}</span>
           ) : (
-            renderRoboostEmailText(main)
+            <div className={html !== null ? 'rb-emailc-html' : undefined}>
+              {mainContent}
+            </div>
           )}
-          {quoted !== '' &&
+          {quotedContent !== null &&
             (showQuoted ? (
-              <div className="rb-emailc-quoted">
-                {renderRoboostEmailText(quoted)}
+              <div
+                className={
+                  html !== null
+                    ? 'rb-emailc-quoted rb-emailc-html'
+                    : 'rb-emailc-quoted'
+                }
+              >
+                {quotedContent}
               </div>
             ) : (
               <button

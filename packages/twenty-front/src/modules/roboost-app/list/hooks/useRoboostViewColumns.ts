@@ -30,7 +30,8 @@ export const isRoboostListableField = (field: FieldMetadataItem) =>
   field.name !== 'id' &&
   field.name !== 'deletedAt';
 
-// Columns, order and visibility live in the view's own fields, so the classic table shows the same set
+// Columns, order, visibility and width live in the view's own fields, so the classic table shows the same set.
+// Changes stay a draft (part of the view's unsaved changes) until saveColumns.
 export const useRoboostViewColumns = ({
   view,
   objectMetadataItem,
@@ -41,6 +42,10 @@ export const useRoboostViewColumns = ({
   const { performViewFieldApiCreate, performViewFieldApiUpdate } =
     usePerformViewFieldApiPersist();
   const [isSaving, setIsSaving] = useState(false);
+  const [draft, setDraft] = useState<{
+    viewId: string;
+    columns: { fieldId: string; size: number }[];
+  } | null>(null);
 
   const fieldsById = new Map(
     objectMetadataItem.fields.map((field) => [field.id, field]),
@@ -71,7 +76,7 @@ export const useRoboostViewColumns = ({
     viewColumns.length > 0 ? viewColumns : fallbackColumns;
 
   // The record name always leads, as in the design
-  const columns = isDefined(labelField)
+  const savedColumns = isDefined(labelField)
     ? [
         unorderedColumns.find(
           (column) => column.field.id === labelField.id,
@@ -85,13 +90,50 @@ export const useRoboostViewColumns = ({
       ]
     : unorderedColumns;
 
-  const applyColumns = async (orderedFieldIds: string[]) => {
-    if (!isDefined(view)) {
+  const draftColumns =
+    isDefined(draft) && draft.viewId === view?.id
+      ? draft.columns
+          .map(({ fieldId, size }) => {
+            const field = fieldsById.get(fieldId);
+
+            return isDefined(field) ? { field, size } : undefined;
+          })
+          .filter(isDefined)
+      : undefined;
+  const columns = draftColumns ?? savedColumns;
+
+  const toDraftColumns = (list: RoboostListColumn[]) =>
+    list.map((column) => ({ fieldId: column.field.id, size: column.size }));
+  const isDirty =
+    isDefined(draftColumns) &&
+    JSON.stringify(toDraftColumns(draftColumns)) !==
+      JSON.stringify(toDraftColumns(savedColumns));
+
+  const updateDraft = (next: { fieldId: string; size: number }[]) => {
+    if (isDefined(view)) {
+      setDraft({ viewId: view.id, columns: next });
+    }
+  };
+
+  const sizeOf = (fieldId: string) =>
+    columns.find((column) => column.field.id === fieldId)?.size ??
+    DEFAULT_COLUMN_SIZE;
+
+  const setColumnOrder = (orderedFieldIds: string[]) =>
+    updateDraft(
+      orderedFieldIds.map((fieldId) => ({ fieldId, size: sizeOf(fieldId) })),
+    );
+
+  // Writes the draft to the view's fields; nothing reaches the view until Save
+  const saveColumns = async () => {
+    if (!isDefined(view) || !isDefined(draftColumns)) {
       return;
     }
     setIsSaving(true);
 
     try {
+      const nextColumns = toDraftColumns(draftColumns);
+      const orderedFieldIds = nextColumns.map(({ fieldId }) => fieldId);
       const viewFieldByFieldId = new Map(
         view.viewFields.map((viewField) => [
           viewField.fieldMetadataId,
@@ -104,10 +146,13 @@ export const useRoboostViewColumns = ({
             viewField.fieldMetadataId,
           );
           const isVisible = nextPosition !== -1;
+          const nextSize = nextColumns[nextPosition]?.size;
 
           if (
             viewField.isVisible === isVisible &&
-            (!isVisible || viewField.position === nextPosition)
+            (!isVisible ||
+              (viewField.position === nextPosition &&
+                viewField.size === nextSize))
           ) {
             return undefined;
           }
@@ -116,15 +161,15 @@ export const useRoboostViewColumns = ({
             input: {
               id: viewField.id,
               update: isVisible
-                ? { isVisible: true, position: nextPosition }
+                ? { isVisible: true, position: nextPosition, size: nextSize }
                 : { isVisible: false },
             },
           };
         })
         .filter(isDefined);
 
-      const creations = orderedFieldIds
-        .map((fieldId, position) =>
+      const creations = nextColumns
+        .map(({ fieldId, size }, position) =>
           viewFieldByFieldId.has(fieldId)
             ? undefined
             : {
@@ -132,7 +177,7 @@ export const useRoboostViewColumns = ({
                 viewId: view.id,
                 isVisible: true,
                 position,
-                size: DEFAULT_COLUMN_SIZE,
+                size,
               },
         )
         .filter(isDefined);
@@ -143,6 +188,7 @@ export const useRoboostViewColumns = ({
       if (creations.length > 0) {
         await performViewFieldApiCreate({ inputs: creations });
       }
+      setDraft(null);
     } finally {
       setIsSaving(false);
     }
@@ -153,17 +199,26 @@ export const useRoboostViewColumns = ({
   return {
     columns,
     isSaving,
-    applyColumns,
-    addColumn: (fieldId: string) => applyColumns([...columnFieldIds, fieldId]),
+    isDirty,
+    saveColumns,
+    resetColumns: () => setDraft(null),
+    applyColumns: setColumnOrder,
+    addColumn: (fieldId: string) =>
+      setColumnOrder([...columnFieldIds, fieldId]),
     removeColumn: (fieldId: string) =>
-      applyColumns(columnFieldIds.filter((id) => id !== fieldId)),
+      setColumnOrder(columnFieldIds.filter((id) => id !== fieldId)),
+    resizeColumn: (fieldId: string, size: number) =>
+      updateDraft(
+        toDraftColumns(columns).map((column) =>
+          column.fieldId === fieldId ? { ...column, size } : column,
+        ),
+      ),
     moveColumn: (fromIndex: number, toIndex: number) => {
       const next = [...columnFieldIds];
       const [moved] = next.splice(fromIndex, 1);
 
       next.splice(toIndex, 0, moved);
-
-      return applyColumns(next);
+      setColumnOrder(next);
     },
   };
 };
