@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { type ObjectRecordBaseEvent } from 'twenty-shared/database-events';
-import { type ObjectRecord } from 'twenty-shared/types';
+import { type ActorMetadata, type ObjectRecord } from 'twenty-shared/types';
 import { isNonEmptyString } from '@sniptt/guards';
 import { fromArrayToValuesByKeyRecord, isDefined } from 'twenty-shared/utils';
 import { In } from 'typeorm';
@@ -54,6 +54,22 @@ const keepDiffOnly = (
   properties: ObjectRecordBaseEvent['properties'],
 ): Pick<ObjectRecordBaseEvent['properties'], 'diff'> =>
   hasNonEmptyDiff(properties) ? { diff: properties.diff } : {};
+
+// Field history shows who or what made each change (member, workflow, import, API)
+const keepDiffAndActor = (
+  properties: ObjectRecordBaseEvent['properties'],
+): Pick<ObjectRecordBaseEvent['properties'], 'diff'> & {
+  updatedBy?: ActorMetadata;
+} => {
+  const updatedBy = (
+    properties.after as { updatedBy?: ActorMetadata } | undefined
+  )?.updatedBy;
+
+  return {
+    ...keepDiffOnly(properties),
+    ...(isDefined(updatedBy) && { updatedBy }),
+  };
+};
 
 const resolveEventRecordForRuleAction = ({
   event,
@@ -285,7 +301,7 @@ export class TimelineActivityService {
     if (rule.targetShape.kind === 'SELF') {
       return matchingEvents.map((event) => {
         const properties =
-          ruleAction === 'updated' ? keepDiffOnly(event.properties) : {};
+          ruleAction === 'updated' ? keepDiffAndActor(event.properties) : {};
 
         return {
           timelineActivityTypeId: timelineActivityType.id,

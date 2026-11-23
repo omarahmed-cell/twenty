@@ -422,3 +422,182 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Side panel body + field history ("Details") */
+.rb-spanel {
+  max-width: 96vw;
+}
+.rb-spanel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 20px 24px;
+}
+.rb-history {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rb-history-field {
+  color: var(--text);
+  font: 600 18px/24px var(--font-display);
+}
+.rb-history-intro {
+  color: var(--text-secondary);
+  font: 400 14px/20px var(--font-sans);
+  margin: 0;
+}
+.rb-history-search {
+  max-width: 280px;
+}
+.rb-history-filters {
+  display: flex;
+  gap: 18px;
+}
+.rb-history-filter {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  font: 400 14px/20px var(--font-sans);
+  gap: 6px;
+  padding: 4px 0;
+}
+.rb-history-filter-label {
+  color: var(--text-secondary);
+}
+.rb-history-range {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+.rb-history-table {
+  border-collapse: collapse;
+  font: 400 14px/20px var(--font-sans);
+  table-layout: fixed;
+  width: 100%;
+}
+.rb-history-table th {
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 10px 12px;
+  text-align: left;
+}
+.rb-history-table td {
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text);
+  overflow: hidden;
+  padding: 14px 12px;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+.rb-history-table th:nth-child(2),
+.rb-history-table td:nth-child(2) {
+  width: 150px;
+}
+.rb-history-table th:nth-child(3),
+.rb-history-table td:nth-child(3) {
+  width: 190px;
+}
+.rb-history-date {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.rb-history-source {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rb-history-link {
+  align-items: center;
+  color: var(--accent-text);
+  display: inline-flex;
+  font-weight: 600;
+  gap: 4px;
+  max-width: 100%;
+  text-decoration: none;
+}
+.rb-history-empty {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 16px 12px;
+}
+.rb-history-more {
+  align-self: flex-start;
+}
+
+/* Property rows: whole row edits, history + copy on the label line, caret on hover */
+.rb-prop {
+  border-radius: var(--radius-md);
+  margin: 0 -8px;
+  padding: 6px 8px;
+}
+.rb-prop.is-editable {
+  cursor: pointer;
+}
+.rb-prop.is-editable:hover:not(.is-editing) {
+  background: var(--surface-hover);
+}
+.rb-prop.is-editing {
+  cursor: default;
+}
+.rb-prop-head {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  min-height: 18px;
+}
+.rb-prop-head .rb-prop-label {
+  flex: 1;
+  min-width: 0;
+}
+.rb-prop-tools {
+  display: inline-flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+.rb-prop:hover .rb-prop-tools,
+.rb-prop-tools:focus-within {
+  opacity: 1;
+}
+.rb-prop-tool {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+.rb-prop-tool:hover {
+  background: var(--surface-active);
+  color: var(--text);
+}
+.rb-prop-value {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+.rb-prop-value > .rb-cell,
+.rb-prop-value > .rb-cell-editor {
+  flex: 1;
+  min-width: 0;
+}
+.rb-prop-caret {
+  color: var(--text-secondary);
+  flex: none;
+  opacity: 0;
+}
+.rb-prop:hover .rb-prop-caret {
+  opacity: 1;
+}

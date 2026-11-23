@@ -18,6 +18,7 @@ import {
   buildTimelineActivityMergeKey,
   buildTimelineActivityMergeKeyCandidates,
 } from 'src/modules/timeline/utils/build-timeline-activity-merge-key.util';
+import { getTimelineActivityActorKey } from 'src/modules/timeline/utils/get-timeline-activity-actor-key.util';
 import { parseLinkedTimelineActivityHappensAt } from 'src/modules/timeline/utils/resolve-timeline-activity-happens-at.util';
 import { buildTimelineActivityRelatedMorphFieldMetadataName } from 'src/modules/timeline/utils/timeline-activity-related-morph-field-metadata-name-builder.util';
 
@@ -232,8 +233,11 @@ export class TimelineActivityRepository {
                 )
                 .find(
                   (timelineActivity) =>
-                    !isDefined(payload.linkedRecordId) ||
-                    timelineActivity.linkedRecordId === payload.linkedRecordId,
+                    (!isDefined(payload.linkedRecordId) ||
+                      timelineActivity.linkedRecordId ===
+                        payload.linkedRecordId) &&
+                    getTimelineActivityActorKey(timelineActivity.properties) ===
+                      getTimelineActivityActorKey(payload.properties),
                 );
 
             if (isDefined(recentTimelineActivity)) {

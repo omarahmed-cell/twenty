@@ -1,6 +1,6 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
-import { RoboostListEditableCell } from '@/roboost-app/list/components/RoboostListEditableCell';
+import { RoboostPropertyRow } from '@/roboost-app/record/components/RoboostPropertyRow';
 import { RoboostRecordContainer } from '@/roboost-app/record/components/RoboostRecordContainer';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
@@ -89,20 +89,14 @@ export const RoboostPropertyGroupContainer = ({
     >
       <div className="rb-prop1">
         {fields.map((field) => (
-          <div key={field.id} className="rb-prop">
-            <div className="rb-prop-label" title={field.label}>
-              {field.label}
-            </div>
-            <div className="rb-prop-value">
-              <RoboostListEditableCell
-                field={field}
-                record={record}
-                objectMetadataItem={objectMetadataItem}
-                objectMetadataItems={objectMetadataItems}
-                onSaved={onSaved}
-              />
-            </div>
-          </div>
+          <RoboostPropertyRow
+            key={field.id}
+            field={field}
+            record={record}
+            objectMetadataItem={objectMetadataItem}
+            objectMetadataItems={objectMetadataItems}
+            onSaved={onSaved}
+          />
         ))}
       </div>
     </RoboostRecordContainer>

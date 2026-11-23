@@ -10,4 +10,5 @@ export type WorkflowExecutionContext = {
   rolePermissionConfig: RolePermissionConfig;
   authContext: WorkspaceAuthContext;
   application: FlatApplication | null;
+  workflowRun?: { id: string; workflowId: string | null };
 };

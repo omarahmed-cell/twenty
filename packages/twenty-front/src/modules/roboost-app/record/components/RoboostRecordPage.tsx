@@ -34,9 +34,7 @@ import {
 } from '@/roboost-app/record/hooks/useRoboostRecordLayout';
 import { roboostRecordLeftPanelCollapsedState } from '@/roboost-app/states/roboostRecordLeftPanelCollapsedState';
 import { roboostRecordRightPanelCollapsedState } from '@/roboost-app/states/roboostRecordRightPanelCollapsedState';
-import { formatRoboostFieldValue } from '@/roboost-app/utils/formatRoboostFieldValue';
 import { getRoboostAvatarTone } from '@/roboost-app/utils/getRoboostAvatarTone';
-import { getRoboostDomainLabel } from '@/roboost-app/utils/getRoboostDomainLabel';
 import {
   getRoboostPersonName,
   type RoboostFullName,
@@ -55,51 +53,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
-import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
+import { RelationType } from '~/generated-metadata/graphql';
 
 const OWNER_FIELD_NAMES = ['accountOwner', 'owner', 'assignee', 'sdrOwner'];
 const NARROW_VIEWPORT_WIDTH = 1340;
 
 type MemberRecord = { id: string; name?: RoboostFullName; __typename: string };
 type LoadedRecord = Record<string, unknown> & { id: string };
-
-const getKeyLine = (
-  objectMetadataItem: EnrichedObjectMetadataItem,
-  record: LoadedRecord,
-): { label: string; href?: string } | null => {
-  const findField = (name: string) =>
-    objectMetadataItem.fields.find(
-      (field) => field.name === name && field.isActive,
-    );
-  const domainField = findField('domainName');
-  const domainUrl = (record.domainName as { primaryLinkUrl?: string } | null)
-    ?.primaryLinkUrl;
-
-  if (isDefined(domainField) && isNonEmptyString(domainUrl)) {
-    return {
-      label: getRoboostDomainLabel(domainUrl) ?? domainUrl,
-      href: domainUrl.startsWith('http') ? domainUrl : `https://${domainUrl}`,
-    };
-  }
-  const email = (record.emails as { primaryEmail?: string } | null)
-    ?.primaryEmail;
-
-  if (isNonEmptyString(email)) {
-    return { label: email, href: `mailto:${email}` };
-  }
-  for (const name of ['jobTitle', 'amount', 'stage', 'status']) {
-    const field = findField(name);
-    const value = isDefined(field)
-      ? formatRoboostFieldValue(field, record[name])
-      : '';
-
-    if (isNonEmptyString(value) && value !== '—') {
-      return { label: value };
-    }
-  }
-
-  return null;
-};
 
 type RoboostRecordPageProps = {
   objectNameSingular: string;
@@ -262,17 +222,7 @@ const RoboostRecordPageContent = ({
   const recordName =
     getRoboostRecordLabel(loadedRecord, objectMetadataItem) ||
     t`Untitled ${objectMetadataItem.labelSingular.toLowerCase()}`;
-  const keyLine = getKeyLine(objectMetadataItem, loadedRecord);
-  const ownerValue = isDefined(ownerField)
-    ? (loadedRecord[ownerField.name] as { name?: RoboostFullName } | null)
-    : null;
-  const ownerName = getRoboostPersonName(ownerValue?.name);
   const avatarUrl = loadedRecord.avatarUrl;
-  const isPersonLike = activeFields.some(
-    (field) =>
-      field.name === labelFieldName &&
-      field.type === FieldMetadataType.FULL_NAME,
-  );
 
   const isNarrow =
     typeof window !== 'undefined' && window.innerWidth < NARROW_VIEWPORT_WIDTH;
@@ -392,25 +342,6 @@ const RoboostRecordPageContent = ({
             <div className="rb-tb-name" title={recordName}>
               {recordName}
             </div>
-            {isDefined(keyLine) &&
-              (isDefined(keyLine.href) ? (
-                <a
-                  className="rb-tb-key"
-                  href={keyLine.href}
-                  target={isPersonLike ? undefined : '_blank'}
-                  rel="noreferrer"
-                >
-                  {keyLine.label}
-                </a>
-              ) : (
-                <span className="rb-tb-key is-plain">{keyLine.label}</span>
-              ))}
-            {isDefined(ownerField) && (
-              <div className="rb-tb-owner">
-                <span className="rb-tb-owner-label">{ownerField.label} · </span>
-                {isNonEmptyString(ownerName) ? ownerName : t`No owner`}
-              </div>
-            )}
           </div>
         </div>
         <RoboostRecordQuickActions

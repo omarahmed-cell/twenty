@@ -23,6 +23,8 @@ export type RoboostFieldInputProps = {
   ) => void;
   placeholder?: string;
   invalid?: boolean;
+  // Opens the dropdown straight away when the editor appears (record properties, table cells)
+  autoOpen?: boolean;
 };
 
 const toDateInput = (value: unknown, withTime: boolean) => {
@@ -50,6 +52,7 @@ export const RoboostFieldInput = ({
   onChange,
   placeholder,
   invalid,
+  autoOpen = false,
 }: RoboostFieldInputProps) => {
   const { t } = useLingui();
   const { objectMetadataItems } = useObjectMetadataItems();
@@ -97,6 +100,7 @@ export const RoboostFieldInput = ({
       return (
         <Select
           aria-label={field.label}
+          autoOpen={autoOpen}
           style={{ width: '100%' }}
           value={isString(value) ? value : ''}
           placeholder={placeholder ?? t`Select…`}
@@ -313,6 +317,7 @@ export const RoboostFieldInput = ({
 
       return (
         <RoboostRecordPicker
+          autoOpen={autoOpen}
           objectNameSingular={targetObjectNameSingular}
           selectedLabel={
             isDefined(relatedRecord)

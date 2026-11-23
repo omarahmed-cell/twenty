@@ -11,7 +11,7 @@ import { useRoboostCloseOnOutsideScroll } from '@/roboost-ui/hooks/useRoboostClo
 import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverPosition';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString, isString } from '@sniptt/guards';
-import { type FocusEvent, useRef, useState } from 'react';
+import { type FocusEvent, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { type RecordGqlOperationFilter } from 'twenty-shared/types';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
@@ -24,6 +24,7 @@ type RoboostRecordPickerProps = {
   onSelect: (record: { id: string; label: string } | null) => void;
   isClearable?: boolean;
   isDisabled?: boolean;
+  autoOpen?: boolean;
 };
 
 const getRecordSubtitle = (record: Record<string, unknown>) => {
@@ -45,6 +46,7 @@ export const RoboostRecordPicker = ({
   onSelect,
   isClearable = true,
   isDisabled = false,
+  autoOpen = false,
 }: RoboostRecordPickerProps) => {
   const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(false);
@@ -67,6 +69,14 @@ export const RoboostRecordPicker = ({
     setSearch('');
     setIsOpen(true);
   };
+
+  // Positioning needs the trigger's rendered rect, so the first open waits for mount
+  useEffect(() => {
+    if (autoOpen && !isDisabled) {
+      open();
+    }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [debouncedSearch] = useDebounce(search, 250);
   const { objectMetadataItems } = useObjectMetadataItems();
 

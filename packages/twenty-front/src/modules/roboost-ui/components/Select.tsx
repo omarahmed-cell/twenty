@@ -5,7 +5,13 @@ import { useRoboostCloseOnOutsideScroll } from '@/roboost-ui/hooks/useRoboostClo
 import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverPosition';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import { type CSSProperties, type FocusEvent, useRef, useState } from 'react';
+import {
+  type CSSProperties,
+  type FocusEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 
 export type SelectOption = {
@@ -23,6 +29,7 @@ export type SelectProps = {
   className?: string;
   style?: CSSProperties;
   'aria-label'?: string;
+  autoOpen?: boolean;
 };
 
 export const Select = ({
@@ -34,6 +41,7 @@ export const Select = ({
   className,
   style,
   'aria-label': ariaLabel,
+  autoOpen = false,
 }: SelectProps) => {
   const { t } = useLingui();
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
@@ -41,6 +49,7 @@ export const Select = ({
   const [search, setSearch] = useState('');
   const anchorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const { position, updatePosition } = useRoboostPopoverPosition({
     anchorRef,
     matchAnchorWidth: true,
@@ -63,6 +72,15 @@ export const Select = ({
     setSearch('');
     setIsOpen(true);
   };
+
+  // Positioning needs the trigger's rendered rect, so the first open waits for mount
+  useEffect(() => {
+    if (autoOpen) {
+      open();
+      triggerRef.current?.focus();
+    }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useRoboostCloseOnOutsideScroll({
     isOpen,
@@ -98,6 +116,7 @@ export const Select = ({
       }}
     >
       <button
+        ref={triggerRef}
         type="button"
         className={cx(
           'rb-select-trigger',

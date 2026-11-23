@@ -129,6 +129,7 @@ export class WorkflowExecutionContextService {
       rolePermissionConfig,
       authContext,
       application,
+      workflowRun: { id: workflowRun.id, workflowId: workflowRun.workflowId },
     };
   }
 
