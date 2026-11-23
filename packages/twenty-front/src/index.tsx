@@ -19,6 +19,7 @@ import '@/roboost-app/styles/roboost-app.css';
 import '@/roboost-app/styles/roboost-record.css';
 import '@/roboost-app/styles/roboost-search.css';
 import '@/roboost-app/styles/roboost-activity.css';
+import '@/roboost-app/styles/roboost-meeting.css';
 import '@/roboost-app/styles/roboost-forms.css';
 import '@/roboost-app/styles/roboost-layout.css';
 import '@/roboost-app/styles/roboost-timeline.css';

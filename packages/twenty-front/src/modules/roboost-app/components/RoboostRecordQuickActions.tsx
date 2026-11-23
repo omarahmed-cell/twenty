@@ -3,6 +3,7 @@ import {
   type RoboostActivityType,
   roboostActivityComposerState,
 } from '@/roboost-app/activity/states/roboostActivityComposerState';
+import { roboostMeetingSchedulerState } from '@/roboost-app/meeting/states/roboostMeetingSchedulerState';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
 import { Icon } from '@/roboost-ui/components/Icon';
@@ -96,6 +97,19 @@ export const RoboostRecordQuickActions = ({
     roboostActivityComposerState,
   );
 
+  const setRoboostMeetingScheduler = useSetAtomState(
+    roboostMeetingSchedulerState,
+  );
+  const openMeeting = (mode: 'SCHEDULE' | 'LOG') =>
+    setRoboostMeetingScheduler({
+      mode,
+      contextTarget: {
+        objectNameSingular: targetRecord.targetObjectNameSingular,
+        recordId: targetRecord.id,
+        label: targetLabel,
+      },
+    });
+
   const openActivity = (type: RoboostActivityType) =>
     setRoboostActivityComposer({
       type,
@@ -136,12 +150,6 @@ export const RoboostRecordQuickActions = ({
       icon: 'tasks',
       onClick: () => openActivity('task'),
     },
-    {
-      key: 'meeting',
-      label: t`Meeting`,
-      icon: 'calendar',
-      onClick: () => openActivity('meeting'),
-    },
   ];
 
   return (
@@ -159,6 +167,37 @@ export const RoboostRecordQuickActions = ({
           <span>{action.label}</span>
         </StyledAction>
       ))}
+      <StyledMoreAnchor>
+        <Menu
+          entries={[
+            {
+              id: 'schedule-meeting',
+              label: t`Schedule meeting`,
+              icon: 'calendar',
+              onSelect: () => openMeeting('SCHEDULE'),
+            },
+            {
+              id: 'log-meeting',
+              label: t`Log meeting`,
+              icon: 'history',
+              onSelect: () => openMeeting('LOG'),
+            },
+          ]}
+          trigger={({ toggle, isOpen }) => (
+            <StyledAction
+              type="button"
+              aria-expanded={isOpen}
+              aria-haspopup="menu"
+              onClick={toggle}
+            >
+              <StyledActionIcon>
+                <Icon name="calendar" size={16} />
+              </StyledActionIcon>
+              <span>{t`Meeting`}</span>
+            </StyledAction>
+          )}
+        />
+      </StyledMoreAnchor>
       <StyledMoreAnchor>
         <Menu
           align="right"

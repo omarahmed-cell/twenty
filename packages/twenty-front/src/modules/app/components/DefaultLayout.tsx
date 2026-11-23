@@ -11,6 +11,7 @@ import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/provide
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { RoboostAppSideNav } from '@/roboost-app/components/RoboostAppSideNav';
 import { RoboostCreateRecordPanel } from '@/roboost-app/components/RoboostCreateRecordPanel';
+import { RoboostMeetingScheduler } from '@/roboost-app/meeting/components/RoboostMeetingScheduler';
 import { RoboostActivityComposer } from '@/roboost-app/activity/components/RoboostActivityComposer';
 import { RoboostPreferencesEffect } from '@/roboost-app/components/RoboostPreferencesEffect';
 import { RoboostSettingsSideNav } from '@/roboost-app/components/RoboostSettingsSideNav';
@@ -104,6 +105,7 @@ export const DefaultLayout = () => {
                 {isRoboostUiEnabled && <RoboostPropertiesPanel />}
                 {isRoboostUiEnabled && <RoboostFieldHistoryPanel />}
                 {isRoboostUiEnabled && <RoboostActivityComposer />}
+                {isRoboostUiEnabled && <RoboostMeetingScheduler />}
                 {isRoboostShellShown ? (
                   <AppShell
                     mode={roboostMode}
