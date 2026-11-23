@@ -65,7 +65,7 @@ describe('TimelineActivityRepository', () => {
         {
           happensAt: new Date('2026-08-23T09:00:00.000Z'),
           properties: {
-            diff: { name: { before: 'First', after: 'Second' } },
+            diff: { city: { before: null, after: 'Cairo' } },
           },
           recordId: RECORD_ID,
           workspaceMemberId: WORKSPACE_MEMBER_ID,
@@ -80,7 +80,10 @@ describe('TimelineActivityRepository', () => {
       '20202020-0000-4000-8000-000000000006',
       {
         properties: {
-          diff: { name: { before: 'Before', after: 'Second' } },
+          diff: {
+            name: { before: 'Before', after: 'First' },
+            city: { before: null, after: 'Cairo' },
+          },
         },
         workspaceMemberId: WORKSPACE_MEMBER_ID,
         timelineActivityTypeSnapshot: TIMELINE_ACTIVITY_TYPE_SNAPSHOT,
