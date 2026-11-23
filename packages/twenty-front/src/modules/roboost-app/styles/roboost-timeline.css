@@ -1,0 +1,424 @@
+/* Timeline cards that open in place (notes, calls, messages, tasks, meetings, emails) */
+.rb-actc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+}
+.rb-actc.is-pinned {
+  border-color: var(--accent-border);
+}
+.rb-actc-head {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+.rb-actc-toggle {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  height: 22px;
+  justify-content: center;
+  transform: rotate(-90deg);
+  transition: transform 0.12s ease;
+  width: 22px;
+}
+.rb-actc.is-open .rb-actc-toggle {
+  transform: none;
+}
+.rb-actc-toggle:hover {
+  background: var(--surface-hover);
+}
+.rb-actc-icon {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: none;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+.rb-tone-accent {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.rb-tone-success {
+  background: var(--success-soft);
+  color: var(--success-text);
+}
+.rb-tone-info {
+  background: var(--info-soft);
+  color: var(--info-text);
+}
+.rb-tone-warning {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+}
+.rb-tone-danger {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+.rb-tone-neutral {
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+}
+.rb-actc-title {
+  cursor: pointer;
+  flex: 1;
+  font: 400 13px/18px var(--font-sans);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-actc-title b {
+  font-weight: 600;
+}
+.rb-actc-pin {
+  color: var(--accent-text);
+  margin-right: 4px;
+  vertical-align: -1px;
+}
+.rb-actc-actions {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  font: 600 12px/16px var(--font-sans);
+  gap: 3px;
+  padding: 3px 6px;
+}
+.rb-actc-actions:hover {
+  background: var(--surface-hover);
+}
+.rb-actc-time {
+  color: var(--text-muted);
+  flex: none;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.rb-actc-preview {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: -webkit-box;
+  font-size: 13px;
+  line-height: 18px;
+  overflow: hidden;
+  padding-left: 60px;
+  white-space: pre-line;
+}
+
+/* Expanded activity */
+.rb-actx {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 0 60px;
+}
+.rb-actx-loading {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding-left: 60px;
+}
+.rb-actx-body {
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font: 400 14px/21px var(--font-sans);
+  margin: 0 -8px;
+  padding: 4px 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rb-actx-body.is-editable {
+  cursor: text;
+}
+.rb-actx-body.is-editable:hover {
+  background: var(--surface-hover);
+}
+.rb-actx-body-input {
+  font: 400 14px/21px var(--font-sans);
+  min-height: 72px;
+  padding: 8px 10px;
+  resize: vertical;
+  width: 100%;
+}
+.rb-actx-fields {
+  border-top: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 10px 18px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  padding-top: 12px;
+}
+.rb-actx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.rb-actx-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+.rb-actx-value {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  font: 600 13px/18px var(--font-sans);
+  gap: 4px;
+  margin: 0 -4px;
+  min-width: 0;
+  padding: 2px 4px;
+  text-align: left;
+}
+.rb-actx-value:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+.rb-actx-value:disabled {
+  cursor: default;
+}
+.rb-actx-save {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.rb-actx-foot {
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+}
+.rb-actx-comment,
+.rb-act-assoc-btn {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: 500 13px/18px var(--font-sans);
+  gap: 6px;
+  padding: 3px 6px;
+}
+.rb-act-assoc-btn {
+  color: var(--text);
+  font-weight: 600;
+}
+.rb-actx-comment:hover,
+.rb-act-assoc-btn:hover {
+  background: var(--surface-hover);
+}
+
+/* Associations pop-over */
+.rb-assoc-pop {
+  padding: 12px;
+  width: 380px;
+}
+.rb-assoc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rb-assoc-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+.rb-assoc-type {
+  color: var(--text-muted);
+  flex: none;
+  font-size: 12px;
+  width: 80px;
+}
+.rb-assoc-name {
+  color: var(--accent-text);
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-assoc-add {
+  border-top: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 120px 1fr;
+  margin-top: 4px;
+  padding-top: 10px;
+}
+.rb-assoc-add .rb-select-trigger {
+  min-width: 0;
+}
+
+/* Email cards */
+.rb-emailc-parties {
+  align-items: baseline;
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 13px;
+  gap: 6px;
+  line-height: 18px;
+  min-width: 0;
+  padding-left: 60px;
+}
+.rb-emailc-to {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-emailc-addr {
+  color: var(--text);
+}
+.rb-emailc-addr.is-link {
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.rb-emailc-addr.is-link:hover {
+  text-decoration: underline;
+}
+.rb-emailc-addr.is-member {
+  font-weight: 500;
+}
+.rb-emailc-arrow {
+  color: var(--text-muted);
+  flex: none;
+}
+.rb-emailc-more {
+  color: var(--text-secondary);
+  flex: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rb-emailc-track {
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 12px;
+  gap: 14px;
+  padding-left: 60px;
+}
+.rb-emailc-track span {
+  align-items: center;
+  display: inline-flex;
+  gap: 5px;
+}
+.rb-dot {
+  border-radius: 999px;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+.rb-dot-success {
+  background: var(--success);
+}
+.rb-dot-info {
+  background: var(--info);
+}
+.rb-emailc-body {
+  color: var(--text);
+  font: 400 14px/21px var(--font-sans);
+  overflow-wrap: anywhere;
+  padding: 4px 0 0 60px;
+}
+.rb-emailc-body p {
+  margin: 0 0 10px;
+}
+.rb-emailc-body a {
+  color: var(--accent-text);
+}
+.rb-emailc-link {
+  display: block;
+  font-weight: 600;
+  margin: 6px 0;
+}
+.rb-emailc-quoted {
+  border-left: 3px solid var(--border);
+  color: var(--text-secondary);
+  margin: 8px 0;
+  padding-left: 12px;
+}
+.rb-emailc-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+}
+.rb-emailc-thread li {
+  display: flex;
+  font-size: 13px;
+  gap: 10px;
+  justify-content: space-between;
+}
+.rb-emailc-thread li.is-current {
+  font-weight: 600;
+}
+
+/* Activity type filter box */
+.rb-atf {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 8px 16px 16px;
+  width: min(760px, 92vw);
+}
+.rb-atf .rb-menu-search {
+  margin: 0 -8px 4px;
+}
+.rb-atf-all {
+  padding: 6px 0 10px;
+}
+.rb-atf-cols {
+  display: grid;
+  gap: 16px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+.rb-atf-col,
+.rb-atf-types {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rb-atf-types {
+  padding-left: 22px;
+}
+
+/* All properties side panel */
+.rb-props-search {
+  margin-bottom: 12px;
+  max-width: 300px;
+}
+.rb-props-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 8px;
+}

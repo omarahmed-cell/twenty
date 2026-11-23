@@ -4,7 +4,8 @@ import { useNavigationMenuItemsData } from '@/navigation-menu-item/display/hooks
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useDeleteOneRecord } from '@/object-record/hooks/useDeleteOneRecord';
 import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
-import { RoboostAllPropertiesModal } from '@/roboost-app/record/components/RoboostAllPropertiesModal';
+import { roboostPropertiesPanelState } from '@/roboost-app/timeline/states/roboostPropertiesPanelState';
+import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { buildRoboostCloneValues } from '@/roboost-app/record/utils/buildRoboostCloneValues';
 import { Button } from '@/roboost-ui/components/Button';
 import { Icon } from '@/roboost-ui/components/Icon';
@@ -34,7 +35,6 @@ export const RoboostRecordActionsMenu = ({
   record,
   recordName,
   classicPagePath,
-  onSaved,
 }: RoboostRecordActionsMenuProps) => {
   const { t } = useLingui();
   const navigateApp = useNavigateApp();
@@ -49,7 +49,9 @@ export const RoboostRecordActionsMenu = ({
   const { createManyNavigationMenuItems } = useCreateManyNavigationMenuItems();
   const { deleteManyNavigationMenuItems } = useDeleteManyNavigationMenuItems();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
+  const setRoboostPropertiesPanel = useSetAtomState(
+    roboostPropertiesPanelState,
+  );
   const [copied, setCopied] = useState(false);
 
   const favoriteItem = navigationMenuItems.find(
@@ -123,7 +125,11 @@ export const RoboostRecordActionsMenu = ({
       id: 'all-properties',
       label: t`View all properties`,
       icon: 'list',
-      onSelect: () => setIsPropertiesOpen(true),
+      onSelect: () =>
+        setRoboostPropertiesPanel({
+          objectNameSingular: objectMetadataItem.nameSingular,
+          recordId: record.id,
+        }),
     },
     {
       id: 'property-history',
@@ -239,15 +245,6 @@ export const RoboostRecordActionsMenu = ({
           </>
         }
       />
-      {isPropertiesOpen && (
-        <RoboostAllPropertiesModal
-          objectMetadataItem={objectMetadataItem}
-          objectMetadataItems={objectMetadataItems}
-          recordId={record.id}
-          onClose={() => setIsPropertiesOpen(false)}
-          onSaved={onSaved}
-        />
-      )}
     </>
   );
 };

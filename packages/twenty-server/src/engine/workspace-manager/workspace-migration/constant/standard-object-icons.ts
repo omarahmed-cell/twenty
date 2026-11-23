@@ -44,6 +44,7 @@ export const STANDARD_OBJECT_ICONS = {
   propertyLogicRule: 'IconListCheck',
   propertyCreation: 'IconUserPlus',
   recordLayout: 'IconLayoutSidebar',
+  activityPin: 'IconPin',
   person: 'IconUser',
   service: 'IconBriefcase',
   product: 'IconPackage',

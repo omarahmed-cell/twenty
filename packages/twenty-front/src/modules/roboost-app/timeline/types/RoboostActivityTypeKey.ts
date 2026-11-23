@@ -1,0 +1,16 @@
+export type RoboostActivityTypeKey =
+  | 'calls'
+  | 'emails'
+  | 'whatsapp'
+  | 'linkedin'
+  | 'sms'
+  | 'meetings'
+  | 'notes'
+  | 'tasks'
+  | 'emailTracking'
+  | 'recordCreated'
+  | 'fieldChanges'
+  | 'stageChanges'
+  | 'workflowActivity'
+  | 'associations'
+  | 'otherUpdates';

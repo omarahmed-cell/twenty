@@ -21,6 +21,7 @@ import '@/roboost-app/styles/roboost-search.css';
 import '@/roboost-app/styles/roboost-activity.css';
 import '@/roboost-app/styles/roboost-forms.css';
 import '@/roboost-app/styles/roboost-layout.css';
+import '@/roboost-app/styles/roboost-timeline.css';
 import '@/roboost-app/styles/roboost-board.css';
 
 const renderApp = () => {

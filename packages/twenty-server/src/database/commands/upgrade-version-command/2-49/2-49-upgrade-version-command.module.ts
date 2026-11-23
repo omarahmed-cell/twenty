@@ -32,6 +32,7 @@ import { ProvisionWorkspaceMemberAccessCommand } from 'src/database/commands/upg
 import { ProvisionTaskAndNoteFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795011565106-provision-task-and-note-fields.command';
 import { ProvisionEmailRecordPageFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795091235333-provision-email-record-page-fields.command';
 import { ProvisionRecordLayoutCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795360703833-provision-record-layout.command';
+import { ProvisionActivityPinCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795388001616-provision-activity-pin.command';
 import { ProvisionEmailReplySyncCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795044442993-provision-email-reply-sync.command';
 import { ProvisionEmailTrackingCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795036985356-provision-email-tracking.command';
 import { ProvisionUnifiedEmailFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795034153621-provision-unified-email-fields.command';
@@ -89,6 +90,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionEmailReplySyncCommand,
     ProvisionEmailRecordPageFieldsCommand,
     ProvisionRecordLayoutCommand,
+    ProvisionActivityPinCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

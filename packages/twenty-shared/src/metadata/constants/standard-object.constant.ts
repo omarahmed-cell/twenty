@@ -1080,6 +1080,11 @@ export const STANDARD_OBJECTS = {
     fields: STANDARD_OBJECT_FIELDS.recordLayout,
     indexes: {},
   },
+  activityPin: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.activityPin,
+    fields: STANDARD_OBJECT_FIELDS.activityPin,
+    indexes: {},
+  },
   messageChannelMessageAssociation: {
     universalIdentifier:
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

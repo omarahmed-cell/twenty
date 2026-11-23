@@ -43,6 +43,7 @@ import { buildPropertyGroupStandardFlatFieldMetadatas } from 'src/engine/workspa
 import { buildPropertyGroupMembershipStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-group-membership-standard-flat-field-metadata.util';
 import { buildPropertyLogicRuleStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-logic-rule-standard-flat-field-metadata.util';
 import { buildRecordLayoutStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-record-layout-standard-flat-field-metadata.util';
+import { buildActivityPinStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-activity-pin-standard-flat-field-metadata.util';
 import { buildPropertyCreationStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-creation-standard-flat-field-metadata.util';
 import { buildMessageChannelMessageAssociationMessageFolderStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-channel-message-association-message-folder-standard-flat-field-metadata.util';
 import { buildMessageChannelMessageAssociationStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-channel-message-association-standard-flat-field-metadata.util';
@@ -121,6 +122,7 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   propertyLogicRule: buildPropertyLogicRuleStandardFlatFieldMetadatas,
   propertyCreation: buildPropertyCreationStandardFlatFieldMetadatas,
   recordLayout: buildRecordLayoutStandardFlatFieldMetadatas,
+  activityPin: buildActivityPinStandardFlatFieldMetadatas,
   message: buildMessageStandardFlatFieldMetadatas,
   messageChannelMessageAssociation:
     buildMessageChannelMessageAssociationStandardFlatFieldMetadatas,

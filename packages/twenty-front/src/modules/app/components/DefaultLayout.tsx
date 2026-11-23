@@ -16,6 +16,7 @@ import { RoboostPreferencesEffect } from '@/roboost-app/components/RoboostPrefer
 import { RoboostSettingsSideNav } from '@/roboost-app/components/RoboostSettingsSideNav';
 import { roboostModeState } from '@/roboost-app/states/roboostModeState';
 import { RoboostFieldHistoryPanel } from '@/roboost-app/history/components/RoboostFieldHistoryPanel';
+import { RoboostPropertiesPanel } from '@/roboost-app/timeline/components/RoboostPropertiesPanel';
 import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { RoboostTopBar } from '@/roboost-app/components/RoboostTopBar';
@@ -100,6 +101,7 @@ export const DefaultLayout = () => {
                 <KeyboardShortcutMenu />
                 {isRoboostUiEnabled && <RoboostPreferencesEffect />}
                 {isRoboostUiEnabled && <RoboostCreateRecordPanel />}
+                {isRoboostUiEnabled && <RoboostPropertiesPanel />}
                 {isRoboostUiEnabled && <RoboostFieldHistoryPanel />}
                 {isRoboostUiEnabled && <RoboostActivityComposer />}
                 {isRoboostShellShown ? (

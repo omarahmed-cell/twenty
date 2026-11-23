@@ -1,75 +1,91 @@
-import { getEmailAddressNames } from '@/activities/unified-emails/utils/getEmailAddressNames';
 import { RoboostActivityCard } from '@/roboost-app/components/RoboostActivityCard';
+import { RoboostActivityItemCard } from '@/roboost-app/timeline/components/RoboostActivityItemCard';
+import { RoboostEmailItemCard } from '@/roboost-app/timeline/components/RoboostEmailItemCard';
+import { type RoboostEmailContact } from '@/roboost-app/timeline/hooks/useRoboostEmailContacts';
 import { type RoboostFeedItem } from '@/roboost-app/types/RoboostFeedItem';
 import { formatRoboostDateTime } from '@/roboost-app/utils/formatRoboostDateTime';
-import { EmailCard } from '@/roboost-ui/components/EmailCard';
+import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
+import { type RoboostTone } from '@/roboost-ui/types/RoboostTone';
 import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
+import { type ReactNode } from 'react';
 import { isDefined } from 'twenty-shared/utils';
+
+export type RoboostFeedThreadEmail = { id: string; date: string; from: string };
 
 type RoboostFeedItemViewProps = {
   item: RoboostFeedItem;
   isExpanded: boolean;
   onToggleExpanded: (expanded: boolean) => void;
+  isPinned: boolean;
+  onTogglePin: () => void;
+  onChanged: () => void;
+  contactByEmail: Map<string, RoboostEmailContact>;
+  thread: RoboostFeedThreadEmail[];
+};
+
+const COMMUNICATION_ICON_BY_TYPE_KEY: Partial<
+  Record<RoboostFeedItem['typeKey'], RoboostIconName>
+> = {
+  whatsapp: 'whatsapp',
+  linkedin: 'linkedin',
+  sms: 'sms',
 };
 
 export const RoboostFeedItemView = ({
   item,
   isExpanded,
   onToggleExpanded,
+  isPinned,
+  onTogglePin,
+  onChanged,
+  contactByEmail,
+  thread,
 }: RoboostFeedItemViewProps) => {
   const { t } = useLingui();
   const { openRecordInSidePanel } = useOpenRecordInSidePanel();
   const time = formatRoboostDateTime(item.date);
-  const recordId = item.id.slice(item.id.indexOf('-') + 1);
-  const openInSidePanel = (objectNameSingular: string) => () =>
-    openRecordInSidePanel({ recordId, objectNameSingular });
-  const description = isNonEmptyString(item.body.trim())
-    ? item.body
-    : undefined;
+  const by = isNonEmptyString(item.ownerName)
+    ? ` ${t`by`} ${item.ownerName}`
+    : '';
+
+  const activityCard = (
+    icon: RoboostIconName,
+    tone: RoboostTone,
+    title: ReactNode,
+    cardTime: string = time,
+  ) =>
+    isDefined(item.recordId) && isDefined(item.objectNameSingular) ? (
+      <RoboostActivityItemCard
+        objectNameSingular={item.objectNameSingular}
+        recordId={item.recordId}
+        icon={icon}
+        tone={tone}
+        title={title}
+        time={cardTime}
+        preview={item.body}
+        isExpanded={isExpanded}
+        onToggleExpanded={onToggleExpanded}
+        isPinned={isPinned}
+        onTogglePin={onTogglePin}
+        onChanged={onChanged}
+      />
+    ) : null;
 
   switch (item.kind) {
-    case 'email': {
-      const email = item.email;
-
-      if (email === undefined) {
-        return null;
-      }
-      const senderName =
-        email.direction === 'INCOMING'
-          ? (getEmailAddressNames(email.from)[0] ?? '')
-          : isNonEmptyString(email.loggedByName)
-            ? email.loggedByName
-            : (getEmailAddressNames(email.from)[0] ?? '');
-      const recipients = getEmailAddressNames(email.to).join(', ');
-      const subject = item.title;
-      const body = isNonEmptyString(email.bodyMarkdown)
-        ? email.bodyMarkdown
-        : (email.bodyPreview ?? '');
-
-      return (
-        <EmailCard
-          from={{ name: senderName, tone: 'accent' }}
-          fromLabel={
-            isNonEmptyString(recipients)
-              ? `${senderName} → ${recipients}`
-              : senderName
-          }
-          to={email.to ?? undefined}
-          subject={
-            <>
-              <b>{t`Email`}</b> – {subject}
-            </>
-          }
+    case 'email':
+      return isDefined(item.email) ? (
+        <RoboostEmailItemCard
+          email={item.email}
+          subject={item.title}
           time={time}
-          snippet={email.bodyPreview ?? undefined}
-          body={body}
-          expanded={isExpanded}
-          onToggle={onToggleExpanded}
+          contactByEmail={contactByEmail}
+          thread={thread}
+          isExpanded={isExpanded}
+          onToggleExpanded={onToggleExpanded}
         />
-      );
-    }
+      ) : null;
     case 'tracking': {
       const email = item.email;
       const verb =
@@ -82,10 +98,10 @@ export const RoboostFeedItemView = ({
           icon="mail"
           tone="info"
           onOpen={
-            isDefined(item.email)
+            isDefined(email)
               ? () =>
                   openRecordInSidePanel({
-                    recordId: item.email?.id ?? '',
+                    recordId: email.id,
                     objectNameSingular: 'email',
                   })
               : undefined
@@ -101,104 +117,70 @@ export const RoboostFeedItemView = ({
       );
     }
     case 'note':
-      return (
-        <RoboostActivityCard
-          icon="note"
-          tone="accent"
-          onOpen={openInSidePanel('note')}
-          title={
-            <>
-              <b>{t`Note`}</b>
-              {isNonEmptyString(item.ownerName)
-                ? ` ${t`added by`} ${item.ownerName}`
-                : ''}
-              {isNonEmptyString(item.title) ? ` — ${item.title}` : ''}
-            </>
-          }
-          time={time}
-          description={description}
-        />
+      return activityCard(
+        'note',
+        'accent',
+        <>
+          <b>{t`Note`}</b>
+          {by}
+          {isNonEmptyString(item.title) ? ` · ${item.title}` : ''}
+        </>,
       );
     case 'task':
-      return (
-        <RoboostActivityCard
-          icon="tasks"
-          tone="neutral"
-          onOpen={openInSidePanel('task')}
-          title={
-            <>
-              <b>{t`Task`}</b> — {item.title}
-            </>
-          }
-          time={`${t`Due`} ${time}`}
-          description={[
-            isNonEmptyString(item.ownerName)
-              ? `${t`Assigned to`} ${item.ownerName}`
-              : t`Unassigned`,
-            item.meta,
-          ]
-            .filter(isNonEmptyString)
-            .join(' · ')}
-        />
+      return activityCard(
+        'tasks',
+        'neutral',
+        <>
+          <b>{t`Task`}</b> · {item.title}
+          {isNonEmptyString(item.ownerName)
+            ? ` · ${t`assigned to`} ${item.ownerName}`
+            : ''}
+        </>,
+        `${t`Due`} ${time}`,
       );
     case 'call':
-      return (
-        <RoboostActivityCard
-          icon="phone"
-          tone="success"
-          onOpen={openInSidePanel('call')}
-          title={
-            <>
-              <b>{t`Call`}</b>
-              {isNonEmptyString(item.title) ? ` — ${item.title}` : ''}
-              {isNonEmptyString(item.ownerName) ? ` · ${item.ownerName}` : ''}
-            </>
-          }
-          time={time}
-          description={[item.meta, description]
-            .filter(isNonEmptyString)
-            .join(' · ')}
-        />
+      return activityCard(
+        'phone',
+        'success',
+        <>
+          <b>
+            {t`Logged call`}
+            {isNonEmptyString(item.meta) ? ` - ${item.meta}` : ''}
+          </b>
+          {by}
+        </>,
       );
     case 'meeting':
-      return (
-        <RoboostActivityCard
-          icon="calendar"
-          tone="info"
-          onOpen={openInSidePanel('calendarEvent')}
-          title={
-            <>
-              <b>{t`Meeting`}</b> — {item.title}
-            </>
-          }
-          time={time}
-          description={[item.meta, description]
-            .filter(isNonEmptyString)
-            .join(' · ')}
-        />
+      return activityCard(
+        'calendar',
+        'info',
+        <>
+          <b>{t`Meeting`}</b> · {item.title}
+          {isNonEmptyString(item.meta) ? ` · ${item.meta}` : ''}
+        </>,
       );
     case 'communication':
+      return activityCard(
+        COMMUNICATION_ICON_BY_TYPE_KEY[item.typeKey] ?? 'whatsapp',
+        'success',
+        <>
+          <b>{item.title}</b>
+          {by}
+        </>,
+      );
+    case 'update':
       return (
         <RoboostActivityCard
-          icon={
-            item.title === t`LinkedIn`
-              ? 'linkedin'
-              : item.title === t`SMS`
-                ? 'sms'
-                : 'whatsapp'
-          }
-          tone="success"
-          onOpen={openInSidePanel('communication')}
+          icon="history"
+          tone="neutral"
           title={
             <>
               <b>{item.title}</b>
-              {isNonEmptyString(item.ownerName)
-                ? ` ${t`logged by`} ${item.ownerName}`
-                : ''}
+              {by}
             </>
           }
           time={time}
-          description={description}
+          description={item.body}
         />
       );
     default:

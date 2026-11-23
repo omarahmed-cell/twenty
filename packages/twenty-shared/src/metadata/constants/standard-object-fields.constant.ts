@@ -1693,6 +1693,23 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: '87a3d07e-3af6-422a-b406-10e2f7fbecdd',
     },
   },
+  activityPin: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.activityPin,
+    ),
+    targetObjectNameSingular: {
+      universalIdentifier: '11e1a201-a717-46e4-ae0d-9aae5b791d1d',
+    },
+    targetRecordId: {
+      universalIdentifier: '10d2f26f-072c-4757-aacb-1403cf3ce6d8',
+    },
+    activityObjectNameSingular: {
+      universalIdentifier: '17bca93d-9c29-4796-83dd-1569a7da5896',
+    },
+    activityRecordId: {
+      universalIdentifier: 'bb04abf8-a915-4096-9252-40c41ed18acc',
+    },
+  },
   messageChannelMessageAssociation: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.messageChannelMessageAssociation,

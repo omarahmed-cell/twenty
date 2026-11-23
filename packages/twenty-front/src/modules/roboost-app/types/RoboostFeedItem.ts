@@ -1,3 +1,5 @@
+import { type RoboostActivityTypeKey } from '@/roboost-app/timeline/types/RoboostActivityTypeKey';
+
 export type RoboostFeedKind =
   | 'email'
   | 'tracking'
@@ -5,7 +7,8 @@ export type RoboostFeedKind =
   | 'task'
   | 'call'
   | 'meeting'
-  | 'communication';
+  | 'communication'
+  | 'update';
 
 export type RoboostFeedEmail = {
   id: string;
@@ -15,6 +18,7 @@ export type RoboostFeedEmail = {
   direction: string | null;
   from: string | null;
   to: string | null;
+  cc: string | null;
   sentAt: string | null;
   openCount: number;
   clickCount: number;
@@ -27,6 +31,10 @@ export type RoboostFeedEmail = {
 export type RoboostFeedItem = {
   id: string;
   kind: RoboostFeedKind;
+  typeKey: RoboostActivityTypeKey;
+  // The activity's own record, for kinds that are stored as records (not tracking or updates)
+  recordId: string | null;
+  objectNameSingular: string | null;
   date: string;
   title: string;
   body: string;

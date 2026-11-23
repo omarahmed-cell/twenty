@@ -14,6 +14,8 @@ import {
   getRoboostRecordLabel,
 } from '@/roboost-app/fields/getRoboostRecordLabel';
 import { useRoboostActivityFeed } from '@/roboost-app/hooks/useRoboostActivityFeed';
+import { useRoboostActivityPins } from '@/roboost-app/timeline/hooks/useRoboostActivityPins';
+import { useRoboostTimelineUpdates } from '@/roboost-app/timeline/hooks/useRoboostTimelineUpdates';
 import { useRoboostRecordLayoutConfig } from '@/roboost-app/layout/hooks/useRoboostRecordLayoutConfig';
 import {
   getRoboostCardLogicFieldNames,
@@ -184,9 +186,24 @@ const RoboostRecordPageContent = ({
     ),
   });
 
-  const { items: feedItems, loading: feedLoading } = useRoboostActivityFeed({
+  const {
+    items: activityItems,
+    loading: feedLoading,
+    refetch: refetchFeed,
+  } = useRoboostActivityFeed({
     targetRecordId: recordId,
     targetObjectNameSingular: objectNameSingular,
+  });
+  const { items: updateItems } = useRoboostTimelineUpdates({
+    targetRecordId: recordId,
+    targetObjectNameSingular: objectNameSingular,
+  });
+  const feedItems = [...activityItems, ...updateItems].sort((first, second) =>
+    second.date.localeCompare(first.date),
+  );
+  const { isPinned, togglePin } = useRoboostActivityPins({
+    targetObjectNameSingular: objectNameSingular,
+    targetRecordId: recordId,
   });
 
   const { records: members } = useFindManyRecords<MemberRecord>({
@@ -501,6 +518,23 @@ const RoboostRecordPageContent = ({
             }}
             customizePath={recordViewSettingsPath}
             overviewSections={recordLayout.overview}
+            isPinned={(item) =>
+              isDefined(item.objectNameSingular) &&
+              isDefined(item.recordId) &&
+              isPinned(item.objectNameSingular, item.recordId)
+            }
+            onTogglePin={(item) => {
+              if (
+                isDefined(item.objectNameSingular) &&
+                isDefined(item.recordId)
+              ) {
+                togglePin(item.objectNameSingular, item.recordId);
+              }
+            }}
+            onChanged={() => {
+              refetchFeed();
+              refetch();
+            }}
             members={members.map((member) => ({
               id: member.id,
               name: getRoboostPersonName(member.name),

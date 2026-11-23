@@ -1,0 +1,1 @@
+export const ROBOOST_ACTIVITY_CARD_FIELD_LIMIT = 6;

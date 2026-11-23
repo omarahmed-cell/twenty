@@ -41,6 +41,7 @@ export enum CoreObjectNameSingular {
   PropertyLogicRule = 'propertyLogicRule',
   PropertyCreation = 'propertyCreation',
   RecordLayout = 'recordLayout',
+  ActivityPin = 'activityPin',
   Note = 'note',
   NoteTarget = 'noteTarget',
   Opportunity = 'opportunity',

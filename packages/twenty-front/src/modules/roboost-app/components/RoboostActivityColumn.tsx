@@ -1,5 +1,11 @@
 import { type RoboostLayoutOverviewSection } from '@/roboost-app/layout/types/RoboostRecordLayout';
 import { RoboostFeedItemView } from '@/roboost-app/components/RoboostFeedItemView';
+import { RoboostActivityTypeFilter } from '@/roboost-app/timeline/components/RoboostActivityTypeFilter';
+import { ROBOOST_ALL_ACTIVITY_TYPE_KEYS } from '@/roboost-app/timeline/constants/RoboostAllActivityTypeKeys';
+import { useRoboostEmailContacts } from '@/roboost-app/timeline/hooks/useRoboostEmailContacts';
+import { type RoboostActivityTypeKey } from '@/roboost-app/timeline/types/RoboostActivityTypeKey';
+import { getRoboostEmailThreadKey } from '@/roboost-app/timeline/utils/getRoboostEmailThreadKey';
+import { parseRoboostEmailAddresses } from '@/roboost-app/timeline/utils/parseRoboostEmailAddresses';
 import {
   type RoboostFeedItem,
   type RoboostFeedKind,
@@ -221,6 +227,9 @@ type RoboostActivityColumnProps = {
   customizePath: string;
   members: { id: string; name: string }[];
   overviewSections: RoboostLayoutOverviewSection[];
+  isPinned: (item: RoboostFeedItem) => boolean;
+  onTogglePin: (item: RoboostFeedItem) => void;
+  onChanged: () => void;
 };
 
 export const RoboostActivityColumn = ({
@@ -233,10 +242,15 @@ export const RoboostActivityColumn = ({
   customizePath,
   members,
   overviewSections,
+  isPinned,
+  onTogglePin,
+  onChanged,
 }: RoboostActivityColumnProps) => {
   const { t } = useLingui();
   const [search, setSearch] = useState('');
-  const [kinds, setKinds] = useState<RoboostFeedKind[]>([]);
+  const [typeKeys, setTypeKeys] = useState<RoboostActivityTypeKey[]>(
+    ROBOOST_ALL_ACTIVITY_TYPE_KEYS,
+  );
   const [dateRange, setDateRange] = useState<RoboostActivityDateRange>('any');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
@@ -245,16 +259,6 @@ export const RoboostActivityColumn = ({
   const [showCanceledMeetings, setShowCanceledMeetings] = useState(true);
   const [showCompletedTasks, setShowCompletedTasks] = useState(true);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
-
-  const kindLabels: Record<RoboostFeedKind, string> = {
-    email: t`Emails`,
-    tracking: t`Email tracking`,
-    note: t`Notes`,
-    task: t`Tasks`,
-    call: t`Calls`,
-    meeting: t`Meetings`,
-    communication: t`Messages`,
-  };
 
   const dateRangeLabels: Record<RoboostActivityDateRange, string> = {
     any: t`Any time`,
@@ -291,7 +295,7 @@ export const RoboostActivityColumn = ({
     if (subTabKinds !== null && !subTabKinds.includes(item.kind)) {
       return false;
     }
-    if (kinds.length > 0 && !kinds.includes(item.kind)) {
+    if (!typeKeys.includes(item.typeKey)) {
       return false;
     }
     if (!showTracking && item.kind === 'tracking') {
@@ -326,16 +330,43 @@ export const RoboostActivityColumn = ({
   });
 
   const expandableIds = visibleItems
-    .filter((item) => item.kind === 'email')
+    .filter((item) => item.kind !== 'update' && item.kind !== 'tracking')
     .map((item) => item.id);
   const isAnyExpanded = expandableIds.some((id) => expandedIds.includes(id));
   const hasFilters =
-    kinds.length > 0 ||
+    typeKeys.length < ROBOOST_ALL_ACTIVITY_TYPE_KEYS.length ||
     dateRange !== 'any' ||
     creatorId !== null ||
     !showTracking ||
     !showCanceledMeetings ||
     !showCompletedTasks;
+
+  const emailItems = items.filter((item) => item.kind === 'email');
+  const contactByEmail = useRoboostEmailContacts(
+    emailItems.flatMap((item) =>
+      [item.email?.from, item.email?.to, item.email?.cc].flatMap((value) =>
+        parseRoboostEmailAddresses(value).map(({ email }) => email),
+      ),
+    ),
+  );
+  const threadByKey = new Map<
+    string,
+    { id: string; date: string; from: string }[]
+  >();
+
+  for (const item of [...emailItems].reverse()) {
+    const key = getRoboostEmailThreadKey(item.title);
+    const thread = threadByKey.get(key) ?? [];
+
+    thread.push({
+      id: item.email?.id ?? item.id,
+      date: item.date,
+      from: parseRoboostEmailAddresses(item.email?.from)[0]?.name ?? '',
+    });
+    threadByKey.set(key, thread);
+  }
+
+  const pinnedItems = items.filter(isPinned);
 
   const renderFeed = (feedItems: RoboostFeedItem[]) => {
     let previousMonth = '';
@@ -353,6 +384,16 @@ export const RoboostActivityColumn = ({
               {showMonth && <StyledMonth>{month}</StyledMonth>}
               <RoboostFeedItemView
                 item={item}
+                isPinned={isPinned(item)}
+                onTogglePin={() => onTogglePin(item)}
+                onChanged={onChanged}
+                contactByEmail={contactByEmail}
+                thread={
+                  item.kind === 'email' && item.email !== undefined
+                    ? (threadByKey.get(getRoboostEmailThreadKey(item.title)) ??
+                      [])
+                    : []
+                }
                 isExpanded={expandedIds.includes(item.id)}
                 onToggleExpanded={(expanded) =>
                   setExpandedIds(
@@ -402,9 +443,12 @@ export const RoboostActivityColumn = ({
                 ) : (
                   <StyledEmpty>{t`No open tasks.`}</StyledEmpty>
                 ))}
-              {section.id === 'pinnedActivities' && (
-                <StyledEmpty>{t`No pinned activities yet.`}</StyledEmpty>
-              )}
+              {section.id === 'pinnedActivities' &&
+                (pinnedItems.length > 0 ? (
+                  renderFeed(pinnedItems)
+                ) : (
+                  <StyledEmpty>{t`No pinned activities yet.`}</StyledEmpty>
+                ))}
               {section.id === 'latestActivity' &&
                 (items.length > 0 ? (
                   renderFeed(items.slice(0, OVERVIEW_ITEM_COUNT))
@@ -449,28 +493,9 @@ export const RoboostActivityColumn = ({
             </StyledChipButton>
           </StyledTools>
           <StyledChips>
-            <FilterChip
-              label={t`Activity type`}
-              value={
-                kinds.length === 0
-                  ? undefined
-                  : kinds.map((kind) => kindLabels[kind]).join(', ')
-              }
-              isActive={kinds.length > 0}
-              keepOpenOnSelect
-              entries={(Object.keys(kindLabels) as RoboostFeedKind[]).map(
-                (kind) => ({
-                  id: kind,
-                  label: kindLabels[kind],
-                  isSelected: kinds.includes(kind),
-                  onSelect: () =>
-                    setKinds(
-                      kinds.includes(kind)
-                        ? kinds.filter((selected) => selected !== kind)
-                        : [...kinds, kind],
-                    ),
-                }),
-              )}
+            <RoboostActivityTypeFilter
+              selected={typeKeys}
+              onChange={setTypeKeys}
             />
             <FilterChip
               label={t`Activity date`}
@@ -561,7 +586,7 @@ export const RoboostActivityColumn = ({
               <StyledClearAll
                 type="button"
                 onClick={() => {
-                  setKinds([]);
+                  setTypeKeys(ROBOOST_ALL_ACTIVITY_TYPE_KEYS);
                   setDateRange('any');
                   setCustomFrom('');
                   setCustomTo('');
@@ -575,8 +600,18 @@ export const RoboostActivityColumn = ({
               </StyledClearAll>
             )}
           </StyledChips>
+          {pinnedItems.length > 0 && subTab === 'all' && (
+            <>
+              <StyledSectionTitle>{t`Pinned`}</StyledSectionTitle>
+              {renderFeed(pinnedItems)}
+            </>
+          )}
           {visibleItems.length > 0 ? (
-            renderFeed(visibleItems)
+            renderFeed(
+              subTab === 'all'
+                ? visibleItems.filter((item) => !isPinned(item))
+                : visibleItems,
+            )
           ) : (
             <StyledEmpty>
               {loading

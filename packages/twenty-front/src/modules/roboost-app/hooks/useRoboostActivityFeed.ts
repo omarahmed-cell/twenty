@@ -1,6 +1,7 @@
 import { getEmailAddressNames } from '@/activities/unified-emails/utils/getEmailAddressNames';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { useRoboostTargetedRecords } from '@/roboost-app/hooks/useRoboostTargetedRecords';
+import { type RoboostActivityTypeKey } from '@/roboost-app/timeline/types/RoboostActivityTypeKey';
 import {
   type RoboostFeedEmail,
   type RoboostFeedItem,
@@ -44,6 +45,15 @@ const getActorId = (value: unknown) =>
 
 const MEMBER_FIELDS: RecordGqlFields = { id: true, name: true };
 
+const COMMUNICATION_TYPE_KEY_BY_CHANNEL: Record<
+  string,
+  RoboostActivityTypeKey
+> = {
+  WHATSAPP: 'whatsapp',
+  LINKEDIN: 'linkedin',
+  SMS: 'sms',
+};
+
 export const useRoboostActivityFeed = ({
   targetRecordId,
   targetObjectNameSingular,
@@ -77,6 +87,7 @@ export const useRoboostActivityFeed = ({
       direction: true,
       from: true,
       to: true,
+      cc: true,
       sentAt: true,
       createdAt: true,
       openCount: true,
@@ -176,6 +187,9 @@ export const useRoboostActivityFeed = ({
     items.push({
       id: `communication-${String(record.id)}`,
       kind: 'communication',
+      typeKey: COMMUNICATION_TYPE_KEY_BY_CHANNEL[channel] ?? 'whatsapp',
+      recordId: String(record.id),
+      objectNameSingular: 'communication',
       date: asString(record.createdAt) ?? '',
       title: channelLabels[channel] ?? channel,
       body: getMarkdown(record.bodyV2),
@@ -195,6 +209,7 @@ export const useRoboostActivityFeed = ({
       direction: asString(record.direction),
       from: asString(record.from),
       to: asString(record.to),
+      cc: asString(record.cc),
       sentAt: asString(record.sentAt) ?? asString(record.createdAt),
       openCount: isNumber(record.openCount) ? record.openCount : 0,
       clickCount: isNumber(record.clickCount) ? record.clickCount : 0,
@@ -210,6 +225,9 @@ export const useRoboostActivityFeed = ({
     items.push({
       id: `email-${email.id}`,
       kind: 'email',
+      typeKey: 'emails',
+      recordId: email.id,
+      objectNameSingular: 'email',
       date: email.sentAt ?? '',
       title: subject,
       body: `${email.bodyPreview ?? ''} ${email.bodyMarkdown ?? ''}`,
@@ -240,6 +258,9 @@ export const useRoboostActivityFeed = ({
       items.push({
         id: `tracking-${email.id}`,
         kind: 'tracking',
+        typeKey: 'emailTracking',
+        recordId: null,
+        objectNameSingular: null,
         date: email.lastClickedAt ?? email.lastOpenedAt ?? email.sentAt ?? '',
         title: recipient,
         body: subject,
@@ -256,6 +277,9 @@ export const useRoboostActivityFeed = ({
     items.push({
       id: `note-${String(record.id)}`,
       kind: 'note',
+      typeKey: 'notes',
+      recordId: String(record.id),
+      objectNameSingular: 'note',
       date: asString(record.createdAt) ?? '',
       title: asString(record.title) ?? '',
       body: getMarkdown(record.bodyV2),
@@ -272,6 +296,9 @@ export const useRoboostActivityFeed = ({
     items.push({
       id: `task-${String(record.id)}`,
       kind: 'task',
+      typeKey: 'tasks',
+      recordId: String(record.id),
+      objectNameSingular: 'task',
       date: asString(record.dueAt) ?? asString(record.createdAt) ?? '',
       title: asString(record.title) ?? '',
       body: getMarkdown(record.bodyV2),
@@ -287,6 +314,9 @@ export const useRoboostActivityFeed = ({
     items.push({
       id: `call-${String(record.id)}`,
       kind: 'call',
+      typeKey: 'calls',
+      recordId: String(record.id),
+      objectNameSingular: 'call',
       date: asString(record.createdAt) ?? '',
       title: asString(record.title) ?? '',
       body: getMarkdown(record.bodyV2),
@@ -303,6 +333,9 @@ export const useRoboostActivityFeed = ({
     items.push({
       id: `meeting-${String(record.id)}`,
       kind: 'meeting',
+      typeKey: 'meetings',
+      recordId: String(record.id),
+      objectNameSingular: 'calendarEvent',
       date: asString(record.startsAt) ?? asString(record.createdAt) ?? '',
       title: asString(record.title) ?? '',
       body: asString(record.description) ?? '',
@@ -321,7 +354,15 @@ export const useRoboostActivityFeed = ({
 
   items.sort((first, second) => second.date.localeCompare(first.date));
 
+  const refetch = () =>
+    Promise.all(
+      [emails, notes, tasks, calls, meetings, communications].map((query) =>
+        query.refetch(),
+      ),
+    );
+
   return {
+    refetch,
     items: items.filter((item) => isDefined(item.date)),
     loading:
       emails.loading ||

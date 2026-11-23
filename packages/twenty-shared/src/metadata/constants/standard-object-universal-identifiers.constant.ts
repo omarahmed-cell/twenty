@@ -60,6 +60,7 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   propertyLogicRule: '82c97370-4fe4-49a9-ad8e-f9910b85273b',
   propertyCreation: 'affcb06c-a531-4034-9e3f-35ac7bc95410',
   recordLayout: '68fccb95-cd12-4bd0-b50e-aaf174ea8beb',
+  activityPin: '6916b2a6-0faa-4309-89cb-5dfc76a04935',
   messageCampaign: '238acb94-dd4c-4036-bc55-19b99d821efd',
   shortLink: '22c96608-d1b1-49a2-b328-3e738d61d82d',
   messageParticipant: '20202020-a433-4456-aa2d-fd9cb26b774a',

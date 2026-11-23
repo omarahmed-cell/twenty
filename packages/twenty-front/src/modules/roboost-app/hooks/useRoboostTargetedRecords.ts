@@ -47,7 +47,7 @@ export const useRoboostTargetedRecords = ({
   const isAvailable = isDefined(filter) && filter.or.length > 0;
 
   // A missing junction object still needs a valid object name for the hook; the read is skipped
-  const { records, loading } = useFindManyRecords<
+  const { records, loading, refetch } = useFindManyRecords<
     ObjectRecord & Record<string, unknown>
   >({
     objectNameSingular: isAvailable
@@ -75,5 +75,5 @@ export const useRoboostTargetedRecords = ({
     }
   }
 
-  return { records: [...relatedRecords.values()], loading };
+  return { records: [...relatedRecords.values()], loading, refetch };
 };
