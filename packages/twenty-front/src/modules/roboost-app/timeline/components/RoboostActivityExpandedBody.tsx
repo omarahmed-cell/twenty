@@ -19,7 +19,14 @@ import { useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { RelationType } from '~/generated-metadata/graphql';
 
-const TITLE_FIELD_NAMES = new Set(['title', 'name']);
+// Titles head the card; sync and provenance fields are bookkeeping, not part of the activity
+const HIDDEN_CARD_FIELD_NAMES = new Set([
+  'title',
+  'name',
+  'recordSource',
+  'hubspotId',
+  'hubspotHasTranscript',
+]);
 
 const getBodyText = (value: unknown) =>
   isString(value)
@@ -35,7 +42,7 @@ const pickCardFields = (
     (field) =>
       field.isActive &&
       field.name !== bodyFieldName &&
-      !TITLE_FIELD_NAMES.has(field.name) &&
+      !HIDDEN_CARD_FIELD_NAMES.has(field.name) &&
       getRoboostFieldEditKind(field) !== null &&
       (!isDefined(field.relation) ||
         field.relation.type === RelationType.MANY_TO_ONE),
