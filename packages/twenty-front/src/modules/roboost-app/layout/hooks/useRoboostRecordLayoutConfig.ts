@@ -13,6 +13,10 @@ import {
 } from '@/roboost-app/layout/states/roboostRecordLayoutsState';
 import { type RoboostRecordLayoutConfig } from '@/roboost-app/layout/types/RoboostRecordLayout';
 import {
+  getRoboostRecordViewName,
+  isRoboostDefaultRecordLayout,
+} from '@/roboost-app/layout/utils/roboostRecordViews';
+import {
   buildRoboostDefaultRecordLayout,
   resolveRoboostRecordLayout,
   type RoboostOverviewSectionTitles,
@@ -32,10 +36,12 @@ const REFRESH_INTERVAL_MILLISECONDS = 10_000;
 let lastLoadStartedAt = 0;
 const materializedObjectIds = new Set<string>();
 
-// The workspace-wide layout of each object; roleId and teamId stay empty until per-role layouts exist
+// The workspace-wide layout of each object (its Default view), or one named view when viewRecordId is given.
+// roleId and teamId stay empty until views are assigned with Teams & Roles.
 export const useRoboostRecordLayoutConfig = (
   objectMetadataItem: EnrichedObjectMetadataItem,
   objectMetadataItems: EnrichedObjectMetadataItem[],
+  viewRecordId?: string,
 ) => {
   const { t } = useLingui();
   const apolloCoreClient = useContext(ApolloCoreClientContext);
@@ -94,30 +100,40 @@ export const useRoboostRecordLayoutConfig = (
     [hasLayoutObject, apolloCoreClient, setRoboostRecordLayouts],
   );
 
-  const storedRecord = roboostRecordLayouts?.find(
+  const defaultRecord = roboostRecordLayouts?.find(
     (record) =>
       record.objectMetadataId === objectMetadataItem.id &&
-      !isDefined(record.roleId) &&
-      !isDefined(record.teamId),
+      isRoboostDefaultRecordLayout(record),
   );
+  const storedRecord = isDefined(viewRecordId)
+    ? roboostRecordLayouts?.find((record) => record.id === viewRecordId)
+    : defaultRecord;
 
   const save = useCallback(
     async (layout: RoboostRecordLayoutConfig) => {
       if (!isDefined(apolloCoreClient)) {
         throw new Error('No API client');
       }
-      const currentRecord = roboostRecordLayouts?.find(
-        (record) =>
-          record.objectMetadataId === objectMetadataItem.id &&
-          !isDefined(record.roleId) &&
-          !isDefined(record.teamId),
+      const currentRecord = roboostRecordLayouts?.find((record) =>
+        isDefined(viewRecordId)
+          ? record.id === viewRecordId
+          : record.objectMetadataId === objectMetadataItem.id &&
+            isRoboostDefaultRecordLayout(record),
       );
+      const viewName = isDefined(currentRecord)
+        ? getRoboostRecordViewName(currentRecord)
+        : undefined;
       const { data } = isDefined(currentRecord)
         ? await apolloCoreClient.mutate<{
             updateRecordLayout: RoboostRecordLayoutRecord;
           }>({
             mutation: UPDATE_RECORD_LAYOUT,
-            variables: { id: currentRecord.id, data: { layout } },
+            variables: {
+              id: currentRecord.id,
+              data: {
+                layout: isDefined(viewName) ? { ...layout, viewName } : layout,
+              },
+            },
           })
         : await apolloCoreClient.mutate<{
             createRecordLayout: RoboostRecordLayoutRecord;
@@ -146,6 +162,7 @@ export const useRoboostRecordLayoutConfig = (
       roboostRecordLayouts,
       objectMetadataItem.id,
       setRoboostRecordLayouts,
+      viewRecordId,
     ],
   );
 
@@ -162,7 +179,8 @@ export const useRoboostRecordLayoutConfig = (
     if (
       !hasLayoutObject ||
       !isDefaultReady ||
-      isDefined(storedRecord) ||
+      isDefined(defaultRecord) ||
+      isDefined(viewRecordId) ||
       materializedObjectIds.has(objectMetadataItem.id)
     ) {
       return;
@@ -171,7 +189,7 @@ export const useRoboostRecordLayoutConfig = (
     save(defaultLayout).catch(() => {});
     // defaultLayout is rebuilt every render; readiness decides when it is final
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasLayoutObject, isDefaultReady, storedRecord, objectMetadataItem.id]);
+  }, [hasLayoutObject, isDefaultReady, defaultRecord, objectMetadataItem.id]);
 
   const layout = resolveRoboostRecordLayout({
     stored: storedRecord?.layout,

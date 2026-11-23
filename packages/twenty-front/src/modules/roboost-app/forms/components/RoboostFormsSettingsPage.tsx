@@ -10,7 +10,10 @@ import {
   type RoboostFormFieldConfig,
 } from '@/roboost-app/hooks/useRoboostFormFields';
 import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
+import { RoboostLayoutObjectSelect } from '@/roboost-app/layout/components/RoboostLayoutObjectSelect';
 import { Button } from '@/roboost-ui/components/Button';
+import { Checkbox } from '@/roboost-ui/components/Checkbox';
+import { Modal } from '@/roboost-ui/components/Modal';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Input } from '@/roboost-ui/components/Input';
 import { Toggle } from '@/roboost-ui/components/Toggle';
@@ -20,7 +23,7 @@ import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
 import { getRoboostFormsSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { isDefined } from 'twenty-shared/utils';
 
 const FORM_OBJECTS: { nameSingular: string; icon: RoboostIconName }[] = [
@@ -69,6 +72,7 @@ const RoboostFormEditor = ({
   );
   const [isAdding, setIsAdding] = useState(false);
   const [search, setSearch] = useState('');
+  const [pickedNames, setPickedNames] = useState<string[]>([]);
   const [draggedName, setDraggedName] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(
     'idle',
@@ -96,6 +100,20 @@ const RoboostFormEditor = ({
   const update = (nextDraft: RoboostFormFieldConfig[]) => {
     setDraft(nextDraft);
     setStatus('idle');
+  };
+
+  const closeAddFields = () => {
+    setIsAdding(false);
+    setSearch('');
+    setPickedNames([]);
+  };
+
+  const addFields = (fieldNames: string[]) => {
+    update([
+      ...draft,
+      ...fieldNames.map((fieldName) => ({ fieldName, isRequired: false })),
+    ]);
+    closeAddFields();
   };
 
   const moveTo = (targetName: string) => {
@@ -138,7 +156,7 @@ const RoboostFormEditor = ({
 
   return (
     <>
-      <section className="rb-forms-card">
+      <section className="rb-forms-card rb-forms-fields-panel">
         <div className="rb-forms-card-head">
           {t`${objectMetadataItem.labelPlural} · create form fields`}
         </div>
@@ -223,8 +241,30 @@ const RoboostFormEditor = ({
               {t`Add field`}
             </button>
             {isAdding && (
-              <div className="rb-addpop rb-forms-addpop">
-                <div className="rb-ap-search">
+              <Modal
+                title={t`Add fields`}
+                subtitle={t`Click a field to add it, or tick several and press Add.`}
+                width={480}
+                className="rb-forms-addmodal"
+                onClose={closeAddFields}
+                footer={
+                  <>
+                    <Button variant="secondary" onClick={closeAddFields}>
+                      {t`Cancel`}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      disabled={pickedNames.length === 0}
+                      onClick={() => addFields(pickedNames)}
+                    >
+                      {pickedNames.length > 0
+                        ? t`Add ${pickedNames.length}`
+                        : t`Add`}
+                    </Button>
+                  </>
+                }
+              >
+                <div className="rb-forms-addmodal-search">
                   <Input
                     variant="search"
                     size="sm"
@@ -234,38 +274,52 @@ const RoboostFormEditor = ({
                     onChange={(event) => setSearch(event.target.value)}
                   />
                 </div>
-                <div className="rb-ap-list">
+                <div className="rb-forms-addmodal-list">
                   {addableFields.map((field) => {
                     const kind = getRoboostFieldEditKind(field);
+                    const isPicked = pickedNames.includes(field.name);
 
                     return (
-                      <button
+                      <div
                         key={field.id}
-                        type="button"
-                        className="rb-ap-item rb-forms-additem"
-                        onClick={() => {
-                          update([
-                            ...draft,
-                            { fieldName: field.name, isRequired: false },
-                          ]);
-                          setIsAdding(false);
-                          setSearch('');
-                        }}
+                        className={cx(
+                          'rb-forms-addmodal-item',
+                          isPicked && 'is-picked',
+                        )}
                       >
-                        <span>{field.label}</span>
-                        <span className="rb-forms-kind">
-                          {isDefined(kind)
-                            ? (FIELD_KIND_LABELS[kind] ?? kind)
-                            : ''}
-                        </span>
-                      </button>
+                        <Checkbox
+                          aria-label={t`Select ${field.label}`}
+                          checked={isPicked}
+                          onChange={(checked) =>
+                            setPickedNames(
+                              checked
+                                ? [...pickedNames, field.name]
+                                : pickedNames.filter(
+                                    (name) => name !== field.name,
+                                  ),
+                            )
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="rb-forms-addmodal-name"
+                          onClick={() => addFields([field.name])}
+                        >
+                          <span className="rb-truncate">{field.label}</span>
+                          <span className="rb-forms-kind">
+                            {isDefined(kind)
+                              ? (FIELD_KIND_LABELS[kind] ?? kind)
+                              : ''}
+                          </span>
+                        </button>
+                      </div>
                     );
                   })}
                   {addableFields.length === 0 && (
                     <div className="rb-forms-hint">{t`No more fields to add.`}</div>
                   )}
                 </div>
-              </div>
+              </Modal>
             )}
           </div>
         </div>
@@ -295,7 +349,7 @@ const RoboostFormEditor = ({
           )}
         </div>
       </section>
-      <section className="rb-forms-card">
+      <section className="rb-forms-card rb-forms-preview-panel">
         <div className="rb-forms-card-head">
           <span className="rb-forms-live" />
           {t`Live preview`}
@@ -362,29 +416,23 @@ export const RoboostFormsSettingsPage = () => {
       (entry) => entry.item.nameSingular === objectNameSingular,
     ) ?? formObjects[0];
 
+  const navigate = useNavigate();
+
   return (
     <>
-      <h2 className="rb-layout-subtitle">{t`Create forms`}</h2>
+      {isDefined(selected) && (
+        <RoboostLayoutObjectSelect
+          objects={formObjects.map(({ item }) => item)}
+          value={selected.item.nameSingular}
+          onChange={(nameSingular) =>
+            navigate(getRoboostFormsSettingsPath(nameSingular))
+          }
+        />
+      )}
       <p className="rb-forms-sub">
         {t`Choose which fields appear when a rep creates a record, their order, and which are required.`}
       </p>
-      <div className="rb-forms-grid">
-        <nav className="rb-forms-card rb-forms-objects" aria-label={t`Objects`}>
-          <div className="rb-cm-group">{t`Objects`}</div>
-          {formObjects.map(({ icon, item }) => (
-            <Link
-              key={item.nameSingular}
-              to={getRoboostFormsSettingsPath(item.nameSingular)}
-              className={cx(
-                'rb-forms-object',
-                item.nameSingular === selected?.item.nameSingular && 'is-on',
-              )}
-            >
-              <Icon name={icon} size={17} />
-              {item.labelPlural}
-            </Link>
-          ))}
-        </nav>
+      <div className="rb-forms-grid rb-forms-grid-split">
         {isDefined(selected) && isNonEmptyString(selected.item.id) && (
           <RoboostFormEditor
             key={selected.item.nameSingular}

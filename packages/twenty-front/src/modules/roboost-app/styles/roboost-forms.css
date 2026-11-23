@@ -193,3 +193,146 @@
     grid-column: 2;
   }
 }
+
+/* Layout tabs: "Select an object:" bar, then panels that fill the screen and scroll inside */
+.rb-layout-object {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  display: flex;
+  gap: 16px;
+  margin: 12px 0 8px;
+  padding: 16px 24px;
+}
+.rb-layout-object-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+.rb-layout-object-select {
+  width: 260px;
+}
+.rb-forms-grid.rb-forms-grid-split {
+  align-items: stretch;
+  grid-template-columns: minmax(0, 62fr) minmax(0, 38fr);
+  height: calc(100vh - 300px);
+  min-height: 440px;
+}
+.rb-forms-grid-split > .rb-forms-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.rb-forms-grid-split > .rb-forms-card > .rb-forms-card-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+@media (max-width: 1100px) {
+  .rb-forms-grid.rb-forms-grid-split {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+  .rb-forms-grid.rb-forms-grid-split > :last-child {
+    grid-column: auto;
+  }
+}
+.rb-forms-addmodal .rb-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  min-height: 0;
+}
+.rb-forms-addmodal-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+.rb-forms-addmodal-item {
+  align-items: center;
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: 8px;
+  padding: 2px 8px;
+}
+.rb-forms-addmodal-item:hover,
+.rb-forms-addmodal-item.is-picked {
+  background: var(--surface-hover);
+}
+.rb-forms-addmodal-name {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  font: inherit;
+  gap: 8px;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 8px 0;
+  text-align: left;
+}
+
+/* Record view tab: views table */
+.rb-rv-views {
+  padding: 16px 20px;
+}
+.rb-rv-views-bar {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.rb-rv-views-search {
+  width: 280px;
+}
+.rb-rv-views-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.rb-rv-views-table th {
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+}
+.rb-rv-views-table td {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px;
+}
+.rb-rv-views-table .rb-rv-views-actions {
+  text-align: right;
+  width: 90px;
+}
+.rb-rv-views-more {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+.rb-rv-views-more:hover {
+  color: var(--text);
+}
+.rb-rv-views-empty {
+  color: var(--text-muted);
+  text-align: center;
+}
+.rb-rv-views-note {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 12px 0 0;
+}

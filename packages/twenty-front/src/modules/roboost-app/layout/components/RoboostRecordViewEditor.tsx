@@ -50,6 +50,8 @@ type RoboostLayoutModalState =
 type RoboostRecordViewEditorProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   objectMetadataItems: EnrichedObjectMetadataItem[];
+  viewRecordId?: string;
+  viewName?: string;
 };
 
 const QUICK_ACTION_PLACEHOLDER_COUNT = 6;
@@ -67,12 +69,15 @@ const summarizeFieldNames = (
 export const RoboostRecordViewEditor = ({
   objectMetadataItem,
   objectMetadataItems,
+  viewRecordId,
+  viewName,
 }: RoboostRecordViewEditorProps) => {
   const { t } = useLingui();
   const navigate = useNavigate();
   const config = useRoboostRecordLayoutConfig(
     objectMetadataItem,
     objectMetadataItems,
+    viewRecordId,
   );
   const [history, setHistory] = useState<RoboostLayoutHistory | null>(null);
   const [middleTab, setMiddleTab] = useState<'overview' | 'activities'>(
@@ -138,7 +143,7 @@ export const RoboostRecordViewEditor = ({
 
   const exit = () => {
     setModal(null);
-    navigate(getRoboostRecordViewSettingsPath());
+    navigate(getRoboostRecordViewSettingsPath(objectMetadataItem.nameSingular));
   };
 
   const save = async (thenExit: boolean) => {
@@ -678,7 +683,7 @@ export const RoboostRecordViewEditor = ({
         <div className="rb-rve-bar-title">
           {t`${objectMetadataItem.labelSingular} record page`}
           <span className="rb-rve-bar-sep">|</span>
-          <span className="rb-rve-bar-view">{t`Default view`}</span>
+          <span className="rb-rve-bar-view">{viewName ?? t`Default view`}</span>
         </div>
         {status === 'saved' && !isDirty && (
           <span className="rb-rve-bar-status">{t`Saved`}</span>
