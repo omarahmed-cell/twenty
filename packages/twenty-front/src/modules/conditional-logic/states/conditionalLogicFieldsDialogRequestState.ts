@@ -10,6 +10,8 @@ export type ConditionalLogicFieldsDialogValues = Record<string, unknown>;
 export type ConditionalLogicFieldsDialogRequest = {
   objectNameSingular: string;
   title: string;
+  // The change that made the fields required, e.g. "Products → SIRA"
+  trigger?: string;
   confirmLabel: string;
   hint: string;
   properties: ConditionalLogicProperty[];

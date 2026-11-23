@@ -6,6 +6,7 @@ import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { RoboostBoardColumn } from '@/roboost-app/board/components/RoboostBoardColumn';
 import { type RoboostPipeline } from '@/roboost-app/board/hooks/useRoboostPipelines';
 import { getRoboostLabelIdentifierFieldName } from '@/roboost-app/fields/getRoboostRecordLabel';
+import { useRoboostRequiredFieldsCheck } from '@/roboost-app/fields/hooks/useRoboostRequiredFieldsCheck';
 import { getRoboostListRecordGqlFields } from '@/roboost-app/list/utils/getRoboostListRecordGqlFields';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { useLingui } from '@lingui/react/macro';
@@ -36,6 +37,7 @@ export const RoboostBoard = ({
   const { t } = useLingui();
   const { objectMetadataItems } = useObjectMetadataItems();
   const apolloCoreClient = useApolloCoreClient();
+  const { completeChange } = useRoboostRequiredFieldsCheck(objectMetadataItem);
   const { updateOneRecord } = useUpdateOneRecord();
   const [dragged, setDragged] = useState<{
     recordId: string;
@@ -88,10 +90,20 @@ export const RoboostBoard = ({
     setError(null);
     setIsMoving(true);
     try {
+      const input = await completeChange({
+        recordId,
+        record: { id: recordId },
+        changes: { stage: toStage },
+        pipelineKey: pipeline.key !== '' ? pipeline.key : undefined,
+      });
+
+      if (input === null) {
+        return;
+      }
       await updateOneRecord({
         objectNameSingular: objectMetadataItem.nameSingular,
         idToUpdate: recordId,
-        updateOneRecordInput: { stage: toStage },
+        updateOneRecordInput: input,
       });
     } catch (moveError) {
       setError(

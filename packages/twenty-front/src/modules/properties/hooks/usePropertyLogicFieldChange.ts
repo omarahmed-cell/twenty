@@ -102,14 +102,11 @@ export const usePropertyLogicFieldChange = (
         ),
       ),
     ];
-    const missingLabels = missingFieldNames
-      .map((fieldName) => fields.find(({ name }) => name === fieldName)?.label)
-      .filter(isDefined)
-      .join(', ');
 
     const values = await askForConditionalLogicValues({
       objectNameSingular: objectMetadataItem.nameSingular,
-      title: t`${triggers} needs: ${missingLabels}`,
+      title: t`Fill in required fields`,
+      trigger: triggers.replaceAll(' -> ', ' → '),
       confirmLabel: t`Save`,
       hint: t`Fill the required fields to save this change.`,
       properties: missingFieldNames.map((fieldName) => ({

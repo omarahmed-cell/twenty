@@ -1,16 +1,10 @@
-import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
 import {
   findMissingConditionalLogicProperties,
   isDefined,
 } from 'twenty-shared/utils';
-import { type JsonValue } from 'type-fest';
-import { Button, Field } from 'twenty-ui/primitives/input';
-import { Dialog } from 'twenty-ui/primitives/surfaces';
-import { themeCssVariables } from 'twenty-ui/theme';
 
-import { CONDITIONAL_LOGIC_FIELDS_DIALOG_ID } from '@/conditional-logic/constants/ConditionalLogicFieldsDialogId';
 import {
   type ConditionalLogicFieldsDialogRequest,
   conditionalLogicFieldsDialogRequestState,
@@ -19,37 +13,35 @@ import {
 import { buildConditionalLogicFields } from '@/conditional-logic/utils/buildConditionalLogicFields';
 import { objectMetadataItemsSelector } from '@/object-metadata/states/objectMetadataItemsSelector';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
-import { formatFieldMetadataItemAsFieldDefinition } from '@/object-metadata/utils/formatFieldMetadataItemAsFieldDefinition';
-import { getFieldMetadataItemGqlFieldName } from '@/object-metadata/utils/getFieldMetadataItemGqlFieldName';
-import { RecordFormFieldInput } from '@/object-record/record-form/components/RecordFormFieldInput';
-import { getRecordFormFieldPlaceholders } from '@/object-record/record-form/utils/getRecordFormFieldPlaceholders';
-import { DialogInstance } from '@/ui/layout/dialog/components/DialogInstance';
-import { useDialog } from '@/ui/layout/dialog/hooks/useDialog';
-import { DropdownInModalContext } from '@/ui/layout/dropdown/contexts/DropdownInModalContext';
+import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
+import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
+import { Button } from '@/roboost-ui/components/Button';
+import { Modal } from '@/roboost-ui/components/Modal';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
-
-const StyledFieldList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${themeCssVariables.spacing[3]};
-`;
-
-const StyledHint = styled.div`
-  color: ${themeCssVariables.font.color.tertiary};
-`;
-
-const StyledFooter = styled.div`
-  display: flex;
-  gap: ${themeCssVariables.spacing[2]};
-  justify-content: flex-end;
-  width: 100%;
-`;
 
 type ConditionalLogicFieldsDialogContentProps = {
   request: ConditionalLogicFieldsDialogRequest;
   objectMetadataItem: EnrichedObjectMetadataItem;
   onSettle: (values: ConditionalLogicFieldsDialogValues | null) => void;
+};
+
+const getCurrentValue = (
+  record: Record<string, unknown>,
+  fieldMetadataItem: FieldMetadataItem,
+) => {
+  const inputKey = getRoboostFieldInputKey(fieldMetadataItem);
+
+  if (inputKey !== fieldMetadataItem.name) {
+    return (
+      record[inputKey] ??
+      (record[fieldMetadataItem.name] as { id?: string } | null)?.id ??
+      null
+    );
+  }
+
+  return record[fieldMetadataItem.name] ?? null;
 };
 
 const ConditionalLogicFieldsDialogContent = ({
@@ -60,6 +52,9 @@ const ConditionalLogicFieldsDialogContent = ({
   const { t } = useLingui();
   const [draftValues, setDraftValues] =
     useState<ConditionalLogicFieldsDialogValues>({});
+  const [relatedRecords, setRelatedRecords] = useState<
+    Record<string, Record<string, unknown> | null>
+  >({});
 
   const { record } = request;
 
@@ -84,87 +79,92 @@ const ConditionalLogicFieldsDialogContent = ({
       : [];
   });
 
-  const setDraftValue = (gqlFieldName: string, value: unknown) =>
-    setDraftValues((previousDraftValues) => ({
-      ...previousDraftValues,
-      [gqlFieldName]: value,
-    }));
-
   return (
-    <DialogInstance
-      dialogId={CONDITIONAL_LOGIC_FIELDS_DIALOG_ID}
-      // Field pickers open dropdowns outside the popup, so only the buttons close it
-      dismissible={false}
+    <Modal
+      title={request.title}
+      subtitle={
+        isDefined(request.trigger) ? (
+          <span className="rb-reqpop-trigger">{request.trigger}</span>
+        ) : undefined
+      }
+      width={480}
+      className="rb-reqpop"
       onClose={() => onSettle(null)}
-      renderInDocumentBody
+      footer={
+        <>
+          <Button variant="secondary" onClick={() => onSettle(null)}>
+            {t`Cancel`}
+          </Button>
+          <Button
+            variant="primary"
+            disabled={missingRequiredFields.length > 0}
+            onClick={() => onSettle(draftValues)}
+          >
+            {request.confirmLabel}
+          </Button>
+        </>
+      }
     >
-      {({ onKeyDown }) => (
-        <Dialog.Popup onKeyDown={onKeyDown} size="md">
-          <Dialog.Header>
-            <Dialog.Title>{request.title}</Dialog.Title>
-          </Dialog.Header>
-          <Dialog.Body>
-            <DropdownInModalContext.Provider value={true}>
-              <StyledFieldList>
-                {rows.map(({ fieldMetadataItem, isRequired }) => {
-                  const gqlFieldName =
-                    getFieldMetadataItemGqlFieldName(fieldMetadataItem);
-                  const fieldLabel = fieldMetadataItem.label;
-                  const { placeholder, subFieldPlaceholders } =
-                    getRecordFormFieldPlaceholders(fieldMetadataItem.type);
-                  const fieldDefinition =
-                    formatFieldMetadataItemAsFieldDefinition({
-                      field: fieldMetadataItem,
-                      objectMetadataItem,
-                      showLabel: true,
-                    });
+      <div
+        className="rb-reqpop-fields"
+        onKeyDown={(event) => {
+          // Escape in a field's dropdown only closes that dropdown
+          if (
+            event.key === 'Escape' &&
+            event.target instanceof Element &&
+            event.target.closest('.rb-select, .rb-menu-portal') !== null
+          ) {
+            event.stopPropagation();
+          }
+        }}
+      >
+        {rows.map(({ fieldMetadataItem, isRequired }) => {
+          const inputKey = getRoboostFieldInputKey(fieldMetadataItem);
+          const value = Object.hasOwn(draftValues, inputKey)
+            ? draftValues[inputKey]
+            : getCurrentValue(record, fieldMetadataItem);
 
-                  return (
-                    <Field.Root key={fieldMetadataItem.id}>
-                      <RecordFormFieldInput
-                        field={{
-                          ...fieldDefinition,
-                          label: isRequired
-                            ? t`${fieldLabel} (required)`
-                            : fieldLabel,
-                        }}
-                        defaultValue={
-                          (Object.hasOwn(draftValues, gqlFieldName)
-                            ? draftValues[gqlFieldName]
-                            : (record[gqlFieldName] ?? null)) as JsonValue
-                        }
-                        onChange={(value) => setDraftValue(gqlFieldName, value)}
-                        onClear={() => setDraftValue(gqlFieldName, null)}
-                        placeholder={placeholder}
-                        subFieldPlaceholders={subFieldPlaceholders}
-                      />
-                    </Field.Root>
-                  );
-                })}
-                {missingRequiredFields.length > 0 && (
-                  <StyledHint>{request.hint}</StyledHint>
-                )}
-              </StyledFieldList>
-            </DropdownInModalContext.Provider>
-          </Dialog.Body>
-          <Dialog.Footer>
-            <StyledFooter>
-              <Button variant="outline" onClick={() => onSettle(null)}>
-                {t`Cancel`}
-              </Button>
-              <Button
-                variant="solid"
-                color="accent"
-                disabled={missingRequiredFields.length > 0}
-                onClick={() => onSettle(draftValues)}
-              >
-                {request.confirmLabel}
-              </Button>
-            </StyledFooter>
-          </Dialog.Footer>
-        </Dialog.Popup>
-      )}
-    </DialogInstance>
+          return (
+            <label key={fieldMetadataItem.id} className="rb-reqpop-field">
+              <span className="rb-reqpop-label">
+                {fieldMetadataItem.label}
+                {isRequired && <span className="rb-req"> *</span>}
+              </span>
+              <RoboostFieldInput
+                field={fieldMetadataItem}
+                value={value}
+                relatedRecord={
+                  Object.hasOwn(relatedRecords, inputKey)
+                    ? relatedRecords[inputKey]
+                    : (record[fieldMetadataItem.name] as Record<
+                        string,
+                        unknown
+                      > | null)
+                }
+                onChange={(nextValue, related) => {
+                  setDraftValues((previous) => ({
+                    ...previous,
+                    [inputKey]: nextValue,
+                  }));
+                  if (related !== undefined) {
+                    setRelatedRecords((previous) => ({
+                      ...previous,
+                      [inputKey]:
+                        related === null
+                          ? null
+                          : { id: related.id, name: related.label },
+                    }));
+                  }
+                }}
+              />
+            </label>
+          );
+        })}
+        {missingRequiredFields.length > 0 && (
+          <div className="rb-reqpop-hint">{request.hint}</div>
+        )}
+      </div>
+    </Modal>
   );
 };
 
@@ -177,7 +177,6 @@ export const ConditionalLogicFieldsDialog = () => {
     conditionalLogicFieldsDialogRequestState,
   );
   const objectMetadataItems = useAtomStateValue(objectMetadataItemsSelector);
-  const { closeDialog } = useDialog();
 
   const objectMetadataItem = objectMetadataItems.find(
     ({ nameSingular }) =>
@@ -193,7 +192,6 @@ export const ConditionalLogicFieldsDialog = () => {
 
   const handleSettle = (values: ConditionalLogicFieldsDialogValues | null) => {
     setConditionalLogicFieldsDialogRequest(null);
-    closeDialog(CONDITIONAL_LOGIC_FIELDS_DIALOG_ID);
     conditionalLogicFieldsDialogRequest.resolve(values);
   };
 

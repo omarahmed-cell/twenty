@@ -967,3 +967,40 @@
   display: block;
   height: 32px;
 }
+
+/* Fields a conditional rule made required: inline in create forms, pop-up elsewhere */
+.rb-cfield-byrule .rb-cfield {
+  border-left: 2px solid var(--accent);
+  padding-left: 10px;
+}
+.rb-reqpop .rb-modal-body {
+  overflow: visible;
+}
+.rb-reqpop-trigger {
+  background: var(--surface-sunken, var(--surface-hover));
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  display: inline-block;
+  font-weight: 500;
+  margin-top: 4px;
+  padding: 2px 8px;
+}
+.rb-reqpop-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rb-reqpop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rb-reqpop-label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.rb-reqpop-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+}

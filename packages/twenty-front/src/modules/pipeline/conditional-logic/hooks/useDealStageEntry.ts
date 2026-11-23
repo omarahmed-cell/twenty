@@ -115,8 +115,9 @@ export const useDealStageEntry = ({
 
     return askForConditionalLogicValues({
       objectNameSingular,
-      title: t`Move to ${stageLabel}`,
-      confirmLabel: t`Move`,
+      title: t`Fill in required fields`,
+      trigger: t`Stage → ${stageLabel}`,
+      confirmLabel: t`Save`,
       hint:
         objectNameSingular === CoreObjectNameSingular.Opportunity
           ? t`Fill the required fields to move this deal.`

@@ -7,6 +7,8 @@ import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInp
 import { isRoboostFieldValueFilled } from '@/roboost-app/fields/isRoboostFieldValueFilled';
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
 import { useRoboostFormFields } from '@/roboost-app/hooks/useRoboostFormFields';
+import { getRoboostRuleRequiredFormFields } from '@/roboost-app/fields/utils/getRoboostRuleRequiredFormFields';
+import { usePropertyLogicRules } from '@/properties/hooks/usePropertyLogicRules';
 import { roboostCreatePanelState } from '@/roboost-app/states/roboostCreatePanelState';
 import { Button } from '@/roboost-ui/components/Button';
 import { Icon } from '@/roboost-ui/components/Icon';
@@ -38,7 +40,9 @@ const RoboostCreateRecordForm = ({
 }: RoboostCreateRecordFormProps) => {
   const { t } = useLingui();
   const navigateApp = useNavigateApp();
-  const formFields = useRoboostFormFields(objectMetadataItem);
+  const configuredFormFields = useRoboostFormFields(objectMetadataItem);
+  const { rules: propertyLogicRules, fields: propertyLogicFields } =
+    usePropertyLogicRules(objectMetadataItem);
   const { createOneRecord } = useCreateOneRecord({
     objectNameSingular: objectMetadataItem.nameSingular,
   });
@@ -65,6 +69,14 @@ const RoboostCreateRecordForm = ({
     label: string;
   } | null>(null);
 
+  // Fields a rule makes required show up in the form, right under the field that triggered them
+  const formFields = getRoboostRuleRequiredFormFields({
+    formFields: configuredFormFields,
+    objectMetadataItem,
+    values: { ...presetValues, ...values },
+    rules: propertyLogicRules,
+    fields: propertyLogicFields,
+  });
   const isCompany = objectMetadataItem.nameSingular === 'company';
   const hasStarted = formFields
     .slice(0, 2)
@@ -167,8 +179,11 @@ const RoboostCreateRecordForm = ({
             </span>
           </div>
         )}
-        {formFields.map(({ field, isRequired }, index) => (
-          <div key={field.id}>
+        {formFields.map(({ field, isRequired, isAddedByRule }, index) => (
+          <div
+            key={field.id}
+            className={isAddedByRule === true ? 'rb-cfield-byrule' : undefined}
+          >
             <div
               className={`rb-cfield ${isCompany && !hasStarted && index >= 2 ? 'is-greyed' : ''}`}
             >

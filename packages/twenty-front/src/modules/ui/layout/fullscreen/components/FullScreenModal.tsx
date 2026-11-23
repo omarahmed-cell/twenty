@@ -3,7 +3,8 @@ import { PageHeader } from '@/ui/layout/page/components/PageHeader';
 import { Breadcrumb } from '@/ui/navigation/bread-crumb/components/Breadcrumb';
 import { type BreadcrumbProps } from '@/ui/navigation/bread-crumb/types/BreadcrumbProps';
 import { styled } from '@linaria/react';
-import { forwardRef } from 'react';
+import { FullScreenHeaderActionsContext } from '@/ui/layout/fullscreen/contexts/FullScreenHeaderActionsContext';
+import { forwardRef, useState } from 'react';
 import { themeCssVariables } from 'twenty-ui/theme';
 
 const StyledFullScreenOverlay = styled.div`
@@ -22,6 +23,12 @@ const StyledFullScreenOverlay = styled.div`
 
 const StyledFullScreenHeaderContainer = styled.div`
   padding-left: ${themeCssVariables.spacing[3]};
+`;
+
+const StyledHeaderActions = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${themeCssVariables.spacing[2]};
 `;
 
 const StyledFullScreenContent = styled.div`
@@ -51,6 +58,9 @@ type FullScreenModalProps = {
 
 export const FullScreenModal = forwardRef<HTMLDivElement, FullScreenModalProps>(
   ({ children, links, onClose, hasClosePageButton = true }, ref) => {
+    const [headerActionsElement, setHeaderActionsElement] =
+      useState<HTMLDivElement | null>(null);
+
     return (
       <StyledFullScreenOverlay
         ref={ref}
@@ -62,9 +72,13 @@ export const FullScreenModal = forwardRef<HTMLDivElement, FullScreenModalProps>(
             title={<Breadcrumb links={links} />}
             hasClosePageButton={hasClosePageButton}
             onClosePage={onClose}
-          />
+          >
+            <StyledHeaderActions ref={setHeaderActionsElement} />
+          </PageHeader>
         </StyledFullScreenHeaderContainer>
-        <StyledFullScreenContent>{children}</StyledFullScreenContent>
+        <FullScreenHeaderActionsContext.Provider value={headerActionsElement}>
+          <StyledFullScreenContent>{children}</StyledFullScreenContent>
+        </FullScreenHeaderActionsContext.Provider>
       </StyledFullScreenOverlay>
     );
   },

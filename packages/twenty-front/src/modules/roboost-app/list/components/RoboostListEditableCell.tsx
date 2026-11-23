@@ -3,6 +3,7 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
+import { useRoboostRequiredFieldsCheck } from '@/roboost-app/fields/hooks/useRoboostRequiredFieldsCheck';
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
 import { RoboostListCellValue } from '@/roboost-app/list/components/RoboostListCellValue';
 import { useRoboostCellEditor } from '@/roboost-app/list/hooks/useRoboostCellEditor';
@@ -24,7 +25,7 @@ const SAVE_ON_CHOICE_KINDS = new Set([
 
 // Clicks inside these belong to the open editor (portalled dropdowns, dialogs it opens)
 const EDITOR_OVERLAY_SELECTOR =
-  '.rb-menu-portal, .rb-popover-panel, .rb-modal-root, [role="dialog"]';
+  '.rb-menu-portal, .rb-popover-panel, .rb-modal-scrim, [role="dialog"]';
 
 type RoboostListEditableCellProps = {
   field: FieldMetadataItem;
@@ -48,6 +49,7 @@ export const RoboostListEditableCell = ({
 }: RoboostListEditableCellProps) => {
   const { t } = useLingui();
   const { updateOneRecord } = useUpdateOneRecord();
+  const { completeChange } = useRoboostRequiredFieldsCheck(objectMetadataItem);
   const editor = useRoboostCellEditor(
     getRoboostCellEditorKey(record.id, field.id),
   );
@@ -87,10 +89,20 @@ export const RoboostListEditableCell = ({
 
   const save = async (value: unknown = currentDraft) => {
     try {
+      const input = await completeChange({
+        recordId: record.id,
+        record,
+        changes: { [getRoboostFieldInputKey(field)]: value },
+      });
+
+      if (input === null) {
+        cancel();
+        return;
+      }
       await updateOneRecord({
         objectNameSingular: objectMetadataItem.nameSingular,
         idToUpdate: record.id,
-        updateOneRecordInput: { [getRoboostFieldInputKey(field)]: value },
+        updateOneRecordInput: input,
       });
       cancel();
       onSaved();

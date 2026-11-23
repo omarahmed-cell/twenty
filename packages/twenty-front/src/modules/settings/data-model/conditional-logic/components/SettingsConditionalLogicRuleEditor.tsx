@@ -1,8 +1,11 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
+import { useContext } from 'react';
+import { createPortal } from 'react-dom';
 import {
   type ConditionalLogicField,
   type ConditionalLogicRule,
+  isDefined,
 } from 'twenty-shared/utils';
 import { LightButton } from 'twenty-ui/components/input';
 import { IconPlus } from 'twenty-ui/icon';
@@ -12,6 +15,7 @@ import { themeCssVariables } from 'twenty-ui/theme';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { isCalculatedFieldMetadataItem } from '@/object-metadata/utils/isCalculatedFieldMetadataItem';
+import { FullScreenHeaderActionsContext } from '@/ui/layout/fullscreen/contexts/FullScreenHeaderActionsContext';
 import { SettingsConditionalLogicConditionGroup } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicConditionGroup';
 import { SettingsConditionalLogicPreview } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicPreview';
 import { SettingsConditionalLogicPropertiesSection } from '@/settings/data-model/conditional-logic/components/SettingsConditionalLogicPropertiesSection';
@@ -42,6 +46,7 @@ const StyledColumns = styled.div`
   flex: 1;
   gap: ${themeCssVariables.spacing[4]};
   grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
 `;
 
@@ -52,6 +57,7 @@ const StyledPanel = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${themeCssVariables.spacing[4]};
+  min-height: 0;
   overflow-y: auto;
   padding: ${themeCssVariables.spacing[4]};
 `;
@@ -109,33 +115,40 @@ export const SettingsConditionalLogicRuleEditor = ({
   expandRule,
 }: SettingsConditionalLogicRuleEditorProps) => {
   const { t } = useLingui();
+  const headerActionsElement = useContext(FullScreenHeaderActionsContext);
   const calculatedFieldNames = new Set(
     [...fieldMetadataItemByName.values()]
       .filter(isCalculatedFieldMetadataItem)
       .map(({ name }) => name),
   );
 
+  const toolbar = (
+    <StyledToolbar>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onCancel}
+        disabled={isSaving}
+      >
+        {t`Cancel`}
+      </Button>
+      <Button
+        variant="solid"
+        color="accent"
+        size="sm"
+        onClick={onSave}
+        disabled={isSaving || !isConditionalLogicRuleDraftValid(draft)}
+      >
+        {t`Save`}
+      </Button>
+    </StyledToolbar>
+  );
+
   return (
     <>
-      <StyledToolbar>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onCancel}
-          disabled={isSaving}
-        >
-          {t`Cancel`}
-        </Button>
-        <Button
-          variant="solid"
-          color="accent"
-          size="sm"
-          onClick={onSave}
-          disabled={isSaving || !isConditionalLogicRuleDraftValid(draft)}
-        >
-          {t`Save`}
-        </Button>
-      </StyledToolbar>
+      {isDefined(headerActionsElement)
+        ? createPortal(toolbar, headerActionsElement)
+        : toolbar}
       <StyledColumns>
         <StyledPanel>
           <StyledSectionTitle>{t`Set conditions`}</StyledSectionTitle>
