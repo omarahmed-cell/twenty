@@ -213,3 +213,36 @@
 .rb-col-resize:active::after {
   opacity: 1;
 }
+
+/* Column header ⋯ menu (freeze, add to the right, remove) */
+.rb-th-menu {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+}
+.rb-th-menu-btn {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  opacity: 0;
+  width: 22px;
+}
+.rb-ltable thead th:hover .rb-th-menu-btn,
+.rb-th-menu-btn[aria-expanded='true'],
+.rb-th-menu-btn:focus-visible {
+  opacity: 1;
+}
+.rb-th-menu-btn:hover {
+  color: var(--text);
+}
+.rb-ltable thead th .rb-lth {
+  max-width: calc(100% - 28px);
+}

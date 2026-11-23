@@ -5,10 +5,12 @@ import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEdi
 import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
 import { RoboostListCellValue } from '@/roboost-app/list/components/RoboostListCellValue';
+import { useRoboostCellEditor } from '@/roboost-app/list/hooks/useRoboostCellEditor';
 import { Button } from '@/roboost-ui/components/Button';
 import { Icon } from '@/roboost-ui/components/Icon';
+import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import { type FocusEvent, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const NOT_EDITED = Symbol('notEdited');
 
@@ -20,16 +22,21 @@ const SAVE_ON_CHOICE_KINDS = new Set([
   'relation',
 ]);
 
+// Clicks inside these belong to the open editor (portalled dropdowns, dialogs it opens)
+const EDITOR_OVERLAY_SELECTOR =
+  '.rb-menu-portal, .rb-popover-panel, .rb-modal-root, [role="dialog"]';
+
 type RoboostListEditableCellProps = {
   field: FieldMetadataItem;
   record: Record<string, unknown> & { id: string };
   objectMetadataItem: EnrichedObjectMetadataItem;
   objectMetadataItems: EnrichedObjectMetadataItem[];
   onSaved: () => void;
-  isEditing?: boolean;
-  onIsEditingChange?: (isEditing: boolean) => void;
   hideEditButton?: boolean;
 };
+
+export const getRoboostCellEditorKey = (recordId: string, fieldId: string) =>
+  `${recordId}:${fieldId}`;
 
 export const RoboostListEditableCell = ({
   field,
@@ -37,13 +44,14 @@ export const RoboostListEditableCell = ({
   objectMetadataItem,
   objectMetadataItems,
   onSaved,
-  isEditing: controlledIsEditing,
-  onIsEditingChange,
   hideEditButton = false,
 }: RoboostListEditableCellProps) => {
   const { t } = useLingui();
   const { updateOneRecord } = useUpdateOneRecord();
-  const [uncontrolledIsEditing, setUncontrolledIsEditing] = useState(false);
+  const editor = useRoboostCellEditor(
+    getRoboostCellEditorKey(record.id, field.id),
+  );
+  const editorRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<unknown>(NOT_EDITED);
   const [draftRelated, setDraftRelated] = useState<
     Record<string, unknown> | null | undefined
@@ -51,7 +59,8 @@ export const RoboostListEditableCell = ({
   const [error, setError] = useState<string | null>(null);
   const editKind = getRoboostFieldEditKind(field);
   const isEditable = editKind !== null;
-  const isEditing = controlledIsEditing ?? uncontrolledIsEditing;
+  const isEditing = editor.isEditing;
+  const saveOnChoice = editKind !== null && SAVE_ON_CHOICE_KINDS.has(editKind);
 
   const initialValue =
     field.relation !== undefined && field.relation !== null
@@ -59,14 +68,21 @@ export const RoboostListEditableCell = ({
       : record[field.name];
   const currentDraft = draft === NOT_EDITED ? initialValue : draft;
 
-  const setIsEditing = (nextIsEditing: boolean) => {
-    if (!nextIsEditing) {
-      setDraft(NOT_EDITED);
-      setDraftRelated(undefined);
-    }
+  const resetDraft = () => {
+    setDraft(NOT_EDITED);
+    setDraftRelated(undefined);
     setError(null);
-    setUncontrolledIsEditing(nextIsEditing);
-    onIsEditingChange?.(nextIsEditing);
+  };
+
+  const cancel = () => {
+    resetDraft();
+    editor.close();
+  };
+
+  const startEditing = () => {
+    if (editor.open()) {
+      resetDraft();
+    }
   };
 
   const save = async (value: unknown = currentDraft) => {
@@ -76,7 +92,7 @@ export const RoboostListEditableCell = ({
         idToUpdate: record.id,
         updateOneRecordInput: { [getRoboostFieldInputKey(field)]: value },
       });
-      setIsEditing(false);
+      cancel();
       onSaved();
     } catch (saveError) {
       setError(
@@ -85,9 +101,65 @@ export const RoboostListEditableCell = ({
     }
   };
 
+  // Click outside: an untouched editor closes, a changed one stays with its Save / Cancel
+  useEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+    const closeWhenUntouched = (event: PointerEvent) => {
+      const target = event.target;
+
+      if (
+        !(target instanceof Element) ||
+        editorRef.current?.contains(target) === true ||
+        target.closest(EDITOR_OVERLAY_SELECTOR) !== null
+      ) {
+        return;
+      }
+      editor.closeIfUntouched();
+    };
+
+    const cancelOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.defaultPrevented) {
+        resetDraft();
+        editor.close();
+      }
+    };
+
+    document.addEventListener('pointerdown', closeWhenUntouched, true);
+    document.addEventListener('keydown', cancelOnEscape);
+
+    return () => {
+      document.removeEventListener('pointerdown', closeWhenUntouched, true);
+      document.removeEventListener('keydown', cancelOnEscape);
+    };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
+
+  // A row that leaves the screen must not keep the shared editor slot
+  useEffect(
+    () => () => editor.close(),
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   if (!isEditing) {
     return (
-      <div className="rb-cell">
+      <div
+        className={cx('rb-cell', isEditable && 'is-editable')}
+        onPointerDown={(event) => {
+          if (
+            event.button !== 0 ||
+            !isEditable ||
+            (event.target instanceof Element &&
+              event.target.closest('a') !== null)
+          ) {
+            return;
+          }
+          event.stopPropagation();
+          startEditing();
+        }}
+      >
         <RoboostListCellValue
           field={field}
           record={record}
@@ -100,7 +172,7 @@ export const RoboostListEditableCell = ({
             aria-label={t`Edit ${field.label}`}
             onClick={(event) => {
               event.stopPropagation();
-              setIsEditing(true);
+              startEditing();
             }}
           >
             <Icon name="pencil" size={13} />
@@ -110,35 +182,25 @@ export const RoboostListEditableCell = ({
     );
   }
 
-  const saveOnChoice = editKind !== null && SAVE_ON_CHOICE_KINDS.has(editKind);
-
   return (
     <div
-      className="rb-cell-editor"
+      ref={editorRef}
+      className={cx(
+        'rb-cell-editor',
+        editor.needsAttention && 'needs-attention',
+      )}
       onClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
-          setIsEditing(false);
+          event.stopPropagation();
+          cancel();
         }
         if (
           event.key === 'Enter' &&
+          !saveOnChoice &&
           !(event.target instanceof HTMLTextAreaElement)
         ) {
           event.preventDefault();
-          save();
-        }
-      }}
-      onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (
-          event.relatedTarget === null ||
-          event.currentTarget.contains(event.relatedTarget) ||
-          event.relatedTarget.closest('.rb-menu-portal') !== null
-        ) {
-          return;
-        }
-        if (saveOnChoice) {
-          setIsEditing(false);
-        } else {
           save();
         }
       }}
@@ -147,7 +209,7 @@ export const RoboostListEditableCell = ({
         field={field}
         value={currentDraft}
         autoOpen
-        onCancel={() => setIsEditing(false)}
+        onCancel={cancel}
         relatedRecord={
           draftRelated !== undefined
             ? draftRelated
@@ -162,13 +224,18 @@ export const RoboostListEditableCell = ({
           }
           if (saveOnChoice) {
             save(value);
+            return;
           }
+          editor.setIsDirty(
+            JSON.stringify(value ?? null) !==
+              JSON.stringify(initialValue ?? null),
+          );
         }}
       />
       {error !== null && <div className="rb-field-error">{error}</div>}
       {!saveOnChoice && (
         <div className="rb-cell-editor-actions">
-          <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
+          <Button size="sm" variant="ghost" onClick={cancel}>
             {t`Cancel`}
           </Button>
           <Button size="sm" variant="primary" onClick={() => save()}>

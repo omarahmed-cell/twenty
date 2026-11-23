@@ -591,6 +591,15 @@
   padding: 8px;
   white-space: normal;
 }
+.rb-ltable .rb-cell.is-editable {
+  cursor: pointer;
+}
+.rb-cell-editor.needs-attention {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 2px var(--accent-soft, rgba(234, 0, 41, 0.18)),
+    var(--shadow-md);
+}
 .rb-cell-editor-actions {
   display: flex;
   gap: 6px;

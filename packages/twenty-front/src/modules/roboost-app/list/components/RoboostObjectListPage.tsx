@@ -118,6 +118,10 @@ export const RoboostObjectListPage = ({
   const [pageSize, setPageSize] = useState(ROBOOST_PAGE_SIZE_OPTIONS[1]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isColumnsOpen, setIsColumnsOpen] = useState(false);
+  const [frozenDraft, setFrozenDraft] = useState<{
+    viewId?: string;
+    count: number;
+  } | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [isFilterRowOpen, setIsFilterRowOpen] = useState(true);
   const [loadedViewId, setLoadedViewId] = useState<string | null>(null);
@@ -156,11 +160,22 @@ export const RoboostObjectListPage = ({
     setFilters(savedState.filters);
     setSort(savedState.sort);
   }
+  const frozenVarKey = `roboost.listFrozen.${activeView?.id ?? objectMetadataItem.id}`;
+  const savedFrozenCount = getUserVar<number>(frozenVarKey) ?? 1;
+  const frozenCount =
+    isDefined(frozenDraft) && frozenDraft.viewId === activeView?.id
+      ? frozenDraft.count
+      : savedFrozenCount;
+  const isFrozenDirty = frozenCount !== savedFrozenCount;
+  const changeFrozenCount = (count: number) =>
+    setFrozenDraft({ viewId: activeView?.id, count });
+
   const {
     columns,
     applyColumns,
     moveColumn,
     addColumn,
+    addColumnAt,
     removeColumn,
     resizeColumn,
     saveColumns,
@@ -168,12 +183,18 @@ export const RoboostObjectListPage = ({
     isDirty: areColumnsDirty,
   } = useRoboostViewColumns({ view: activeView, objectMetadataItem });
   const isViewDirty =
-    areColumnsDirty || !isSameRoboostViewState({ filters, sort }, savedState);
+    areColumnsDirty ||
+    isFrozenDirty ||
+    !isSameRoboostViewState({ filters, sort }, savedState);
 
   const saveView = async () => {
     setIsSavingView(true);
     try {
       await saveColumns();
+      if (isFrozenDirty) {
+        await setUserVar(frozenVarKey, frozenCount);
+        setFrozenDraft(null);
+      }
       await saveViewState({ filters, sort });
       enqueueToast({ status: 'success', children: t`View saved` });
     } catch {
@@ -188,6 +209,7 @@ export const RoboostObjectListPage = ({
 
   const resetView = () => {
     resetColumns();
+    setFrozenDraft(null);
     setFilters(savedState.filters);
     setSort(savedState.sort);
     setPage(1);
@@ -208,7 +230,9 @@ export const RoboostObjectListPage = ({
     });
 
     if (mode === 'clone') {
+      await setUserVar(`roboost.listFrozen.${viewId}`, frozenCount);
       resetColumns();
+      setFrozenDraft(null);
     }
     setViewName('');
     changeView(viewId);
@@ -216,9 +240,6 @@ export const RoboostObjectListPage = ({
 
   const { filter: viewFilter, orderBy: viewOrderBy } =
     useRoboostViewQueryVariables({ view: activeView, objectMetadataItem });
-
-  const frozenVarKey = `roboost.listFrozen.${activeView?.id ?? objectMetadataItem.id}`;
-  const frozenCount = getUserVar<number>(frozenVarKey) ?? 1;
 
   const activeFields = objectMetadataItem.fields.filter(
     (field) => field.isActive,
@@ -631,6 +652,8 @@ export const RoboostObjectListPage = ({
               onSelectionChange={setSelectedIds}
               onMoveColumn={moveColumn}
               onResizeColumn={resizeColumn}
+              onFrozenCountChange={changeFrozenCount}
+              onAddColumnAt={addColumnAt}
               onToggleColumn={(fieldId) =>
                 columns.some((column) => column.field.id === fieldId)
                   ? removeColumn(fieldId)
@@ -688,7 +711,7 @@ export const RoboostObjectListPage = ({
             setIsColumnsOpen(false);
             applyColumns(fieldIds);
             if (nextFrozenCount !== frozenCount) {
-              await setUserVar(frozenVarKey, nextFrozenCount);
+              changeFrozenCount(nextFrozenCount);
             }
           }}
         />

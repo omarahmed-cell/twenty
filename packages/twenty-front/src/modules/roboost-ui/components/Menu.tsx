@@ -20,6 +20,7 @@ export type MenuEntry =
       isDisabled?: boolean;
       hint?: string;
       description?: string;
+      keepMenuOpen?: boolean;
       onSelect: () => void;
     }
   | { id: string; label: string; icon?: RoboostIconName; href: string }
@@ -37,6 +38,7 @@ export type MenuProps = {
   placement?: 'below' | 'above';
   isSearchable?: boolean;
   searchPlaceholder?: string;
+  onClose?: () => void;
 };
 
 const isActionEntry = (
@@ -54,6 +56,7 @@ export const Menu = ({
   placement = 'below',
   isSearchable,
   searchPlaceholder,
+  onClose,
 }: MenuProps) => {
   const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(false);
@@ -79,6 +82,11 @@ export const Menu = ({
         )
       : entries;
 
+  const close = () => {
+    setIsOpen(false);
+    onClose?.();
+  };
+
   // Popovers live in a body portal so scrolling panels and modals never clip them
   const open = () => {
     updatePosition();
@@ -90,7 +98,7 @@ export const Menu = ({
     isOpen,
     popoverRef: menuRef,
     onReposition: updatePosition,
-    onClose: () => setIsOpen(false),
+    onClose: () => close(),
   });
 
   // The list lives in a body portal, so focus moving into it (the search box) is not leaving the menu
@@ -99,7 +107,7 @@ export const Menu = ({
       !event.currentTarget.contains(event.relatedTarget) &&
       menuRef.current?.contains(event.relatedTarget) !== true
     ) {
-      setIsOpen(false);
+      close();
     }
   };
 
@@ -110,13 +118,13 @@ export const Menu = ({
       onBlur={closeWhenFocusLeaves}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
-          setIsOpen(false);
+          close();
         }
       }}
     >
       {trigger({
         isOpen,
-        toggle: () => (isOpen ? setIsOpen(false) : open()),
+        toggle: () => (isOpen ? close() : open()),
       })}
       {isOpen &&
         createPortal(
@@ -188,7 +196,7 @@ export const Menu = ({
                       to={entry.href}
                       role="menuitem"
                       className="rb-menu-item"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => close()}
                     >
                       {content}
                     </Link>
@@ -214,8 +222,8 @@ export const Menu = ({
                     aria-selected={entry.isSelected}
                     onClick={() => {
                       entry.onSelect();
-                      if (!keepOpenOnSelect) {
-                        setIsOpen(false);
+                      if (!keepOpenOnSelect && entry.keepMenuOpen !== true) {
+                        close();
                       }
                     }}
                   >

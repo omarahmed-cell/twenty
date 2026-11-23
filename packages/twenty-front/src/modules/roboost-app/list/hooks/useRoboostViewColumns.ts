@@ -205,6 +205,12 @@ export const useRoboostViewColumns = ({
     applyColumns: setColumnOrder,
     addColumn: (fieldId: string) =>
       setColumnOrder([...columnFieldIds, fieldId]),
+    addColumnAt: (fieldId: string, index: number) =>
+      setColumnOrder([
+        ...columnFieldIds.slice(0, index),
+        fieldId,
+        ...columnFieldIds.slice(index),
+      ]),
     removeColumn: (fieldId: string) =>
       setColumnOrder(columnFieldIds.filter((id) => id !== fieldId)),
     resizeColumn: (fieldId: string, size: number) =>

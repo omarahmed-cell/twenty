@@ -4,6 +4,7 @@ import {
   getRoboostRecordLabel,
 } from '@/roboost-app/fields/getRoboostRecordLabel';
 import { RoboostAddColumnPopover } from '@/roboost-app/list/components/RoboostAddColumnPopover';
+import { RoboostColumnHeaderMenu } from '@/roboost-app/list/components/RoboostColumnHeaderMenu';
 import { RoboostListEditableCell } from '@/roboost-app/list/components/RoboostListEditableCell';
 import { type RoboostListColumn } from '@/roboost-app/list/hooks/useRoboostViewColumns';
 import { getRoboostAvatarTone } from '@/roboost-app/utils/getRoboostAvatarTone';
@@ -43,6 +44,8 @@ type RoboostListTableProps = {
   onMoveColumn: (fromIndex: number, toIndex: number) => void;
   onResizeColumn: (fieldId: string, size: number) => void;
   onToggleColumn: (fieldId: string) => void;
+  onFrozenCountChange: (frozenCount: number) => void;
+  onAddColumnAt: (fieldId: string, index: number) => void;
   onSaved: () => void;
   isLoading: boolean;
 };
@@ -66,6 +69,8 @@ export const RoboostListTable = ({
   onMoveColumn,
   onResizeColumn,
   onToggleColumn,
+  onFrozenCountChange,
+  onAddColumnAt,
   onSaved,
   isLoading,
 }: RoboostListTableProps) => {
@@ -232,6 +237,19 @@ export const RoboostListTable = ({
                       </span>
                     )}
                   </span>
+                  <RoboostColumnHeaderMenu
+                    objectMetadataItem={objectMetadataItem}
+                    columnLabel={column.field.label}
+                    shownFieldIds={columns.map((shown) => shown.field.id)}
+                    isFrozen={columnIndex < frozenCount}
+                    canRemove={columnIndex > 0}
+                    onFreeze={() => onFrozenCountChange(columnIndex + 1)}
+                    onUnfreeze={() => onFrozenCountChange(columnIndex)}
+                    onAddColumnRight={(fieldId) =>
+                      onAddColumnAt(fieldId, columnIndex + 1)
+                    }
+                    onRemove={() => onToggleColumn(column.field.id)}
+                  />
                   <span
                     className="rb-col-resize"
                     role="separator"

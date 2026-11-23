@@ -2,12 +2,16 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { roboostFieldHistoryState } from '@/roboost-app/history/states/roboostFieldHistoryState';
-import { RoboostListEditableCell } from '@/roboost-app/list/components/RoboostListEditableCell';
+import {
+  getRoboostCellEditorKey,
+  RoboostListEditableCell,
+} from '@/roboost-app/list/components/RoboostListEditableCell';
+import { useRoboostCellEditor } from '@/roboost-app/list/hooks/useRoboostCellEditor';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useLingui } from '@lingui/react/macro';
-import { type MouseEvent, useRef, useState } from 'react';
+import { type MouseEvent, useRef } from 'react';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 
 const EMPTY_DISPLAY = '—';
@@ -29,7 +33,10 @@ export const RoboostPropertyRow = ({
   onSaved,
 }: RoboostPropertyRowProps) => {
   const { t } = useLingui();
-  const [isEditing, setIsEditing] = useState(false);
+  const editor = useRoboostCellEditor(
+    getRoboostCellEditorKey(record.id, field.id),
+  );
+  const isEditing = editor.isEditing;
   const valueRef = useRef<HTMLDivElement>(null);
   const setRoboostFieldHistory = useSetAtomState(roboostFieldHistoryState);
   const { copyToClipboard } = useCopyToClipboard();
@@ -52,7 +59,7 @@ export const RoboostPropertyRow = ({
       )}
       onClick={() => {
         if (isEditable && !isEditing) {
-          setIsEditing(true);
+          editor.open();
         }
       }}
     >
@@ -94,8 +101,6 @@ export const RoboostPropertyRow = ({
           objectMetadataItem={objectMetadataItem}
           objectMetadataItems={objectMetadataItems}
           onSaved={onSaved}
-          isEditing={isEditing}
-          onIsEditingChange={setIsEditing}
           hideEditButton
         />
         {isEditable && !isEditing && (
