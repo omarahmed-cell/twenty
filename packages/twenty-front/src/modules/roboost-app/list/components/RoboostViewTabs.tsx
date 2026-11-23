@@ -97,6 +97,7 @@ export const RoboostViewTabs = ({
     <Menu
       align="left"
       minWidth={240}
+      isSearchable={false}
       entries={[
         {
           id: 'rename',
