@@ -124,7 +124,7 @@ export class RoboostNotificationService {
 
       if (isDefined(input.groupKey)) {
         const updated: { id: string }[] = await this.coreDataSource.query(
-          `UPDATE ${this.table(input.workspaceId)}
+          `WITH updated AS (UPDATE ${this.table(input.workspaceId)}
           SET title = $4, body = $5, "actorWorkspaceMemberId" = $6, "actorName" = $7,
             "targetObjectNameSingular" = $8, "targetRecordId" = $9, "targetPath" = $10,
             "downloadUrl" = $11, "actionLabel" = $12, "relatedRecords" = $13::jsonb,
@@ -132,7 +132,7 @@ export class RoboostNotificationService {
           WHERE "recipientWorkspaceMemberId" = $1 AND type = $2 AND "groupKey" = $15
             AND "isRead" = false AND "isTrashed" = false
             AND ($16::int IS NULL OR "createdAt" > now() - make_interval(secs => $16::int))
-          RETURNING id`,
+          RETURNING id) SELECT id FROM updated`,
           values,
         );
 
@@ -160,6 +160,24 @@ export class RoboostNotificationService {
 
       return null;
     }
+  }
+
+  async existsWithGroupKey({
+    workspaceId,
+    recipientWorkspaceMemberId,
+    groupKey,
+  }: {
+    workspaceId: string;
+    recipientWorkspaceMemberId: string;
+    groupKey: string;
+  }): Promise<boolean> {
+    const [row]: { exists: boolean }[] = await this.coreDataSource.query(
+      `SELECT EXISTS (SELECT 1 FROM ${this.table(workspaceId)}
+        WHERE "recipientWorkspaceMemberId" = $1 AND "groupKey" = $2) AS exists`,
+      [recipientWorkspaceMemberId, groupKey],
+    );
+
+    return row?.exists === true;
   }
 
   // The unread notification a new event would merge into, when one exists inside the window
