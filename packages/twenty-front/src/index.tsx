@@ -26,6 +26,7 @@ import '@/roboost-app/styles/roboost-timeline.css';
 import '@/roboost-app/styles/roboost-notifications.css';
 import '@/roboost-app/styles/roboost-scoring.css';
 import '@/roboost-app/styles/roboost-scoring-editor.css';
+import '@/roboost-app/styles/roboost-scoring-panels.css';
 import '@/roboost-app/styles/roboost-list-views.css';
 import '@/roboost-app/styles/roboost-board.css';
 

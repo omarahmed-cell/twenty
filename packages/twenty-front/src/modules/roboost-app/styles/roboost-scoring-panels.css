@@ -1,0 +1,224 @@
+/* ---------- Score editor: test bar, settings, history; record page explanation ---------- */
+.rb-sce-recalc {
+  align-items: center;
+  background: var(--info-soft);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-full);
+  color: var(--info-text);
+  display: inline-flex;
+  font: 600 12px/16px var(--font-sans);
+  gap: 6px;
+  padding: 3px 10px;
+}
+.rb-sce-testbar {
+  align-items: center;
+  background: var(--success-soft);
+  border-bottom: 2px solid var(--success-border);
+  color: var(--text);
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  font: 500 13px/18px var(--font-sans);
+  gap: 12px;
+  justify-content: center;
+  min-height: 52px;
+  padding: 8px 16px;
+}
+.rb-sce-testbar strong {
+  font-weight: 700;
+}
+.rb-sce-testrecord {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  font: 600 13px/18px var(--font-sans);
+  gap: 8px;
+  justify-content: space-between;
+  max-width: 320px;
+  min-width: 220px;
+  padding: 7px 10px;
+}
+.rb-sce-testsep {
+  align-self: stretch;
+  border-left: 1px solid var(--success-border);
+}
+.rb-sce-testing {
+  color: var(--text-secondary);
+}
+.rb-sce-frozen {
+  align-items: center;
+  color: var(--info-text);
+  display: inline-flex;
+  font-weight: 600;
+  gap: 6px;
+}
+.rb-sct-option {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2px;
+}
+.rb-sct-desc {
+  color: var(--text-secondary);
+  font: 400 12px/16px var(--font-sans);
+}
+
+/* Settings tab */
+.rb-scs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+}
+.rb-scs-row {
+  align-items: center;
+  display: flex;
+  font: 500 13px/18px var(--font-sans);
+  gap: 10px;
+}
+.rb-scs-label {
+  color: var(--text-secondary);
+  min-width: 120px;
+}
+.rb-scs-toggle {
+  align-items: flex-start;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+}
+.rb-scs-toggle > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rb-scs-toggle-title {
+  color: var(--text);
+  font: 600 14px/20px var(--font-sans);
+}
+.rb-scs-progress {
+  background: var(--surface-sunken);
+  border-radius: var(--radius-full);
+  height: 8px;
+  overflow: hidden;
+}
+.rb-scs-progress span {
+  background: var(--accent);
+  display: block;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Version history */
+.rb-sch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rb-sch-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  font: 400 13px/18px var(--font-sans);
+  gap: 4px;
+  padding: 12px 14px;
+}
+.rb-sch-head {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+.rb-sch-note {
+  color: var(--text);
+  margin: 4px 0 0;
+}
+.rb-sch-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.rb-sc-badge.is-current {
+  background: var(--success-soft);
+  border-color: var(--success-border);
+  color: var(--success-text);
+  margin-left: 0;
+}
+.rb-sch-view .rb-modal-body {
+  background: var(--canvas);
+  max-height: 72vh;
+  overflow-y: auto;
+}
+
+/* Why this score? */
+.rb-scw {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rb-scw-head {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+.rb-scw-value {
+  color: var(--text);
+  font: 700 32px/36px var(--font-display);
+}
+.rb-scw-meta {
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  font: 500 12px/17px var(--font-sans);
+  gap: 2px;
+}
+.rb-scw-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.rb-scw-group-head {
+  align-items: center;
+  color: var(--text);
+  display: flex;
+  font: 600 13px/18px var(--font-sans);
+  gap: 8px;
+}
+.rb-scw-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rb-scw-rules li {
+  align-items: flex-start;
+  display: flex;
+  font: 400 13px/18px var(--font-sans);
+  gap: 8px;
+}
+.rb-scw-rule {
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+.rb-scw-points {
+  color: var(--success-text);
+  flex: none;
+  font-weight: 700;
+}
+.rb-scw-points.is-negative {
+  color: var(--danger-text);
+}
+.rb-prop-tool.rb-prop-tool-text {
+  font: 500 12px/16px var(--font-sans);
+  gap: 4px;
+  padding: 0 6px;
+  width: auto;
+}

@@ -17,6 +17,7 @@ import { RoboostPreferencesEffect } from '@/roboost-app/components/RoboostPrefer
 import { RoboostSettingsSideNav } from '@/roboost-app/components/RoboostSettingsSideNav';
 import { roboostModeState } from '@/roboost-app/states/roboostModeState';
 import { RoboostFieldHistoryPanel } from '@/roboost-app/history/components/RoboostFieldHistoryPanel';
+import { RoboostScoreWhyPanel } from '@/roboost-app/scoring/components/RoboostScoreWhyPanel';
 import { RoboostPropertiesPanel } from '@/roboost-app/timeline/components/RoboostPropertiesPanel';
 import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -104,6 +105,7 @@ export const DefaultLayout = () => {
                 {isRoboostUiEnabled && <RoboostCreateRecordPanel />}
                 {isRoboostUiEnabled && <RoboostPropertiesPanel />}
                 {isRoboostUiEnabled && <RoboostFieldHistoryPanel />}
+                {isRoboostUiEnabled && <RoboostScoreWhyPanel />}
                 {isRoboostUiEnabled && <RoboostActivityComposer />}
                 {isRoboostUiEnabled && <RoboostMeetingScheduler />}
                 {isRoboostShellShown ? (

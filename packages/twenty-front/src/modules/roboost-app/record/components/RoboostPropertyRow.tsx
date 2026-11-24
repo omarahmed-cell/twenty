@@ -2,6 +2,8 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { roboostFieldHistoryState } from '@/roboost-app/history/states/roboostFieldHistoryState';
+import { roboostScoreWhyState } from '@/roboost-app/scoring/states/roboostScoreWhyState';
+import { getRoboostScoreIdOfField } from '@/roboost-app/scoring/utils/getRoboostScoreIdOfField';
 import {
   getRoboostCellEditorKey,
   RoboostListEditableCell,
@@ -11,6 +13,7 @@ import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useLingui } from '@lingui/react/macro';
+import { isDefined } from 'twenty-shared/utils';
 import { type MouseEvent, useRef } from 'react';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 
@@ -39,6 +42,8 @@ export const RoboostPropertyRow = ({
   const isEditing = editor.isEditing;
   const valueRef = useRef<HTMLDivElement>(null);
   const setRoboostFieldHistory = useSetAtomState(roboostFieldHistoryState);
+  const setRoboostScoreWhy = useSetAtomState(roboostScoreWhyState);
+  const isScoreProperty = isDefined(getRoboostScoreIdOfField(field));
   const { copyToClipboard } = useCopyToClipboard();
   const isEditable = getRoboostFieldEditKind(field) !== null;
 
@@ -68,6 +73,24 @@ export const RoboostPropertyRow = ({
           {field.label}
         </div>
         <div className="rb-prop-tools" onClick={stopRowClick}>
+          {isScoreProperty && (
+            <button
+              type="button"
+              className="rb-prop-tool rb-prop-tool-text"
+              title={t`Why this score?`}
+              onClick={() =>
+                setRoboostScoreWhy({
+                  objectNameSingular: objectMetadataItem.nameSingular,
+                  recordId: record.id,
+                  fieldMetadataId: field.id,
+                  fieldLabel: field.label,
+                })
+              }
+            >
+              <Icon name="gauge" size={14} />
+              {t`Why this score?`}
+            </button>
+          )}
           <button
             type="button"
             className="rb-prop-tool"

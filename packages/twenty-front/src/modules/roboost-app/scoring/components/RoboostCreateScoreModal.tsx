@@ -1,7 +1,5 @@
-import {
-  ROBOOST_CREATE_SCORE,
-  ROBOOST_SCORE_ELIGIBLE_FIELDS,
-} from '@/roboost-app/scoring/graphql/roboostScoreQueries';
+import { RoboostScorePropertyChoice } from '@/roboost-app/scoring/components/RoboostScorePropertyChoice';
+import { ROBOOST_CREATE_SCORE } from '@/roboost-app/scoring/graphql/roboostScoreQueries';
 import { useRoboostScoreObjectLabels } from '@/roboost-app/scoring/hooks/useRoboostScoreObjectLabels';
 import { type RoboostScore } from '@/roboost-app/scoring/types/RoboostScore';
 import { useInvalidateMetadataStore } from '@/metadata-store/hooks/useInvalidateMetadataStore';
@@ -10,10 +8,9 @@ import { Field } from '@/roboost-ui/components/Field';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Input } from '@/roboost-ui/components/Input';
 import { Modal } from '@/roboost-ui/components/Modal';
-import { Select } from '@/roboost-ui/components/Select';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useMutation } from '@apollo/client/react';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
 import {
@@ -47,8 +44,9 @@ export const RoboostCreateScoreModal = ({
   const [objectName, setObjectName] = useState<RoboostScoreObjectName | null>(
     cloneSource?.objectName ?? null,
   );
+  const cloneSourceName = cloneSource?.name ?? '';
   const [name, setName] = useState(
-    isClone ? t`Copy of ${cloneSource.name}` : '',
+    isClone ? t`Copy of ${cloneSourceName}` : '',
   );
   const [propertyMode, setPropertyMode] = useState<'new' | 'existing'>('new');
   const [propertyLabel, setPropertyLabel] = useState('');
@@ -56,17 +54,9 @@ export const RoboostCreateScoreModal = ({
   const [fieldMetadataId, setFieldMetadataId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: eligibleData } = useQuery<{
-    roboostScoreEligibleFields: { id: string; label: string }[];
-  }>(ROBOOST_SCORE_ELIGIBLE_FIELDS, {
-    variables: { objectName },
-    skip: !isDefined(objectName) || step !== 2,
-    fetchPolicy: 'network-only',
-  });
   const [createScore] = useMutation<{ roboostCreateScore: RoboostScore }>(
     ROBOOST_CREATE_SCORE,
   );
-  const eligibleFields = eligibleData?.roboostScoreEligibleFields ?? [];
   const shownPropertyLabel = isPropertyLabelEdited ? propertyLabel : name;
   const canCreate =
     name.trim() !== '' &&
@@ -191,86 +181,25 @@ export const RoboostCreateScoreModal = ({
             />
           </Field>
           <div className="rb-sc-form-label">{t`Score property`}</div>
-          <div className="rb-sc-radios" role="radiogroup">
-            <label
-              className={cx(
-                'rb-sc-radio',
-                propertyMode === 'new' && 'is-selected',
-              )}
-            >
-              <input
-                type="radio"
-                name="rb-score-property"
-                checked={propertyMode === 'new'}
-                onChange={() => setPropertyMode('new')}
-              />
-              <span className="rb-sc-radio-body">
-                <span className="rb-sc-radio-title">
-                  {t`Create a new property`}
-                </span>
-                <span className="rb-sc-radio-hint">
-                  {t`A read-only Number property on ${objectLabel}, in the Scores group.`}
-                </span>
-                {propertyMode === 'new' && (
-                  <Input
-                    size="sm"
-                    aria-label={t`Property name`}
-                    placeholder={t`Property name`}
-                    invalid={shownPropertyLabel.trim() === ''}
-                    value={shownPropertyLabel}
-                    onChange={(event) => {
-                      setIsPropertyLabelEdited(true);
-                      setPropertyLabel(event.target.value);
-                    }}
-                  />
-                )}
-              </span>
-            </label>
-            <label
-              className={cx(
-                'rb-sc-radio',
-                propertyMode === 'existing' && 'is-selected',
-              )}
-            >
-              <input
-                type="radio"
-                name="rb-score-property"
-                checked={propertyMode === 'existing'}
-                onChange={() => setPropertyMode('existing')}
-              />
-              <span className="rb-sc-radio-body">
-                <span className="rb-sc-radio-title">
-                  {t`Use an existing property`}
-                </span>
-                <span className="rb-sc-radio-hint">
-                  {t`Number properties on ${objectLabel} that no other score uses.`}
-                </span>
-                {propertyMode === 'existing' && (
-                  <>
-                    <Select
-                      aria-label={t`Existing property`}
-                      placeholder={
-                        eligibleFields.length === 0
-                          ? t`No Number property available`
-                          : t`Choose a property`
-                      }
-                      isSearchable
-                      value={fieldMetadataId}
-                      options={eligibleFields.map((field) => ({
-                        value: field.id,
-                        label: field.label,
-                      }))}
-                      onChange={setFieldMetadataId}
-                    />
-                    <span className="rb-sc-warning">
-                      <Icon name="alert-triangle" size={14} />
-                      {t`Its current values will be overwritten when the score is published.`}
-                    </span>
-                  </>
-                )}
-              </span>
-            </label>
-          </div>
+          {isDefined(objectName) && (
+            <RoboostScorePropertyChoice
+              objectName={objectName}
+              objectLabel={objectLabel}
+              value={{
+                mode: propertyMode,
+                label: shownPropertyLabel,
+                fieldMetadataId,
+              }}
+              onChange={(next) => {
+                setPropertyMode(next.mode);
+                setFieldMetadataId(next.fieldMetadataId);
+                if (next.label !== shownPropertyLabel) {
+                  setIsPropertyLabelEdited(true);
+                  setPropertyLabel(next.label);
+                }
+              }}
+            />
+          )}
           {isDefined(error) && (
             <div className="rb-sc-error" role="alert">
               {error}
