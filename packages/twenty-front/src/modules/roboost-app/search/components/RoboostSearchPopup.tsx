@@ -1,3 +1,4 @@
+import { getRoboostZoom } from '@/roboost-ui/utils/getRoboostZoom';
 import { SEARCH_QUERY } from '@/command-menu/graphql/queries/search';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -165,8 +166,8 @@ export const RoboostSearchPopup = ({ onClose }: RoboostSearchPopupProps) => {
       <div className="rb-search-scrim" onClick={onClose} />
       <div
         style={{
-          left: Math.max(8, (anchorRect?.left ?? 72) - 36),
-          top: Math.max(4, (anchorRect?.top ?? 10) - 6),
+          left: Math.max(8, (anchorRect?.left ?? 72) / getRoboostZoom() - 36),
+          top: Math.max(4, (anchorRect?.top ?? 10) / getRoboostZoom() - 6),
         }}
         className="rb-searchbox"
         role="dialog"

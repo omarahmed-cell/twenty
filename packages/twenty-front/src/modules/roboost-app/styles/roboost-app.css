@@ -1118,3 +1118,40 @@
   color: var(--text-secondary);
   font-size: 13px;
 }
+
+/* Table editing like HubSpot: the cell itself becomes the one outlined box, lists open below it */
+td.is-cell-editing {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+.rb-cell-editor.is-in-cell {
+  background: none;
+  border: none;
+  box-shadow: none;
+  gap: 0;
+  min-width: 0;
+  padding: 0;
+}
+.rb-cell-editor.is-in-cell .rb-select-trigger,
+.rb-cell-editor.is-in-cell .rb-input {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-height: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+.rb-cell-editor.is-in-cell .rb-input:focus-within,
+.rb-cell-editor.is-in-cell .rb-select-trigger:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+.rb-floating-panel.rb-cell-editor-panel {
+  padding: 8px;
+}
+.rb-cell-editor-panel > .rb-cell-editor {
+  border: none;
+  box-shadow: none;
+  min-width: 0;
+  padding: 0;
+}

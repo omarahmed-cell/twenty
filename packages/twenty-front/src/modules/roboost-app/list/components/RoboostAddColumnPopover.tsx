@@ -1,10 +1,11 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useRoboostFieldGroups } from '@/roboost-app/list/hooks/useRoboostFieldGroups';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
+import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Input } from '@/roboost-ui/components/Input';
 import { useLingui } from '@lingui/react/macro';
-import { type FocusEvent, Fragment, useState } from 'react';
+import { type FocusEvent, Fragment, useRef, useState } from 'react';
 
 type RoboostAddColumnPopoverProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
@@ -22,17 +23,23 @@ export const RoboostAddColumnPopover = ({
   const [search, setSearch] = useState('');
   const groups = useRoboostFieldGroups(objectMetadataItem);
   const term = search.trim().toLowerCase();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
       className="rb-menu-anchor"
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
+        if (
+          !event.currentTarget.contains(event.relatedTarget) &&
+          panelRef.current?.contains(event.relatedTarget) !== true
+        ) {
           setIsOpen(false);
         }
       }}
     >
       <button
+        ref={buttonRef}
         type="button"
         className="rb-addcol-btn"
         aria-expanded={isOpen}
@@ -45,10 +52,24 @@ export const RoboostAddColumnPopover = ({
         {t`Add column`}
       </button>
       {isOpen && (
-        <div
-          className="rb-addpop"
+        <FloatingPanel
+          anchor={buttonRef.current}
+          panelRef={panelRef}
+          align="end"
+          minWidth={280}
+          className="rb-floating-surface rb-addpop"
           tabIndex={-1}
           onClick={(event) => event.stopPropagation()}
+          onBlur={(event: FocusEvent<HTMLDivElement>) => {
+            if (
+              !event.currentTarget.contains(event.relatedTarget) &&
+              buttonRef.current?.parentElement?.contains(
+                event.relatedTarget,
+              ) !== true
+            ) {
+              setIsOpen(false);
+            }
+          }}
         >
           <div className="rb-ap-search">
             <Input
@@ -83,7 +104,7 @@ export const RoboostAddColumnPopover = ({
               );
             })}
           </div>
-        </div>
+        </FloatingPanel>
       )}
     </div>
   );

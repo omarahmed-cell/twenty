@@ -3,11 +3,10 @@ import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { MenuSearch } from '@/roboost-ui/components/MenuSearch';
 import { type SelectOption } from '@/roboost-ui/components/Select';
-import { useRoboostAnchoredPosition } from '@/roboost-ui/hooks/useRoboostAnchoredPosition';
+import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { type RefObject, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 
 export type FieldDropdownProps = {
   anchorRef: RefObject<HTMLElement | null>;
@@ -48,11 +47,6 @@ export const FieldDropdown = ({
   const [search, setSearch] = useState('');
   const [draft, setDraft] = useState<string[]>(selectedValues);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const position = useRoboostAnchoredPosition({
-    anchorRef,
-    isOpen: true,
-    minWidth,
-  });
   const searchTerm = search.trim().toLowerCase();
   const visibleOptions =
     searchTerm === ''
@@ -121,14 +115,14 @@ export const FieldDropdown = ({
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return createPortal(
-    <div
-      ref={panelRef}
-      className={cx(
-        'rb-ui rb-menu rb-menu-portal rb-fdd',
-        isMulti && 'is-multi',
-      )}
-      style={position}
+  return (
+    <FloatingPanel
+      anchor={anchorRef.current}
+      panelRef={panelRef}
+      matchAnchorWidth
+      minWidth={minWidth}
+      onAnchorHidden={onDismiss}
+      className={cx('rb-menu rb-menu-portal rb-fdd', isMulti && 'is-multi')}
       role="listbox"
       aria-label={ariaLabel}
       aria-multiselectable={isMulti}
@@ -229,7 +223,6 @@ export const FieldDropdown = ({
           </Button>
         </div>
       )}
-    </div>,
-    document.body,
+    </FloatingPanel>
   );
 };

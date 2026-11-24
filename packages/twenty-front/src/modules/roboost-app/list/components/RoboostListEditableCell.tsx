@@ -11,19 +11,11 @@ import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
 import { RoboostListCellValue } from '@/roboost-app/list/components/RoboostListCellValue';
 import { useRoboostCellEditor } from '@/roboost-app/list/hooks/useRoboostCellEditor';
 import { Button } from '@/roboost-ui/components/Button';
-import { useRoboostAnchoredPosition } from '@/roboost-ui/hooks/useRoboostAnchoredPosition';
+import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import {
-  memo,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { createPortal } from 'react-dom';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const NOT_EDITED = Symbol('notEdited');
 const FLOATING_EDITOR_MIN_WIDTH = 280;
@@ -36,9 +28,19 @@ const SAVE_ON_CHOICE_KINDS = new Set([
   'relation',
 ]);
 
-// Clicks inside these belong to the open editor (portalled dropdowns, dialogs it opens)
+// These edit inside the cell itself, like HubSpot: one outlined box, any list below it
+const IN_CELL_KINDS = new Set([
+  'select',
+  'multiSelect',
+  'rating',
+  'relation',
+  'text',
+  'number',
+]);
+
+// Clicks inside these belong to the open editor (floating lists, dialogs it opens)
 const EDITOR_OVERLAY_SELECTOR =
-  '.rb-menu-portal, .rb-popover-panel, .rb-modal-scrim, [role="dialog"]';
+  '.rb-floating, .rb-modal-scrim, [role="dialog"]';
 
 type RoboostListEditableCellProps = {
   field: FieldMetadataItem;
@@ -66,7 +68,6 @@ const RoboostListCellEditor = ({
   const editorRef = useRef<HTMLDivElement>(null);
   const placeholderRef = useRef<HTMLDivElement>(null);
   const [tableCell, setTableCell] = useState<HTMLElement | null>(null);
-  const tableCellRef = useMemo(() => ({ current: tableCell }), [tableCell]);
   const [draft, setDraft] = useState<unknown>(NOT_EDITED);
   const [draftRelated, setDraftRelated] = useState<
     Record<string, unknown> | null | undefined
@@ -79,23 +80,24 @@ const RoboostListCellEditor = ({
     editKind === 'select' ||
     editKind === 'multiSelect' ||
     editKind === 'rating';
+  const isInCell = editKind !== null && IN_CELL_KINDS.has(editKind);
+  const isInTable = tableCell !== null;
+  const isFloating = isInTable && !isInCell;
+  // Text and numbers in a table have no room for buttons: Enter or a click outside saves
+  const savesOnLeave = isInTable && isInCell && !saveOnChoice;
 
   const initialValue =
     field.relation !== undefined && field.relation !== null
       ? ((record[field.name] as { id?: string } | null)?.id ?? null)
       : record[field.name];
   const currentDraft = draft === NOT_EDITED ? initialValue : draft;
-  const floatingStyle = useRoboostAnchoredPosition({
-    anchorRef: tableCellRef,
-    isOpen: tableCell !== null,
-    minWidth: FLOATING_EDITOR_MIN_WIDTH,
-  });
-
   useLayoutEffect(() => {
-    if (!isInlineDropdown) {
-      setTableCell(placeholderRef.current?.closest('td') ?? null);
-    }
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    const cell = placeholderRef.current?.closest('td') ?? null;
+
+    setTableCell(cell);
+    cell?.classList.add('is-cell-editing');
+
+    return () => cell?.classList.remove('is-cell-editing');
   }, []);
 
   useEffect(() => {
@@ -144,7 +146,17 @@ const RoboostListCellEditor = ({
     }
   };
 
-  // Click outside: an untouched editor closes, a changed one stays with its Save / Cancel
+  const leaveRef = useRef<() => void>(() => {});
+
+  leaveRef.current = () => {
+    if (savesOnLeave && draft !== NOT_EDITED) {
+      save();
+      return;
+    }
+    editor.closeIfUntouched();
+  };
+
+  // Click outside: an untouched editor closes, a changed one stays with its Save / Cancel (in-cell text saves)
   useEffect(() => {
     if (!isEditing) {
       return;
@@ -159,7 +171,7 @@ const RoboostListCellEditor = ({
       ) {
         return;
       }
-      editor.closeIfUntouched();
+      leaveRef.current();
     };
 
     const cancelOnEscape = (event: KeyboardEvent) => {
@@ -185,10 +197,9 @@ const RoboostListCellEditor = ({
       className={cx(
         'rb-cell-editor',
         isInlineDropdown && 'is-inline-dropdown',
-        tableCell !== null && 'rb-ui is-floating',
+        isInCell && isInTable && 'is-in-cell',
         editor.needsAttention && 'needs-attention',
       )}
-      style={tableCell !== null ? floatingStyle : undefined}
       onClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
@@ -233,7 +244,7 @@ const RoboostListCellEditor = ({
         }}
       />
       {error !== null && <div className="rb-field-error">{error}</div>}
-      {!saveOnChoice && (
+      {!saveOnChoice && !savesOnLeave && (
         <div className="rb-cell-editor-actions">
           <Button size="sm" variant="ghost" onClick={cancel}>
             {t`Cancel`}
@@ -246,25 +257,31 @@ const RoboostListCellEditor = ({
     </div>
   );
 
-  // In a table the editor floats above the grid, under its cell, so the table never clips it
-  if (tableCell !== null) {
-    return (
-      <>
-        <div className="rb-cell">
-          <RoboostListCellValue
-            field={field}
-            record={record}
-            objectMetadataItems={objectMetadataItems}
-          />
-        </div>
-        {createPortal(editorBox, document.body)}
-      </>
-    );
-  }
-
+  // Editors with several inputs open one panel under the cell, which keeps showing its value
   return (
     <div ref={placeholderRef} className="rb-cell-editor-slot">
-      {editorBox}
+      {isFloating ? (
+        <>
+          <div className="rb-cell">
+            <RoboostListCellValue
+              field={field}
+              record={record}
+              objectMetadataItems={objectMetadataItems}
+            />
+          </div>
+          <FloatingPanel
+            anchor={tableCell}
+            minWidth={FLOATING_EDITOR_MIN_WIDTH}
+            matchAnchorWidth
+            maxHeight={null}
+            className="rb-floating-surface rb-cell-editor-panel"
+          >
+            {editorBox}
+          </FloatingPanel>
+        </>
+      ) : (
+        editorBox
+      )}
     </div>
   );
 };

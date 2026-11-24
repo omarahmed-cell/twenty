@@ -2457,3 +2457,49 @@
   justify-content: flex-end;
   padding: 8px 4px 4px;
 }
+
+/* ---------- FloatingPanel: the one positioned layer for every list and panel ---------- */
+.rb-floating {
+  z-index: 1000;
+}
+.rb-floating > .rb-floating-panel {
+  bottom: auto;
+  box-sizing: border-box;
+  left: auto;
+  max-height: calc(var(--rb-floating-max-height, 320px) / var(--t-zoom, 1));
+  position: relative;
+  right: auto;
+  top: auto;
+}
+.rb-floating > .rb-floating-panel.rb-menu,
+.rb-floating > .rb-floating-panel.rb-popover-panel,
+.rb-floating > .rb-floating-panel.rb-floating-surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+.rb-floating > .rb-floating-panel.rb-popover-panel,
+.rb-floating > .rb-floating-panel.rb-floating-surface {
+  overflow: auto;
+}
+.rb-floating-arrow {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  height: 10px;
+  pointer-events: none;
+  position: absolute;
+  transform: rotate(45deg);
+  width: 10px;
+}
+.rb-floating[data-side='bottom'] > .rb-floating-arrow {
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+  top: -5px;
+}
+.rb-floating[data-side='top'] > .rb-floating-arrow {
+  border-left-color: transparent;
+  border-top-color: transparent;
+  bottom: -5px;
+}

@@ -1,8 +1,8 @@
 import { Icon } from '@/roboost-ui/components/Icon';
 import { MenuSearch } from '@/roboost-ui/components/MenuSearch';
 import { ROBOOST_MENU_SEARCH_THRESHOLD } from '@/roboost-ui/constants/RoboostMenuSearchThreshold';
-import { useRoboostCloseOnOutsideScroll } from '@/roboost-ui/hooks/useRoboostCloseOnOutsideScroll';
-import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverPosition';
+import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
+import { getRoboostTriggerElement } from '@/roboost-ui/utils/getRoboostTriggerElement';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
@@ -13,7 +13,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 
 export type MenuEntry =
@@ -71,12 +70,6 @@ export const Menu = ({
   const [search, setSearch] = useState('');
   const anchorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { position, updatePosition } = useRoboostPopoverPosition({
-    anchorRef,
-    align,
-    placement,
-    isOpen,
-  });
 
   const actionEntries = entries.filter(isActionEntry);
   const showSearch =
@@ -98,7 +91,6 @@ export const Menu = ({
 
   // Popovers live in a body portal so scrolling panels and modals never clip them
   const open = () => {
-    updatePosition();
     setSearch('');
     setIsOpen(true);
   };
@@ -113,13 +105,6 @@ export const Menu = ({
     }
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useRoboostCloseOnOutsideScroll({
-    isOpen,
-    popoverRef: menuRef,
-    onReposition: updatePosition,
-    onClose: () => close(),
-  });
 
   // The list lives in a body portal, so focus moving into it (the search box) is not leaving the menu
   const closeWhenFocusLeaves = (event: FocusEvent<HTMLDivElement>) => {
@@ -146,119 +131,118 @@ export const Menu = ({
         isOpen,
         toggle: () => (isOpen ? close() : open()),
       })}
-      {isOpen &&
-        createPortal(
-          <div
-            ref={menuRef}
-            className="rb-ui rb-menu rb-menu-portal"
-            style={{ minWidth, ...position }}
-            role="menu"
-            tabIndex={-1}
-            onMouseDown={(event) => {
-              if (!(event.target instanceof HTMLInputElement)) {
-                event.preventDefault();
+      {isOpen && (
+        <FloatingPanel
+          anchor={getRoboostTriggerElement(anchorRef.current)}
+          panelRef={menuRef}
+          align={align === 'right' ? 'end' : 'start'}
+          side={placement === 'above' ? 'top' : 'bottom'}
+          minWidth={minWidth}
+          onAnchorHidden={close}
+          className="rb-menu rb-menu-portal"
+          role="menu"
+          tabIndex={-1}
+          onMouseDown={(event) => {
+            if (!(event.target instanceof HTMLInputElement)) {
+              event.preventDefault();
+            }
+          }}
+        >
+          {showSearch && (
+            <MenuSearch
+              value={search}
+              onChange={setSearch}
+              placeholder={searchPlaceholder}
+            />
+          )}
+          {header}
+          <div className="rb-menu-list">
+            {visibleEntries.map((entry) => {
+              if ('isSeparator' in entry) {
+                return <div key={entry.id} className="rb-menu-sep" />;
               }
-            }}
-          >
-            {showSearch && (
-              <MenuSearch
-                value={search}
-                onChange={setSearch}
-                placeholder={searchPlaceholder}
-              />
-            )}
-            {header}
-            <div className="rb-menu-list">
-              {visibleEntries.map((entry) => {
-                if ('isSeparator' in entry) {
-                  return <div key={entry.id} className="rb-menu-sep" />;
-                }
 
-                if ('heading' in entry) {
-                  return (
-                    <div key={entry.id} className="rb-menu-heading">
-                      {entry.heading}
-                    </div>
-                  );
-                }
-
-                const content = (
-                  <>
-                    {entry.icon !== undefined && (
-                      <Icon name={entry.icon} size={16} />
-                    )}
-                    {'description' in entry &&
-                    entry.description !== undefined ? (
-                      <span className="rb-menu-label rb-menu-two-line">
-                        <span className="rb-menu-label-main">
-                          {entry.label}
-                        </span>
-                        <span className="rb-menu-label-sub">
-                          {entry.description}
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="rb-menu-label">{entry.label}</span>
-                    )}
-                    {'hint' in entry && entry.hint !== undefined && (
-                      <span className="rb-menu-hint">{entry.hint}</span>
-                    )}
-                    {'isSelected' in entry && entry.isSelected === true && (
-                      <Icon name="check" size={16} />
-                    )}
-                  </>
-                );
-
-                if ('href' in entry) {
-                  return (
-                    <Link
-                      key={entry.id}
-                      to={entry.href}
-                      role="menuitem"
-                      className="rb-menu-item"
-                      onClick={() => close()}
-                    >
-                      {content}
-                    </Link>
-                  );
-                }
-
+              if ('heading' in entry) {
                 return (
-                  <button
+                  <div key={entry.id} className="rb-menu-heading">
+                    {entry.heading}
+                  </div>
+                );
+              }
+
+              const content = (
+                <>
+                  {entry.icon !== undefined && (
+                    <Icon name={entry.icon} size={16} />
+                  )}
+                  {'description' in entry && entry.description !== undefined ? (
+                    <span className="rb-menu-label rb-menu-two-line">
+                      <span className="rb-menu-label-main">{entry.label}</span>
+                      <span className="rb-menu-label-sub">
+                        {entry.description}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="rb-menu-label">{entry.label}</span>
+                  )}
+                  {'hint' in entry && entry.hint !== undefined && (
+                    <span className="rb-menu-hint">{entry.hint}</span>
+                  )}
+                  {'isSelected' in entry && entry.isSelected === true && (
+                    <Icon name="check" size={16} />
+                  )}
+                </>
+              );
+
+              if ('href' in entry) {
+                return (
+                  <Link
                     key={entry.id}
-                    type="button"
-                    role={
-                      entry.isSelected !== undefined
-                        ? 'menuitemcheckbox'
-                        : 'menuitem'
-                    }
-                    aria-checked={entry.isSelected}
-                    aria-disabled={entry.isDisabled}
-                    className={cx(
-                      'rb-menu-item',
-                      entry.isDanger === true && 'rb-menu-item-danger',
-                      entry.isDisabled === true && 'is-disabled',
-                    )}
-                    aria-selected={entry.isSelected}
-                    onClick={() => {
-                      entry.onSelect();
-                      if (!keepOpenOnSelect && entry.keepMenuOpen !== true) {
-                        close();
-                      }
-                    }}
+                    to={entry.href}
+                    role="menuitem"
+                    className="rb-menu-item"
+                    onClick={() => close()}
                   >
                     {content}
-                  </button>
+                  </Link>
                 );
-              })}
-              {showSearch && visibleEntries.length === 0 && (
-                <div className="rb-menu-empty">{t`No matches`}</div>
-              )}
-            </div>
-            {footer}
-          </div>,
-          document.body,
-        )}
+              }
+
+              return (
+                <button
+                  key={entry.id}
+                  type="button"
+                  role={
+                    entry.isSelected !== undefined
+                      ? 'menuitemcheckbox'
+                      : 'menuitem'
+                  }
+                  aria-checked={entry.isSelected}
+                  aria-disabled={entry.isDisabled}
+                  className={cx(
+                    'rb-menu-item',
+                    entry.isDanger === true && 'rb-menu-item-danger',
+                    entry.isDisabled === true && 'is-disabled',
+                  )}
+                  aria-selected={entry.isSelected}
+                  onClick={() => {
+                    entry.onSelect();
+                    if (!keepOpenOnSelect && entry.keepMenuOpen !== true) {
+                      close();
+                    }
+                  }}
+                >
+                  {content}
+                </button>
+              );
+            })}
+            {showSearch && visibleEntries.length === 0 && (
+              <div className="rb-menu-empty">{t`No matches`}</div>
+            )}
+          </div>
+          {footer}
+        </FloatingPanel>
+      )}
     </div>
   );
 };

@@ -7,15 +7,15 @@ import {
 import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { MenuSearch } from '@/roboost-ui/components/MenuSearch';
-import { useRoboostCloseOnOutsideScroll } from '@/roboost-ui/hooks/useRoboostCloseOnOutsideScroll';
-import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverPosition';
+import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString, isString } from '@sniptt/guards';
 import { type FocusEvent, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { type RecordGqlOperationFilter } from 'twenty-shared/types';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { useDebounce } from 'use-debounce';
+
+const PICKER_MIN_WIDTH = 240;
 
 type RoboostRecordPickerProps = {
   objectNameSingular: string;
@@ -53,21 +53,8 @@ export const RoboostRecordPicker = ({
   const [search, setSearch] = useState('');
   const anchorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { position, updatePosition } = useRoboostPopoverPosition({
-    anchorRef,
-    matchAnchorWidth: true,
-    isOpen,
-  });
-
-  useRoboostCloseOnOutsideScroll({
-    isOpen,
-    popoverRef: menuRef,
-    onReposition: updatePosition,
-    onClose: () => setIsOpen(false),
-  });
 
   const open = () => {
-    updatePosition();
     setSearch('');
     setIsOpen(true);
   };
@@ -144,82 +131,83 @@ export const RoboostRecordPicker = ({
         </span>
         <Icon name="caret" className="rb-caret" size={16} />
       </button>
-      {isOpen &&
-        createPortal(
-          <div
-            ref={menuRef}
-            className="rb-ui rb-menu rb-menu-portal rb-picker-menu"
-            style={position}
-            role="listbox"
-            tabIndex={-1}
-            onMouseDown={(event) => {
-              if (!(event.target instanceof HTMLInputElement)) {
-                event.preventDefault();
-              }
-            }}
-            onBlur={(event) => {
-              if (
-                !event.currentTarget.contains(event.relatedTarget) &&
-                anchorRef.current?.contains(event.relatedTarget) !== true
-              ) {
-                setIsOpen(false);
-              }
-            }}
-          >
-            <MenuSearch value={search} onChange={setSearch} />
-            <div className="rb-menu-list">
-              {isClearable && isNonEmptyString(selectedLabel) && (
+      {isOpen && (
+        <FloatingPanel
+          anchor={anchorRef.current}
+          panelRef={menuRef}
+          matchAnchorWidth
+          minWidth={PICKER_MIN_WIDTH}
+          onAnchorHidden={() => setIsOpen(false)}
+          className="rb-menu rb-menu-portal rb-picker-menu"
+          role="listbox"
+          tabIndex={-1}
+          onMouseDown={(event) => {
+            if (!(event.target instanceof HTMLInputElement)) {
+              event.preventDefault();
+            }
+          }}
+          onBlur={(event) => {
+            if (
+              !event.currentTarget.contains(event.relatedTarget) &&
+              anchorRef.current?.contains(event.relatedTarget) !== true
+            ) {
+              setIsOpen(false);
+            }
+          }}
+        >
+          <MenuSearch value={search} onChange={setSearch} />
+          <div className="rb-menu-list">
+            {isClearable && isNonEmptyString(selectedLabel) && (
+              <button
+                type="button"
+                className="rb-menu-item"
+                onClick={() => {
+                  onSelect(null);
+                  setIsOpen(false);
+                }}
+              >
+                <Icon name="x" size={16} />
+                <span className="rb-menu-label">{t`Clear`}</span>
+              </button>
+            )}
+            {records.map((record) => {
+              const label = getRoboostRecordLabel(record, objectMetadataItem);
+              const subtitle = getRecordSubtitle(record);
+
+              return (
                 <button
+                  key={record.id}
                   type="button"
                   className="rb-menu-item"
+                  role="option"
+                  aria-selected={label === selectedLabel}
                   onClick={() => {
-                    onSelect(null);
+                    onSelect({ id: record.id, label });
                     setIsOpen(false);
                   }}
                 >
-                  <Icon name="x" size={16} />
-                  <span className="rb-menu-label">{t`Clear`}</span>
+                  <Avatar
+                    name={label}
+                    src={(record.avatarUrl as string | undefined) ?? null}
+                    size="xs"
+                  />
+                  {subtitle !== undefined ? (
+                    <span className="rb-menu-label rb-menu-two-line">
+                      <span className="rb-menu-label-main">{label}</span>
+                      <span className="rb-menu-label-sub">{subtitle}</span>
+                    </span>
+                  ) : (
+                    <span className="rb-menu-label">{label}</span>
+                  )}
                 </button>
-              )}
-              {records.map((record) => {
-                const label = getRoboostRecordLabel(record, objectMetadataItem);
-                const subtitle = getRecordSubtitle(record);
-
-                return (
-                  <button
-                    key={record.id}
-                    type="button"
-                    className="rb-menu-item"
-                    role="option"
-                    aria-selected={label === selectedLabel}
-                    onClick={() => {
-                      onSelect({ id: record.id, label });
-                      setIsOpen(false);
-                    }}
-                  >
-                    <Avatar
-                      name={label}
-                      src={(record.avatarUrl as string | undefined) ?? null}
-                      size="xs"
-                    />
-                    {subtitle !== undefined ? (
-                      <span className="rb-menu-label rb-menu-two-line">
-                        <span className="rb-menu-label-main">{label}</span>
-                        <span className="rb-menu-label-sub">{subtitle}</span>
-                      </span>
-                    ) : (
-                      <span className="rb-menu-label">{label}</span>
-                    )}
-                  </button>
-                );
-              })}
-              {!loading && records.length === 0 && (
-                <div className="rb-menu-empty">{t`No matches`}</div>
-              )}
-            </div>
-          </div>,
-          document.body,
-        )}
+              );
+            })}
+            {!loading && records.length === 0 && (
+              <div className="rb-menu-empty">{t`No matches`}</div>
+            )}
+          </div>
+        </FloatingPanel>
+      )}
     </div>
   );
 };

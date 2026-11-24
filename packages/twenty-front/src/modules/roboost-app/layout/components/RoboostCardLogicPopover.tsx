@@ -1,3 +1,4 @@
+import { getRoboostZoom } from '@/roboost-ui/utils/getRoboostZoom';
 import { type RoboostCardLogic } from '@/roboost-app/layout/types/RoboostRecordLayout';
 import {
   describeRoboostCardLogic,
@@ -224,7 +225,11 @@ export const RoboostCardLogicPopover = ({
         className="rb-rve-logic"
         role="dialog"
         aria-label={t`Conditional logic`}
-        style={{ left, top, width: POPOVER_WIDTH }}
+        style={{
+          left: left / getRoboostZoom(),
+          top: top / getRoboostZoom(),
+          width: POPOVER_WIDTH,
+        }}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="rb-rve-logic-head">
