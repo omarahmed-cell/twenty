@@ -56,6 +56,7 @@ export const RoboostRecordPicker = ({
   const { position, updatePosition } = useRoboostPopoverPosition({
     anchorRef,
     matchAnchorWidth: true,
+    isOpen,
   });
 
   useRoboostCloseOnOutsideScroll({

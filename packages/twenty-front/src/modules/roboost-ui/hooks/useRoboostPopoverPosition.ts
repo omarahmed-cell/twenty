@@ -1,4 +1,9 @@
-import { type CSSProperties, type RefObject, useState } from 'react';
+import {
+  type CSSProperties,
+  type RefObject,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { isDefined } from 'twenty-shared/utils';
 
 const GAP = 4;
@@ -15,11 +20,14 @@ export const useRoboostPopoverPosition = ({
   align = 'left',
   placement = 'below',
   matchAnchorWidth = false,
+  isOpen = false,
 }: {
   anchorRef: RefObject<HTMLElement | null>;
   align?: 'left' | 'right';
   placement?: PopoverPlacement;
   matchAnchorWidth?: boolean;
+  // While open the panel follows its control every frame, so it never ends up over it
+  isOpen?: boolean;
 }) => {
   const [position, setPosition] = useState<CSSProperties>({});
 
@@ -54,6 +62,31 @@ export const useRoboostPopoverPosition = ({
       ...(matchAnchorWidth ? { minWidth: rect.width } : {}),
     });
   };
+
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    let frameId = 0;
+    let lastKey = '';
+    const track = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      const key = isDefined(rect)
+        ? `${rect.left}|${rect.top}|${rect.right}|${rect.bottom}|${window.innerWidth}|${window.innerHeight}`
+        : '';
+
+      if (key !== lastKey) {
+        lastKey = key;
+        updatePosition();
+      }
+      frameId = requestAnimationFrame(track);
+    };
+
+    track();
+
+    return () => cancelAnimationFrame(frameId);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [anchorRef, isOpen]);
 
   return { position, updatePosition };
 };

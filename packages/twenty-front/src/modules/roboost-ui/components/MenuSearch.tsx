@@ -1,17 +1,19 @@
 import { Icon } from '@/roboost-ui/components/Icon';
 import { useLingui } from '@lingui/react/macro';
-import { useEffect, useRef } from 'react';
+import { type KeyboardEvent, useEffect, useRef } from 'react';
 
 export type MenuSearchProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export const MenuSearch = ({
   value,
   onChange,
   placeholder,
+  onKeyDown,
 }: MenuSearchProps) => {
   const { t } = useLingui();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,6 +37,7 @@ export const MenuSearch = ({
         placeholder={placeholder ?? t`Search`}
         aria-label={placeholder ?? t`Search`}
         onChange={(event) => onChange(event.target.value)}
+        onKeyDown={onKeyDown}
       />
       <Icon name="search" size={16} />
     </div>

@@ -75,6 +75,7 @@ export const Menu = ({
     anchorRef,
     align,
     placement,
+    isOpen,
   });
 
   const actionEntries = entries.filter(isActionEntry);

@@ -1,18 +1,9 @@
+import { FieldDropdown } from '@/roboost-ui/components/FieldDropdown';
 import { Icon } from '@/roboost-ui/components/Icon';
-import { MenuSearch } from '@/roboost-ui/components/MenuSearch';
 import { ROBOOST_MENU_SEARCH_THRESHOLD } from '@/roboost-ui/constants/RoboostMenuSearchThreshold';
-import { useRoboostCloseOnOutsideScroll } from '@/roboost-ui/hooks/useRoboostCloseOnOutsideScroll';
-import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverPosition';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import {
-  type CSSProperties,
-  type FocusEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { createPortal } from 'react-dom';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 export type SelectOption = {
   value: string;
@@ -30,6 +21,10 @@ export type SelectProps = {
   style?: CSSProperties;
   'aria-label'?: string;
   autoOpen?: boolean;
+  // Fields always show the search box; short control lists only when they are long
+  isSearchable?: boolean;
+  // Clicking the selected option again clears the value (onChange receives '')
+  isClearable?: boolean;
 };
 
 export const Select = ({
@@ -42,80 +37,38 @@ export const Select = ({
   style,
   'aria-label': ariaLabel,
   autoOpen = false,
+  isSearchable,
+  isClearable = false,
 }: SelectProps) => {
   const { t } = useLingui();
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
   const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
   const anchorRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const { position, updatePosition } = useRoboostPopoverPosition({
-    anchorRef,
-    matchAnchorWidth: true,
-  });
   const currentValue = value ?? uncontrolledValue;
   const currentOption = options.find((option) => option.value === currentValue);
-  const showSearch = options.length > ROBOOST_MENU_SEARCH_THRESHOLD;
-  const searchTerm = search.trim().toLowerCase();
-  const visibleOptions =
-    searchTerm === ''
-      ? options
-      : options.filter((option) =>
-          `${option.label} ${option.description ?? ''}`
-            .toLowerCase()
-            .includes(searchTerm),
-        );
 
-  const open = () => {
-    updatePosition();
-    setSearch('');
-    setIsOpen(true);
-  };
-
-  // Positioning needs the trigger's rendered rect, so the first open waits for mount
   useEffect(() => {
     if (autoOpen) {
-      open();
+      setIsOpen(true);
       triggerRef.current?.focus();
     }
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useRoboostCloseOnOutsideScroll({
-    isOpen,
-    popoverRef: menuRef,
-    onReposition: updatePosition,
-    onClose: () => setIsOpen(false),
-  });
-
-  const choose = (option: SelectOption) => {
-    if (value === undefined) {
-      setUncontrolledValue(option.value);
-    }
+  const choose = (nextValue: string | null) => {
     setIsOpen(false);
-    onChange?.(option.value);
+    const chosenValue = nextValue ?? '';
+
+    if (value === undefined) {
+      setUncontrolledValue(chosenValue);
+    }
+    onChange?.(chosenValue);
+    triggerRef.current?.focus();
   };
 
   return (
-    <div
-      ref={anchorRef}
-      className={cx('rb-select', className)}
-      style={style}
-      onBlur={(event: FocusEvent<HTMLDivElement>) => {
-        if (
-          !event.currentTarget.contains(event.relatedTarget) &&
-          menuRef.current?.contains(event.relatedTarget) !== true
-        ) {
-          setIsOpen(false);
-        }
-      }}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          setIsOpen(false);
-        }
-      }}
-    >
+    <div ref={anchorRef} className={cx('rb-select', className)} style={style}>
       <button
         ref={triggerRef}
         type="button"
@@ -126,67 +79,28 @@ export const Select = ({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        onClick={() => (isOpen ? setIsOpen(false) : open())}
+        onClick={() => setIsOpen(!isOpen)}
       >
         <span className="rb-truncate">
           {currentOption?.label ?? placeholder ?? t`Select`}
         </span>
         <Icon name="caret" className="rb-caret" size={16} />
       </button>
-      {isOpen &&
-        createPortal(
-          <div
-            ref={menuRef}
-            className="rb-ui rb-menu rb-menu-portal"
-            style={position}
-            role="listbox"
-            tabIndex={-1}
-            onMouseDown={(event) => {
-              if (!(event.target instanceof HTMLInputElement)) {
-                event.preventDefault();
-              }
-            }}
-            onBlur={(event) => {
-              if (
-                !event.currentTarget.contains(event.relatedTarget) &&
-                anchorRef.current?.contains(event.relatedTarget) !== true
-              ) {
-                setIsOpen(false);
-              }
-            }}
-          >
-            {showSearch && <MenuSearch value={search} onChange={setSearch} />}
-            <div className="rb-menu-list">
-              {visibleOptions.map((option) => (
-                <div
-                  key={option.value}
-                  role="option"
-                  className="rb-menu-item"
-                  aria-selected={option.value === currentValue}
-                  onClick={() => choose(option)}
-                >
-                  {option.description !== undefined ? (
-                    <span className="rb-menu-label rb-menu-two-line">
-                      <span className="rb-menu-label-main">{option.label}</span>
-                      <span className="rb-menu-label-sub">
-                        {option.description}
-                      </span>
-                    </span>
-                  ) : (
-                    <span className="rb-menu-label">{option.label}</span>
-                  )}
-                  {option.value === currentValue && (
-                    <Icon name="check" size={16} />
-                  )}
-                </div>
-              ))}
-              {visibleOptions.length === 0 && (
-                <div className="rb-menu-empty">{t`No matches`}</div>
-              )}
-            </div>
-          </div>,
-          document.body,
-        )}
+      {isOpen && (
+        <FieldDropdown
+          anchorRef={anchorRef}
+          options={options}
+          mode="single"
+          selectedValues={currentValue === undefined ? [] : [currentValue]}
+          isClearable={isClearable}
+          isSearchable={
+            isSearchable ?? options.length > ROBOOST_MENU_SEARCH_THRESHOLD
+          }
+          aria-label={ariaLabel}
+          onChoose={choose}
+          onDismiss={() => setIsOpen(false)}
+        />
+      )}
     </div>
   );
 };

@@ -2422,3 +2422,38 @@
   margin: var(--space-1) calc(-1 * var(--space-1)) calc(-1 * var(--space-1));
   padding: var(--space-2) var(--space-3);
 }
+
+/* Field dropdown: one size everywhere, search pinned on top, only the list scrolls */
+.rb-menu.rb-menu-portal.rb-fdd {
+  box-sizing: border-box;
+  min-width: 0;
+}
+.rb-fdd-list {
+  overflow-x: hidden;
+}
+.rb-fdd-item {
+  box-sizing: border-box;
+  font-size: 14px;
+  min-height: 36px;
+}
+.rb-fdd-item.is-active {
+  background: var(--surface-hover);
+}
+.rb-fdd-item .rb-check {
+  min-width: 0;
+  pointer-events: none;
+  width: 100%;
+}
+.rb-fdd-item .rb-check .rb-menu-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-fdd .rb-multi-actions {
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex: none;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 8px 4px 4px;
+}

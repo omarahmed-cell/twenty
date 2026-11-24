@@ -2,6 +2,7 @@ import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadat
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { getRoboostRecordLabel } from '@/roboost-app/fields/getRoboostRecordLabel';
+import { RoboostInlineFieldDropdown } from '@/roboost-app/fields/RoboostInlineFieldDropdown';
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Input } from '@/roboost-ui/components/Input';
@@ -101,39 +102,54 @@ export const RoboostFieldInput = ({
       );
     case 'select':
     case 'rating':
-      return (
+    case 'multiSelect': {
+      const isMulti = kind === 'multiSelect';
+      const options = [...(field.options ?? [])]
+        .sort((first, second) => first.position - second.position)
+        .map((option) => ({ value: option.value, label: option.label }));
+      const selectedValues = isMulti
+        ? Array.isArray(value)
+          ? (value as string[])
+          : []
+        : isString(value) && value !== ''
+          ? [value]
+          : [];
+
+      if (autoOpen) {
+        return (
+          <RoboostInlineFieldDropdown
+            aria-label={field.label}
+            options={options}
+            mode={isMulti ? 'multi' : 'single'}
+            selectedValues={selectedValues}
+            onChange={onChange}
+            onCancel={onCancel}
+          />
+        );
+      }
+
+      return isMulti ? (
+        <MultiSelect
+          aria-label={field.label}
+          style={{ width: '100%' }}
+          value={selectedValues}
+          placeholder={placeholder ?? t`Select…`}
+          options={options}
+          onChange={onChange}
+          onCancel={onCancel}
+        />
+      ) : (
         <Select
           aria-label={field.label}
-          autoOpen={autoOpen}
           style={{ width: '100%' }}
-          value={isString(value) ? value : ''}
+          value={selectedValues[0] ?? ''}
           placeholder={placeholder ?? t`Select…`}
-          options={[
-            { value: '', label: t`None` },
-            ...[...(field.options ?? [])]
-              .sort((first, second) => first.position - second.position)
-              .map((option) => ({ value: option.value, label: option.label })),
-          ]}
+          options={options}
+          isSearchable
+          isClearable
           onChange={(nextValue) =>
             onChange(nextValue === '' ? null : nextValue)
           }
-        />
-      );
-    case 'multiSelect': {
-      const selected = Array.isArray(value) ? (value as string[]) : [];
-
-      return (
-        <MultiSelect
-          aria-label={field.label}
-          autoOpen={autoOpen}
-          style={{ width: '100%' }}
-          value={selected}
-          placeholder={placeholder ?? t`Select…`}
-          options={[...(field.options ?? [])]
-            .sort((first, second) => first.position - second.position)
-            .map((option) => ({ value: option.value, label: option.label }))}
-          onChange={onChange}
-          onCancel={onCancel}
         />
       );
     }

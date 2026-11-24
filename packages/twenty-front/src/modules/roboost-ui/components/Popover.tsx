@@ -26,6 +26,7 @@ export const Popover = ({
   const { position, updatePosition } = useRoboostPopoverPosition({
     anchorRef,
     align,
+    isOpen,
   });
   const close = () => setIsOpen(false);
 

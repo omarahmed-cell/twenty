@@ -19,6 +19,9 @@ import { useState } from 'react';
 import { isDefined } from 'twenty-shared/utils';
 import { RelationType } from '~/generated-metadata/graphql';
 
+// A pick from a list is the whole edit, so the list closes and the draft waits for Save
+const CLOSE_ON_CHOICE_KINDS = new Set(['select', 'multiSelect', 'rating']);
+
 // Titles head the card; sync and provenance fields are bookkeeping, not part of the activity
 const HIDDEN_CARD_FIELD_NAMES = new Set([
   'title',
@@ -208,9 +211,17 @@ export const RoboostActivityExpandedBody = ({
                   relatedRecord={
                     record[field.name] as Record<string, unknown> | null
                   }
-                  onChange={(value) =>
-                    setDraft({ ...draft, [field.name]: value })
-                  }
+                  onCancel={() => setEditingFieldName(null)}
+                  onChange={(value) => {
+                    setDraft({ ...draft, [field.name]: value });
+                    if (
+                      CLOSE_ON_CHOICE_KINDS.has(
+                        getRoboostFieldEditKind(field) ?? '',
+                      )
+                    ) {
+                      setEditingFieldName(null);
+                    }
+                  }}
                 />
               ) : (
                 <button

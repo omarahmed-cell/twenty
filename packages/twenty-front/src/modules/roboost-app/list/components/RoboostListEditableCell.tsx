@@ -58,6 +58,10 @@ const RoboostListCellEditor = ({
   const editKind = getRoboostFieldEditKind(field);
   const isEditing = editor.isEditing;
   const saveOnChoice = editKind !== null && SAVE_ON_CHOICE_KINDS.has(editKind);
+  const isInlineDropdown =
+    editKind === 'select' ||
+    editKind === 'multiSelect' ||
+    editKind === 'rating';
 
   const initialValue =
     field.relation !== undefined && field.relation !== null
@@ -142,6 +146,7 @@ const RoboostListCellEditor = ({
       ref={editorRef}
       className={cx(
         'rb-cell-editor',
+        isInlineDropdown && 'is-inline-dropdown',
         editor.needsAttention && 'needs-attention',
       )}
       onClick={(event) => event.stopPropagation()}
@@ -238,7 +243,7 @@ export const RoboostListEditableCell = memo(
           field={field}
           record={record}
           objectMetadataItem={objectMetadataItem}
-            onSaved={onSaved}
+          onSaved={onSaved}
           editor={editor}
         />
       );

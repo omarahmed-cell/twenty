@@ -1061,3 +1061,25 @@
   flex: 1;
   max-width: 420px;
 }
+
+/* Select and multi-select fields edit in place: the value stays, the list opens out of the field */
+.rb-cell-editor.is-inline-dropdown {
+  background: none;
+  border: none;
+  box-shadow: none;
+  min-width: 0;
+  padding: 0;
+}
+.rb-fdd-value {
+  align-items: center;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+}
+.rb-fdd-caret {
+  color: var(--text-secondary);
+  flex: none;
+}

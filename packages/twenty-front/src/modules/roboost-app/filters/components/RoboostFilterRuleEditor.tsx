@@ -7,7 +7,7 @@ import { isRoboostValuelessFilterOperator } from '@/roboost-app/filters/utils/is
 import { type RoboostFilterRule } from '@/roboost-app/list/types/RoboostListFilters';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Input } from '@/roboost-ui/components/Input';
-import { Menu } from '@/roboost-ui/components/Menu';
+import { MultiSelect } from '@/roboost-ui/components/MultiSelect';
 import { Select } from '@/roboost-ui/components/Select';
 import { useLingui } from '@lingui/react/macro';
 import { isString } from '@sniptt/guards';
@@ -70,41 +70,16 @@ export const RoboostFilterRuleEditor = ({
         );
 
         return (
-          <Menu
-            keepOpenOnSelect
-            minWidth={240}
-            entries={options.map((option) => ({
-              id: option.value,
+          <MultiSelect
+            aria-label={t`Values`}
+            className="rb-frule-values"
+            value={values}
+            placeholder={t`Choose values`}
+            options={options.map((option) => ({
+              value: option.value,
               label: option.label,
-              isSelected: values.includes(option.value),
-              onSelect: () =>
-                setValues(
-                  values.includes(option.value)
-                    ? values.filter((value) => value !== option.value)
-                    : [...values, option.value],
-                ),
             }))}
-            trigger={({ toggle, isOpen }) => (
-              <button
-                type="button"
-                className="rb-select-trigger rb-frule-values"
-                aria-expanded={isOpen}
-                onClick={toggle}
-              >
-                <span className="rb-truncate">
-                  {values.length === 0
-                    ? t`Choose values`
-                    : values
-                        .map(
-                          (value) =>
-                            options.find((option) => option.value === value)
-                              ?.label ?? value,
-                        )
-                        .join(', ')}
-                </span>
-                <Icon name="caret" size={14} />
-              </button>
-            )}
+            onChange={setValues}
           />
         );
       }
