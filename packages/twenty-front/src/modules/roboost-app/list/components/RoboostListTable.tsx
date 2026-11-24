@@ -21,6 +21,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Link } from 'react-router-dom';
@@ -80,39 +81,50 @@ export const RoboostListTable = ({
   const { t } = useLingui();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
-  const [resizing, setResizing] = useState<{
-    fieldId: string;
-    size: number;
-  } | null>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
 
-  // Width follows the pointer while dragging and lands in the view's unsaved changes on release
+  // While dragging, widths move through CSS variables on the table (no re-render);
+  // the final width lands in the view's unsaved changes on release
   const startResize = (
     event: ReactPointerEvent<HTMLSpanElement>,
     column: RoboostListColumn,
+    columnIndex: number,
   ) => {
     event.preventDefault();
     event.stopPropagation();
+    const table = tableRef.current;
     const startX = event.clientX;
-    const startSize = Math.max(
-      getRoboostColumnMinWidth(column.field.label),
-      column.size,
-    );
+    const startSize = columnWidths[columnIndex];
+    const minSize = getRoboostColumnMinWidth(column.field.label);
     let latestSize = startSize;
 
     const move = (moveEvent: PointerEvent) => {
       latestSize = Math.max(
-        getRoboostColumnMinWidth(column.field.label),
+        minSize,
         Math.round(startSize + moveEvent.clientX - startX),
       );
-      setResizing({ fieldId: column.field.id, size: latestSize });
+      table?.style.setProperty(`--rb-cw-${columnIndex}`, `${latestSize}px`);
+      let left = CHECK_COLUMN_WIDTH;
+
+      for (let index = 0; index < frozenCount; index++) {
+        if (index > columnIndex) {
+          table?.style.setProperty(`--rb-cl-${index}`, `${left}px`);
+        }
+        left += index === columnIndex ? latestSize : columnWidths[index];
+      }
     };
     const stop = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', stop);
-      setResizing(null);
       if (latestSize !== startSize) {
         onResizeColumn(column.field.id, latestSize);
       }
+      requestAnimationFrame(() => {
+        table?.style.removeProperty(`--rb-cw-${columnIndex}`);
+        for (let index = 0; index < frozenCount; index++) {
+          table?.style.removeProperty(`--rb-cl-${index}`);
+        }
+      });
     };
 
     window.addEventListener('pointermove', move);
@@ -125,24 +137,33 @@ export const RoboostListTable = ({
     recordIds.length > 0 && recordIds.every((id) => selectedIds.includes(id));
   const isSomeSelected = recordIds.some((id) => selectedIds.includes(id));
 
+  const columnWidths = useMemo(
+    () =>
+      columns.map((column) =>
+        Math.max(getRoboostColumnMinWidth(column.field.label), column.size),
+      ),
+    [columns],
+  );
+
   const columnStyles = useMemo(() => {
     let left = CHECK_COLUMN_WIDTH;
 
-    return columns.map((column, columnIndex): CSSProperties => {
-      const width = Math.max(
-        getRoboostColumnMinWidth(column.field.label),
-        resizing?.fieldId === column.field.id ? resizing.size : column.size,
-      );
-      const style: CSSProperties = { width, minWidth: width, maxWidth: width };
+    return columnWidths.map((width, columnIndex): CSSProperties => {
+      const widthValue = `var(--rb-cw-${columnIndex}, ${width}px)`;
+      const style: CSSProperties = {
+        width: widthValue,
+        minWidth: widthValue,
+        maxWidth: widthValue,
+      };
 
       if (columnIndex < frozenCount) {
-        style.left = left;
+        style.left = `var(--rb-cl-${columnIndex}, ${left}px)`;
       }
       left += width;
 
       return style;
     });
-  }, [columns, frozenCount, resizing]);
+  }, [columnWidths, frozenCount]);
 
   // Rows stay memoized while cells change; a selection change re-renders only the row elements, not the cells
   const toggleRow = useCallback(
@@ -157,7 +178,7 @@ export const RoboostListTable = ({
 
   return (
     <div className="rb-ls-tablewrap">
-      <table className="rb-ltable">
+      <table ref={tableRef} className="rb-ltable">
         <thead>
           <tr>
             <th className="rb-lt-check">
@@ -269,7 +290,9 @@ export const RoboostListTable = ({
                       event.preventDefault();
                       event.stopPropagation();
                     }}
-                    onPointerDown={(event) => startResize(event, column)}
+                    onPointerDown={(event) =>
+                      startResize(event, column, columnIndex)
+                    }
                   />
                 </th>
               );
