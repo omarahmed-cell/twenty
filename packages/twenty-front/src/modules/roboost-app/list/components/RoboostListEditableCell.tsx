@@ -1,19 +1,32 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
-import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
+import {
+  getRoboostFieldEditKind,
+  getRoboostReadOnlyReason,
+} from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
 import { useRoboostRequiredFieldsCheck } from '@/roboost-app/fields/hooks/useRoboostRequiredFieldsCheck';
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
 import { RoboostListCellValue } from '@/roboost-app/list/components/RoboostListCellValue';
 import { useRoboostCellEditor } from '@/roboost-app/list/hooks/useRoboostCellEditor';
 import { Button } from '@/roboost-ui/components/Button';
+import { useRoboostAnchoredPosition } from '@/roboost-ui/hooks/useRoboostAnchoredPosition';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import { memo, useEffect, useRef, useState } from 'react';
+import {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
 
 const NOT_EDITED = Symbol('notEdited');
+const FLOATING_EDITOR_MIN_WIDTH = 280;
 
 // Picking from a list is the whole edit, so these save on choice instead of waiting for Save
 const SAVE_ON_CHOICE_KINDS = new Set([
@@ -43,6 +56,7 @@ const RoboostListCellEditor = ({
   field,
   record,
   objectMetadataItem,
+  objectMetadataItems,
   onSaved,
   editor,
 }: RoboostListCellEditorProps) => {
@@ -50,6 +64,9 @@ const RoboostListCellEditor = ({
   const { updateOneRecord } = useUpdateOneRecord();
   const { completeChange } = useRoboostRequiredFieldsCheck(objectMetadataItem);
   const editorRef = useRef<HTMLDivElement>(null);
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const [tableCell, setTableCell] = useState<HTMLElement | null>(null);
+  const tableCellRef = useMemo(() => ({ current: tableCell }), [tableCell]);
   const [draft, setDraft] = useState<unknown>(NOT_EDITED);
   const [draftRelated, setDraftRelated] = useState<
     Record<string, unknown> | null | undefined
@@ -68,6 +85,27 @@ const RoboostListCellEditor = ({
       ? ((record[field.name] as { id?: string } | null)?.id ?? null)
       : record[field.name];
   const currentDraft = draft === NOT_EDITED ? initialValue : draft;
+  const floatingStyle = useRoboostAnchoredPosition({
+    anchorRef: tableCellRef,
+    isOpen: tableCell !== null,
+    minWidth: FLOATING_EDITOR_MIN_WIDTH,
+  });
+
+  useLayoutEffect(() => {
+    if (!isInlineDropdown) {
+      setTableCell(placeholderRef.current?.closest('td') ?? null);
+    }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isInlineDropdown) {
+      editorRef.current
+        ?.querySelector<HTMLElement>('input:not([type="checkbox"]), textarea')
+        ?.focus({ preventScroll: true });
+    }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableCell]);
 
   const resetDraft = () => {
     setDraft(NOT_EDITED);
@@ -141,14 +179,16 @@ const RoboostListCellEditor = ({
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing]);
 
-  return (
+  const editorBox = (
     <div
       ref={editorRef}
       className={cx(
         'rb-cell-editor',
         isInlineDropdown && 'is-inline-dropdown',
+        tableCell !== null && 'rb-ui is-floating',
         editor.needsAttention && 'needs-attention',
       )}
+      style={tableCell !== null ? floatingStyle : undefined}
       onClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
@@ -205,11 +245,33 @@ const RoboostListCellEditor = ({
       )}
     </div>
   );
+
+  // In a table the editor floats above the grid, under its cell, so the table never clips it
+  if (tableCell !== null) {
+    return (
+      <>
+        <div className="rb-cell">
+          <RoboostListCellValue
+            field={field}
+            record={record}
+            objectMetadataItems={objectMetadataItems}
+          />
+        </div>
+        {createPortal(editorBox, document.body)}
+      </>
+    );
+  }
+
+  return (
+    <div ref={placeholderRef} className="rb-cell-editor-slot">
+      {editorBox}
+    </div>
+  );
 };
 
 type RoboostListCellEditorProps = Omit<
   RoboostListEditableCellProps,
-  'hideEditButton' | 'objectMetadataItems'
+  'hideEditButton'
 > & {
   editor: ReturnType<typeof useRoboostCellEditor>;
 };
@@ -229,6 +291,7 @@ export const RoboostListEditableCell = memo(
       getRoboostCellEditorKey(record.id, field.id),
     );
     const isEditable = getRoboostFieldEditKind(field) !== null;
+    const readOnlyReason = getRoboostReadOnlyReason(field);
 
     // A row that leaves the screen must not keep the shared editor slot
     useEffect(
@@ -243,6 +306,7 @@ export const RoboostListEditableCell = memo(
           field={field}
           record={record}
           objectMetadataItem={objectMetadataItem}
+          objectMetadataItems={objectMetadataItems}
           onSaved={onSaved}
           editor={editor}
         />
@@ -252,6 +316,13 @@ export const RoboostListEditableCell = memo(
     return (
       <div
         className={cx('rb-cell', isEditable && 'is-editable')}
+        title={
+          readOnlyReason === 'calculated'
+            ? t`Calculated automatically`
+            : readOnlyReason === 'readOnly'
+              ? t`Read-only`
+              : undefined
+        }
         onPointerDown={(event) => {
           if (
             event.button !== 0 ||

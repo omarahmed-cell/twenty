@@ -1083,3 +1083,14 @@
   color: var(--text-secondary);
   flex: none;
 }
+
+/* Table cell editors float above the grid under their cell, so nothing clips them */
+.rb-cell-editor.is-floating {
+  box-sizing: border-box;
+  overflow: auto;
+  position: fixed;
+  z-index: 95;
+}
+.rb-cell-editor-slot {
+  min-width: 0;
+}

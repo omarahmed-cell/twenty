@@ -214,18 +214,21 @@
   opacity: 1;
 }
 
-/* Column header ⋯ menu (freeze, add to the right, remove) */
+/* Column header ⋮ menu (freeze, add to the right, remove): its own slot on the right, never over the name */
+.rb-ltable thead th {
+  padding-right: 38px;
+}
 .rb-th-menu {
   position: absolute;
-  right: 8px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
 }
 .rb-th-menu-btn {
   align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: none;
+  border: none;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
@@ -233,7 +236,8 @@
   height: 22px;
   justify-content: center;
   opacity: 0;
-  width: 22px;
+  padding: 0;
+  width: 18px;
 }
 .rb-ltable thead th:hover .rb-th-menu-btn,
 .rb-th-menu-btn[aria-expanded='true'],
@@ -241,8 +245,16 @@
   opacity: 1;
 }
 .rb-th-menu-btn:hover {
+  background: var(--surface-hover);
   color: var(--text);
 }
 .rb-ltable thead th .rb-lth {
-  max-width: calc(100% - 28px);
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+.rb-ltable thead th .rb-lth-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

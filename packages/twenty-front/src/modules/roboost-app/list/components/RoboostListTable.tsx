@@ -7,6 +7,7 @@ import { RoboostAddColumnPopover } from '@/roboost-app/list/components/RoboostAd
 import { RoboostColumnHeaderMenu } from '@/roboost-app/list/components/RoboostColumnHeaderMenu';
 import { RoboostListEditableCell } from '@/roboost-app/list/components/RoboostListEditableCell';
 import { type RoboostListColumn } from '@/roboost-app/list/hooks/useRoboostViewColumns';
+import { getRoboostColumnMinWidth } from '@/roboost-app/list/utils/getRoboostColumnMinWidth';
 import { getRoboostAvatarTone } from '@/roboost-app/utils/getRoboostAvatarTone';
 import { Avatar } from '@/roboost-ui/components/Avatar';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
@@ -28,7 +29,6 @@ import { getAppPath } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 const CHECK_COLUMN_WIDTH = 44;
-const MIN_COLUMN_WIDTH = 80;
 
 export type RoboostListSort = { fieldName: string; direction: 'asc' | 'desc' };
 
@@ -93,12 +93,15 @@ export const RoboostListTable = ({
     event.preventDefault();
     event.stopPropagation();
     const startX = event.clientX;
-    const startSize = column.size;
+    const startSize = Math.max(
+      getRoboostColumnMinWidth(column.field.label),
+      column.size,
+    );
     let latestSize = startSize;
 
     const move = (moveEvent: PointerEvent) => {
       latestSize = Math.max(
-        MIN_COLUMN_WIDTH,
+        getRoboostColumnMinWidth(column.field.label),
         Math.round(startSize + moveEvent.clientX - startX),
       );
       setResizing({ fieldId: column.field.id, size: latestSize });
@@ -126,8 +129,10 @@ export const RoboostListTable = ({
     let left = CHECK_COLUMN_WIDTH;
 
     return columns.map((column, columnIndex): CSSProperties => {
-      const width =
-        resizing?.fieldId === column.field.id ? resizing.size : column.size;
+      const width = Math.max(
+        getRoboostColumnMinWidth(column.field.label),
+        resizing?.fieldId === column.field.id ? resizing.size : column.size,
+      );
       const style: CSSProperties = { width, minWidth: width, maxWidth: width };
 
       if (columnIndex < frozenCount) {
@@ -221,9 +226,7 @@ export const RoboostListTable = ({
                   }}
                 >
                   <span className="rb-lth">
-                    {columnIndex === 0 && column.field.name === labelFieldName
-                      ? `${column.field.label}`
-                      : column.field.label}
+                    <span className="rb-lth-text">{column.field.label}</span>
                     {isActiveSort && (
                       <span className="rb-sorti">
                         <Icon

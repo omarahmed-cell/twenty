@@ -592,12 +592,9 @@
   flex: 0 1 auto;
   min-width: 0;
 }
-.rb-prop-value > .rb-cell-editor {
+.rb-prop-value > .rb-cell-editor-slot {
   flex: 1;
   min-width: 0;
-}
-.rb-prop-value > .rb-cell-editor.is-inline-dropdown {
-  flex: 0 1 auto;
 }
 .rb-prop-caret {
   color: var(--text-secondary);

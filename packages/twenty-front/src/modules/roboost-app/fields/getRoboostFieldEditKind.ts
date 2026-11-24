@@ -1,4 +1,5 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { isCalculatedFieldMetadataItem } from '@/object-metadata/utils/isCalculatedFieldMetadataItem';
 import { FieldMetadataType, RelationType } from '~/generated-metadata/graphql';
 
 export type RoboostFieldEditKind =
@@ -45,11 +46,35 @@ const KIND_BY_TYPE: Partial<Record<FieldMetadataType, RoboostFieldEditKind>> = {
   [FieldMetadataType.RATING]: 'rating',
 };
 
-// Null means the field is shown but not edited in place (system, computed, rich or composite-heavy types)
+// HubSpot ids link records back to HubSpot; editing them would break the sync
+const HUBSPOT_ID_FIELD_NAME_PATTERN = /^hubspot([A-Z]\w*)?Id$/;
+
+export type RoboostReadOnlyReason = 'calculated' | 'readOnly';
+
+// Why a field never opens an editor: shown as its hover tooltip
+export const getRoboostReadOnlyReason = (
+  field: FieldMetadataItem,
+): RoboostReadOnlyReason | null => {
+  if (isCalculatedFieldMetadataItem(field)) {
+    return 'calculated';
+  }
+  if (
+    READ_ONLY_FIELD_NAMES.has(field.name) ||
+    field.isSystem === true ||
+    field.isUIEditable === false ||
+    HUBSPOT_ID_FIELD_NAME_PATTERN.test(field.name)
+  ) {
+    return 'readOnly';
+  }
+
+  return null;
+};
+
+// Null means the field is shown but not edited in place (read-only, rich or composite-heavy types)
 export const getRoboostFieldEditKind = (
   field: FieldMetadataItem,
 ): RoboostFieldEditKind | null => {
-  if (READ_ONLY_FIELD_NAMES.has(field.name) || field.isSystem === true) {
+  if (getRoboostReadOnlyReason(field) !== null) {
     return null;
   }
 
