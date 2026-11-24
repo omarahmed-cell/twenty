@@ -5,6 +5,7 @@ import { ROBOOST_FILTER_OPERATORS_BY_KIND } from '@/roboost-app/filters/constant
 import { getRoboostFilterFieldKind } from '@/roboost-app/filters/utils/getRoboostFilterFieldKind';
 import { isRoboostValuelessFilterOperator } from '@/roboost-app/filters/utils/isRoboostValuelessFilterOperator';
 import { type RoboostFilterRule } from '@/roboost-app/list/types/RoboostListFilters';
+import { isRoboostPercentageField } from '@/roboost-app/utils/formatRoboostPercentage';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Input } from '@/roboost-ui/components/Input';
 import { MultiSelect } from '@/roboost-ui/components/MultiSelect';
@@ -181,18 +182,29 @@ export const RoboostFilterRuleEditor = ({
         );
       }
       case 'number':
-      case 'currency':
+      case 'currency': {
+        // Percentage fields are typed as % and kept as fractions, which is how they are stored
+        const isPercent = kind === 'number' && isRoboostPercentageField(field);
+        const shown = (stored: string | undefined) =>
+          !isPercent || stored === undefined || stored === ''
+            ? (stored ?? '')
+            : String(Number((Number(stored) * 100).toFixed(4)));
+        const stored = (typed: string) =>
+          !isPercent || typed === '' ? typed : String(Number(typed) / 100);
+        const suffix = isPercent && <span className="rb-frule-suffix">%</span>;
+
         return (
           <div className="rb-frule-range">
             <Input
               type="number"
               size="sm"
               aria-label={t`Value`}
-              value={values[0] ?? ''}
+              value={shown(values[0])}
               onChange={(event) =>
-                setValues([event.target.value, values[1] ?? ''])
+                setValues([stored(event.target.value), values[1] ?? ''])
               }
             />
+            {suffix}
             {(rule.operator === 'isBetween' ||
               rule.operator === 'isNotBetween') && (
               <>
@@ -201,15 +213,17 @@ export const RoboostFilterRuleEditor = ({
                   type="number"
                   size="sm"
                   aria-label={t`Second value`}
-                  value={values[1] ?? ''}
+                  value={shown(values[1])}
                   onChange={(event) =>
-                    setValues([values[0] ?? '', event.target.value])
+                    setValues([values[0] ?? '', stored(event.target.value)])
                   }
                 />
+                {suffix}
               </>
             )}
           </div>
         );
+      }
       default:
         return (
           <Input

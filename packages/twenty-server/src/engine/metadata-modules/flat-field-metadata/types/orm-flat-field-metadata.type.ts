@@ -23,8 +23,9 @@ export const ORM_FLAT_FIELD_METADATA_KEYS = [
   // read by the shared query runners and REST/direct-execution paths
   'isActive',
   'isSystem',
-  // read by the timeline write path to drop non-audited fields
+  // read by the timeline write path to drop non-audited and calculated fields
   'isAuditLogged',
+  'isUIEditable',
 ] as const satisfies readonly (keyof FlatFieldMetadata)[];
 
 export type OrmFlatFieldMetadataKey =

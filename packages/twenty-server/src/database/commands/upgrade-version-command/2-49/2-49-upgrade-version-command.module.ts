@@ -35,6 +35,7 @@ import { ProvisionRecordLayoutCommand } from 'src/database/commands/upgrade-vers
 import { ProvisionMeetingsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000000-provision-meetings.command';
 import { CopyCalendarEventsToMeetingsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000001-copy-calendar-events-to-meetings.command';
 import { TurnOffNativeCalendarSyncCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000003-turn-off-native-calendar-sync.command';
+import { RemoveCalculatedFieldTimelineRowsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795483935348-remove-calculated-field-timeline-rows.command';
 import { RemoveLegacyCalendarEventMeetingFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000002-remove-legacy-calendar-event-meeting-fields.command';
 import { ProvisionActivityPinCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795388001616-provision-activity-pin.command';
 import { ProvisionEmailReplySyncCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795044442993-provision-email-reply-sync.command';
@@ -99,6 +100,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     CopyCalendarEventsToMeetingsCommand,
     RemoveLegacyCalendarEventMeetingFieldsCommand,
     TurnOffNativeCalendarSyncCommand,
+    RemoveCalculatedFieldTimelineRowsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

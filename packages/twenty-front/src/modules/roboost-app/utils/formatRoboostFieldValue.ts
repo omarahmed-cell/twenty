@@ -1,5 +1,9 @@
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { formatRoboostDate } from '@/roboost-app/utils/formatRoboostDate';
+import {
+  formatRoboostPercentage,
+  isRoboostPercentageField,
+} from '@/roboost-app/utils/formatRoboostPercentage';
 import { getRoboostDomainLabel } from '@/roboost-app/utils/getRoboostDomainLabel';
 import { getRoboostPersonName } from '@/roboost-app/utils/getRoboostPersonName';
 import { isNonEmptyString, isNumber, isString } from '@sniptt/guards';
@@ -65,7 +69,13 @@ export const formatRoboostFieldValue = (
       return value === true ? 'Yes' : 'No';
     case FieldMetadataType.NUMBER:
     case FieldMetadataType.NUMERIC:
-      return isNumber(value) ? value.toLocaleString('en-US') : String(value);
+      if (!isNumber(value)) {
+        return String(value);
+      }
+
+      return isRoboostPercentageField(fieldMetadataItem)
+        ? formatRoboostPercentage(value)
+        : value.toLocaleString('en-US');
     case FieldMetadataType.LINKS: {
       const label = getRoboostDomainLabel(
         composite?.primaryLinkUrl as string | null | undefined,

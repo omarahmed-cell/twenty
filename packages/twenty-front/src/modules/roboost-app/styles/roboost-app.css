@@ -1094,3 +1094,8 @@
 .rb-cell-editor-slot {
   min-width: 0;
 }
+
+.rb-frule-suffix {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
