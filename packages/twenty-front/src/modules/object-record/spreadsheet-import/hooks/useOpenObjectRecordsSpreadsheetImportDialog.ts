@@ -14,6 +14,7 @@ import { spreadsheetImportCreatedRecordsProgressState } from '@/spreadsheet-impo
 import { type SpreadsheetImportDialogOptions } from '@/spreadsheet-import/types';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
 import { useToast } from 'twenty-ui/components/feedback';
+import { useRoboostImportLog } from '@/roboost-app/data-transfer/hooks/useRoboostImportLog';
 
 export const useOpenObjectRecordsSpreadsheetImportDialog = (
   objectNameSingular: string,
@@ -23,6 +24,7 @@ export const useOpenObjectRecordsSpreadsheetImportDialog = (
   const { buildSpreadsheetImportFields } = useBuildSpreadsheetImportFields();
 
   const { enqueueToast } = useToast();
+  const { startRoboostImportLog } = useRoboostImportLog();
 
   const { objectMetadataItem } = useObjectMetadataItem({
     objectNameSingular,
@@ -65,7 +67,7 @@ export const useOpenObjectRecordsSpreadsheetImportDialog = (
 
     openSpreadsheetImportDialog({
       ...options,
-      onSubmit: async (data) => {
+      onSubmit: async (data, file) => {
         const createInputs = data.validStructuredRows.map((record) => {
           const fieldMapping: Record<string, any> =
             buildRecordFromImportedStructuredRow({
@@ -77,10 +79,21 @@ export const useOpenObjectRecordsSpreadsheetImportDialog = (
           return fieldMapping;
         });
 
+        const importLog = await startRoboostImportLog({
+          name: file?.name ?? objectMetadataItem.labelPlural,
+          objectNameSingular,
+        });
+
         try {
-          await batchCreateManyRecords({
+          const savedRecords = await batchCreateManyRecords({
             recordsToCreate: createInputs,
             upsert: true,
+          });
+
+          await importLog.finish({
+            savedRecords,
+            createInputs,
+            invalidRows: data.invalidStructuredRows,
           });
           await apolloCoreClient.refetchQueries({
             updateCache: (cache) => {
@@ -88,6 +101,10 @@ export const useOpenObjectRecordsSpreadsheetImportDialog = (
             },
           });
         } catch (error: any) {
+          await importLog.fail({
+            createInputs,
+            invalidRows: data.invalidStructuredRows,
+          });
           enqueueToast(getToastOptionsFromError({ error }));
         }
       },

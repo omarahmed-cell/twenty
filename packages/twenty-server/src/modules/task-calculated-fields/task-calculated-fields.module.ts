@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
+import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { RecomputeTaskCalculatedFieldsCommand } from 'src/modules/task-calculated-fields/commands/recompute-task-calculated-fields.command';
 import { TaskOverdueCronCommand } from 'src/modules/task-calculated-fields/crons/commands/task-overdue.cron.command';
@@ -14,6 +15,7 @@ import { TaskOverdueService } from 'src/modules/task-calculated-fields/services/
   imports: [
     TypeOrmModule.forFeature([WorkspaceEntity]),
     WorkspaceIteratorModule,
+    RoboostNotificationModule,
   ],
   providers: [
     TaskOverdueService,

@@ -1,3 +1,5 @@
+import { ROBOOST_SET_TASK_REMINDER } from '@/roboost-app/activity/graphql/roboostTaskReminderQueries';
+import { useMutation } from '@apollo/client/react';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { RoboostActivityTextEditor } from '@/roboost-app/activity/components/RoboostActivityTextEditor';
 import { RoboostActivityTargetsMenu } from '@/roboost-app/activity/components/RoboostActivityTargetsMenu';
@@ -36,7 +38,15 @@ import { isDefined } from 'twenty-shared/utils';
 
 type RoboostComposerSize = 'normal' | 'expanded' | 'minimised';
 
-const REMINDER_OPTIONS = ['none', 'atDue', 'minutes30', 'hour1', 'day1'];
+const REMINDER_OPTIONS = [
+  'atDue',
+  'minutes15',
+  'minutes30',
+  'hour1',
+  'day1',
+  'custom',
+  'none',
+];
 const CHANNEL_BY_TYPE: Partial<Record<RoboostActivityType, string>> = {
   whatsapp: 'WHATSAPP',
   linkedin: 'LINKEDIN',
@@ -85,7 +95,9 @@ const RoboostActivityComposerForm = ({
   };
   const [dueValue, setDueValue] =
     useState<RoboostDueDateValue>(defaultDueValue);
-  const [reminder, setReminder] = useState('none');
+  const [reminder, setReminder] = useState('atDue');
+  const [reminderAt, setReminderAt] = useState('');
+  const [setTaskReminder] = useMutation(ROBOOST_SET_TASK_REMINDER);
   // Whoever creates an activity owns it until they pick someone else
   const [assigneeId, setAssigneeId] = useState<string | null>(
     currentWorkspaceMember?.id ?? null,
@@ -242,7 +254,7 @@ const RoboostActivityComposerForm = ({
     setIsSaving(true);
     setError(null);
     try {
-      await saveActivity({
+      const saved = await saveActivity({
         type,
         input: buildInput(),
         targets,
@@ -253,6 +265,20 @@ const RoboostActivityComposerForm = ({
             }
           : undefined,
       });
+
+      if (type === 'task' && isDefined(saved?.id)) {
+        await setTaskReminder({
+          variables: {
+            taskId: saved.id,
+            offset:
+              reminder === 'custom' && reminderAt === '' ? 'atDue' : reminder,
+            customAt:
+              reminder === 'custom' && reminderAt !== ''
+                ? new Date(reminderAt).toISOString()
+                : null,
+          },
+        }).catch(() => undefined);
+      }
       onClose();
     } catch (saveError) {
       setError(
@@ -446,16 +472,31 @@ const RoboostActivityComposerForm = ({
                         options={REMINDER_OPTIONS.map((option) => ({
                           value: option,
                           label: {
-                            none: t`No reminder`,
-                            atDue: t`At the due time`,
+                            atDue: t`At due time`,
+                            minutes15: t`15 minutes before`,
                             minutes30: t`30 minutes before`,
                             hour1: t`1 hour before`,
                             day1: t`1 day before`,
+                            custom: t`Custom date & time`,
+                            none: t`No reminder`,
                           }[option] as string,
                         }))}
                         onChange={setReminder}
                       />
                     </label>
+                    {reminder === 'custom' && (
+                      <label className="rb-act-field">
+                        <span className="rb-act-label">{t`Remind me at`}</span>
+                        <Input
+                          type="datetime-local"
+                          aria-label={t`Remind me at`}
+                          value={reminderAt}
+                          onChange={(event) =>
+                            setReminderAt(event.target.value)
+                          }
+                        />
+                      </label>
+                    )}
                     <div className="rb-act-field">
                       <span className="rb-act-label">{t`Assigned to`}</span>
                       <RoboostRecordPicker

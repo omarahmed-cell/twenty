@@ -1,3 +1,5 @@
+import { RoboostImportFilterSection } from '@/roboost-app/data-transfer/components/RoboostImportFilterSection';
+import { ROBOOST_IMPORT_FILTER_FIELD_NAME } from '@/roboost-app/data-transfer/constants/RoboostImportFilterFieldName';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import {
@@ -116,8 +118,11 @@ export const RoboostAdvancedFiltersPanel = ({
     setIsApplying(true);
     try {
       const associations = await resolveAssociationFilters(
-        draft.associations.filter((association) =>
-          isDefined(getTargetObject(association.relationFieldName)),
+        draft.associations.filter(
+          (association) =>
+            association.relationFieldName ===
+              ROBOOST_IMPORT_FILTER_FIELD_NAME ||
+            isDefined(getTargetObject(association.relationFieldName)),
         ),
       );
 
@@ -155,86 +160,92 @@ export const RoboostAdvancedFiltersPanel = ({
       <section className="rb-afp-section">
         <h3 className="rb-afp-title">{t`Association`}</h3>
         <p className="rb-afp-sub">{t`Filter by associated objects`}</p>
-        {draft.associations.map((association) => {
-          const targetObject = getTargetObject(association.relationFieldName);
+        {draft.associations
+          .filter(
+            (association) =>
+              association.relationFieldName !==
+              ROBOOST_IMPORT_FILTER_FIELD_NAME,
+          )
+          .map((association) => {
+            const targetObject = getTargetObject(association.relationFieldName);
 
-          return (
-            <div key={association.id} className="rb-afp-group">
-              <div className="rb-afp-group-head">
-                <Select
-                  aria-label={t`Associated object`}
-                  placeholder={t`Choose an association`}
-                  value={association.relationFieldName}
-                  options={relationFields.map((field) => ({
-                    value: field.name,
-                    label: field.label,
-                  }))}
-                  onChange={(relationFieldName) =>
-                    updateAssociation(association.id, () => ({
-                      ...association,
-                      relationFieldName,
-                      rules: [newRule()],
-                      resolvedFilter: null,
-                    }))
-                  }
-                />
-                <button
-                  type="button"
-                  className="rb-rc-iconbtn"
-                  aria-label={t`Remove association filter`}
-                  onClick={() =>
-                    setDraft({
-                      ...draft,
-                      associations: draft.associations.filter(
-                        (candidate) => candidate.id !== association.id,
-                      ),
-                    })
-                  }
-                >
-                  <Icon name="x" size={14} />
-                </button>
-              </div>
-              {isDefined(targetObject) &&
-                association.rules.map((rule, index) => (
-                  <div key={rule.id}>
-                    {index > 0 && <div className="rb-afp-and">{t`and`}</div>}
-                    <RoboostFilterRuleEditor
-                      objectMetadataItem={targetObject}
-                      rule={rule}
-                      onChange={(nextRule) =>
-                        updateAssociation(association.id, (current) => ({
-                          ...current,
-                          rules: current.rules.map((candidate) =>
-                            candidate.id === rule.id ? nextRule : candidate,
-                          ),
-                        }))
-                      }
-                      onRemove={() =>
-                        updateAssociation(association.id, (current) => ({
-                          ...current,
-                          rules: current.rules.filter(
-                            (candidate) => candidate.id !== rule.id,
-                          ),
-                        }))
-                      }
-                    />
-                  </div>
-                ))}
-              {isDefined(targetObject) &&
-                getRoboostFilterableFields(targetObject).length > 0 && (
-                  <AddFilterButton
-                    label={t`Add condition`}
-                    onClick={() =>
-                      updateAssociation(association.id, (current) => ({
-                        ...current,
-                        rules: [...current.rules, newRule()],
+            return (
+              <div key={association.id} className="rb-afp-group">
+                <div className="rb-afp-group-head">
+                  <Select
+                    aria-label={t`Associated object`}
+                    placeholder={t`Choose an association`}
+                    value={association.relationFieldName}
+                    options={relationFields.map((field) => ({
+                      value: field.name,
+                      label: field.label,
+                    }))}
+                    onChange={(relationFieldName) =>
+                      updateAssociation(association.id, () => ({
+                        ...association,
+                        relationFieldName,
+                        rules: [newRule()],
+                        resolvedFilter: null,
                       }))
                     }
                   />
-                )}
-            </div>
-          );
-        })}
+                  <button
+                    type="button"
+                    className="rb-rc-iconbtn"
+                    aria-label={t`Remove association filter`}
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        associations: draft.associations.filter(
+                          (candidate) => candidate.id !== association.id,
+                        ),
+                      })
+                    }
+                  >
+                    <Icon name="x" size={14} />
+                  </button>
+                </div>
+                {isDefined(targetObject) &&
+                  association.rules.map((rule, index) => (
+                    <div key={rule.id}>
+                      {index > 0 && <div className="rb-afp-and">{t`and`}</div>}
+                      <RoboostFilterRuleEditor
+                        objectMetadataItem={targetObject}
+                        rule={rule}
+                        onChange={(nextRule) =>
+                          updateAssociation(association.id, (current) => ({
+                            ...current,
+                            rules: current.rules.map((candidate) =>
+                              candidate.id === rule.id ? nextRule : candidate,
+                            ),
+                          }))
+                        }
+                        onRemove={() =>
+                          updateAssociation(association.id, (current) => ({
+                            ...current,
+                            rules: current.rules.filter(
+                              (candidate) => candidate.id !== rule.id,
+                            ),
+                          }))
+                        }
+                      />
+                    </div>
+                  ))}
+                {isDefined(targetObject) &&
+                  getRoboostFilterableFields(targetObject).length > 0 && (
+                    <AddFilterButton
+                      label={t`Add condition`}
+                      onClick={() =>
+                        updateAssociation(association.id, (current) => ({
+                          ...current,
+                          rules: [...current.rules, newRule()],
+                        }))
+                      }
+                    />
+                  )}
+              </div>
+            );
+          })}
         <AddFilterButton
           label={t`Add filter`}
           onClick={() =>
@@ -253,6 +264,14 @@ export const RoboostAdvancedFiltersPanel = ({
           }
         />
       </section>
+      <div className="rb-afp-divider">
+        <span>{t`AND`}</span>
+      </div>
+      <RoboostImportFilterSection
+        objectNameSingular={objectMetadataItem.nameSingular}
+        associations={draft.associations}
+        onChange={(associations) => setDraft({ ...draft, associations })}
+      />
       <div className="rb-afp-divider">
         <span>{t`AND`}</span>
       </div>

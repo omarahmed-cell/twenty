@@ -1,3 +1,4 @@
+import { useRoboostDownloadTransferFile } from '@/roboost-app/data-transfer/hooks/useRoboostDownloadTransferFile';
 import { RoboostNotificationChips } from '@/roboost-app/notifications/components/RoboostNotificationChips';
 import { RoboostNotificationItem } from '@/roboost-app/notifications/components/RoboostNotificationItem';
 import { useRoboostNotificationList } from '@/roboost-app/notifications/hooks/useRoboostNotificationList';
@@ -52,6 +53,7 @@ export const RoboostNotificationsPanel = ({
   const [pendingDelete, setPendingDelete] = useState<
     { ids: string[] } | { all: true } | null
   >(null);
+  const { downloadFromNotification } = useRoboostDownloadTransferFile();
   const { items, hasMore, isLoading, loadMore, apply } =
     useRoboostNotificationList({ tab, type, isOpen: true });
 
@@ -357,14 +359,18 @@ export const RoboostNotificationsPanel = ({
               </Button>
             )}
             {isNonEmptyString(hoveredNotification.downloadUrl) && (
-              <a
-                className="rb-btn rb-btn-secondary rb-btn-sm"
-                href={hoveredNotification.downloadUrl}
-                download
+              <Button
+                size="sm"
+                variant="secondary"
+                icon="download"
+                onClick={() =>
+                  downloadFromNotification(
+                    hoveredNotification.downloadUrl ?? '',
+                  )
+                }
               >
-                <Icon name="download" size={14} />
                 {t`Download`}
-              </a>
+              </Button>
             )}
           </div>
           <RoboostNotificationChips

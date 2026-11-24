@@ -1,3 +1,5 @@
+import { ROBOOST_LOG_EXPORT } from '@/roboost-app/data-transfer/graphql/roboostDataTransferQueries';
+import { useMutation } from '@apollo/client/react';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -135,6 +137,7 @@ export const RoboostObjectListPage = ({
   const { createView } = useRoboostCreateView(objectMetadataItem);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [logExport] = useMutation(ROBOOST_LOG_EXPORT);
   const [isCardSettingsOpen, setIsCardSettingsOpen] = useState(false);
   const { pipelines } = useRoboostPipelines(objectMetadataItem);
   const {
@@ -367,7 +370,11 @@ export const RoboostObjectListPage = ({
         (record) => selectedIds.length === 0 || selectedIds.includes(record.id),
       );
 
-      exportRoboostTableToCsv({
+      const exportName = (
+        activeView?.name ?? objectMetadataItem.labelPlural
+      ).replace('{objectLabelPlural}', objectMetadataItem.labelPlural);
+      const fileName = `${exportName}.csv`;
+      const csv = exportRoboostTableToCsv({
         headers: columns.map((column) => column.field.label),
         rows: exportRows.map((record) =>
           columns.map((column) =>
@@ -388,8 +395,20 @@ export const RoboostObjectListPage = ({
                 ),
           ),
         ),
-        fileName: `${objectMetadataItem.labelPlural}.csv`,
+        fileName,
       });
+
+      // Every export is logged for the audit and kept 30 days for downloading again
+      logExport({
+        variables: {
+          name: exportName,
+          source: selectedIds.length > 0 ? 'Records' : 'View',
+          objectNameSingular: objectMetadataItem.nameSingular,
+          recordCount: exportRows.length,
+          fileName,
+          content: csv,
+        },
+      }).catch(() => undefined);
     } finally {
       setIsExporting(false);
     }

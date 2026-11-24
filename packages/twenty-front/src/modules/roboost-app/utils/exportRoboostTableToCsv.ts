@@ -23,4 +23,6 @@ export const exportRoboostTableToCsv = ({
   const csv = json2csv(objects, { keys: headers });
 
   saveAs(new Blob([csv], { type: 'text/csv;charset=utf-8' }), fileName);
+
+  return csv;
 };

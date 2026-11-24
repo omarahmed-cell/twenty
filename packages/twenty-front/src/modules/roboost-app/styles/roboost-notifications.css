@@ -274,3 +274,175 @@
 .rb-notif-pref-text span {
   color: var(--text-secondary);
 }
+
+/* Settings > Data management > Import & Export */
+.rb-dt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rb-dt-heading {
+  font: 600 18px/26px var(--font-sans);
+  margin: 12px 0 0;
+}
+.rb-dt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+}
+.rb-dt-card-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+.rb-dt-title {
+  font: 600 15px/22px var(--font-sans);
+  margin: 0;
+}
+.rb-dt-sub {
+  color: var(--text-secondary);
+  font: 400 13px/19px var(--font-sans);
+  margin: 2px 0 0;
+}
+.rb-dt-muted {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.rb-dt-threshold {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+.rb-dt-threshold .rb-input {
+  width: 160px;
+}
+.rb-dt-filters {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rb-dt-filters .rb-select {
+  width: 190px;
+}
+.rb-dt-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.rb-dt-table {
+  border-collapse: collapse;
+  font: 400 13px/18px var(--font-sans);
+  min-width: 100%;
+}
+.rb-dt-table th {
+  background: var(--surface-subtle, var(--surface-hover));
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 10px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+.rb-dt-table td {
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  vertical-align: top;
+}
+.rb-dt-table .is-number {
+  text-align: right;
+}
+.rb-dt-table tr.is-highlighted td {
+  background: var(--accent-soft, rgba(234, 0, 41, 0.08));
+}
+.rb-dt-name {
+  color: var(--text);
+  font-weight: 600;
+  max-width: 320px;
+}
+.rb-dt-rename {
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 6px;
+  padding: 0;
+  text-align: left;
+}
+.rb-dt-rename svg {
+  color: var(--text-muted);
+  opacity: 0;
+}
+.rb-dt-rename:hover svg {
+  opacity: 1;
+}
+.rb-dt-status,
+.rb-dt-state {
+  align-items: center;
+  display: inline-flex;
+  font-size: 12px;
+  gap: 6px;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.rb-dt-dot {
+  border-radius: 50%;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+.rb-dt-status.is-ok .rb-dt-dot,
+.rb-dt-state.is-done .rb-dt-dot {
+  background: var(--success, #12a150);
+}
+.rb-dt-status.is-muted,
+.rb-dt-state.is-in_progress {
+  color: var(--text-secondary);
+}
+.rb-dt-status.is-muted .rb-dt-dot,
+.rb-dt-state.is-in_progress .rb-dt-dot {
+  background: var(--text-muted);
+}
+.rb-dt-state.is-done_with_errors .rb-dt-dot {
+  background: var(--warning, #e8a317);
+}
+.rb-dt-state.is-failed .rb-dt-dot {
+  background: var(--danger, #d92d20);
+}
+.rb-dt-errors {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+.rb-dt-sort {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 4px;
+  padding: 0;
+}
+.rb-dt-empty {
+  color: var(--text-muted);
+  font: 400 13px/18px var(--font-sans);
+  padding: 24px;
+  text-align: center;
+}
+.rb-dt-pager {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.rb-dt-pager > :first-child {
+  margin-right: auto;
+}

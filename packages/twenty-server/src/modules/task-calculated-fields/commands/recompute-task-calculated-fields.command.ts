@@ -30,11 +30,11 @@ export class RecomputeTaskCalculatedFieldsCommand extends ProvisionedWorkspaceCo
       return;
     }
 
-    const changedCount =
+    const newlyOverdue =
       await this.taskOverdueService.recomputeOverdue(workspaceId);
 
     this.logger.log(
-      `Workspace ${workspaceId}: Is Overdue changed on ${changedCount} task(s)`,
+      `Workspace ${workspaceId}: ${newlyOverdue.length} task(s) became overdue`,
     );
   }
 }

@@ -1,3 +1,6 @@
+import { ROBOOST_IMPORT_FILTER_FIELD_NAME } from '@/roboost-app/data-transfer/constants/RoboostImportFilterFieldName';
+import { ROBOOST_IMPORT_RECORD_IDS } from '@/roboost-app/data-transfer/graphql/roboostDataTransferQueries';
+import { useApolloClient } from '@apollo/client/react';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
@@ -20,12 +23,44 @@ export const useResolveRoboostAssociationFilters = (
   objectMetadataItem: EnrichedObjectMetadataItem,
 ) => {
   const apolloCoreClient = useApolloCoreClient();
+  const apolloClient = useApolloClient();
   const { objectMetadataItems } = useObjectMetadataItems();
   const { objectPermissionsByObjectMetadataId } = useObjectPermissions();
+
+  const resolveImport = async (
+    association: RoboostAssociationFilter,
+  ): Promise<RecordGqlOperationFilter | null> => {
+    const rule = association.rules[0];
+    const importIds = Array.isArray(rule?.value) ? rule.value : [];
+
+    if (importIds.length === 0) {
+      return null;
+    }
+    const { data } = await apolloClient.query<{
+      roboostImportRecordIds: string[];
+    }>({
+      query: ROBOOST_IMPORT_RECORD_IDS,
+      variables: {
+        importIds,
+        objectNameSingular: objectMetadataItem.nameSingular,
+      },
+      fetchPolicy: 'network-only',
+    });
+    const recordIds = data?.roboostImportRecordIds ?? [];
+
+    if (rule.operator === 'isNoneOf') {
+      return recordIds.length > 0 ? { not: { id: { in: recordIds } } } : null;
+    }
+
+    return { id: { in: recordIds.length > 0 ? recordIds : [NO_MATCH_ID] } };
+  };
 
   const resolveOne = async (
     association: RoboostAssociationFilter,
   ): Promise<RecordGqlOperationFilter | null> => {
+    if (association.relationFieldName === ROBOOST_IMPORT_FILTER_FIELD_NAME) {
+      return resolveImport(association);
+    }
     const relationField = objectMetadataItem.fields.find(
       (field) => field.name === association.relationFieldName,
     );

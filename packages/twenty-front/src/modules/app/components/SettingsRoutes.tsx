@@ -422,6 +422,14 @@ const SettingsTwoFactorAuthenticationMethod = lazy(() =>
   ),
 );
 
+const SettingsRoboostImportExport = lazy(() =>
+  import('~/pages/settings/data-management/SettingsRoboostImportExport').then(
+    (module) => ({
+      default: module.SettingsRoboostImportExport,
+    }),
+  ),
+);
+
 const SettingsRoboostNotifications = lazy(() =>
   import('~/pages/settings/notifications/SettingsRoboostNotifications').then(
     (module) => ({
@@ -838,6 +846,16 @@ const createSettingsRouteElements = ({
     <Route
       path={SettingsPath.Notifications}
       element={<SettingsRoboostNotifications />}
+    />
+    <Route
+      path={SettingsPath.ImportExport}
+      element={<SettingsRoboostImportExport />}
+    />
+    <Route
+      path={SettingsPath.DataManagement}
+      element={
+        <Navigate to={getSettingsPath(SettingsPath.ImportExport)} replace />
+      }
     />
     <Route
       element={

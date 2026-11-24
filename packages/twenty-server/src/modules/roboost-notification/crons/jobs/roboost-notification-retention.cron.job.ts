@@ -8,6 +8,7 @@ import { Process } from 'src/engine/core-modules/message-queue/decorators/proces
 import { Processor } from 'src/engine/core-modules/message-queue/decorators/processor.decorator';
 import { MessageQueue } from 'src/engine/core-modules/message-queue/message-queue.constants';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
+import { RoboostDataTransferService } from 'src/modules/roboost-notification/services/roboost-data-transfer.service';
 import { RoboostNotificationService } from 'src/modules/roboost-notification/services/roboost-notification.service';
 
 // After the 00:37 UTC backup and the 01:15 property history trim
@@ -23,6 +24,7 @@ export class RoboostNotificationRetentionCronJob {
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly roboostNotificationService: RoboostNotificationService,
+    private readonly roboostDataTransferService: RoboostDataTransferService,
   ) {}
 
   @Process(RoboostNotificationRetentionCronJob.name)
@@ -34,6 +36,18 @@ export class RoboostNotificationRetentionCronJob {
 
     for (const { id: workspaceId } of workspaces) {
       try {
+        if (await this.roboostDataTransferService.tablesExist(workspaceId)) {
+          const expired =
+            await this.roboostDataTransferService.expireExportFiles(
+              workspaceId,
+            );
+
+          if (expired > 0) {
+            this.logger.log(
+              `Workspace ${workspaceId}: ${expired} export file(s) expired after 30 days`,
+            );
+          }
+        }
         if (!(await this.roboostNotificationService.tableExists(workspaceId))) {
           continue;
         }

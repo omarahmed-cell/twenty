@@ -16,6 +16,11 @@ import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { RoboostNotificationService } from 'src/modules/roboost-notification/services/roboost-notification.service';
 import {
+  ROBOOST_REMINDER_OFFSETS,
+  type RoboostReminderOffset,
+  RoboostTaskNotificationService,
+} from 'src/modules/roboost-notification/services/roboost-task-notification.service';
+import {
   type RoboostNotificationTab,
   type RoboostNotificationType,
 } from 'src/modules/roboost-notification/types/roboost-notification.type';
@@ -96,6 +101,15 @@ class RoboostNotificationCountsDTO {
   trash: number;
 }
 
+@ObjectType('RoboostTaskReminder')
+class RoboostTaskReminderDTO {
+  @Field(() => String)
+  offset: string;
+
+  @Field(() => String, { nullable: true })
+  customAt: string | null;
+}
+
 const parseTab = (tab: string): RoboostNotificationTab => {
   if (!TABS.includes(tab as RoboostNotificationTab)) {
     throw new BadRequestException(`Unknown tab ${tab}`);
@@ -143,7 +157,57 @@ const requireMember = (workspaceMemberId: string | undefined) => {
 export class RoboostNotificationResolver {
   constructor(
     private readonly roboostNotificationService: RoboostNotificationService,
+    private readonly roboostTaskNotificationService: RoboostTaskNotificationService,
   ) {}
+
+  @Mutation(() => Boolean)
+  async roboostSetTaskReminder(
+    @AuthWorkspace() workspace: WorkspaceEntity,
+    @AuthWorkspaceMemberId() workspaceMemberId: string | undefined,
+    @Args('taskId', { type: () => String }) taskId: string,
+    @Args('offset', { type: () => String }) offset: string,
+    @Args('customAt', { type: () => String, nullable: true })
+    customAt: string | null,
+  ): Promise<boolean> {
+    requireMember(workspaceMemberId);
+    if (
+      !(offset in ROBOOST_REMINDER_OFFSETS) &&
+      offset !== 'custom' &&
+      offset !== 'none'
+    ) {
+      throw new BadRequestException(`Unknown reminder ${offset}`);
+    }
+    if (offset === 'custom' && !isDefined(customAt)) {
+      throw new BadRequestException('A custom reminder needs a date and time');
+    }
+
+    return this.roboostTaskNotificationService.setReminder({
+      workspaceId: workspace.id,
+      taskId,
+      offset: offset as RoboostReminderOffset,
+      customAt: offset === 'custom' ? customAt : null,
+    });
+  }
+
+  @Query(() => RoboostTaskReminderDTO, { nullable: true })
+  async roboostTaskReminder(
+    @AuthWorkspace() workspace: WorkspaceEntity,
+    @Args('taskId', { type: () => String }) taskId: string,
+  ): Promise<RoboostTaskReminderDTO | null> {
+    const reminder = await this.roboostTaskNotificationService.getReminder(
+      workspace.id,
+      taskId,
+    );
+
+    return isDefined(reminder)
+      ? {
+          offset: reminder.offset,
+          customAt: isDefined(reminder.customAt)
+            ? new Date(reminder.customAt).toISOString()
+            : null,
+        }
+      : null;
+  }
 
   @Query(() => RoboostNotificationPageDTO)
   async roboostNotifications(
