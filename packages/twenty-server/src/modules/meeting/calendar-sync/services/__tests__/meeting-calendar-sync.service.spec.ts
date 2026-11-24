@@ -17,7 +17,7 @@ const ACCOUNT = {
 type QueryCall = { sql: string; params: unknown[] };
 
 const buildService = ({
-  existingMeetingId = null,
+  existingMeetingId = null as string | null,
   people = [] as { id: string; companyId: string | null; email: string }[],
   companies = [] as { id: string; primaryLinkUrl: string }[],
 } = {}) => {

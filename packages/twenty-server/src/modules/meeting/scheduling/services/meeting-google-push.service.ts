@@ -11,7 +11,7 @@ import {
   type MeetingGoogleAccount,
 } from 'src/modules/meeting/scheduling/services/meeting-google-calendar.service';
 
-type MeetingRow = {
+export type MeetingRow = {
   id: string;
   title: string | null;
   startsAt: Date | null;
@@ -124,7 +124,7 @@ export class MeetingGooglePushService {
     return true;
   }
 
-  private async findMeeting(
+  async findMeeting(
     workspaceId: string,
     meetingId: string,
   ): Promise<MeetingRow | undefined> {
@@ -141,7 +141,7 @@ export class MeetingGooglePushService {
   }
 
   // The event lives on the organizer's calendar: the account whose address is the calendar id, else the host's or creator's
-  private async findOrganizerAccount(
+  async findOrganizerAccount(
     workspaceId: string,
     meeting: MeetingRow,
   ): Promise<MeetingGoogleAccount | null> {

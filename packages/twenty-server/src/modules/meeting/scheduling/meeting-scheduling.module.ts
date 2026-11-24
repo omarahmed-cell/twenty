@@ -18,6 +18,10 @@ import { MeetingSchedulingService } from 'src/modules/meeting/scheduling/service
     MeetingGooglePushJob,
     MeetingGooglePushListener,
   ],
-  exports: [MeetingGoogleCalendarService, MeetingSchedulingService],
+  exports: [
+    MeetingGoogleCalendarService,
+    MeetingSchedulingService,
+    MeetingGooglePushService,
+  ],
 })
 export class MeetingSchedulingModule {}

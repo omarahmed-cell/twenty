@@ -47,6 +47,7 @@ import { OpportunityCalculatedFieldsNightlyCronCommand } from 'src/modules/oppor
 import { PersonCalculatedFieldsNightlyCronCommand } from 'src/modules/person-calculated-fields/crons/commands/person-calculated-fields-nightly.cron.command';
 import { TaskOverdueCronCommand } from 'src/modules/task-calculated-fields/crons/commands/task-overdue.cron.command';
 import { EmailReplySyncCronCommand } from 'src/modules/unified-email/crons/commands/email-reply-sync.cron.command';
+import { MeetingArtifactsCronCommand } from 'src/modules/meeting/artifacts/crons/commands/meeting-artifacts.cron.command';
 import { MeetingCalendarSyncCronCommand } from 'src/modules/meeting/calendar-sync/crons/commands/meeting-calendar-sync.cron.command';
 
 @Command({
@@ -80,6 +81,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly taskOverdueCronCommand: TaskOverdueCronCommand,
     private readonly emailReplySyncCronCommand: EmailReplySyncCronCommand,
     private readonly meetingCalendarSyncCronCommand: MeetingCalendarSyncCronCommand,
+    private readonly meetingArtifactsCronCommand: MeetingArtifactsCronCommand,
     private readonly opportunityCalculatedFieldsNightlyCronCommand: OpportunityCalculatedFieldsNightlyCronCommand,
 
     private readonly workflowCronTriggerCronCommand: WorkflowCronTriggerCronCommand,
@@ -200,6 +202,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'MeetingCalendarSync',
         command: this.meetingCalendarSyncCronCommand,
+      },
+      {
+        name: 'MeetingArtifacts',
+        command: this.meetingArtifactsCronCommand,
       },
       {
         name: 'OpportunityCalculatedFieldsNightly',
