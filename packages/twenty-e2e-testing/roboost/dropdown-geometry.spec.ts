@@ -804,12 +804,31 @@ test('toolbar and timeline panels', async ({ page }, testInfo) => {
     await closeOpenEditor(page);
   }
 
-  const meetingButton = page.getByRole('button', { name: /^Meeting$/ }).first();
+  const meetingButton = page
+    .locator('button', { hasText: /^Meeting$/ })
+    .first();
 
-  if ((await meetingButton.count()) > 0) {
+  if ((await meetingButton.count()) === 0) {
+    results.push({
+      name: 'meeting scheduler',
+      problems: ['no Meeting button on the record page'],
+      numbers: '',
+    });
+  } else {
     await meetingButton.click();
-    await page.waitForTimeout(1500);
-    const scheduler = page.locator('[role="dialog"]').last();
+    results.push(
+      await measurePanel({
+        page,
+        name: 'Meeting button menu',
+        trigger: meetingButton,
+      }),
+    );
+    await page
+      .locator('.rb-floating [role="menuitem"]', { hasText: /Schedule/ })
+      .first()
+      .click();
+    await page.waitForTimeout(2500);
+    const scheduler = page.locator('.rb-mtg-pop').last();
     const pickers = scheduler.locator('.rb-select-trigger');
     const pickerCount = Math.min(await pickers.count(), 3);
 
@@ -831,6 +850,13 @@ test('toolbar and timeline panels', async ({ page }, testInfo) => {
       );
       await page.keyboard.press('Escape');
       await page.waitForTimeout(300);
+    }
+    if (pickerCount === 0) {
+      results.push({
+        name: 'meeting scheduler',
+        problems: ['no pickers found in the scheduler'],
+        numbers: '',
+      });
     }
   }
 
