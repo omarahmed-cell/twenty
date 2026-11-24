@@ -46,6 +46,7 @@ import { CompanyPastMeetingsCronCommand } from 'src/modules/company-calculated-f
 import { OpportunityCalculatedFieldsNightlyCronCommand } from 'src/modules/opportunity-calculated-fields/crons/commands/opportunity-calculated-fields-nightly.cron.command';
 import { PersonCalculatedFieldsNightlyCronCommand } from 'src/modules/person-calculated-fields/crons/commands/person-calculated-fields-nightly.cron.command';
 import { TaskOverdueCronCommand } from 'src/modules/task-calculated-fields/crons/commands/task-overdue.cron.command';
+import { RoboostNotificationRetentionCronCommand } from 'src/modules/roboost-notification/crons/commands/roboost-notification-retention.cron.command';
 import { PropertyHistoryTrimCronCommand } from 'src/modules/timeline/crons/commands/property-history-trim.cron.command';
 import { EmailReplySyncCronCommand } from 'src/modules/unified-email/crons/commands/email-reply-sync.cron.command';
 import { MeetingArtifactsCronCommand } from 'src/modules/meeting/artifacts/crons/commands/meeting-artifacts.cron.command';
@@ -82,6 +83,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly taskOverdueCronCommand: TaskOverdueCronCommand,
     private readonly emailReplySyncCronCommand: EmailReplySyncCronCommand,
     private readonly propertyHistoryTrimCronCommand: PropertyHistoryTrimCronCommand,
+    private readonly roboostNotificationRetentionCronCommand: RoboostNotificationRetentionCronCommand,
     private readonly meetingCalendarSyncCronCommand: MeetingCalendarSyncCronCommand,
     private readonly meetingArtifactsCronCommand: MeetingArtifactsCronCommand,
     private readonly opportunityCalculatedFieldsNightlyCronCommand: OpportunityCalculatedFieldsNightlyCronCommand,
@@ -196,6 +198,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'TaskOverdue',
         command: this.taskOverdueCronCommand,
+      },
+      {
+        name: 'RoboostNotificationRetention',
+        command: this.roboostNotificationRetentionCronCommand,
       },
       {
         name: 'PropertyHistoryTrim',

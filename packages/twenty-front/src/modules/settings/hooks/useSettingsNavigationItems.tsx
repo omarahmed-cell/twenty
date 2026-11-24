@@ -15,6 +15,9 @@ import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import {
   IconAppWindow,
+  IconBell,
+  IconDatabase,
+  IconFileImport,
   IconApps,
   IconAt,
   IconCalendarEvent,
@@ -100,6 +103,11 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           Icon: IconColorSwatch,
         },
         {
+          label: t`Notifications`,
+          path: SettingsPath.Notifications,
+          Icon: IconBell,
+        },
+        {
           label: t`Gmail extension`,
           path: SettingsPath.GmailExtension,
           Icon: IconPuzzle,
@@ -155,6 +163,21 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
               path: SettingsPath.Properties,
               Icon: IconListSearch,
               isHidden: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
+              indentationLevel: 2,
+            },
+          ],
+        },
+        {
+          label: t`Data management`,
+          path: SettingsPath.ImportExport,
+          Icon: IconDatabase,
+          isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+          subItems: [
+            {
+              label: t`Import & Export`,
+              path: SettingsPath.ImportExport,
+              Icon: IconFileImport,
+              isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
               indentationLevel: 2,
             },
           ],

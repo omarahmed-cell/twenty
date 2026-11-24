@@ -27,6 +27,15 @@ const ARROW_CORNER_PADDING = 16;
 const MIN_USABLE_HEIGHT = 120;
 export const FLOATING_PANEL_DEFAULT_MAX_HEIGHT = 320;
 
+type FloatingPanelSide = 'bottom' | 'top' | 'left' | 'right';
+
+const OPPOSITE_SIDE: Record<FloatingPanelSide, FloatingPanelSide> = {
+  bottom: 'top',
+  top: 'bottom',
+  left: 'right',
+  right: 'left',
+};
+
 export type FloatingPanelProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   'children'
@@ -37,7 +46,7 @@ export type FloatingPanelProps = Omit<
   panelRef?: RefObject<HTMLDivElement | null>;
   align?: 'start' | 'end';
   // Below by default; the other side is used only when the preferred one has no room
-  side?: 'bottom' | 'top';
+  side?: FloatingPanelSide;
   // Design pixels, like the rest of the stylesheet
   minWidth?: number;
   matchAnchorWidth?: boolean;
@@ -75,9 +84,7 @@ export const FloatingPanel = ({
       middleware: [
         offset(GAP),
         flip({
-          fallbackPlacements: [
-            `${preferredSide === 'bottom' ? 'top' : 'bottom'}-${align}`,
-          ],
+          fallbackPlacements: [`${OPPOSITE_SIDE[preferredSide]}-${align}`],
           padding: VIEWPORT_PADDING,
         }),
         shift({ padding: VIEWPORT_PADDING }),
@@ -106,8 +113,10 @@ export const FloatingPanel = ({
       ],
     });
   const isAnchorHidden = middlewareData.hide?.referenceHidden === true;
-  const side = placement.startsWith('top') ? 'top' : 'bottom';
+  const side = placement.split('-')[0] as FloatingPanelSide;
+  const isVerticalSide = side === 'left' || side === 'right';
   const arrowX = middlewareData.arrow?.x;
+  const arrowY = middlewareData.arrow?.y;
 
   useEffect(() => {
     if (isAnchorHidden) {
@@ -116,10 +125,9 @@ export const FloatingPanel = ({
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [isAnchorHidden]);
 
-  const arrowStyle: CSSProperties = {
-    left: isDefined(arrowX) ? `${arrowX}px` : undefined,
-    zoom: 1,
-  };
+  const arrowStyle: CSSProperties = isVerticalSide
+    ? { top: isDefined(arrowY) ? `${arrowY}px` : undefined, zoom: 1 }
+    : { left: isDefined(arrowX) ? `${arrowX}px` : undefined, zoom: 1 };
 
   return createPortal(
     <div

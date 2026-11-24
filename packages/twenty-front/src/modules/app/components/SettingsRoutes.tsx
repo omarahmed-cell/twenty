@@ -422,6 +422,14 @@ const SettingsTwoFactorAuthenticationMethod = lazy(() =>
   ),
 );
 
+const SettingsRoboostNotifications = lazy(() =>
+  import('~/pages/settings/notifications/SettingsRoboostNotifications').then(
+    (module) => ({
+      default: module.SettingsRoboostNotifications,
+    }),
+  ),
+);
+
 const SettingsGmailExtension = lazy(() =>
   import('~/pages/settings/gmail-extension/SettingsGmailExtension').then(
     (module) => ({
@@ -826,6 +834,10 @@ const createSettingsRouteElements = ({
     <Route
       path={SettingsPath.GmailExtension}
       element={<SettingsGmailExtension />}
+    />
+    <Route
+      path={SettingsPath.Notifications}
+      element={<SettingsRoboostNotifications />}
     />
     <Route
       element={

@@ -2503,3 +2503,13 @@
   border-top-color: transparent;
   bottom: -5px;
 }
+.rb-floating[data-side='left'] > .rb-floating-arrow {
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  right: -5px;
+}
+.rb-floating[data-side='right'] > .rb-floating-arrow {
+  border-right-color: transparent;
+  border-top-color: transparent;
+  left: -5px;
+}

@@ -1,5 +1,6 @@
 import { useAuth } from '@/auth/hooks/useAuth';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { RoboostNotificationBell } from '@/roboost-app/notifications/components/RoboostNotificationBell';
 import { RoboostNewRecordMenu } from '@/roboost-app/components/RoboostNewRecordMenu';
 import { getRoboostPersonName } from '@/roboost-app/utils/getRoboostPersonName';
 import { Avatar } from '@/roboost-ui/components/Avatar';
@@ -48,15 +49,7 @@ export const RoboostTopBar = () => {
       >
         <Icon name="settings" />
       </Link>
-      {/* Notifications module is not built yet; the bell stays as a placeholder */}
-      <button
-        type="button"
-        className="rb-topbar-iconbtn"
-        aria-label={t`Notifications`}
-        title={t`Notifications`}
-      >
-        <Icon name="bell" />
-      </button>
+      <RoboostNotificationBell />
       <Menu
         align="right"
         minWidth={220}
