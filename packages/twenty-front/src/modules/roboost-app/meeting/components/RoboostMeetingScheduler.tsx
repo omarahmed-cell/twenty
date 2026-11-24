@@ -1,3 +1,4 @@
+import { resolveRoboostTimeZone } from '@/roboost-app/meeting/utils/resolveRoboostTimeZone';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
@@ -129,7 +130,12 @@ const RoboostMeetingSchedulerForm = ({
   const [size, setSize] = useState<'normal' | 'expanded' | 'minimised'>(
     'normal',
   );
-  const [timeZone, setTimeZone] = useState(userTimezone);
+  const [timeZone, setTimeZone] = useState(() =>
+    resolveRoboostTimeZone(
+      userTimezone,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+    ),
+  );
   const initialSlot = getDefaultSlot(timeZone, workingDays);
   const [hostId, setHostId] = useState(currentWorkspaceMember?.id ?? '');
   const [title, setTitle] = useState('');

@@ -1,3 +1,4 @@
+import { resolveRoboostTimeZone } from '@/roboost-app/meeting/utils/resolveRoboostTimeZone';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
@@ -199,7 +200,7 @@ export const RoboostMeetingItemCard = ({
     ) ||
     attendee.email ||
     '';
-  const timeZone = record?.timezone ?? userTimezone;
+  const timeZone = resolveRoboostTimeZone(record?.timezone, userTimezone);
   const hostName = memberName(record?.host?.name);
   const attendees = record?.meetingAttendees ?? [];
   const organizer = attendees.find((attendee) => attendee.isOrganizer === true);

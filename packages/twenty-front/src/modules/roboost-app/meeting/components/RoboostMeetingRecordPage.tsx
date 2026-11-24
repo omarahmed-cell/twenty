@@ -1,3 +1,4 @@
+import { resolveRoboostTimeZone } from '@/roboost-app/meeting/utils/resolveRoboostTimeZone';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { useDeleteOneRecord } from '@/object-record/hooks/useDeleteOneRecord';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
@@ -174,7 +175,7 @@ export const RoboostMeetingRecordPage = ({
     );
   }
 
-  const timeZone = record.timezone ?? userTimezone;
+  const timeZone = resolveRoboostTimeZone(record.timezone, userTimezone);
   const startsAt = isDefined(record.startsAt)
     ? new Date(record.startsAt)
     : null;
