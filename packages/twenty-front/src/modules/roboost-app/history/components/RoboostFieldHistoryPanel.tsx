@@ -242,6 +242,10 @@ const RoboostFieldHistoryContent = ({
       return <span>{entry.actorName ?? t`User`}</span>;
     }
 
+    if (entry.source === 'calculated' && isDefined(entry.calculatedBy)) {
+      return <span>{entry.calculatedBy}</span>;
+    }
+
     return <span>{sourceLabels[entry.source]}</span>;
   };
 

@@ -348,7 +348,55 @@ export {
 } from './pipeline/stage-calculated-properties';
 export { removePropertiesFromRecord } from './removePropertiesFromRecord';
 export { removeUndefinedFields } from './removeUndefinedFields';
+export type { RoboostFilterRuleValue } from './roboost-filter/buildRoboostFilterRule';
+export { buildRoboostFilterRule } from './roboost-filter/buildRoboostFilterRule';
+export type { RoboostDatePresetRangeKey } from './roboost-filter/getRoboostDatePresetRange';
+export { getRoboostDatePresetRange } from './roboost-filter/getRoboostDatePresetRange';
+export type { RoboostFilterField } from './roboost-filter/getRoboostFilterFieldKind';
+export { getRoboostFilterFieldKind } from './roboost-filter/getRoboostFilterFieldKind';
+export type {
+  RoboostFilterOperator,
+  RoboostFilterFieldKind,
+} from './roboost-filter/roboost-filter-operator';
+export {
+  ROBOOST_FILTER_OPERATORS_BY_KIND,
+  isRoboostValuelessFilterOperator,
+  isRoboostTwoValueFilterOperator,
+} from './roboost-filter/roboost-filter-operator';
 export { safeParseRelativeDateFilterJsonStringified } from './safeParseRelativeDateFilterJsonStringified';
+export type {
+  RoboostRuleSetMatch,
+  RoboostScoreRuleSetResult,
+  RoboostScoreGroupResult,
+  RoboostScoreBreakdown,
+  RoboostScoreValidation,
+} from './scoring/compute-roboost-score';
+export {
+  computeRoboostScoreBreakdown,
+  getRoboostRuleSetMaxPoints,
+  isRoboostScoreConditionComplete,
+  validateRoboostScoreCriteria,
+} from './scoring/compute-roboost-score';
+export { parseRoboostScoreCriteria } from './scoring/parse-roboost-score-criteria';
+export type {
+  RoboostScoreObjectName,
+  RoboostScoreAction,
+  RoboostScoreCondition,
+  RoboostScoreValuePoints,
+  RoboostScoreRuleSet,
+  RoboostScoreGroup,
+  RoboostScoreCriteria,
+} from './scoring/roboost-score-criteria';
+export {
+  ROBOOST_SCORE_OBJECT_NAMES,
+  ROBOOST_SCORE_LIMIT_OPTIONS,
+  roundRoboostScorePoints,
+  getRoboostSignedPoints,
+  createRoboostScoreId,
+  createEmptyRoboostScoreRuleSet,
+  createEmptyRoboostScoreGroup,
+  createDefaultRoboostScoreCriteria,
+} from './scoring/roboost-score-criteria';
 export { getSegmentMembershipOptionValue } from './segment/getSegmentMembershipOptionValue';
 export { getGenericOperationName } from './sentry/getGenericOperationName';
 export { getHumanReadableNameFromCode } from './sentry/getHumanReadableNameFromCode';

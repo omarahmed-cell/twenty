@@ -48,6 +48,7 @@ import { PersonCalculatedFieldsNightlyCronCommand } from 'src/modules/person-cal
 import { TaskOverdueCronCommand } from 'src/modules/task-calculated-fields/crons/commands/task-overdue.cron.command';
 import { RoboostTaskReminderCronCommand } from 'src/modules/roboost-notification/crons/commands/roboost-task-reminder.cron.command';
 import { RoboostNotificationRetentionCronCommand } from 'src/modules/roboost-notification/crons/commands/roboost-notification-retention.cron.command';
+import { RoboostScoreVerifyCronCommand } from 'src/modules/roboost-scoring/crons/commands/roboost-score-verify.cron.command';
 import { PropertyHistoryTrimCronCommand } from 'src/modules/timeline/crons/commands/property-history-trim.cron.command';
 import { EmailReplySyncCronCommand } from 'src/modules/unified-email/crons/commands/email-reply-sync.cron.command';
 import { MeetingArtifactsCronCommand } from 'src/modules/meeting/artifacts/crons/commands/meeting-artifacts.cron.command';
@@ -85,6 +86,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly emailReplySyncCronCommand: EmailReplySyncCronCommand,
     private readonly propertyHistoryTrimCronCommand: PropertyHistoryTrimCronCommand,
     private readonly roboostNotificationRetentionCronCommand: RoboostNotificationRetentionCronCommand,
+    private readonly roboostScoreVerifyCronCommand: RoboostScoreVerifyCronCommand,
     private readonly roboostTaskReminderCronCommand: RoboostTaskReminderCronCommand,
     private readonly meetingCalendarSyncCronCommand: MeetingCalendarSyncCronCommand,
     private readonly meetingArtifactsCronCommand: MeetingArtifactsCronCommand,
@@ -208,6 +210,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'RoboostNotificationRetention',
         command: this.roboostNotificationRetentionCronCommand,
+      },
+      {
+        name: 'RoboostScoreVerify',
+        command: this.roboostScoreVerifyCronCommand,
       },
       {
         name: 'PropertyHistoryTrim',

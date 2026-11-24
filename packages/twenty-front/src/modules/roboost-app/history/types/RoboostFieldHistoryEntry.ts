@@ -14,4 +14,6 @@ export type RoboostFieldHistoryEntry = {
   source: RoboostFieldHistorySource;
   actorName: string | null;
   workflowId: string | null;
+  // Who calculated it, e.g. "Score: Deal fit v3"
+  calculatedBy?: string | null;
 };

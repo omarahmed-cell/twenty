@@ -36,6 +36,7 @@ import { ProvisionMeetingsCommand } from 'src/database/commands/upgrade-version-
 import { CopyCalendarEventsToMeetingsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000001-copy-calendar-events-to-meetings.command';
 import { TurnOffNativeCalendarSyncCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795400000003-turn-off-native-calendar-sync.command';
 import { CreateRoboostTaskReminderTableCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795545310151-create-roboost-task-reminder-table.command';
+import { CreateRoboostScoreTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795562107009-create-roboost-score-tables.command';
 import { CreateRoboostDataTransferTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795544772205-create-roboost-data-transfer-tables.command';
 import { CreateRoboostNotificationTableCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795541802255-create-roboost-notification-table.command';
 import { SplitFieldHistoryPerPropertyCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795521311364-split-field-history-per-property.command';
@@ -109,6 +110,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     CreateRoboostNotificationTableCommand,
     CreateRoboostDataTransferTablesCommand,
     CreateRoboostTaskReminderTableCommand,
+    CreateRoboostScoreTablesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

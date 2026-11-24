@@ -267,10 +267,13 @@ export class TimelineActivityService {
     workspaceId,
     objectNameSingular,
     changes,
+    calculatedBy,
   }: {
     workspaceId: string;
     objectNameSingular: string;
     changes: CalculatedFieldChange[];
+    // Shown as the source of the change, e.g. "Score: Deal fit v3"
+    calculatedBy?: string;
   }) {
     if (changes.length === 0) {
       return;
@@ -301,6 +304,7 @@ export class TimelineActivityService {
           properties: {
             diff: { [fieldName]: { before, after } },
             isCalculated: true,
+            ...(isDefined(calculatedBy) ? { calculatedBy } : {}),
           } as TimelineActivityPayload['properties'],
         })),
       });

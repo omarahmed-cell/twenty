@@ -70,6 +70,11 @@ export const getRoboostFieldHistoryEntries = ({
               ? memberName
               : null,
           workflowId: updatedBy?.context?.workflowId ?? null,
+          calculatedBy: isNonEmptyString(
+            timelineActivity.properties?.calculatedBy,
+          )
+            ? timelineActivity.properties.calculatedBy
+            : null,
         },
       ];
     })

@@ -65,6 +65,7 @@ import { ActorLinkModule } from 'src/modules/actor-link/actor-link.module';
 import { WorkspaceMemberPreCreateModule } from 'src/modules/workspace-member-pre-create/workspace-member-pre-create.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
+import { RoboostScoringModule } from 'src/modules/roboost-scoring/roboost-scoring.module';
 import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { TaskCalculatedFieldsModule } from 'src/modules/task-calculated-fields/task-calculated-fields.module';
@@ -93,6 +94,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     PersonCalculatedFieldsModule,
     TimelineActivityModule,
     RoboostNotificationModule,
+    RoboostScoringModule,
     TaskCalculatedFieldsModule,
     UnifiedEmailModule,
     MeetingCalendarSyncModule,
