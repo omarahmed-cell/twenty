@@ -61,6 +61,7 @@ export const RoboostAppSideNav = () => {
     home: t`Home`,
     settings: t`Settings`,
     meetings: t`Meetings`,
+    scoring: t`Scoring`,
   };
 
   const groups: NavGroup[] = ROBOOST_NAV_DEFINITION.map((group) => ({
@@ -70,7 +71,9 @@ export const RoboostAppSideNav = () => {
         const isActive =
           entry.id === 'settings'
             ? pathname.startsWith('/settings')
-            : pathname === entry.path;
+            : entry.id === 'scoring'
+              ? pathname.startsWith('/scoring')
+              : pathname === entry.path;
 
         return [
           {

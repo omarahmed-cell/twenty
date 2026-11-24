@@ -63,6 +63,18 @@ const MobileHomePage = lazy(() =>
   })),
 );
 
+const RoboostScoringIndexPage = lazy(() =>
+  import('~/pages/scoring/RoboostScoringIndexPage').then((module) => ({
+    default: module.RoboostScoringIndexPage,
+  })),
+);
+
+const RoboostScoreEditorRoutePage = lazy(() =>
+  import('~/pages/scoring/RoboostScoreEditorRoutePage').then((module) => ({
+    default: module.RoboostScoreEditorRoutePage,
+  })),
+);
+
 const NotFound = lazy(() =>
   import('~/pages/not-found/NotFound').then((module) => ({
     default: module.NotFound,
@@ -158,6 +170,22 @@ export const createWorkspaceRouteObjects = ({
       element: (
         <LazyRoute>
           <AiChatInboxPage />
+        </LazyRoute>
+      ),
+    },
+    {
+      path: '/scoring',
+      element: (
+        <LazyRoute>
+          <RoboostScoringIndexPage />
+        </LazyRoute>
+      ),
+    },
+    {
+      path: '/scoring/:scoreId',
+      element: (
+        <LazyRoute>
+          <RoboostScoreEditorRoutePage />
         </LazyRoute>
       ),
     },

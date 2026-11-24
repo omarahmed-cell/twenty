@@ -46,6 +46,7 @@ export const ROBOOST_NAV_DEFINITION: RoboostNavGroupDefinition[] = [
   {
     groupId: 'system',
     entries: [
+      { id: 'scoring', icon: 'gauge', path: '/scoring' },
       { id: 'workflows', icon: 'workflows', objectNamePlural: 'workflows' },
       { id: 'settings', icon: 'settings', path: '/settings/profile' },
     ],
