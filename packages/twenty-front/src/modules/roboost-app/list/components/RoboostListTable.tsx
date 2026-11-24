@@ -16,7 +16,10 @@ import { useLingui } from '@lingui/react/macro';
 import { isString } from '@sniptt/guards';
 import {
   type CSSProperties,
+  memo,
   type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useMemo,
   useState,
 } from 'react';
 import { Link } from 'react-router-dom';
@@ -46,7 +49,7 @@ type RoboostListTableProps = {
   onToggleColumn: (fieldId: string) => void;
   onFrozenCountChange: (frozenCount: number) => void;
   onAddColumnAt: (fieldId: string, index: number) => void;
-  onSaved: () => void;
+  onSaved?: () => void;
   isLoading: boolean;
 };
 
@@ -81,9 +84,6 @@ export const RoboostListTable = ({
     fieldId: string;
     size: number;
   } | null>(null);
-
-  const sizeOf = (column: RoboostListColumn) =>
-    resizing?.fieldId === column.field.id ? resizing.size : column.size;
 
   // Width follows the pointer while dragging and lands in the view's unsaved changes on release
   const startResize = (
@@ -122,28 +122,33 @@ export const RoboostListTable = ({
     recordIds.length > 0 && recordIds.every((id) => selectedIds.includes(id));
   const isSomeSelected = recordIds.some((id) => selectedIds.includes(id));
 
-  const getStickyStyle = (columnIndex: number): CSSProperties | undefined => {
-    const width = sizeOf(columns[columnIndex]);
-    const sizeStyle = { width, minWidth: width, maxWidth: width };
+  const columnStyles = useMemo(() => {
+    let left = CHECK_COLUMN_WIDTH;
 
-    if (columnIndex >= frozenCount) {
-      return sizeStyle;
-    }
-    const left =
-      CHECK_COLUMN_WIDTH +
-      columns
-        .slice(0, columnIndex)
-        .reduce((sum, column) => sum + sizeOf(column), 0);
+    return columns.map((column, columnIndex): CSSProperties => {
+      const width =
+        resizing?.fieldId === column.field.id ? resizing.size : column.size;
+      const style: CSSProperties = { width, minWidth: width, maxWidth: width };
 
-    return { left, ...sizeStyle };
-  };
+      if (columnIndex < frozenCount) {
+        style.left = left;
+      }
+      left += width;
 
-  const toggleRow = (id: string) =>
-    onSelectionChange(
-      selectedIds.includes(id)
-        ? selectedIds.filter((selectedId) => selectedId !== id)
-        : [...selectedIds, id],
-    );
+      return style;
+    });
+  }, [columns, frozenCount, resizing]);
+
+  // Rows stay memoized while cells change; a selection change re-renders only the row elements, not the cells
+  const toggleRow = useCallback(
+    (id: string) =>
+      onSelectionChange(
+        selectedIds.includes(id)
+          ? selectedIds.filter((selectedId) => selectedId !== id)
+          : [...selectedIds, id],
+      ),
+    [selectedIds, onSelectionChange],
+  );
 
   return (
     <div className="rb-ls-tablewrap">
@@ -176,7 +181,7 @@ export const RoboostListTable = ({
                     columnIndex === frozenCount - 1 && 'rb-lt-sticky-edge',
                     dropIndex === columnIndex && 'is-drop-target',
                   )}
-                  style={getStickyStyle(columnIndex)}
+                  style={columnStyles[columnIndex]}
                   draggable={canDrag}
                   aria-sort={
                     isActiveSort
@@ -276,70 +281,21 @@ export const RoboostListTable = ({
           </tr>
         </thead>
         <tbody>
-          {records.map((record) => {
-            const isSelected = selectedIds.includes(record.id);
-            const recordPath = getAppPath(AppPath.RecordShowPage, {
-              objectNameSingular: objectMetadataItem.nameSingular,
-              objectRecordId: record.id,
-            });
-
-            return (
-              <tr key={record.id} aria-selected={isSelected}>
-                <td className="rb-lt-check">
-                  <Checkbox
-                    aria-label={t`Select row`}
-                    checked={isSelected}
-                    onChange={() => toggleRow(record.id)}
-                  />
-                </td>
-                {columns.map((column, columnIndex) => {
-                  const isLabelColumn = column.field.name === labelFieldName;
-                  const label = getRoboostRecordLabel(
-                    record,
-                    objectMetadataItem,
-                  );
-
-                  return (
-                    <td
-                      key={column.field.id}
-                      className={cx(
-                        columnIndex < frozenCount && 'rb-lt-sticky',
-                        columnIndex === frozenCount - 1 && 'rb-lt-sticky-edge',
-                      )}
-                      style={getStickyStyle(columnIndex)}
-                    >
-                      {isLabelColumn ? (
-                        <Link className="rb-lcompany" to={recordPath}>
-                          <Avatar
-                            name={label}
-                            src={
-                              isString(record.avatarUrl)
-                                ? record.avatarUrl
-                                : null
-                            }
-                            size="sm"
-                            tone={getRoboostAvatarTone(label)}
-                          />
-                          <span className="rb-truncate">
-                            {label === '' ? t`Untitled` : label}
-                          </span>
-                        </Link>
-                      ) : (
-                        <RoboostListEditableCell
-                          field={column.field}
-                          record={record}
-                          objectMetadataItem={objectMetadataItem}
-                          objectMetadataItems={objectMetadataItems}
-                          onSaved={onSaved}
-                        />
-                      )}
-                    </td>
-                  );
-                })}
-                <td className="rb-lt-add" />
-              </tr>
-            );
-          })}
+          {records.map((record) => (
+            <RoboostListRow
+              key={record.id}
+              record={record}
+              columns={columns}
+              columnStyles={columnStyles}
+              frozenCount={frozenCount}
+              labelFieldName={labelFieldName}
+              objectMetadataItem={objectMetadataItem}
+              objectMetadataItems={objectMetadataItems}
+              isSelected={selectedIds.includes(record.id)}
+              onToggle={toggleRow}
+              onSaved={onSaved}
+            />
+          ))}
         </tbody>
       </table>
       {records.length === 0 && (
@@ -352,3 +308,83 @@ export const RoboostListTable = ({
     </div>
   );
 };
+
+type RoboostListRowProps = {
+  record: RoboostListRecord;
+  columns: RoboostListColumn[];
+  columnStyles: CSSProperties[];
+  frozenCount: number;
+  labelFieldName: string | undefined;
+  objectMetadataItem: EnrichedObjectMetadataItem;
+  objectMetadataItems: EnrichedObjectMetadataItem[];
+  isSelected: boolean;
+  onToggle: (id: string) => void;
+  onSaved?: () => void;
+};
+
+const RoboostListRow = memo(
+  ({
+    record,
+    columns,
+    columnStyles,
+    frozenCount,
+    labelFieldName,
+    objectMetadataItem,
+    objectMetadataItems,
+    isSelected,
+    onToggle,
+    onSaved,
+  }: RoboostListRowProps) => {
+    const { t } = useLingui();
+    const recordPath = getAppPath(AppPath.RecordShowPage, {
+      objectNameSingular: objectMetadataItem.nameSingular,
+      objectRecordId: record.id,
+    });
+    const label = getRoboostRecordLabel(record, objectMetadataItem);
+
+    return (
+      <tr aria-selected={isSelected}>
+        <td className="rb-lt-check">
+          <Checkbox
+            aria-label={t`Select row`}
+            checked={isSelected}
+            onChange={() => onToggle(record.id)}
+          />
+        </td>
+        {columns.map((column, columnIndex) => (
+          <td
+            key={column.field.id}
+            className={cx(
+              columnIndex < frozenCount && 'rb-lt-sticky',
+              columnIndex === frozenCount - 1 && 'rb-lt-sticky-edge',
+            )}
+            style={columnStyles[columnIndex]}
+          >
+            {column.field.name === labelFieldName ? (
+              <Link className="rb-lcompany" to={recordPath}>
+                <Avatar
+                  name={label}
+                  src={isString(record.avatarUrl) ? record.avatarUrl : null}
+                  size="sm"
+                  tone={getRoboostAvatarTone(label)}
+                />
+                <span className="rb-truncate">
+                  {label === '' ? t`Untitled` : label}
+                </span>
+              </Link>
+            ) : (
+              <RoboostListEditableCell
+                field={column.field}
+                record={record}
+                objectMetadataItem={objectMetadataItem}
+                objectMetadataItems={objectMetadataItems}
+                onSaved={onSaved}
+              />
+            )}
+          </td>
+        ))}
+        <td className="rb-lt-add" />
+      </tr>
+    );
+  },
+);

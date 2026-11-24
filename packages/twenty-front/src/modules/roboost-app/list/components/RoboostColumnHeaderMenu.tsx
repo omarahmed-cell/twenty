@@ -17,7 +17,7 @@ type RoboostColumnHeaderMenuProps = {
   onRemove: () => void;
 };
 
-export const RoboostColumnHeaderMenu = ({
+const RoboostColumnHeaderMenuContent = ({
   objectMetadataItem,
   columnLabel,
   shownFieldIds,
@@ -27,7 +27,8 @@ export const RoboostColumnHeaderMenu = ({
   onUnfreeze,
   onAddColumnRight,
   onRemove,
-}: RoboostColumnHeaderMenuProps) => {
+  onDismiss,
+}: RoboostColumnHeaderMenuProps & { onDismiss: () => void }) => {
   const { t } = useLingui();
   const [isChoosingField, setIsChoosingField] = useState(false);
   const groups = useRoboostFieldGroups(objectMetadataItem);
@@ -84,6 +85,59 @@ export const RoboostColumnHeaderMenu = ({
   ];
 
   return (
+    <Menu
+      initiallyOpen
+      minWidth={isChoosingField ? 260 : 200}
+      isSearchable={isChoosingField}
+      searchPlaceholder={t`Search properties`}
+      entries={isChoosingField ? fieldEntries : actionEntries}
+      onClose={() => {
+        setIsChoosingField(false);
+        onDismiss();
+      }}
+      trigger={({ isOpen, toggle }) => (
+        <RoboostColumnHeaderMenuButton
+          columnLabel={columnLabel}
+          isOpen={isOpen}
+          onClick={toggle}
+        />
+      )}
+    />
+  );
+};
+
+const RoboostColumnHeaderMenuButton = ({
+  columnLabel,
+  isOpen,
+  onClick,
+}: {
+  columnLabel: string;
+  isOpen: boolean;
+  onClick: () => void;
+}) => {
+  const { t } = useLingui();
+
+  return (
+    <button
+      type="button"
+      className="rb-th-menu-btn"
+      aria-label={t`${columnLabel} column options`}
+      aria-expanded={isOpen}
+      draggable={false}
+      onClick={onClick}
+    >
+      <Icon name="more-vertical" size={14} />
+    </button>
+  );
+};
+
+// Headers render only the button; the menu and its field list mount on click
+export const RoboostColumnHeaderMenu = (
+  props: RoboostColumnHeaderMenuProps,
+) => {
+  const [isActive, setIsActive] = useState(false);
+
+  return (
     <span
       className="rb-th-menu"
       onClick={(event) => event.stopPropagation()}
@@ -93,25 +147,26 @@ export const RoboostColumnHeaderMenu = ({
         event.stopPropagation();
       }}
     >
-      <Menu
-        minWidth={isChoosingField ? 260 : 200}
-        isSearchable={isChoosingField}
-        searchPlaceholder={t`Search properties`}
-        entries={isChoosingField ? fieldEntries : actionEntries}
-        onClose={() => setIsChoosingField(false)}
-        trigger={({ isOpen, toggle }) => (
-          <button
-            type="button"
-            className="rb-th-menu-btn"
-            aria-label={t`${columnLabel} column options`}
-            aria-expanded={isOpen}
-            draggable={false}
-            onClick={toggle}
-          >
-            <Icon name="more" size={14} />
-          </button>
-        )}
-      />
+      {isActive ? (
+        <RoboostColumnHeaderMenuContent
+          objectMetadataItem={props.objectMetadataItem}
+          columnLabel={props.columnLabel}
+          shownFieldIds={props.shownFieldIds}
+          isFrozen={props.isFrozen}
+          canRemove={props.canRemove}
+          onFreeze={props.onFreeze}
+          onUnfreeze={props.onUnfreeze}
+          onAddColumnRight={props.onAddColumnRight}
+          onRemove={props.onRemove}
+          onDismiss={() => setIsActive(false)}
+        />
+      ) : (
+        <RoboostColumnHeaderMenuButton
+          columnLabel={props.columnLabel}
+          isOpen={false}
+          onClick={() => setIsActive(true)}
+        />
+      )}
     </span>
   );
 };

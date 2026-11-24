@@ -6,7 +6,13 @@ import { useRoboostPopoverPosition } from '@/roboost-ui/hooks/useRoboostPopoverP
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import { type FocusEvent, type ReactNode, useRef, useState } from 'react';
+import {
+  type FocusEvent,
+  type ReactNode,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 
@@ -39,6 +45,7 @@ export type MenuProps = {
   isSearchable?: boolean;
   searchPlaceholder?: string;
   onClose?: () => void;
+  initiallyOpen?: boolean;
 };
 
 const isActionEntry = (
@@ -57,6 +64,7 @@ export const Menu = ({
   isSearchable,
   searchPlaceholder,
   onClose,
+  initiallyOpen = false,
 }: MenuProps) => {
   const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(false);
@@ -93,6 +101,17 @@ export const Menu = ({
     setSearch('');
     setIsOpen(true);
   };
+
+  // Lazily mounted menus open on the click that mounted them
+  useLayoutEffect(() => {
+    if (initiallyOpen) {
+      anchorRef.current
+        ?.querySelector<HTMLElement>('button, [tabindex]')
+        ?.focus();
+      open();
+    }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useRoboostCloseOnOutsideScroll({
     isOpen,

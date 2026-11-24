@@ -11,7 +11,7 @@ import { Button } from '@/roboost-ui/components/Button';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 const NOT_EDITED = Symbol('notEdited');
 
@@ -32,27 +32,23 @@ type RoboostListEditableCellProps = {
   record: Record<string, unknown> & { id: string };
   objectMetadataItem: EnrichedObjectMetadataItem;
   objectMetadataItems: EnrichedObjectMetadataItem[];
-  onSaved: () => void;
+  onSaved?: () => void;
   hideEditButton?: boolean;
 };
 
 export const getRoboostCellEditorKey = (recordId: string, fieldId: string) =>
   `${recordId}:${fieldId}`;
 
-export const RoboostListEditableCell = ({
+const RoboostListCellEditor = ({
   field,
   record,
   objectMetadataItem,
-  objectMetadataItems,
   onSaved,
-  hideEditButton = false,
-}: RoboostListEditableCellProps) => {
+  editor,
+}: RoboostListCellEditorProps) => {
   const { t } = useLingui();
   const { updateOneRecord } = useUpdateOneRecord();
   const { completeChange } = useRoboostRequiredFieldsCheck(objectMetadataItem);
-  const editor = useRoboostCellEditor(
-    getRoboostCellEditorKey(record.id, field.id),
-  );
   const editorRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<unknown>(NOT_EDITED);
   const [draftRelated, setDraftRelated] = useState<
@@ -60,7 +56,6 @@ export const RoboostListEditableCell = ({
   >(undefined);
   const [error, setError] = useState<string | null>(null);
   const editKind = getRoboostFieldEditKind(field);
-  const isEditable = editKind !== null;
   const isEditing = editor.isEditing;
   const saveOnChoice = editKind !== null && SAVE_ON_CHOICE_KINDS.has(editKind);
 
@@ -81,12 +76,6 @@ export const RoboostListEditableCell = ({
     editor.close();
   };
 
-  const startEditing = () => {
-    if (editor.open()) {
-      resetDraft();
-    }
-  };
-
   const save = async (value: unknown = currentDraft) => {
     try {
       const input = await completeChange({
@@ -105,7 +94,7 @@ export const RoboostListEditableCell = ({
         updateOneRecordInput: input,
       });
       cancel();
-      onSaved();
+      onSaved?.();
     } catch (saveError) {
       setError(
         saveError instanceof Error ? saveError.message : t`Could not save`,
@@ -147,52 +136,6 @@ export const RoboostListEditableCell = ({
     };
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing]);
-
-  // A row that leaves the screen must not keep the shared editor slot
-  useEffect(
-    () => () => editor.close(),
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  if (!isEditing) {
-    return (
-      <div
-        className={cx('rb-cell', isEditable && 'is-editable')}
-        onPointerDown={(event) => {
-          if (
-            event.button !== 0 ||
-            !isEditable ||
-            (event.target instanceof Element &&
-              event.target.closest('a') !== null)
-          ) {
-            return;
-          }
-          event.stopPropagation();
-          startEditing();
-        }}
-      >
-        <RoboostListCellValue
-          field={field}
-          record={record}
-          objectMetadataItems={objectMetadataItems}
-        />
-        {isEditable && !hideEditButton && (
-          <button
-            type="button"
-            className="rb-cell-edit"
-            aria-label={t`Edit ${field.label}`}
-            onClick={(event) => {
-              event.stopPropagation();
-              startEditing();
-            }}
-          >
-            <Icon name="pencil" size={13} />
-          </button>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div
@@ -258,3 +201,84 @@ export const RoboostListEditableCell = ({
     </div>
   );
 };
+
+type RoboostListCellEditorProps = Omit<
+  RoboostListEditableCellProps,
+  'hideEditButton' | 'objectMetadataItems'
+> & {
+  editor: ReturnType<typeof useRoboostCellEditor>;
+};
+
+// Display cells stay cheap: the save hooks mount only in the one open editor
+export const RoboostListEditableCell = memo(
+  ({
+    field,
+    record,
+    objectMetadataItem,
+    objectMetadataItems,
+    onSaved,
+    hideEditButton = false,
+  }: RoboostListEditableCellProps) => {
+    const { t } = useLingui();
+    const editor = useRoboostCellEditor(
+      getRoboostCellEditorKey(record.id, field.id),
+    );
+    const isEditable = getRoboostFieldEditKind(field) !== null;
+
+    // A row that leaves the screen must not keep the shared editor slot
+    useEffect(
+      () => () => editor.close(),
+      // oxlint-disable-next-line react-hooks/exhaustive-deps
+      [],
+    );
+
+    if (editor.isEditing) {
+      return (
+        <RoboostListCellEditor
+          field={field}
+          record={record}
+          objectMetadataItem={objectMetadataItem}
+            onSaved={onSaved}
+          editor={editor}
+        />
+      );
+    }
+
+    return (
+      <div
+        className={cx('rb-cell', isEditable && 'is-editable')}
+        onPointerDown={(event) => {
+          if (
+            event.button !== 0 ||
+            !isEditable ||
+            (event.target instanceof Element &&
+              event.target.closest('a') !== null)
+          ) {
+            return;
+          }
+          event.stopPropagation();
+          editor.open();
+        }}
+      >
+        <RoboostListCellValue
+          field={field}
+          record={record}
+          objectMetadataItems={objectMetadataItems}
+        />
+        {isEditable && !hideEditButton && (
+          <button
+            type="button"
+            className="rb-cell-edit"
+            aria-label={t`Edit ${field.label}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              editor.open();
+            }}
+          >
+            <Icon name="pencil" size={13} />
+          </button>
+        )}
+      </div>
+    );
+  },
+);

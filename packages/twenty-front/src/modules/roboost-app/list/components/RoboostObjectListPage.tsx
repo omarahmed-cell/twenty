@@ -659,7 +659,6 @@ export const RoboostObjectListPage = ({
                   ? removeColumn(fieldId)
                   : addColumn(fieldId)
               }
-              onSaved={() => refetch()}
               isLoading={loading}
             />
           )}
