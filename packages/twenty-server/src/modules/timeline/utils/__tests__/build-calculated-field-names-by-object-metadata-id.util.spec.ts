@@ -10,7 +10,7 @@ import { buildCalculatedFieldNamesByObjectMetadataId } from 'src/modules/timelin
 const COMPANY_OBJECT_METADATA_ID = 'company-object-metadata-id';
 
 describe('buildCalculatedFieldNamesByObjectMetadataId', () => {
-  it('keeps formula and non UI editable fields, nothing else', () => {
+  it('keeps formula and non UI editable fields, never system fields', () => {
     const fields = [
       getFlatFieldMetadataMock({
         universalIdentifier: 'completion-index-field',
@@ -27,6 +27,14 @@ describe('buildCalculatedFieldNamesByObjectMetadataId', () => {
         objectMetadataId: COMPANY_OBJECT_METADATA_ID,
         type: FieldMetadataType.NUMBER,
         name: 'numberOfPastMeetings',
+        isUIEditable: false,
+      } as Parameters<typeof getFlatFieldMetadataMock>[0]),
+      getFlatFieldMetadataMock({
+        universalIdentifier: 'updated-by-field',
+        objectMetadataId: COMPANY_OBJECT_METADATA_ID,
+        type: FieldMetadataType.ACTOR,
+        name: 'updatedBy',
+        isSystem: true,
         isUIEditable: false,
       } as Parameters<typeof getFlatFieldMetadataMock>[0]),
       getFlatFieldMetadataMock({

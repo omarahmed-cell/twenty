@@ -4,38 +4,53 @@ import { type FlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/typ
 import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
 import { getFieldFormulaSettings } from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
 
+// System fields (updatedBy, updatedAt...) are bookkeeping, never a property with its own history
 export const isCalculatedFlatFieldMetadata = (
   flatFieldMetadata: OrmFlatFieldMetadata,
 ): boolean =>
-  isDefined(getFieldFormulaSettings(flatFieldMetadata)) ||
-  flatFieldMetadata.isUIEditable === false;
+  flatFieldMetadata.isSystem !== true &&
+  (isDefined(getFieldFormulaSettings(flatFieldMetadata)) ||
+    flatFieldMetadata.isUIEditable === false);
 
-export const buildCalculatedFieldNamesByObjectMetadataId = (
+const buildFieldNamesByObjectMetadataId = (
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
+  isIncluded: (flatFieldMetadata: OrmFlatFieldMetadata) => boolean,
 ): Map<string, Set<string>> => {
-  const calculatedFieldNamesByObjectMetadataId = new Map<string, Set<string>>();
+  const fieldNamesByObjectMetadataId = new Map<string, Set<string>>();
 
   for (const flatFieldMetadata of Object.values(
     flatFieldMetadataMaps.byUniversalIdentifier,
   )) {
-    if (
-      !isDefined(flatFieldMetadata) ||
-      !isCalculatedFlatFieldMetadata(flatFieldMetadata)
-    ) {
+    if (!isDefined(flatFieldMetadata) || !isIncluded(flatFieldMetadata)) {
       continue;
     }
 
-    const calculatedFieldNames =
-      calculatedFieldNamesByObjectMetadataId.get(
-        flatFieldMetadata.objectMetadataId,
-      ) ?? new Set<string>();
+    const fieldNames =
+      fieldNamesByObjectMetadataId.get(flatFieldMetadata.objectMetadataId) ??
+      new Set<string>();
 
-    calculatedFieldNames.add(flatFieldMetadata.name);
-    calculatedFieldNamesByObjectMetadataId.set(
+    fieldNames.add(flatFieldMetadata.name);
+    fieldNamesByObjectMetadataId.set(
       flatFieldMetadata.objectMetadataId,
-      calculatedFieldNames,
+      fieldNames,
     );
   }
 
-  return calculatedFieldNamesByObjectMetadataId;
+  return fieldNamesByObjectMetadataId;
 };
+
+export const buildCalculatedFieldNamesByObjectMetadataId = (
+  flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
+) =>
+  buildFieldNamesByObjectMetadataId(
+    flatFieldMetadataMaps,
+    isCalculatedFlatFieldMetadata,
+  );
+
+export const buildSystemFieldNamesByObjectMetadataId = (
+  flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
+) =>
+  buildFieldNamesByObjectMetadataId(
+    flatFieldMetadataMaps,
+    (flatFieldMetadata) => flatFieldMetadata.isSystem === true,
+  );

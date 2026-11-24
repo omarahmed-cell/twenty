@@ -55,6 +55,7 @@ type BuildPayloadsForRuleArgs = {
 
 type BuildSourceRulePayloadsArgs = BuildPayloadsForRuleArgs & {
   calculatedFieldNames: ReadonlySet<string>;
+  systemFieldNames: ReadonlySet<string>;
 };
 
 const hasNonEmptyDiff = (
@@ -159,6 +160,7 @@ export class TimelineActivityService {
       junctionRules,
       nonAuditLoggedFieldNames,
       calculatedFieldNames,
+      systemFieldNames,
       flatFieldMetadataMaps,
       resolveTimelineActivityType,
     } = await this.timelineActivityRoutingPlanService.getRulesForEventBatch({
@@ -199,6 +201,7 @@ export class TimelineActivityService {
               flatFieldMetadataMaps,
               resolveTimelineActivityType,
               calculatedFieldNames,
+              systemFieldNames,
             }),
           ),
           ...junctionRules.map((rule) =>
@@ -367,6 +370,7 @@ export class TimelineActivityService {
     flatFieldMetadataMaps,
     resolveTimelineActivityType,
     calculatedFieldNames,
+    systemFieldNames,
   }: BuildSourceRulePayloadsArgs): Promise<TimelineActivityPayload[]> {
     const ruleAction = resolveTimelineActivityRuleAction({
       actions: rule.actions,
@@ -433,8 +437,9 @@ export class TimelineActivityService {
 
         const { updatedBy } = keepDiffAndActor(event.properties);
 
-        return Object.entries(event.properties.diff ?? {}).map(
-          ([fieldName, change]) => {
+        return Object.entries(event.properties.diff ?? {})
+          .filter(([fieldName]) => !systemFieldNames.has(fieldName))
+          .map(([fieldName, change]) => {
             const isCalculated = calculatedFieldNames.has(fieldName);
 
             return {
@@ -450,8 +455,7 @@ export class TimelineActivityService {
                   : isDefined(updatedBy) && { updatedBy }),
               } as TimelineActivityPayload['properties'],
             };
-          },
-        );
+          });
       });
     }
 

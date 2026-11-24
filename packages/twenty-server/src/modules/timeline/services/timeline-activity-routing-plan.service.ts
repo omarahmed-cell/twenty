@@ -11,7 +11,10 @@ import { type FlatTimelineActivityTypeMaps } from 'src/engine/metadata-modules/f
 import { type TimelineActivityRule } from 'src/modules/timeline/types/timeline-activity-rule.type';
 import { buildDirectRelationTargetShape } from 'src/modules/timeline/utils/build-direct-relation-target-shape.util';
 import { buildJunctionTargetShape } from 'src/modules/timeline/utils/build-junction-target-shape.util';
-import { buildCalculatedFieldNamesByObjectMetadataId } from 'src/modules/timeline/utils/build-calculated-field-names-by-object-metadata-id.util';
+import {
+  buildCalculatedFieldNamesByObjectMetadataId,
+  buildSystemFieldNamesByObjectMetadataId,
+} from 'src/modules/timeline/utils/build-calculated-field-names-by-object-metadata-id.util';
 import { resolveTimelineActivityTypeForRule } from 'src/modules/timeline/utils/resolve-timeline-activity-type-for-rule.util';
 import { buildNonAuditLoggedFieldNamesByObjectMetadataId } from 'src/modules/timeline/utils/build-non-audit-logged-field-names-by-object-metadata-id.util';
 import { buildTimelineActivitySelfRule } from 'src/modules/timeline/utils/build-timeline-activity-self-rule.util';
@@ -33,6 +36,7 @@ type TimelineActivityRulesForEventBatch = {
   junctionRules: TimelineActivityRule[];
   nonAuditLoggedFieldNames: ReadonlySet<string>;
   calculatedFieldNames: ReadonlySet<string>;
+  systemFieldNames: ReadonlySet<string>;
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   resolveTimelineActivityType: TimelineActivityTypeResolver;
 };
@@ -40,6 +44,7 @@ type TimelineActivityRulesForEventBatch = {
 type TimelineActivityRoutingPlan = {
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
   calculatedFieldNamesByObjectMetadataId: Map<string, ReadonlySet<string>>;
+  systemFieldNamesByObjectMetadataId: Map<string, ReadonlySet<string>>;
   activeTimelineActivityTypes: ResolvableTimelineActivityType[];
   throughRules: TimelineActivityRule[];
   eligibleNonAuditedObjectMetadataIds: Set<string>;
@@ -107,6 +112,10 @@ export class TimelineActivityRoutingPlanService {
       ),
       nonAuditLoggedFieldNames:
         routingPlan.nonAuditLoggedFieldNamesByObjectMetadataId.get(
+          flatObjectMetadata.id,
+        ) ?? EMPTY_NON_AUDIT_LOGGED_FIELD_NAMES,
+      systemFieldNames:
+        routingPlan.systemFieldNamesByObjectMetadataId.get(
           flatObjectMetadata.id,
         ) ?? EMPTY_NON_AUDIT_LOGGED_FIELD_NAMES,
       calculatedFieldNames:
@@ -328,6 +337,8 @@ export class TimelineActivityRoutingPlanService {
       flatObjectMetadataMaps,
       calculatedFieldNamesByObjectMetadataId:
         buildCalculatedFieldNamesByObjectMetadataId(flatFieldMetadataMaps),
+      systemFieldNamesByObjectMetadataId:
+        buildSystemFieldNamesByObjectMetadataId(flatFieldMetadataMaps),
       activeTimelineActivityTypes,
       throughRules,
       eligibleNonAuditedObjectMetadataIds,
