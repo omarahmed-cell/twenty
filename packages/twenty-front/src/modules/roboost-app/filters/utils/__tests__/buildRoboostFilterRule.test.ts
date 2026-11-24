@@ -54,7 +54,10 @@ describe('buildRoboostFilterRule', () => {
         value: ['10', '5'],
       }),
     ).toEqual({
-      amount: { amountMicros: { gte: 5_000_000, lte: 10_000_000 } },
+      and: [
+        { amount: { amountMicros: { gte: 5_000_000 } } },
+        { amount: { amountMicros: { lte: 10_000_000 } } },
+      ],
     });
     expect(
       buildRoboostFilterRule({
@@ -91,10 +94,10 @@ describe('buildRoboostFilterRule', () => {
         now,
       }),
     ).toEqual({
-      createdAt: {
-        gte: new Date(2026, 10, 1).toISOString(),
-        lt: new Date(2026, 11, 1).toISOString(),
-      },
+      and: [
+        { createdAt: { gte: new Date(2026, 10, 1).toISOString() } },
+        { createdAt: { lt: new Date(2026, 11, 1).toISOString() } },
+      ],
     });
   });
 

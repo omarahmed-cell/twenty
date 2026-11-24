@@ -92,13 +92,27 @@ const knownCondition = (
   return { [field.name]: { is: isKnown ? 'NOT_NULL' : 'NULL' } };
 };
 
+// The API takes one operator per field filter, so a range becomes an "and" of single bounds
+const splitBounds = <TValue>(
+  comparison: Record<string, TValue>,
+  build: (bound: Record<string, TValue>) => RecordGqlOperationFilter,
+): RecordGqlOperationFilter => {
+  const bounds = Object.entries(comparison).map(([key, value]) =>
+    build({ [key]: value }),
+  );
+
+  return bounds.length === 1 ? bounds[0] : { and: bounds };
+};
+
 const numberCondition = (
   field: FieldMetadataItem,
   comparison: Record<string, number>,
 ): RecordGqlOperationFilter =>
-  field.type === FieldMetadataType.CURRENCY
-    ? { [field.name]: { amountMicros: comparison } }
-    : { [field.name]: comparison };
+  splitBounds(comparison, (bound) =>
+    field.type === FieldMetadataType.CURRENCY
+      ? { [field.name]: { amountMicros: bound } }
+      : { [field.name]: bound },
+  );
 
 const startOfDay = (value: string) => {
   const [year, month, day] = value.slice(0, 10).split('-').map(Number);
@@ -109,16 +123,17 @@ const startOfDay = (value: string) => {
 const dateCondition = (
   field: FieldMetadataItem,
   comparison: Record<string, Date>,
-): RecordGqlOperationFilter => ({
-  [field.name]: Object.fromEntries(
-    Object.entries(comparison).map(([key, date]) => [
-      key,
-      field.type === FieldMetadataType.DATE
-        ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-        : date.toISOString(),
-    ]),
-  ),
-});
+): RecordGqlOperationFilter =>
+  splitBounds(comparison, (bound) => ({
+    [field.name]: Object.fromEntries(
+      Object.entries(bound).map(([key, date]) => [
+        key,
+        field.type === FieldMetadataType.DATE
+          ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+          : date.toISOString(),
+      ]),
+    ),
+  }));
 
 const rangeCondition = (
   field: FieldMetadataItem,
