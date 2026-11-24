@@ -145,7 +145,6 @@ export const RoboostFieldInput = ({
           value={selectedValues[0] ?? ''}
           placeholder={placeholder ?? t`Select…`}
           options={options}
-          isSearchable
           isClearable
           onChange={(nextValue) =>
             onChange(nextValue === '' ? null : nextValue)

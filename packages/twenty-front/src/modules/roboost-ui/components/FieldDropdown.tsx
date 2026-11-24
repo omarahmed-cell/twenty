@@ -2,6 +2,7 @@ import { Button } from '@/roboost-ui/components/Button';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { MenuSearch } from '@/roboost-ui/components/MenuSearch';
+import { ROBOOST_MENU_SEARCH_THRESHOLD } from '@/roboost-ui/constants/RoboostMenuSearchThreshold';
 import { type SelectOption } from '@/roboost-ui/components/Select';
 import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { cx } from '@/roboost-ui/utils/cx';
@@ -38,7 +39,7 @@ export const FieldDropdown = ({
   onDismiss,
   minWidth = 0,
   isClearable = false,
-  isSearchable = true,
+  isSearchable = options.length > ROBOOST_MENU_SEARCH_THRESHOLD,
   'aria-label': ariaLabel,
 }: FieldDropdownProps) => {
   const { t } = useLingui();
