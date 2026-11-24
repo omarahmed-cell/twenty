@@ -12,6 +12,7 @@ import {
 } from '@/roboost-app/types/RoboostFeedItem';
 import { type RoboostDateRange } from '@/roboost-app/list/types/RoboostListFilters';
 import { getRoboostRangeStart } from '@/roboost-app/list/utils/getRoboostRangeStart';
+import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
 import { FilterChip } from '@/roboost-ui/components/FilterChip';
 import { Input } from '@/roboost-ui/components/Input';
 import { Tabs } from '@/roboost-ui/components/Tabs';
@@ -20,6 +21,8 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+const TIMELINE_COLLAPSED_USER_VAR = 'roboost.timelineCardsCollapsed';
 
 export type RoboostRecordMainTab = 'overview' | 'activities';
 export type RoboostActivitySubTab =
@@ -191,7 +194,7 @@ const StyledFeed = styled.div`
 const StyledEmpty = styled.div`
   background: ${ROBOOST_UI_THEME.surface};
   border: 1px dashed ${ROBOOST_UI_THEME.borderStrong};
-  border-radius: ${ROBOOST_UI_THEME.radiusMd};
+  border-radius: ${ROBOOST_UI_THEME.radiusLg};
   color: ${ROBOOST_UI_THEME.textMuted};
   font-size: 13px;
   line-height: 18px;
@@ -258,7 +261,13 @@ export const RoboostActivityColumn = ({
   const [showTracking, setShowTracking] = useState(true);
   const [showCanceledMeetings, setShowCanceledMeetings] = useState(true);
   const [showCompletedTasks, setShowCompletedTasks] = useState(true);
-  const [expandedIds, setExpandedIds] = useState<string[]>([]);
+  const { getUserVar, setUserVar } = useRoboostUserVars();
+  // Cards open expanded like HubSpot; "Collapse all" is remembered per user
+  const isCollapsedByDefault =
+    getUserVar<boolean>(TIMELINE_COLLAPSED_USER_VAR) === true;
+  const [toggledIds, setToggledIds] = useState<string[]>([]);
+  const isItemExpanded = (id: string) =>
+    isCollapsedByDefault !== toggledIds.includes(id);
 
   const dateRangeLabels: Record<RoboostActivityDateRange, string> = {
     any: t`Any time`,
@@ -332,7 +341,7 @@ export const RoboostActivityColumn = ({
   const expandableIds = visibleItems
     .filter((item) => item.kind !== 'update' && item.kind !== 'tracking')
     .map((item) => item.id);
-  const isAnyExpanded = expandableIds.some((id) => expandedIds.includes(id));
+  const isAnyExpanded = expandableIds.some(isItemExpanded);
   const hasFilters =
     typeKeys.length < ROBOOST_ALL_ACTIVITY_TYPE_KEYS.length ||
     dateRange !== 'any' ||
@@ -394,12 +403,13 @@ export const RoboostActivityColumn = ({
                       [])
                     : []
                 }
-                isExpanded={expandedIds.includes(item.id)}
+                isExpanded={isItemExpanded(item.id)}
                 onToggleExpanded={(expanded) =>
-                  setExpandedIds(
-                    expanded
-                      ? [...expandedIds, item.id]
-                      : expandedIds.filter((id) => id !== item.id),
+                  expanded !== isItemExpanded(item.id) &&
+                  setToggledIds(
+                    toggledIds.includes(item.id)
+                      ? toggledIds.filter((id) => id !== item.id)
+                      : [...toggledIds, item.id],
                   )
                 }
               />
@@ -487,7 +497,10 @@ export const RoboostActivityColumn = ({
             </StyledSearch>
             <StyledChipButton
               type="button"
-              onClick={() => setExpandedIds(isAnyExpanded ? [] : expandableIds)}
+              onClick={() => {
+                setToggledIds([]);
+                setUserVar(TIMELINE_COLLAPSED_USER_VAR, isAnyExpanded);
+              }}
             >
               {isAnyExpanded ? t`Collapse all` : t`Expand all`}
             </StyledChipButton>

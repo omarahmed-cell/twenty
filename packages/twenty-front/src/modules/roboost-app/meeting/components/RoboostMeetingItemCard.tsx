@@ -65,7 +65,7 @@ type MeetingRecord = {
   locationType: string | null;
   location: string | null;
   googleEventId: string | null;
-  attendeeDescription: { markdown?: string | null } | null;
+  internalNote: { markdown?: string | null } | null;
   host: { id: string; name?: MemberName | null } | null;
   meetingAttendees: MeetingAttendeeRecord[] | null;
 };
@@ -79,7 +79,7 @@ type MeetingDraft = {
   meetingOutcome: string;
   locationType: string;
   location: string;
-  attendeeDescription: string;
+  internalNote: string;
   attendees: RoboostMeetingAttendeeDraft[];
 };
 
@@ -104,7 +104,7 @@ const MEETING_GQL_FIELDS: RecordGqlFields = {
   locationType: true,
   location: true,
   googleEventId: true,
-  attendeeDescription: true,
+  internalNote: true,
   host: { id: true, name: true },
   meetingAttendees: {
     id: true,
@@ -236,7 +236,7 @@ export const RoboostMeetingItemCard = ({
         timeZoneName: 'shortOffset',
       }).format(new Date(record.startsAt))
     : '--';
-  const attendeeDescription = record?.attendeeDescription?.markdown ?? '';
+  const internalNote = record?.internalNote?.markdown ?? '';
 
   const startEdit = () => {
     if (!isDefined(record)) {
@@ -257,7 +257,7 @@ export const RoboostMeetingItemCard = ({
         record.locationType === 'VIDEO_CONFERENCE'
           ? ''
           : (record.location ?? ''),
-      attendeeDescription,
+      internalNote,
       attendees: attendees
         .filter((attendee) => isNonEmptyString(attendee.email))
         .map((attendee) => ({
@@ -301,10 +301,7 @@ export const RoboostMeetingItemCard = ({
           ...(draft.locationType === 'VIDEO_CONFERENCE'
             ? {}
             : { location: draft.location || null }),
-          attendeeDescription: {
-            markdown: draft.attendeeDescription,
-            blocknote: null,
-          },
+          internalNote: { markdown: draft.internalNote, blocknote: null },
         },
       });
 
@@ -389,12 +386,12 @@ export const RoboostMeetingItemCard = ({
         {t`View meeting details`}
       </Link>
       <div className="rb-mtgc-desc">
-        <div className="rb-actx-label">{t`Attendee description`}</div>
+        <div className="rb-actx-label">{t`Internal note`}</div>
         <div className="rb-actx-body">
-          {attendeeDescription.trim() === '' ? (
-            <span className="rb-muted">{t`No description`}</span>
+          {internalNote.trim() === '' ? (
+            <span className="rb-muted">{t`No internal note`}</span>
           ) : (
-            attendeeDescription
+            internalNote
           )}
         </div>
       </div>
@@ -597,16 +594,16 @@ export const RoboostMeetingItemCard = ({
         </label>
       </div>
       <div className="rb-mtg-field">
-        <span className="rb-act-label">{t`Attendee description`}</span>
+        <span className="rb-act-label">{t`Internal note`}</span>
         <RoboostActivityTextEditor
-          value={draft.attendeeDescription}
-          placeholder={t`Send a description to your attendees…`}
-          onChange={(value) => updateDraft({ attendeeDescription: value })}
+          value={draft.internalNote}
+          placeholder={t`A private note for your team, never sent to attendees…`}
+          onChange={(value) => updateDraft({ internalNote: value })}
         />
       </div>
       {isNonEmptyString(record?.googleEventId) && (
         <span className="rb-mtg-hint">
-          {t`Title, time, attendees, location and description update the Google invite and notify attendees.`}
+          {t`Title, time, attendees and location update the Google invite and notify attendees. The internal note stays in the CRM.`}
         </span>
       )}
       {error !== null && <div className="rb-field-error">{error}</div>}

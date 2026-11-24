@@ -20,11 +20,41 @@
 .rb-recpage .rb-rec-col {
   min-height: 0;
 }
+/* HubSpot proportions: each side about a quarter of the content, the timeline the rest */
 .rb-recpage .rb-rec-left,
 .rb-recpage .rb-rec-right {
-  flex: 0 0 308px;
-  max-width: 308px;
+  flex: 0 0 clamp(320px, 25%, 440px);
+  max-width: 440px;
   min-width: 0;
+}
+.rb-recpage .rb-rec-main {
+  flex: 1 1 0;
+  min-width: 420px;
+}
+/* Collapse right first, then left, as space runs out (the page is not a size container) */
+@media (max-width: 1180px) {
+  .rb-recpage .rb-rec-right {
+    flex: 0 0 40px;
+    max-width: 40px;
+  }
+  .rb-recpage .rb-rec-right .rb-rec-panel {
+    display: none;
+  }
+  .rb-recpage .rb-rec-right .rb-rec-rail {
+    display: flex;
+  }
+}
+@media (max-width: 900px) {
+  .rb-recpage .rb-rec-left {
+    flex: 0 0 40px;
+    max-width: 40px;
+  }
+  .rb-recpage .rb-rec-left .rb-rec-panel {
+    display: none;
+  }
+  .rb-recpage .rb-rec-left .rb-rec-rail {
+    display: flex;
+  }
 }
 .rb-recpage .rb-rec-left .rb-rec-panel,
 .rb-recpage .rb-rec-right .rb-rec-panel {
@@ -66,7 +96,7 @@
 .rb-rc {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
   flex: none;
   min-width: 0;
@@ -206,7 +236,7 @@
   align-items: flex-start;
   background: var(--surface-sunken);
   border: 1px dashed var(--border-strong);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   color: var(--text-muted);
   display: flex;
   flex-direction: column;
@@ -332,7 +362,7 @@
 .rb-mini {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   min-width: 0;
   padding: 10px;
 }

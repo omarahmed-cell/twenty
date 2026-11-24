@@ -1132,8 +1132,8 @@ td.is-cell-editing {
   min-width: 0;
   padding: 0;
 }
-.rb-cell-editor.is-in-cell .rb-select-trigger,
-.rb-cell-editor.is-in-cell .rb-input {
+td .rb-cell-editor.is-in-cell .rb-select-trigger,
+td .rb-cell-editor.is-in-cell .rb-input {
   background: transparent;
   border: none;
   box-shadow: none;
@@ -1141,8 +1141,8 @@ td.is-cell-editing {
   padding-left: 0;
   padding-right: 0;
 }
-.rb-cell-editor.is-in-cell .rb-input:focus-within,
-.rb-cell-editor.is-in-cell .rb-select-trigger:focus-visible {
+td .rb-cell-editor.is-in-cell .rb-input:focus-within,
+td .rb-cell-editor.is-in-cell .rb-select-trigger:focus-visible {
   box-shadow: none;
   outline: none;
 }

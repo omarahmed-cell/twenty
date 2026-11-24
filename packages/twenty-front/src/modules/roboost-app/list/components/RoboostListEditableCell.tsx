@@ -197,7 +197,7 @@ const RoboostListCellEditor = ({
       className={cx(
         'rb-cell-editor',
         isInlineDropdown && 'is-inline-dropdown',
-        isInCell && isInTable && 'is-in-cell',
+        isInCell && (isInTable || saveOnChoice) && 'is-in-cell',
         editor.needsAttention && 'needs-attention',
       )}
       onClick={(event) => event.stopPropagation()}

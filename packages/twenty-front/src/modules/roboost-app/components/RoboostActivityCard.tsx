@@ -10,7 +10,7 @@ const StyledCard = styled.div`
   align-items: flex-start;
   background: ${ROBOOST_UI_THEME.surface};
   border: 1px solid ${ROBOOST_UI_THEME.border};
-  border-radius: ${ROBOOST_UI_THEME.radiusMd};
+  border-radius: ${ROBOOST_UI_THEME.radiusLg};
   box-shadow: ${ROBOOST_UI_THEME.shadowXs};
   display: flex;
   gap: 12px;
