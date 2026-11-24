@@ -16,6 +16,8 @@ import { FieldMetadataType } from '~/generated-metadata/graphql';
 import { useDebounce } from 'use-debounce';
 
 const PICKER_MIN_WIDTH = 240;
+// Inside a record field or table cell the list hangs under the whole field, never over its label
+const FIELD_CONTAINER_SELECTOR = '.rb-prop, td';
 
 type RoboostRecordPickerProps = {
   objectNameSingular: string;
@@ -133,7 +135,10 @@ export const RoboostRecordPicker = ({
       </button>
       {isOpen && (
         <FloatingPanel
-          anchor={anchorRef.current}
+          anchor={
+            anchorRef.current?.closest<HTMLElement>(FIELD_CONTAINER_SELECTOR) ??
+            anchorRef.current
+          }
           panelRef={menuRef}
           matchAnchorWidth
           minWidth={PICKER_MIN_WIDTH}

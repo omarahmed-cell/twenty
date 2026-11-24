@@ -265,12 +265,10 @@ const checkRecordField = async ({
   page,
   name,
   label,
-  isRelation,
 }: {
   page: Page;
   name: string;
   label: string;
-  isRelation: boolean;
 }) => {
   const row = propertyRow(page, label);
 
@@ -281,7 +279,8 @@ const checkRecordField = async ({
   await page.waitForTimeout(400);
 
   // Lists hang under the whole field; a relation's list hangs under the value box that replaced the value
-  const trigger = isRelation ? row.locator('.rb-picker').first() : row;
+  // Every list hangs under the whole field (label and value), relations included
+  const trigger = row;
   const result = await measurePanel({
     page,
     name,
@@ -304,6 +303,21 @@ const openRecord = async (page: Page, path: string, uiScale: number) => {
   await page.waitForTimeout(2500);
 };
 
+// The toolbar shifts while the view loads; measure only once it stops moving
+const waitForStableBox = async (locator: Locator) => {
+  let previous = '';
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const current = describeBox(await boxOf(locator));
+
+    if (current === previous && current !== 'none') {
+      return;
+    }
+    previous = current;
+    await locator.page().waitForTimeout(500);
+  }
+};
+
 const openList = async (page: Page, path: string, uiScale: number) => {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.rb-cell', { timeout: 600_000 });
@@ -324,11 +338,7 @@ test('record page fields', async ({ page }, testInfo) => {
   ];
 
   await openRecord(page, `/object/person/${CC_TEST_CONTACT_ID}`, uiScale);
-  for (const [field, isRelation] of [
-    ['Lifecycle Stage', false],
-    ['Company', true],
-    ['Customer Success Responsible', true],
-  ] as const) {
+  for (const field of ['Lifecycle Stage', 'Company', 'Contact owner']) {
     for (const [positionName, fraction] of positions) {
       const row = propertyRow(page, field);
 
@@ -347,7 +357,6 @@ test('record page fields', async ({ page }, testInfo) => {
           page,
           name: `contact ${field} (${positionName} of column)`,
           label: field,
-          isRelation,
         }),
       );
     }
@@ -364,7 +373,6 @@ test('record page fields', async ({ page }, testInfo) => {
         page,
         name: `company Uses Aggregators multi-select (${positionName} of column)`,
         label: 'Uses Aggregators',
-        isRelation: false,
       }),
     );
   }
@@ -660,6 +668,7 @@ test('toolbar and timeline panels', async ({ page }, testInfo) => {
   const results: CaseResult[] = [];
 
   await openList(page, '/objects/people', uiScale);
+  await waitForStableBox(page.getByRole('button', { name: /^Sort/ }).first());
   const sortButton = page.getByRole('button', { name: /^Sort/ }).first();
   const filterButton = page.getByRole('button', { name: /^Filter/ }).first();
   const toolbarNeighbours: [string, Locator][] = [
@@ -691,12 +700,15 @@ test('toolbar and timeline panels', async ({ page }, testInfo) => {
   }
   await closeOpenEditor(page);
 
-  const chips = page.locator('.rb-chip');
+  const chips = page.locator('.rb-chip[aria-haspopup="menu"]');
   const chipCount = Math.min(await chips.count(), 4);
 
   for (let index = 0; index < chipCount; index++) {
     const chip = chips.nth(index);
-    const chipName = (await chip.innerText()).split('\n')[0].trim();
+    if (!(await chip.isVisible())) {
+      continue;
+    }
+    const chipName = ((await chip.textContent()) ?? '').trim().slice(0, 30);
 
     await chip.click();
     results.push(
@@ -761,7 +773,10 @@ test('toolbar and timeline panels', async ({ page }, testInfo) => {
   }
   for (let index = 0; index < timelineChipCount; index++) {
     const chip = timelineChips.nth(index);
-    const chipName = (await chip.innerText()).split('\n')[0].trim();
+    if (!(await chip.isVisible())) {
+      continue;
+    }
+    const chipName = ((await chip.textContent()) ?? '').trim().slice(0, 30);
 
     await chip.click();
     results.push(

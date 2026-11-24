@@ -7,5 +7,6 @@ playwright-report/.last-run.json
 results/
 run_results/.playwright-artifacts-0/
 run_results/.playwright-artifacts-1/
-.auth/roboost/.auth.json
+.auth/
+roboost/.auth.json
 roboost/run_results/
