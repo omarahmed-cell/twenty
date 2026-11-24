@@ -41,6 +41,8 @@ export type RoboostNotificationInput = {
   relatedCount?: number;
   // Re-sending with the same key updates the existing unread notification instead of adding one
   groupKey?: string | null;
+  // Only an unread notification with the same key created this recently is updated
+  groupWindowSeconds?: number | null;
 };
 
 export type RoboostNotificationRow = {

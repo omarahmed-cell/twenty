@@ -59,6 +59,7 @@ import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { parseRoboostLinkFilters } from '@/roboost-app/list/utils/parseRoboostLinkFilters';
 import {
   CoreObjectNameSingular,
   type RecordGqlOperationFilter,
@@ -154,10 +155,16 @@ export const RoboostObjectListPage = ({
 
   const { savedState, saveViewState } = useRoboostSavedViewState(activeView);
 
-  // Opening a view brings back its last saved filters and sort
+  const linkFilters = parseRoboostLinkFilters(searchParams);
+
+  // Opening a view brings back its last saved filters and sort; a notification link brings its own
   if (isDefined(activeView) && activeView.id !== loadedViewId) {
     setLoadedViewId(activeView.id);
-    setFilters(savedState.filters);
+    setFilters(
+      isDefined(linkFilters.advanced)
+        ? { ...EMPTY_ROBOOST_LIST_FILTERS, advanced: linkFilters.advanced }
+        : savedState.filters,
+    );
     setSort(savedState.sort);
   }
   const frozenVarKey = `roboost.listFrozen.${activeView?.id ?? objectMetadataItem.id}`;
@@ -261,10 +268,14 @@ export const RoboostObjectListPage = ({
 
   const scopeFieldName = searchParams.get('filterField');
   const scopeValue = searchParams.get('filterValue');
-  const scopeFilter =
+  const fieldScopeFilter =
     isNonEmptyString(scopeFieldName) && isNonEmptyString(scopeValue)
       ? { [scopeFieldName]: { eq: scopeValue } }
       : undefined;
+  const scopeFilter =
+    isDefined(fieldScopeFilter) && isDefined(linkFilters.idsFilter)
+      ? { and: [fieldScopeFilter, linkFilters.idsFilter] }
+      : (fieldScopeFilter ?? linkFilters.idsFilter ?? undefined);
 
   const filter = buildRoboostListFilter({
     objectMetadataItem,

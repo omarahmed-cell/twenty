@@ -8,6 +8,7 @@ import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import {
   type RoboostNotificationInput,
+  type RoboostNotificationRelatedRecord,
   type RoboostNotificationRow,
   type RoboostNotificationTab,
   type RoboostNotificationType,
@@ -118,6 +119,7 @@ export class RoboostNotificationService {
         JSON.stringify(input.relatedRecords ?? []),
         input.relatedCount ?? input.relatedRecords?.length ?? 0,
         input.groupKey ?? null,
+        input.groupWindowSeconds ?? null,
       ];
 
       if (isDefined(input.groupKey)) {
@@ -129,6 +131,7 @@ export class RoboostNotificationService {
             "relatedCount" = $14, subtype = $3, "createdAt" = now()
           WHERE "recipientWorkspaceMemberId" = $1 AND type = $2 AND "groupKey" = $15
             AND "isRead" = false AND "isTrashed" = false
+            AND ($16::int IS NULL OR "createdAt" > now() - make_interval(secs => $16::int))
           RETURNING id`,
           values,
         );
@@ -145,7 +148,7 @@ export class RoboostNotificationService {
            "relatedRecords", "relatedCount", "groupKey")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb, $14, $15)
         RETURNING id`,
-        values,
+        values.slice(0, 15),
       );
 
       return inserted?.id ?? null;
@@ -157,6 +160,36 @@ export class RoboostNotificationService {
 
       return null;
     }
+  }
+
+  // The unread notification a new event would merge into, when one exists inside the window
+  async findRecentGroup({
+    workspaceId,
+    recipientWorkspaceMemberId,
+    groupKey,
+    windowSeconds,
+  }: {
+    workspaceId: string;
+    recipientWorkspaceMemberId: string;
+    groupKey: string;
+    windowSeconds: number;
+  }): Promise<{
+    relatedRecords: RoboostNotificationRelatedRecord[];
+    relatedCount: number;
+  } | null> {
+    const [row]: {
+      relatedRecords: RoboostNotificationRelatedRecord[];
+      relatedCount: number;
+    }[] = await this.coreDataSource.query(
+      `SELECT "relatedRecords", "relatedCount" FROM ${this.table(workspaceId)}
+      WHERE "recipientWorkspaceMemberId" = $1 AND "groupKey" = $2
+        AND "isRead" = false AND "isTrashed" = false
+        AND "createdAt" > now() - make_interval(secs => $3::int)
+      ORDER BY "createdAt" DESC LIMIT 1`,
+      [recipientWorkspaceMemberId, groupKey, windowSeconds],
+    );
+
+    return row ?? null;
   }
 
   async list({
