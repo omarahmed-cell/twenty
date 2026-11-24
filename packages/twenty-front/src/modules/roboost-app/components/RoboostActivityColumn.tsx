@@ -267,7 +267,7 @@ export const RoboostActivityColumn = ({
     getUserVar<boolean>(TIMELINE_COLLAPSED_USER_VAR) === true;
   const [toggledIds, setToggledIds] = useState<string[]>([]);
   const isItemExpanded = (id: string) =>
-    isCollapsedByDefault !== toggledIds.includes(id);
+    !isCollapsedByDefault !== toggledIds.includes(id);
 
   const dateRangeLabels: Record<RoboostActivityDateRange, string> = {
     any: t`Any time`,

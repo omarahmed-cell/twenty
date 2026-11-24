@@ -23,27 +23,15 @@
 /* HubSpot proportions: each side about a quarter of the content, the timeline the rest */
 .rb-recpage .rb-rec-left,
 .rb-recpage .rb-rec-right {
-  flex: 0 0 clamp(320px, 25%, 440px);
-  max-width: 440px;
+  flex: 0 0 clamp(320px, 25%, 640px);
+  max-width: 640px;
   min-width: 0;
 }
 .rb-recpage .rb-rec-main {
   flex: 1 1 0;
   min-width: 420px;
 }
-/* Collapse right first, then left, as space runs out (the page is not a size container) */
-@media (max-width: 1180px) {
-  .rb-recpage .rb-rec-right {
-    flex: 0 0 40px;
-    max-width: 40px;
-  }
-  .rb-recpage .rb-rec-right .rb-rec-panel {
-    display: none;
-  }
-  .rb-recpage .rb-rec-right .rb-rec-rail {
-    display: flex;
-  }
-}
+/* The right column collapses in RoboostRecordPage below 1180px; the left one follows here */
 @media (max-width: 900px) {
   .rb-recpage .rb-rec-left {
     flex: 0 0 40px;

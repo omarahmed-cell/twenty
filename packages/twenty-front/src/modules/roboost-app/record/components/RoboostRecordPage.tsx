@@ -58,7 +58,7 @@ import { getAppPath, isDefined } from 'twenty-shared/utils';
 import { RelationType } from '~/generated-metadata/graphql';
 
 const OWNER_FIELD_NAMES = ['accountOwner', 'owner', 'assignee', 'sdrOwner'];
-const NARROW_VIEWPORT_WIDTH = 1340;
+const NARROW_VIEWPORT_WIDTH = 1180;
 
 type MemberRecord = { id: string; name?: RoboostFullName; __typename: string };
 type LoadedRecord = Record<string, unknown> & { id: string };
