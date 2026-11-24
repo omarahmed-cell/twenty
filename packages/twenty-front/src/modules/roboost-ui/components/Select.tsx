@@ -1,5 +1,6 @@
 import { FieldDropdown } from '@/roboost-ui/components/FieldDropdown';
 import { Icon } from '@/roboost-ui/components/Icon';
+import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { ROBOOST_MENU_SEARCH_THRESHOLD } from '@/roboost-ui/constants/RoboostMenuSearchThreshold';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
@@ -9,6 +10,9 @@ export type SelectOption = {
   value: string;
   label: string;
   description?: string;
+  // Consecutive options with the same group get one header above them
+  group?: string;
+  icon?: RoboostIconName;
 };
 
 export type SelectProps = {

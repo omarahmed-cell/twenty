@@ -7,7 +7,7 @@ import { type SelectOption } from '@/roboost-ui/components/Select';
 import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
-import { type RefObject, useEffect, useRef, useState } from 'react';
+import { Fragment, type RefObject, useEffect, useRef, useState } from 'react';
 
 export type FieldDropdownProps = {
   anchorRef: RefObject<HTMLElement | null>;
@@ -183,31 +183,47 @@ export const FieldDropdown = ({
           const isSelected = isMulti
             ? draft.includes(option.value)
             : selectedValues.includes(option.value);
+          const groupHeader =
+            option.group !== undefined &&
+            option.group !== visibleOptions[index - 1]?.group ? (
+              <div className="rb-cm-group" role="presentation">
+                {option.group}
+              </div>
+            ) : null;
 
           return (
-            <div
-              key={option.value}
-              role="option"
-              aria-selected={isSelected}
-              title={option.label}
-              className={cx(
-                'rb-menu-item rb-fdd-item',
-                index === activeIndex && 'is-active',
-              )}
-              onMouseEnter={() => setActiveIndex(index)}
-              onClick={() => pick(option)}
-            >
-              {isMulti ? (
-                <Checkbox checked={isSelected} onChange={() => {}}>
-                  <span className="rb-menu-label">{option.label}</span>
-                </Checkbox>
-              ) : (
-                <>
-                  <span className="rb-menu-label">{option.label}</span>
-                  {isSelected && <Icon name="check" size={16} />}
-                </>
-              )}
-            </div>
+            <Fragment key={option.value}>
+              {groupHeader}
+              <div
+                role="option"
+                aria-selected={isSelected}
+                title={option.label}
+                className={cx(
+                  'rb-menu-item rb-fdd-item',
+                  index === activeIndex && 'is-active',
+                )}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => pick(option)}
+              >
+                {isMulti ? (
+                  <Checkbox checked={isSelected} onChange={() => {}}>
+                    <span className="rb-menu-label">{option.label}</span>
+                  </Checkbox>
+                ) : (
+                  <>
+                    {option.icon !== undefined && (
+                      <Icon
+                        name={option.icon}
+                        size={14}
+                        className="rb-fdd-icon"
+                      />
+                    )}
+                    <span className="rb-menu-label">{option.label}</span>
+                    {isSelected && <Icon name="check" size={16} />}
+                  </>
+                )}
+              </div>
+            </Fragment>
           );
         })}
         {visibleOptions.length === 0 && (
