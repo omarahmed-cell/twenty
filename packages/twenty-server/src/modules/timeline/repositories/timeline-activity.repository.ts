@@ -22,10 +22,13 @@ import { doTimelineActivityDiffsOverlap } from 'src/modules/timeline/utils/do-ti
 import { getTimelineActivityActorKey } from 'src/modules/timeline/utils/get-timeline-activity-actor-key.util';
 import { parseLinkedTimelineActivityHappensAt } from 'src/modules/timeline/utils/resolve-timeline-activity-happens-at.util';
 import { buildTimelineActivityRelatedMorphFieldMetadataName } from 'src/modules/timeline/utils/timeline-activity-related-morph-field-metadata-name-builder.util';
+import { trimFieldHistory } from 'src/modules/timeline/utils/trim-field-history.util';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 type TimelineActivityPayloadWorkspaceIdAndObjectSingularName = {
   payloads: (Omit<TimelineActivityPayload, 'properties'> & {
-    properties: Pick<TimelineActivityPayload['properties'], 'diff'>;
+    properties: Pick<TimelineActivityPayload['properties'], 'diff'> &
+      Record<string, unknown>;
   })[];
   workspaceId: string;
   objectSingularName: string;
@@ -61,6 +64,86 @@ export class TimelineActivityRepository {
         shouldFilterMissingTargets: true,
       });
     }
+  }
+
+  // One row per field change, never merged, so each field keeps exactly its latest `limit` changes
+  async insertFieldHistory(
+    args: TimelineActivityPayloadWorkspaceIdAndObjectSingularName & {
+      limit: number;
+    },
+  ) {
+    if (args.payloads.length === 0) {
+      return;
+    }
+
+    try {
+      await this.insertFieldHistoryOnce({
+        ...args,
+        shouldFilterMissingTargets: false,
+      });
+    } catch (error) {
+      if (!isForeignKeyViolation(error)) {
+        throw error;
+      }
+
+      await this.insertFieldHistoryOnce({
+        ...args,
+        shouldFilterMissingTargets: true,
+      });
+    }
+  }
+
+  private async insertFieldHistoryOnce({
+    objectSingularName,
+    workspaceId,
+    payloads,
+    limit,
+    shouldFilterMissingTargets,
+  }: TimelineActivityPayloadWorkspaceIdAndObjectSingularName & {
+    limit: number;
+    shouldFilterMissingTargets: boolean;
+  }) {
+    await this.workspaceOrmManager.executeInWorkspaceContext(async () => {
+      await this.workspaceOrmManager.runInWorkspaceTransaction(
+        async (transactionScope) => {
+          const timelineActivityRepository =
+            transactionScope.getRepository<ObjectLiteral>('timelineActivity', {
+              shouldBypassPermissionChecks: true,
+            });
+          const insertablePayloads = shouldFilterMissingTargets
+            ? await this.filterPayloadsWithExistingTarget({
+                transactionScope,
+                objectSingularName,
+                payloads,
+              })
+            : payloads;
+
+          await this.insertTimelineActivities({
+            timelineActivityRepository,
+            objectSingularName,
+            payloads: insertablePayloads,
+          });
+
+          await trimFieldHistory({
+            executeQuery: transactionScope.executeRawQuery,
+            schemaName: getWorkspaceSchemaName(workspaceId),
+            targetColumnName:
+              this.getTimelineActivityPropertyName(objectSingularName),
+            groups: insertablePayloads.flatMap((payload) =>
+              isDefined(payload.fieldHistoryFieldName)
+                ? [
+                    {
+                      recordId: payload.recordId,
+                      fieldName: payload.fieldHistoryFieldName,
+                    },
+                  ]
+                : [],
+            ),
+            limit,
+          });
+        },
+      );
+    }, buildSystemAuthContext(workspaceId));
   }
 
   async updateLinkedTimelineActivitiesHappensAt({

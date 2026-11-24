@@ -1,3 +1,4 @@
+import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.module';
 import { DealStageHistoryModule } from 'src/modules/deal-stage-history/deal-stage-history.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +15,7 @@ import { OpportunityCalculationQueueService } from 'src/modules/opportunity-calc
 
 @Module({
   imports: [
+    TimelineActivityModule,
     TypeOrmModule.forFeature([WorkspaceEntity]),
     WorkspaceIteratorModule,
     DealStageHistoryModule,

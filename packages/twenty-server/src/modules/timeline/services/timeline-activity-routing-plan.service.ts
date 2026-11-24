@@ -11,6 +11,8 @@ import { type FlatTimelineActivityTypeMaps } from 'src/engine/metadata-modules/f
 import { type TimelineActivityRule } from 'src/modules/timeline/types/timeline-activity-rule.type';
 import { buildDirectRelationTargetShape } from 'src/modules/timeline/utils/build-direct-relation-target-shape.util';
 import { buildJunctionTargetShape } from 'src/modules/timeline/utils/build-junction-target-shape.util';
+import { buildCalculatedFieldNamesByObjectMetadataId } from 'src/modules/timeline/utils/build-calculated-field-names-by-object-metadata-id.util';
+import { resolveTimelineActivityTypeForRule } from 'src/modules/timeline/utils/resolve-timeline-activity-type-for-rule.util';
 import { buildNonAuditLoggedFieldNamesByObjectMetadataId } from 'src/modules/timeline/utils/build-non-audit-logged-field-names-by-object-metadata-id.util';
 import { buildTimelineActivitySelfRule } from 'src/modules/timeline/utils/build-timeline-activity-self-rule.util';
 import { resolveTimelineActivityTypeRouting } from 'src/modules/timeline/utils/resolve-timeline-activity-type-routing.util';
@@ -19,6 +21,7 @@ import {
   buildTimelineActivityTypeResolution,
   toResolvedTimelineActivityType,
   type ResolvableTimelineActivityType,
+  type ResolvedTimelineActivityType,
   type TimelineActivityTypeResolver,
 } from 'src/modules/timeline/utils/resolve-timeline-activity-type.util';
 import { resolveEffectiveFlatEntityProperty } from 'src/engine/metadata-modules/overrides/utils/resolve-effective-flat-entity-property.util';
@@ -29,11 +32,14 @@ type TimelineActivityRulesForEventBatch = {
   sourceRules: TimelineActivityRule[];
   junctionRules: TimelineActivityRule[];
   nonAuditLoggedFieldNames: ReadonlySet<string>;
+  calculatedFieldNames: ReadonlySet<string>;
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   resolveTimelineActivityType: TimelineActivityTypeResolver;
 };
 
 type TimelineActivityRoutingPlan = {
+  flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
+  calculatedFieldNamesByObjectMetadataId: Map<string, ReadonlySet<string>>;
   activeTimelineActivityTypes: ResolvableTimelineActivityType[];
   throughRules: TimelineActivityRule[];
   eligibleNonAuditedObjectMetadataIds: Set<string>;
@@ -103,9 +109,46 @@ export class TimelineActivityRoutingPlanService {
         routingPlan.nonAuditLoggedFieldNamesByObjectMetadataId.get(
           flatObjectMetadata.id,
         ) ?? EMPTY_NON_AUDIT_LOGGED_FIELD_NAMES,
+      calculatedFieldNames:
+        routingPlan.calculatedFieldNamesByObjectMetadataId.get(
+          flatObjectMetadata.id,
+        ) ?? EMPTY_NON_AUDIT_LOGGED_FIELD_NAMES,
       flatFieldMetadataMaps: routingPlan.flatFieldMetadataMaps,
       resolveTimelineActivityType: routingPlan.resolveTimelineActivityType,
     };
+  }
+
+  // The type a record's own field changes are written with; undefined when the object keeps no history
+  async getFieldHistoryTimelineActivityType({
+    workspaceId,
+    objectNameSingular,
+  }: {
+    workspaceId: string;
+    objectNameSingular: string;
+  }): Promise<ResolvedTimelineActivityType | undefined> {
+    const routingPlan = await this.getRoutingPlan(workspaceId);
+    const flatObjectMetadata = Object.values(
+      routingPlan.flatObjectMetadataMaps.byUniversalIdentifier,
+    ).find((item) => item?.nameSingular === objectNameSingular);
+
+    if (!isDefined(flatObjectMetadata)) {
+      return undefined;
+    }
+
+    const selfRule = buildTimelineActivitySelfRule({
+      flatObjectMetadata,
+      timelineActivityTypes: routingPlan.activeTimelineActivityTypes,
+    });
+
+    if (!isDefined(selfRule) || !selfRule.actions.includes('updated')) {
+      return undefined;
+    }
+
+    return resolveTimelineActivityTypeForRule({
+      rule: selfRule,
+      ruleAction: 'updated',
+      resolveTimelineActivityType: routingPlan.resolveTimelineActivityType,
+    });
   }
 
   private async getRoutingPlan(
@@ -282,6 +325,9 @@ export class TimelineActivityRoutingPlanService {
     }
 
     return {
+      flatObjectMetadataMaps,
+      calculatedFieldNamesByObjectMetadataId:
+        buildCalculatedFieldNamesByObjectMetadataId(flatFieldMetadataMaps),
       activeTimelineActivityTypes,
       throughRules,
       eligibleNonAuditedObjectMetadataIds,

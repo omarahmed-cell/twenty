@@ -4,6 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { isDefined } from 'twenty-shared/utils';
 import { DataSource, In } from 'typeorm';
 
+import { TimelineActivityService } from 'src/modules/timeline/services/timeline-activity.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
@@ -33,6 +34,7 @@ export class PersonCalculatedFieldsService {
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly timelineActivityService: TimelineActivityService,
   ) {}
 
   async resolvePersonIds({
@@ -194,6 +196,21 @@ export class PersonCalculatedFieldsService {
         await personRepository.update({ id: In([personId]) }, changes);
       }
     }, buildSystemAuthContext(workspaceId));
+
+    await this.timelineActivityService.recordCalculatedFieldChanges({
+      workspaceId,
+      objectNameSingular: 'person',
+      changes: rows.flatMap((row) =>
+        Object.entries(changesByPersonId.get(row.id) ?? {}).map(
+          ([fieldName, after]) => ({
+            recordId: row.id,
+            fieldName,
+            before: row.current[fieldName as keyof typeof row.current],
+            after,
+          }),
+        ),
+      ),
+    });
 
     this.logger.log(
       `Workspace ${workspaceId}: recomputed ${rows.length} ${rows.length === 1 ? 'person' : 'people'}, ${changesByPersonId.size} changed`,

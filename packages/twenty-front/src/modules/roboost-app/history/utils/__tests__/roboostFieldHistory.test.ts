@@ -105,6 +105,25 @@ describe('getRoboostFieldHistorySource', () => {
     expect(source(FieldActorSource.SYSTEM)).toBe('system');
   });
 
+  it('labels recomputed values as calculated whoever triggered them', () => {
+    const entries = getRoboostFieldHistoryEntries({
+      timelineActivities: [
+        buildRow({
+          id: 'calculated',
+          workspaceMemberId: 'member-1',
+          properties: {
+            diff: { completion: { before: 0.4, after: 0.429 } },
+            isCalculated: true,
+          },
+        }),
+      ],
+      field: { name: 'completion', settings: null },
+      isUpdateRow: () => true,
+    });
+
+    expect(entries.map(({ source }) => source)).toEqual(['calculated']);
+  });
+
   it('falls back to the member on rows written before the actor was kept', () => {
     expect(
       getRoboostFieldHistorySource({

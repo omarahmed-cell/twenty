@@ -6,7 +6,6 @@ import { computeMorphOrRelationFieldJoinColumnName } from 'src/engine/metadata-m
 import { isAuditLoggableFieldType } from 'src/engine/metadata-modules/field-metadata/utils/is-audit-loggable-field-type.util';
 import { type OrmFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/orm-flat-field-metadata.type';
 import { isMorphOrRelationFlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/utils/is-morph-or-relation-flat-field-metadata.util';
-import { getFieldFormulaSettings } from 'src/modules/field-formula/utils/resolve-field-formula-configs.util';
 
 export const buildNonAuditLoggedFieldNamesByObjectMetadataId = (
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>,
@@ -25,14 +24,9 @@ export const buildNonAuditLoggedFieldNamesByObjectMetadataId = (
 
     // A projection cached before the column existed has no value, so only an explicit false excludes.
     // The type rule outranks the flag: every row predating the backfill says true.
-    // Calculated fields are recomputed from other fields, so their changes would only repeat those
-    const isCalculated =
-      isDefined(getFieldFormulaSettings(flatFieldMetadata)) ||
-      flatFieldMetadata.isUIEditable === false;
     const isAuditLogged =
       flatFieldMetadata.isAuditLogged !== false &&
-      isAuditLoggableFieldType(flatFieldMetadata.type) &&
-      !isCalculated;
+      isAuditLoggableFieldType(flatFieldMetadata.type);
 
     if (isAuditLogged) {
       continue;

@@ -37,13 +37,6 @@ export const ROBOOST_ACTIVITY_TYPE_CATEGORIES: RoboostActivityTypeCategory[] = [
   {
     id: 'updates',
     label: msg`Updates`,
-    types: [
-      { key: 'fieldChanges', label: msg`Field changes` },
-      { key: 'stageChanges', label: msg`Stage changes` },
-      { key: 'recordCreated', label: msg`Record created` },
-      { key: 'workflowActivity', label: msg`Workflow activity` },
-      { key: 'associations', label: msg`Association changes` },
-      { key: 'otherUpdates', label: msg`Deleted and restored` },
-    ],
+    types: [{ key: 'recordCreated', label: msg`Record created` }],
   },
 ];

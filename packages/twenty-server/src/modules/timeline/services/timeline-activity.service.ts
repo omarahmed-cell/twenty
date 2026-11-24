@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { type ObjectRecordBaseEvent } from 'twenty-shared/database-events';
 import { type ActorMetadata, type ObjectRecord } from 'twenty-shared/types';
@@ -35,6 +35,15 @@ import { doesObjectRecordEventChangeFields } from 'src/modules/timeline/utils/do
 import { excludeNonAuditLoggedFieldsFromEvents } from 'src/modules/timeline/utils/exclude-non-audit-logged-fields-from-events.util';
 import { resolveTimelineActivityRuleAction } from 'src/modules/timeline/utils/resolve-timeline-activity-rule-action.util';
 import { resolveTimelineActivityTypeForRule } from 'src/modules/timeline/utils/resolve-timeline-activity-type-for-rule.util';
+import { PropertyHistoryLimitsService } from 'src/modules/timeline/services/property-history-limits.service';
+import { getPropertyHistoryLimit } from 'src/modules/timeline/utils/get-property-history-limit.util';
+
+export type CalculatedFieldChange = {
+  recordId: string;
+  fieldName: string;
+  before: unknown;
+  after: unknown;
+};
 
 type BuildPayloadsForRuleArgs = {
   rule: TimelineActivityRule;
@@ -42,6 +51,10 @@ type BuildPayloadsForRuleArgs = {
   action: DatabaseEventAction;
   flatFieldMetadataMaps: FlatEntityMaps<OrmFlatFieldMetadata>;
   resolveTimelineActivityType: TimelineActivityTypeResolver;
+};
+
+type BuildSourceRulePayloadsArgs = BuildPayloadsForRuleArgs & {
+  calculatedFieldNames: ReadonlySet<string>;
 };
 
 const hasNonEmptyDiff = (
@@ -119,11 +132,14 @@ const buildLinkedPayload = ({
 
 @Injectable()
 export class TimelineActivityService {
+  private readonly logger = new Logger(TimelineActivityService.name);
+
   constructor(
     private readonly timelineActivityRepository: TimelineActivityRepository,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly timelineActivityRoutingPlanService: TimelineActivityRoutingPlanService,
     private readonly timelineActivityTargetQueryService: TimelineActivityTargetQueryService,
+    private readonly propertyHistoryLimitsService: PropertyHistoryLimitsService,
   ) {}
 
   async upsertEvents({
@@ -142,6 +158,7 @@ export class TimelineActivityService {
       sourceRules,
       junctionRules,
       nonAuditLoggedFieldNames,
+      calculatedFieldNames,
       flatFieldMetadataMaps,
       resolveTimelineActivityType,
     } = await this.timelineActivityRoutingPlanService.getRulesForEventBatch({
@@ -164,21 +181,30 @@ export class TimelineActivityService {
         const enrichedEvents = await this.enrichEventsWithWorkspaceMemberId({
           events: auditLoggedEvents,
         });
+        // Calculated values only belong in the record's own field history
+        const linkedEvents = excludeNonAuditLoggedFieldsFromEvents({
+          events: enrichedEvents,
+          nonAuditLoggedFieldNames: calculatedFieldNames,
+        });
 
         return Promise.all([
           ...sourceRules.map((rule) =>
             this.buildPayloadsForSourceRule({
               rule,
-              events: enrichedEvents,
+              events:
+                rule.targetShape.kind === 'SELF'
+                  ? enrichedEvents
+                  : linkedEvents,
               action,
               flatFieldMetadataMaps,
               resolveTimelineActivityType,
+              calculatedFieldNames,
             }),
           ),
           ...junctionRules.map((rule) =>
             this.buildPayloadsForJunctionRule({
               rule,
-              events: enrichedEvents,
+              events: linkedEvents,
               action,
               flatFieldMetadataMaps,
               resolveTimelineActivityType,
@@ -206,8 +232,21 @@ export class TimelineActivityService {
       return;
     }
 
+    const fieldHistoryPayloads = payloads.filter((payload) =>
+      isDefined(payload.fieldHistoryFieldName),
+    );
+
+    if (fieldHistoryPayloads.length > 0) {
+      await this.insertFieldHistory({
+        workspaceId,
+        payloads: fieldHistoryPayloads,
+      });
+    }
+
     const payloadsByObjectSingularName = fromArrayToValuesByKeyRecord({
-      array: payloads,
+      array: payloads.filter(
+        (payload) => !isDefined(payload.fieldHistoryFieldName),
+      ),
       key: 'objectSingularName',
     });
 
@@ -216,6 +255,79 @@ export class TimelineActivityService {
         objectSingularName,
         workspaceId,
         payloads: payloadsByObjectSingularName[objectSingularName],
+      });
+    }
+  }
+
+  // For values the server computes itself and writes without record events
+  async recordCalculatedFieldChanges({
+    workspaceId,
+    objectNameSingular,
+    changes,
+  }: {
+    workspaceId: string;
+    objectNameSingular: string;
+    changes: CalculatedFieldChange[];
+  }) {
+    if (changes.length === 0) {
+      return;
+    }
+
+    const timelineActivityType =
+      await this.timelineActivityRoutingPlanService.getFieldHistoryTimelineActivityType(
+        { workspaceId, objectNameSingular },
+      );
+
+    if (!isDefined(timelineActivityType)) {
+      return;
+    }
+
+    const happensAt = new Date();
+
+    // History must never fail the recompute that produced it
+    try {
+      await this.insertFieldHistory({
+        workspaceId,
+        payloads: changes.map(({ recordId, fieldName, before, after }) => ({
+          timelineActivityTypeId: timelineActivityType.id,
+          timelineActivityTypeSnapshot: timelineActivityType.snapshot,
+          happensAt,
+          objectSingularName: objectNameSingular,
+          recordId,
+          fieldHistoryFieldName: fieldName,
+          properties: {
+            diff: { [fieldName]: { before, after } },
+            isCalculated: true,
+          } as TimelineActivityPayload['properties'],
+        })),
+      });
+    } catch (error) {
+      this.logger.error(
+        `Could not record calculated field history for ${objectNameSingular} in workspace ${workspaceId}: ${error}`,
+      );
+    }
+  }
+
+  private async insertFieldHistory({
+    workspaceId,
+    payloads,
+  }: {
+    workspaceId: string;
+    payloads: TimelineActivityPayload[];
+  }) {
+    const limits =
+      await this.propertyHistoryLimitsService.getLimits(workspaceId);
+    const payloadsByObjectSingularName = fromArrayToValuesByKeyRecord({
+      array: payloads,
+      key: 'objectSingularName',
+    });
+
+    for (const objectSingularName in payloadsByObjectSingularName) {
+      await this.timelineActivityRepository.insertFieldHistory({
+        objectSingularName,
+        workspaceId,
+        payloads: payloadsByObjectSingularName[objectSingularName],
+        limit: getPropertyHistoryLimit(limits, objectSingularName),
       });
     }
   }
@@ -254,7 +366,8 @@ export class TimelineActivityService {
     action,
     flatFieldMetadataMaps,
     resolveTimelineActivityType,
-  }: BuildPayloadsForRuleArgs): Promise<TimelineActivityPayload[]> {
+    calculatedFieldNames,
+  }: BuildSourceRulePayloadsArgs): Promise<TimelineActivityPayload[]> {
     const ruleAction = resolveTimelineActivityRuleAction({
       actions: rule.actions,
       targetShape: rule.targetShape,
@@ -299,19 +412,46 @@ export class TimelineActivityService {
     const { nameSingular } = rule.sourceFlatObjectMetadata;
 
     if (rule.targetShape.kind === 'SELF') {
-      return matchingEvents.map((event) => {
-        const properties =
-          ruleAction === 'updated' ? keepDiffAndActor(event.properties) : {};
-
-        return {
+      return matchingEvents.flatMap((event): TimelineActivityPayload[] => {
+        const basePayload = {
           timelineActivityTypeId: timelineActivityType.id,
           timelineActivityTypeSnapshot: timelineActivityType.snapshot,
           happensAt: resolveTimelineActivityHappensAt(event),
           objectSingularName: nameSingular,
           recordId: event.recordId,
-          workspaceMemberId: event.workspaceMemberId,
-          properties,
         };
+
+        if (ruleAction !== 'updated') {
+          return [
+            {
+              ...basePayload,
+              workspaceMemberId: event.workspaceMemberId,
+              properties: {},
+            },
+          ];
+        }
+
+        const { updatedBy } = keepDiffAndActor(event.properties);
+
+        return Object.entries(event.properties.diff ?? {}).map(
+          ([fieldName, change]) => {
+            const isCalculated = calculatedFieldNames.has(fieldName);
+
+            return {
+              ...basePayload,
+              fieldHistoryFieldName: fieldName,
+              workspaceMemberId: isCalculated
+                ? undefined
+                : event.workspaceMemberId,
+              properties: {
+                diff: { [fieldName]: change },
+                ...(isCalculated
+                  ? { isCalculated: true }
+                  : isDefined(updatedBy) && { updatedBy }),
+              } as TimelineActivityPayload['properties'],
+            };
+          },
+        );
       });
     }
 

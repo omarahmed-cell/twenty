@@ -4,6 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { isDefined } from 'twenty-shared/utils';
 import { DataSource, In } from 'typeorm';
 
+import { TimelineActivityService } from 'src/modules/timeline/services/timeline-activity.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { DealStageHistoryService } from 'src/modules/deal-stage-history/services/deal-stage-history.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
@@ -34,6 +35,7 @@ export class OpportunityCalculatedFieldsService {
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
+    private readonly timelineActivityService: TimelineActivityService,
     private readonly dealStageHistoryService: DealStageHistoryService,
   ) {}
 
@@ -227,6 +229,21 @@ export class OpportunityCalculatedFieldsService {
         );
       }
     }, buildSystemAuthContext(workspaceId));
+
+    await this.timelineActivityService.recordCalculatedFieldChanges({
+      workspaceId,
+      objectNameSingular: 'opportunity',
+      changes: rows.flatMap((row) =>
+        Object.entries(changesByOpportunityId.get(row.id) ?? {}).map(
+          ([fieldName, after]) => ({
+            recordId: row.id,
+            fieldName,
+            before: row.current[fieldName as keyof typeof row.current],
+            after,
+          }),
+        ),
+      ),
+    });
 
     this.logger.log(
       `Workspace ${workspaceId}: recomputed ${rows.length} deal${rows.length === 1 ? '' : 's'}, ${changesByOpportunityId.size} changed`,

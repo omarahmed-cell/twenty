@@ -34,6 +34,7 @@ const recompute = async (
     } as never,
     {} as never,
     {} as never,
+    { recordCalculatedFieldChanges: jest.fn() } as never,
   );
 
   jest.spyOn(service, 'getConfigs').mockResolvedValue([config]);
@@ -81,6 +82,7 @@ const rewrite = async (
       }),
     } as never,
     { updateOneField } as never,
+    { recordCalculatedFieldChanges: jest.fn() } as never,
   );
 
   const backfill = jest.spyOn(service, 'backfill').mockResolvedValue();
@@ -145,6 +147,7 @@ describe('FieldFormulaService.backfill', () => {
       } as never,
       { evictWorkspaceFromLocalCache: jest.fn() } as never,
       {} as never,
+      { recordCalculatedFieldChanges: jest.fn() } as never,
     );
 
     jest
@@ -155,7 +158,10 @@ describe('FieldFormulaService.backfill', () => {
         buildNumberConfig('second', 'first + 1', 'first'),
       ]);
 
-    await service.backfill({ workspaceId: 'workspace', targetFieldId: 'first' });
+    await service.backfill({
+      workspaceId: 'workspace',
+      targetFieldId: 'first',
+    });
 
     expect(update.mock.calls[0][1]).toEqual({ first: 4, second: 5 });
   });
@@ -165,10 +171,7 @@ describe('FieldFormulaService.recomputeTimeBased', () => {
   const buildScheduledRun = async (records: TestRecord[]) => {
     const update = jest.fn();
     const getRepository = jest.fn(() => ({
-      find: jest
-        .fn()
-        .mockResolvedValueOnce(records)
-        .mockResolvedValue([]),
+      find: jest.fn().mockResolvedValueOnce(records).mockResolvedValue([]),
       update,
     }));
 
@@ -180,6 +183,7 @@ describe('FieldFormulaService.recomputeTimeBased', () => {
       } as never,
       {} as never,
       {} as never,
+      { recordCalculatedFieldChanges: jest.fn() } as never,
     );
 
     jest.spyOn(service, 'getConfigs').mockResolvedValue([
@@ -189,7 +193,10 @@ describe('FieldFormulaService.recomputeTimeBased', () => {
         targetFieldName: 'unrelated',
       },
       {
-        ...buildConfig(FieldMetadataType.NUMBER, 'daysSince(date("2026-01-01"))'),
+        ...buildConfig(
+          FieldMetadataType.NUMBER,
+          'daysSince(date("2026-01-01"))',
+        ),
         targetFieldId: 'age',
         targetFieldName: 'age',
         dependencies: [],
@@ -273,7 +280,10 @@ describe('FieldFormulaService.rewriteReferences', () => {
 
   it('rewrites comparisons on the renamed field and backfills after saving', async () => {
     const { savedExpressions, backfilledFieldIds, updateOrder, backfillOrder } =
-      await rewrite([{ id: 'kind', expression: 'line == "RETAIL" ? 1 : 2' }], {});
+      await rewrite(
+        [{ id: 'kind', expression: 'line == "RETAIL" ? 1 : 2' }],
+        {},
+      );
 
     expect(savedExpressions).toEqual([['kind', 'line == "SHOP" ? 1 : 2']]);
     expect(backfilledFieldIds).toEqual(['kind']);
@@ -412,6 +422,7 @@ describe('FieldFormulaService', () => {
       } as never,
       {} as never,
       {} as never,
+      { recordCalculatedFieldChanges: jest.fn() } as never,
     );
 
     jest.spyOn(service, 'getConfigs').mockResolvedValue([

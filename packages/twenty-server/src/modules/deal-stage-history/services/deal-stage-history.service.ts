@@ -9,6 +9,7 @@ import {
 } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
+import { TimelineActivityService } from 'src/modules/timeline/services/timeline-activity.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import {
   applyDealStageMove,
@@ -99,6 +100,7 @@ export class DealStageHistoryService {
   constructor(
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
+    private readonly timelineActivityService: TimelineActivityService,
   ) {}
 
   async recordStageChanges({
@@ -558,6 +560,17 @@ export class DealStageHistoryService {
         .join(', ')} WHERE "id" = $1`,
       [deal.id, ...changed.map(([, value]) => value)],
     );
+
+    await this.timelineActivityService.recordCalculatedFieldChanges({
+      workspaceId,
+      objectNameSingular: tables.recordTable,
+      changes: changed.map(([fieldName, after]) => ({
+        recordId: deal.id,
+        fieldName,
+        before: deal[fieldName],
+        after,
+      })),
+    });
 
     return true;
   }

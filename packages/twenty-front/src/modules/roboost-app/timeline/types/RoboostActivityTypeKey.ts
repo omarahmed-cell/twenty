@@ -8,9 +8,4 @@ export type RoboostActivityTypeKey =
   | 'notes'
   | 'tasks'
   | 'emailTracking'
-  | 'recordCreated'
-  | 'fieldChanges'
-  | 'stageChanges'
-  | 'workflowActivity'
-  | 'associations'
-  | 'otherUpdates';
+  | 'recordCreated';

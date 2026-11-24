@@ -3,6 +3,7 @@ export type RoboostFieldHistorySource =
   | 'workflow'
   | 'import'
   | 'api'
+  | 'calculated'
   | 'system';
 
 export type RoboostFieldHistoryEntry = {

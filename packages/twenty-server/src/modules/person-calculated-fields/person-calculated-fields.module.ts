@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.module';
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { RecomputePersonCalculatedFieldsCommand } from 'src/modules/person-calculated-fields/commands/recompute-person-calculated-fields.command';
@@ -13,6 +14,7 @@ import { PersonCalculationQueueService } from 'src/modules/person-calculated-fie
 
 @Module({
   imports: [
+    TimelineActivityModule,
     TypeOrmModule.forFeature([WorkspaceEntity]),
     WorkspaceIteratorModule,
   ],

@@ -11,6 +11,7 @@ import { SettingsLogs } from '@/settings/event-logs/components/SettingsLogs';
 import { SettingsOpenLogConsoleCard } from '@/settings/event-logs/components/SettingsOpenLogConsoleCard';
 import { DeleteWorkspace } from '@/settings/profile/components/DeleteWorkspace';
 import { RoboostWorkingDaysSettings } from '@/roboost-app/activity/components/RoboostWorkingDaysSettings';
+import { RoboostPropertyHistorySettings } from '@/roboost-app/history/components/RoboostPropertyHistorySettings';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { SettingsSecuritySettings } from '@/settings/security/components/SettingsSecuritySettings';
 import { NameField } from '@/settings/workspace/components/NameField';
@@ -90,6 +91,13 @@ export const SettingsGeneral = () => {
             description={t`Due dates set "in N business days" skip the other days, and times default to the start of the work day.`}
           />
           <RoboostWorkingDaysSettings />
+        </Section.Root>
+        <Section.Root>
+          <Section.Header
+            title={t`Property history`}
+            description={t`Changes kept per property, per record. When a property passes the limit, its oldest change is removed. Activities and current values are never removed.`}
+          />
+          <RoboostPropertyHistorySettings />
         </Section.Root>
         {isMultiWorkspaceEnabled && (
           <Section.Root>

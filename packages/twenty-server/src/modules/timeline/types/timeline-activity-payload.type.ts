@@ -12,4 +12,5 @@ export type TimelineActivityPayload = {
   timelineActivityTypeSnapshot: TimelineActivityTypeSnapshot;
   recordId: string;
   objectSingularName?: string;
+  fieldHistoryFieldName?: string;
 };

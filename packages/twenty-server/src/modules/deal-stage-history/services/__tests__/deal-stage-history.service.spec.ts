@@ -42,7 +42,10 @@ const buildService = () => {
   });
 
   return {
-    service: new DealStageHistoryService({ query } as unknown as DataSource),
+    service: new DealStageHistoryService(
+      { query } as unknown as DataSource,
+      { recordCalculatedFieldChanges: jest.fn() } as never,
+    ),
     query,
   };
 };

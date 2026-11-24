@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.module';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
@@ -15,6 +16,7 @@ import { FieldFormulaService } from 'src/modules/field-formula/services/field-fo
 
 @Module({
   imports: [
+    TimelineActivityModule,
     TypeOrmModule.forFeature([WorkspaceEntity]),
     WorkspaceCacheModule,
     FieldMetadataModule,

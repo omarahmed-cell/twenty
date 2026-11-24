@@ -1,4 +1,3 @@
-import { useTimelineActivities } from '@/activities/timeline-activities/hooks/useTimelineActivities';
 import { useTimelineActivityTypes } from '@/activities/timeline-activities/hooks/useTimelineActivityTypes';
 import { EventRelationFieldDiffValues } from '@/activities/timeline-activities/rows/main-object/components/EventRelationFieldDiffValues';
 import { getTimelineActivityAction } from '@/activities/timeline-activities/utils/getTimelineActivityAction';
@@ -9,13 +8,18 @@ import {
   roboostFieldHistoryState,
   type RoboostFieldHistoryTarget,
 } from '@/roboost-app/history/states/roboostFieldHistoryState';
+import { useRoboostFieldHistoryActivities } from '@/roboost-app/history/hooks/useRoboostFieldHistoryActivities';
+import { useRoboostPropertyHistoryLimits } from '@/roboost-app/history/hooks/useRoboostPropertyHistoryLimits';
 import { type RoboostDatePreset } from '@/roboost-app/history/types/RoboostDatePreset';
 import {
   type RoboostFieldHistoryEntry,
   type RoboostFieldHistorySource,
 } from '@/roboost-app/history/types/RoboostFieldHistoryEntry';
 import { getRoboostDatePresetRange } from '@/roboost-app/history/utils/getRoboostDatePresetRange';
-import { getRoboostFieldHistoryEntries } from '@/roboost-app/history/utils/getRoboostFieldHistoryEntries';
+import {
+  getRoboostFieldHistoryDiffKeys,
+  getRoboostFieldHistoryEntries,
+} from '@/roboost-app/history/utils/getRoboostFieldHistoryEntries';
 import { formatRoboostDateTime } from '@/roboost-app/utils/formatRoboostDateTime';
 import { formatRoboostFieldValue } from '@/roboost-app/utils/formatRoboostFieldValue';
 import { Icon } from '@/roboost-ui/components/Icon';
@@ -33,7 +37,6 @@ import { FieldMetadataType } from '~/generated-metadata/graphql';
 type WorkflowRecord = { id: string; name: string | null; __typename: string };
 
 const DAY_IN_MS = 24 * 3600 * 1000;
-const TIMELINE_PAGE_SIZE = 60;
 
 const HistoryFilterMenu = <TValue extends string>({
   label,
@@ -93,12 +96,26 @@ const RoboostFieldHistoryContent = ({
     (item) => item.name === target.fieldName,
   );
 
-  const { timelineActivities, firstQueryLoading, fetchMoreRecords } =
-    useTimelineActivities({
-      id: target.recordId,
-      targetObjectNameSingular: target.objectNameSingular,
-    });
+  const diffKeys = getRoboostFieldHistoryDiffKeys(
+    field ?? { name: target.fieldName, settings: null },
+  );
+  const {
+    timelineActivities,
+    firstQueryLoading,
+    fetchMoreRecords,
+    hasNextPage,
+  } = useRoboostFieldHistoryActivities({
+    recordId: target.recordId,
+    objectNameSingular: target.objectNameSingular,
+    diffKeys,
+  });
   const { timelineActivityTypeMaps } = useTimelineActivityTypes();
+  const { getLimit } = useRoboostPropertyHistoryLimits();
+  const keptChangesLimit = getLimit(target.objectNameSingular);
+  const hasRemovedOlderChanges = timelineActivities.some(
+    (timelineActivity) =>
+      timelineActivity.properties?.olderChangesRemoved === true,
+  );
 
   const entries = isDefined(field)
     ? getRoboostFieldHistoryEntries({
@@ -128,6 +145,7 @@ const RoboostFieldHistoryContent = ({
     workflow: t`Workflow`,
     import: t`Import`,
     api: t`API`,
+    calculated: t`Calculated automatically`,
     system: t`System`,
   };
   const dateLabels: Record<RoboostDatePreset, string> = {
@@ -311,16 +329,20 @@ const RoboostFieldHistoryContent = ({
               : t`No changes match these filters.`}
           </div>
         )}
-        {!firstQueryLoading &&
-          timelineActivities.length >= TIMELINE_PAGE_SIZE && (
-            <button
-              type="button"
-              className="rb-link rb-history-more"
-              onClick={() => fetchMoreRecords()}
-            >
-              {t`Load older changes`}
-            </button>
-          )}
+        {!firstQueryLoading && hasNextPage && (
+          <button
+            type="button"
+            className="rb-link rb-history-more"
+            onClick={() => fetchMoreRecords()}
+          >
+            {t`Load older changes`}
+          </button>
+        )}
+        {!firstQueryLoading && !hasNextPage && hasRemovedOlderChanges && (
+          <div className="rb-history-kept">
+            {t`Only the latest ${keptChangesLimit} changes are kept`}
+          </div>
+        )}
       </div>
     </SidePanel>
   );

@@ -19,29 +19,16 @@ export const useRoboostTimelineUpdates = ({
     targetObjectNameSingular,
   });
   const { timelineActivityTypeMaps } = useTimelineActivityTypes();
-  const objectMetadataItem = objectMetadataItems.find(
-    (item) => item.nameSingular === targetObjectNameSingular,
-  );
+  const objectLabel =
+    objectMetadataItems.find(
+      (item) => item.nameSingular === targetObjectNameSingular,
+    )?.labelSingular ?? '';
 
   const items = mapRoboostTimelineUpdates({
     timelineActivities,
     getAction: (timelineActivity) =>
       getTimelineActivityAction(timelineActivity, timelineActivityTypeMaps),
-    fields: objectMetadataItem?.fields ?? [],
-    objectLabel: objectMetadataItem?.labelSingular ?? '',
-    linkedObjectNameById: new Map(
-      objectMetadataItems.map((item) => [item.id, item.nameSingular]),
-    ),
-    labels: {
-      created: (objectLabel) => t`${objectLabel} created`,
-      changed: (fieldLabels) => t`Updated ${fieldLabels}`,
-      deleted: (objectLabel) => t`${objectLabel} deleted`,
-      restored: (objectLabel) => t`${objectLabel} restored`,
-      linked: (linkedName) => t`Associated with ${linkedName}`,
-      unlinked: (linkedName) => t`Association with ${linkedName} removed`,
-      updated: t`Record updated`,
-      empty: t`Cleared`,
-    },
+    createdTitle: t`${objectLabel} created`,
   });
 
   return { items, loading: firstQueryLoading };

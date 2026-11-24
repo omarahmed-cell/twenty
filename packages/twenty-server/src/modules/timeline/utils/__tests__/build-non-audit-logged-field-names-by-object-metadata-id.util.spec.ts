@@ -152,36 +152,4 @@ describe('buildNonAuditLoggedFieldNamesByObjectMetadataId', () => {
       ).size,
     ).toBe(0);
   });
-
-  it('treats calculated fields as non audit logged', () => {
-    const nonAuditLoggedFieldNamesByObjectMetadataId =
-      buildNonAuditLoggedFieldNamesByObjectMetadataId(
-        buildMaps([
-          getFlatFieldMetadataMock({
-            universalIdentifier: 'completion-index-field',
-            objectMetadataId: COMPANY_OBJECT_METADATA_ID,
-            type: FieldMetadataType.NUMBER,
-            name: 'researchCompletionIndex',
-            settings: {
-              type: 'percentage',
-              formula: { expression: 'if(isEmpty(name), 0, 1)' },
-            },
-          } as Parameters<typeof getFlatFieldMetadataMock>[0]),
-          getFlatFieldMetadataMock({
-            universalIdentifier: 'past-meetings-field',
-            objectMetadataId: COMPANY_OBJECT_METADATA_ID,
-            type: FieldMetadataType.NUMBER,
-            name: 'numberOfPastMeetings',
-            isUIEditable: false,
-          } as Parameters<typeof getFlatFieldMetadataMock>[0]),
-          buildField({ universalIdentifier: 'name-field', name: 'name' }),
-        ]),
-      );
-
-    expect(
-      nonAuditLoggedFieldNamesByObjectMetadataId.get(
-        COMPANY_OBJECT_METADATA_ID,
-      ),
-    ).toEqual(new Set(['researchCompletionIndex', 'numberOfPastMeetings']));
-  });
 });

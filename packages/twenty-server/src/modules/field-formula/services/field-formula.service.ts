@@ -14,6 +14,10 @@ import {
 } from 'twenty-shared/utils';
 import { In, MoreThan } from 'typeorm';
 
+import {
+  type CalculatedFieldChange,
+  TimelineActivityService,
+} from 'src/modules/timeline/services/timeline-activity.service';
 import { FieldMetadataService } from 'src/engine/metadata-modules/field-metadata/services/field-metadata.service';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
@@ -52,6 +56,8 @@ const selectWithDownstream = (
   });
 };
 
+type WriteChangesOptions = { isScheduled: boolean; workspaceId?: string };
+
 @Injectable()
 export class FieldFormulaService {
   private readonly logger = new Logger(FieldFormulaService.name);
@@ -60,6 +66,7 @@ export class FieldFormulaService {
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly fieldMetadataService: FieldMetadataService,
+    private readonly timelineActivityService: TimelineActivityService,
   ) {}
 
   async getConfigs(workspaceId: string): Promise<ResolvedFieldFormulaConfig[]> {
@@ -155,7 +162,7 @@ export class FieldFormulaService {
               timeBasedConfigs.map(({ targetFieldId }) => targetFieldId),
             ),
             objectNameSingular,
-            { isScheduled: true },
+            { isScheduled: true, workspaceId },
           );
 
           fieldIds.forEach((fieldId) => changedFieldIds.add(fieldId));
@@ -177,7 +184,10 @@ export class FieldFormulaService {
         'flatFieldMetadataMaps',
       ]);
 
-    return resolveFieldSyncConfigs(flatObjectMetadataMaps, flatFieldMetadataMaps)
+    return resolveFieldSyncConfigs(
+      flatObjectMetadataMaps,
+      flatFieldMetadataMaps,
+    )
       .filter(({ sourceFieldId }) => sourceFieldIds.includes(sourceFieldId))
       .map(({ targetFieldId }) => targetFieldId);
   }
@@ -185,7 +195,7 @@ export class FieldFormulaService {
   private async recomputeAllRecords(
     configs: ResolvedFieldFormulaConfig[],
     objectNameSingular: string,
-    options: { isScheduled: boolean } = { isScheduled: false },
+    options: WriteChangesOptions = { isScheduled: false },
   ): Promise<string[]> {
     const repository = this.getRepository(objectNameSingular);
     const changedFieldIds = new Set<string>();
@@ -381,8 +391,9 @@ export class FieldFormulaService {
     configs: ResolvedFieldFormulaConfig[],
     objectNameSingular: string,
     records: FormulaRecord[],
-    { isScheduled }: { isScheduled: boolean } = { isScheduled: false },
+    { isScheduled, workspaceId }: WriteChangesOptions = { isScheduled: false },
   ): Promise<string[]> {
+    const calculatedChanges: CalculatedFieldChange[] = [];
     const recordIdsByPatch = new Map<
       string,
       { patch: Record<string, unknown>; recordIds: string[] }
@@ -412,6 +423,12 @@ export class FieldFormulaService {
             value === null && config.outputType === FieldMetadataType.CURRENCY
               ? EMPTY_CURRENCY
               : value;
+          calculatedChanges.push({
+            recordId: record.id,
+            fieldName: config.targetFieldName,
+            before: record[config.targetFieldName],
+            after: patch[config.targetFieldName],
+          });
         }
       }
 
@@ -437,6 +454,15 @@ export class FieldFormulaService {
 
     for (const { patch, recordIds } of recordIdsByPatch.values()) {
       await repository.update({ id: In(recordIds) }, patch);
+    }
+
+    // Scheduled writes emit no events, so their history is written here
+    if (isScheduled && isDefined(workspaceId)) {
+      await this.timelineActivityService.recordCalculatedFieldChanges({
+        workspaceId,
+        objectNameSingular,
+        changes: calculatedChanges,
+      });
     }
 
     return [...changedFieldIds];

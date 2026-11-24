@@ -10,7 +10,9 @@ import {
   isDefined,
 } from 'twenty-shared/utils';
 
-const getDiffKeys = (field: Pick<FieldMetadataItem, 'name' | 'settings'>) => [
+export const getRoboostFieldHistoryDiffKeys = (
+  field: Pick<FieldMetadataItem, 'name' | 'settings'>,
+) => [
   field.name,
   (field.settings as { joinColumnName?: string } | null | undefined)
     ?.joinColumnName ??
@@ -27,7 +29,7 @@ export const getRoboostFieldHistoryEntries = ({
   field: Pick<FieldMetadataItem, 'name' | 'settings'>;
   isUpdateRow: (timelineActivity: TimelineActivity) => boolean;
 }): RoboostFieldHistoryEntry[] => {
-  const diffKeys = getDiffKeys(field);
+  const diffKeys = getRoboostFieldHistoryDiffKeys(field);
 
   return timelineActivities
     .filter(
@@ -49,6 +51,7 @@ export const getRoboostFieldHistoryEntries = ({
       const source = getRoboostFieldHistorySource({
         updatedBy,
         workspaceMemberId: timelineActivity.workspaceMemberId,
+        isCalculated: timelineActivity.properties?.isCalculated === true,
       });
       const memberName = getRoboostPersonName(
         timelineActivity.workspaceMember?.name,

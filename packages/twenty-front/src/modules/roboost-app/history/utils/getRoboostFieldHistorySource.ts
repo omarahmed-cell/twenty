@@ -6,10 +6,16 @@ import { isDefined } from 'twenty-shared/utils';
 export const getRoboostFieldHistorySource = ({
   updatedBy,
   workspaceMemberId,
+  isCalculated = false,
 }: {
   updatedBy: ActorMetadata | undefined;
   workspaceMemberId: string | null | undefined;
+  isCalculated?: boolean;
 }): RoboostFieldHistorySource => {
+  if (isCalculated) {
+    return 'calculated';
+  }
+
   if (!isDefined(updatedBy)) {
     // Rows written before the actor was recorded only know the member
     return isNonEmptyString(workspaceMemberId) ? 'user' : 'system';
