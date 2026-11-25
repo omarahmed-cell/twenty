@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
+import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
+import { RoboostScoreFreezeImportedCommand } from 'src/modules/roboost-scoring/commands/roboost-score-freeze-imported.command';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { RoboostScoreVerifyCronCommand } from 'src/modules/roboost-scoring/crons/commands/roboost-score-verify.cron.command';
@@ -23,6 +25,7 @@ import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.m
     FieldMetadataModule,
     WorkspaceCacheModule,
     TimelineActivityModule,
+    WorkspaceIteratorModule,
   ],
   providers: [
     RoboostScoreStoreService,
@@ -36,7 +39,12 @@ import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.m
     RoboostScoreRecordListener,
     RoboostScoreVerifyCronJob,
     RoboostScoreVerifyCronCommand,
+    RoboostScoreFreezeImportedCommand,
   ],
-  exports: [RoboostScoreStoreService, RoboostScoreVerifyCronCommand],
+  exports: [
+    RoboostScoreStoreService,
+    RoboostScoreVerifyCronCommand,
+    RoboostScoreFreezeImportedCommand,
+  ],
 })
 export class RoboostScoringModule {}

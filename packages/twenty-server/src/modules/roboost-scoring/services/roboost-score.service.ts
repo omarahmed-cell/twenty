@@ -149,6 +149,13 @@ export class RoboostScoreService {
           score.objectName,
         ),
     });
+    await this.roboostScoreStoreService.updateScore(workspaceId, score.id, {
+      linkedFieldMetadataId: field.id,
+    });
+    await this.roboostScoreRecalcService.freezeImportedClosedWon(
+      workspaceId,
+      score.id,
+    );
 
     return field.id;
   }

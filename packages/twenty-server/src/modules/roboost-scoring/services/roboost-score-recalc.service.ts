@@ -68,6 +68,53 @@ export class RoboostScoreRecalcService {
     return new Set(rows.map(({ id }) => id));
   }
 
+  // HubSpot already paid commissions on these deals: their imported score is kept as it is.
+  // Only deals that came from HubSpot (hubspotId set) with a value in the linked property count.
+  async freezeImportedClosedWon(workspaceId: string, scoreId: string) {
+    const liveOrDraft = await this.roboostScoreStoreService.getScore(
+      workspaceId,
+      scoreId,
+    );
+
+    if (
+      !isDefined(liveOrDraft) ||
+      liveOrDraft.objectName !== 'opportunity' ||
+      !isDefined(liveOrDraft.linkedFieldMetadataId)
+    ) {
+      return 0;
+    }
+    const fieldName = await this.roboostScoreEngineService.runInWorkspace(
+      workspaceId,
+      async () =>
+        [
+          ...this.roboostScoreEngineService
+            .getObjectFields('opportunity')
+            .values(),
+        ].find((field) => field.id === liveOrDraft.linkedFieldMetadataId)?.name,
+    );
+
+    if (!isDefined(fieldName)) {
+      return 0;
+    }
+    const schema = this.roboostScoreStoreService.schema(workspaceId);
+    const [row] = await this.coreDataSource.query(
+      `WITH frozen AS (
+        INSERT INTO ${schema}."roboostScoreResult"
+          ("scoreId", "recordId", value, frozen, "frozenAt", source)
+        SELECT $1, o.id, o."${fieldName}", true, now(), 'HUBSPOT_IMPORT'
+        FROM ${schema}."opportunity" o
+        JOIN ${schema}."pipelineStage" ps ON ps.value = o.stage::text AND ps."deletedAt" IS NULL
+        WHERE ps.probability = 100 AND o."deletedAt" IS NULL
+          AND o."${fieldName}" IS NOT NULL AND o."hubspotId" IS NOT NULL
+        ON CONFLICT ("scoreId", "recordId") DO NOTHING
+        RETURNING 1
+      ) SELECT count(*)::int AS count FROM frozen`,
+      [scoreId],
+    );
+
+    return row?.count ?? 0;
+  }
+
   async recalculateRecords({
     workspaceId,
     objectName,

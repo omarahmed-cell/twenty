@@ -468,7 +468,9 @@ const RoboostScoreEditorBody = ({
                     <span className="rb-sce-testsep" />
                     <span className="rb-sce-frozen">
                       <Icon name="info" size={13} />
-                      {t`Frozen at ${publishedScore} (v${frozenVersion}, ${frozenDate})`}
+                      {testResult.resultSource === 'HUBSPOT_IMPORT'
+                        ? t`Imported from HubSpot, frozen at ${publishedScore} (${frozenDate})`
+                        : t`Frozen at ${publishedScore} (v${frozenVersion}, ${frozenDate})`}
                     </span>
                   </>
                 )}
