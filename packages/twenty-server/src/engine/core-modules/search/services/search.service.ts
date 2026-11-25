@@ -55,6 +55,10 @@ import { resolveEffectiveEntityProperty } from 'src/engine/metadata-modules/over
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { type WorkspaceRepository } from 'src/engine/twenty-orm/repository/workspace-repository';
 import { getWorkspaceContext } from 'src/engine/twenty-orm/storage/orm-workspace-context.storage';
+import {
+  PermissionsException,
+  PermissionsExceptionCode,
+} from 'src/engine/metadata-modules/permissions/permissions.exception';
 import { resolveRolePermissionConfig } from 'src/engine/twenty-orm/utils/resolve-role-permission-config.util';
 import { type RolePermissionConfig } from 'src/engine/twenty-orm/types/role-permission-config.type';
 import { ApplicationTranslationCatalogService } from 'src/engine/metadata-modules/application-translation-catalog/services/application-translation-catalog.service';
@@ -122,28 +126,45 @@ export class SearchService {
                     context.flatRoleTargetByAgentIdMaps,
                 }) ?? undefined;
 
-              const repository =
-                this.workspaceOrmManager.getRepository<ObjectRecord>(
-                  flatObjectMetadata.nameSingular,
-                  rolePermissionConfig,
-                  { useReplica: true },
-                );
+              // An object the user may not read is left out instead of failing the whole search
+              try {
+                const repository =
+                  this.workspaceOrmManager.getRepository<ObjectRecord>(
+                    flatObjectMetadata.nameSingular,
+                    rolePermissionConfig,
+                    { useReplica: true },
+                  );
 
-              return {
-                objectMetadataItem: flatObjectMetadata,
-                records: await this.buildSearchQueryAndGetRecordsWithFallback({
-                  entityManager: repository,
-                  rolePermissionConfig,
-                  flatObjectMetadata,
-                  flatFieldMetadataMaps,
-                  searchInput,
-                  searchTerms: formatSearchTerms(searchInput, 'and'),
-                  searchTermsOr: formatSearchTerms(searchInput, 'or'),
-                  limit: limit as number,
-                  filter: filter ?? ({} as ObjectRecordFilter),
-                  after,
-                }),
-              };
+                return {
+                  objectMetadataItem: flatObjectMetadata,
+                  records: await this.buildSearchQueryAndGetRecordsWithFallback(
+                    {
+                      entityManager: repository,
+                      rolePermissionConfig,
+                      flatObjectMetadata,
+                      flatFieldMetadataMaps,
+                      searchInput,
+                      searchTerms: formatSearchTerms(searchInput, 'and'),
+                      searchTermsOr: formatSearchTerms(searchInput, 'or'),
+                      limit: limit as number,
+                      filter: filter ?? ({} as ObjectRecordFilter),
+                      after,
+                    },
+                  ),
+                };
+              } catch (error) {
+                if (
+                  error instanceof PermissionsException &&
+                  error.code === PermissionsExceptionCode.PERMISSION_DENIED
+                ) {
+                  return {
+                    objectMetadataItem: flatObjectMetadata,
+                    records: [],
+                  };
+                }
+
+                throw error;
+              }
             },
           );
         }),
