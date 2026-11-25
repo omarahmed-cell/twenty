@@ -29,6 +29,12 @@ export const useRoboostTimelineUpdates = ({
     getAction: (timelineActivity) =>
       getTimelineActivityAction(timelineActivity, timelineActivityTypeMaps),
     createdTitle: t`${objectLabel} created`,
+    getMergeTitle: (event, otherRecordName) =>
+      event === 'merged'
+        ? t`merged ${otherRecordName} into this record`
+        : event === 'unmerged'
+          ? t`unmerged ${otherRecordName} from this record`
+          : t`restored this record from ${otherRecordName} by unmerging`,
   });
 
   return { items, loading: firstQueryLoading };

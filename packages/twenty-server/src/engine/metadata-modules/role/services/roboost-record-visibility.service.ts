@@ -6,7 +6,10 @@ import { DataSource } from 'typeorm';
 
 import { type RoboostRecordAccessSubject } from 'src/engine/metadata-modules/role/types/roboost-record-access-maps.type';
 import { type OperationType } from 'src/engine/twenty-orm/repository/permissions.utils';
-import { buildRoboostRecordAccessCondition } from 'src/engine/twenty-orm/utils/build-roboost-record-access-condition.util';
+import {
+  buildRoboostMergeCondition,
+  buildRoboostRecordAccessCondition,
+} from 'src/engine/twenty-orm/utils/build-roboost-record-access-condition.util';
 import { compileNamedParameters } from 'src/engine/twenty-orm/sql/utils/compile-named-parameters.util';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
@@ -50,12 +53,14 @@ export class RoboostRecordVisibilityService {
     objectNameSingular,
     recordIds,
     operationType = 'select',
+    isMerge = false,
   }: {
     workspaceId: string;
     workspaceMemberId: string;
     objectNameSingular: string;
     recordIds: string[];
     operationType?: OperationType;
+    isMerge?: boolean;
   }): Promise<string[]> {
     if (recordIds.length === 0) {
       return [];
@@ -71,13 +76,20 @@ export class RoboostRecordVisibilityService {
     }
 
     const schemaName = getWorkspaceSchemaName(workspaceId);
-    const condition = buildRoboostRecordAccessCondition({
-      subject,
-      objectNameSingular,
-      operationType,
-      alias: 'rbv',
-      schemaName,
-    });
+    const condition = isMerge
+      ? buildRoboostMergeCondition({
+          subject,
+          objectNameSingular,
+          alias: 'rbv',
+          schemaName,
+        })
+      : buildRoboostRecordAccessCondition({
+          subject,
+          objectNameSingular,
+          operationType,
+          alias: 'rbv',
+          schemaName,
+        });
 
     if (condition.kind === 'open') {
       return recordIds;

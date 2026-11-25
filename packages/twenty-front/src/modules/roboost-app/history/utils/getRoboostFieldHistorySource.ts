@@ -21,6 +21,10 @@ export const getRoboostFieldHistorySource = ({
     return isNonEmptyString(workspaceMemberId) ? 'user' : 'system';
   }
 
+  if (isNonEmptyString(updatedBy.context?.roboostMergeId)) {
+    return 'merge';
+  }
+
   if (isNonEmptyString(updatedBy.context?.workflowId)) {
     return 'workflow';
   }

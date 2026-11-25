@@ -82,6 +82,17 @@ export { RECORD_SOURCE_OBJECT_NAMES } from './RecordSourceObjectNames';
 export { RELATION_NESTED_QUERY_KEYWORDS } from './RelationNestedQueriesKeyword';
 export { RESERVED_SUBDOMAINS } from './ReservedSubdomains';
 export type {
+  RoboostMergeObjectName,
+  RoboostMergeFieldMode,
+  RoboostMergeFieldPlan,
+} from './RoboostMergeConfig';
+export {
+  ROBOOST_MERGE_OBJECT_NAMES,
+  ROBOOST_MERGE_MAX_MERGES_PER_RECORD,
+  ROBOOST_UNMERGE_WINDOW_DAYS,
+  ROBOOST_MERGE_COMPANY_FIELD_NAME,
+} from './RoboostMergeConfig';
+export type {
   RoboostOwnershipField,
   RoboostActivityOwnership,
 } from './RoboostOwnershipFields';

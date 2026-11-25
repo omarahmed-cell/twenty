@@ -1,3 +1,6 @@
+import { RoboostMergeModal } from '@/roboost-app/merge/components/RoboostMergeModal';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { ROBOOST_MERGE_OBJECT_NAMES } from 'twenty-shared/constants';
 import { useCreateManyNavigationMenuItems } from '@/navigation-menu-item/common/hooks/useCreateManyNavigationMenuItems';
 import { useDeleteManyNavigationMenuItems } from '@/navigation-menu-item/common/hooks/useDeleteManyNavigationMenuItems';
 import { useNavigationMenuItemsData } from '@/navigation-menu-item/display/hooks/useNavigationMenuItemsData';
@@ -35,6 +38,7 @@ export const RoboostRecordActionsMenu = ({
   record,
   recordName,
   classicPagePath,
+  onSaved,
 }: RoboostRecordActionsMenuProps) => {
   const { t } = useLingui();
   const navigateApp = useNavigateApp();
@@ -53,6 +57,17 @@ export const RoboostRecordActionsMenu = ({
     roboostPropertiesPanelState,
   );
   const [copied, setCopied] = useState(false);
+  const [isMergeOpen, setIsMergeOpen] = useState(false);
+  const roboostAccess = useRoboostAccess();
+  const isMergeObject = (
+    ROBOOST_MERGE_OBJECT_NAMES as readonly string[]
+  ).includes(objectMetadataItem.nameSingular);
+  const mergeSetting = roboostAccess.getObjectPermissions(
+    objectMetadataItem.nameSingular,
+  )?.merge;
+  const canMerge =
+    isMergeObject &&
+    (!isDefined(mergeSetting) || mergeSetting.scope !== 'NONE');
 
   const favoriteItem = navigationMenuItems.find(
     (item) =>
@@ -189,7 +204,17 @@ export const RoboostRecordActionsMenu = ({
           recordFilter: { id: { in: [record.id] } },
         }),
     },
-    { id: 'merge', label: t`Merge`, icon: 'merge', onSelect: notBuilt },
+    ...(canMerge
+      ? [
+          {
+            id: 'merge',
+            label: t`Merge`,
+            icon: 'merge' as const,
+            onSelect: () => setIsMergeOpen(true),
+          },
+        ]
+      : []),
+
     { id: 'clone', label: t`Clone`, icon: 'copy', onSelect: clone },
     {
       id: 'classic',
@@ -228,6 +253,24 @@ export const RoboostRecordActionsMenu = ({
           </button>
         )}
       />
+      {isMergeOpen && (
+        <RoboostMergeModal
+          objectMetadataItem={objectMetadataItem}
+          startRecordId={record.id}
+          onClose={() => setIsMergeOpen(false)}
+          onMerged={(primaryId) => {
+            setIsMergeOpen(false);
+            if (primaryId === record.id) {
+              onSaved();
+            } else {
+              navigateApp(AppPath.RecordShowPage, {
+                objectNameSingular: objectMetadataItem.nameSingular,
+                objectRecordId: primaryId,
+              });
+            }
+          }}
+        />
+      )}
       <Modal
         open={isDeleteOpen}
         tone="danger"

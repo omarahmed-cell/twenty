@@ -37,6 +37,9 @@ export const ROBOOST_ACTIVITY_TYPE_CATEGORIES: RoboostActivityTypeCategory[] = [
   {
     id: 'updates',
     label: msg`Updates`,
-    types: [{ key: 'recordCreated', label: msg`Record created` }],
+    types: [
+      { key: 'recordCreated', label: msg`Record created` },
+      { key: 'recordMerged', label: msg`Merges` },
+    ],
   },
 ];

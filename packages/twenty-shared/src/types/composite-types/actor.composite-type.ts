@@ -70,5 +70,6 @@ export type ActorMetadata = {
     agentId?: string;
     workflowId?: string;
     workflowRunId?: string;
+    roboostMergeId?: string;
   };
 };

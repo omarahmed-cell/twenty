@@ -383,3 +383,45 @@ export const isRoboostCreateAllowed = ({
 
   return objectPermissions.enabled && objectPermissions.create === true;
 };
+
+// Merge is its own scope (Merge setting) and needs the object turned on
+export const buildRoboostMergeCondition = ({
+  subject,
+  objectNameSingular,
+  alias,
+  schemaName,
+}: {
+  subject: RoboostRecordAccessSubject;
+  objectNameSingular: string;
+  alias: string;
+  schemaName: string;
+}): RoboostRecordAccessCondition => {
+  const objectPermissions = subject.permissions.objects[objectNameSingular];
+
+  if (!isDefined(objectPermissions)) {
+    return OPEN;
+  }
+
+  if (!objectPermissions.enabled || !isDefined(objectPermissions.merge)) {
+    return DENIED;
+  }
+
+  const condition = buildOwnedRecordCondition({
+    alias,
+    objectNameSingular,
+    setting: objectPermissions.merge,
+    context: {
+      schemaName,
+      memberParameter: ROBOOST_RECORD_ACCESS_MEMBER_PARAMETER,
+    },
+  });
+
+  return condition.kind === 'gated'
+    ? {
+        ...condition,
+        parameters: {
+          [ROBOOST_RECORD_ACCESS_MEMBER_PARAMETER]: subject.workspaceMemberId,
+        },
+      }
+    : condition;
+};

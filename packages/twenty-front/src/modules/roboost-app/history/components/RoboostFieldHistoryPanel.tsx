@@ -146,6 +146,7 @@ const RoboostFieldHistoryContent = ({
     import: t`Import`,
     api: t`API`,
     calculated: t`Calculated automatically`,
+    merge: t`Merge`,
     system: t`System`,
   };
   const dateLabels: Record<RoboostDatePreset, string> = {
@@ -244,6 +245,12 @@ const RoboostFieldHistoryContent = ({
 
     if (entry.source === 'calculated' && isDefined(entry.calculatedBy)) {
       return <span>{entry.calculatedBy}</span>;
+    }
+
+    if (entry.source === 'merge') {
+      const actorName = entry.actorName ?? t`User`;
+
+      return <span>{t`Merge by ${actorName}`}</span>;
     }
 
     return <span>{sourceLabels[entry.source]}</span>;

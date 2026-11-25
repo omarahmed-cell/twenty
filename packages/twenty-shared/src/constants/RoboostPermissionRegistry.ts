@@ -39,7 +39,7 @@ const buildCrmObjectItem = (
   },
   defaults: CRM_OBJECT_DEFAULTS,
   supportsUnassigned: true,
-  storedOnly: ['merge'],
+  help: 'Merge applies to both records of a merge. Manage duplicates shows to users with Merge on the object; bulk merge needs Merge = All. Unmerge is for admins only.',
 });
 
 const ACTIVITY_DEFAULTS: RoboostObjectPermissions = {

@@ -4,6 +4,7 @@ export type RoboostFieldHistorySource =
   | 'import'
   | 'api'
   | 'calculated'
+  | 'merge'
   | 'system';
 
 export type RoboostFieldHistoryEntry = {

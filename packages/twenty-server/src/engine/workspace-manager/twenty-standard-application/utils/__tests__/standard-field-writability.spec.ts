@@ -68,7 +68,15 @@ describe('Standard field writability', () => {
     STANDARD_OBJECTS.workspaceMember.fields.isPreCreated.universalIdentifier,
   ]);
 
+  const mergedRecordIdsFieldUniversalIdentifiers = new Set(
+    (['company', 'person', 'opportunity', 'service'] as const).map(
+      (objectName) =>
+        STANDARD_OBJECTS[objectName].fields.mergedRecordIds.universalIdentifier,
+    ),
+  );
+
   const serverWrittenFieldUniversalIdentifiers = new Set([
+    ...mergedRecordIdsFieldUniversalIdentifiers,
     ...companyServerComputedFieldUniversalIdentifiers,
     ...personServerComputedFieldUniversalIdentifiers,
     ...companyAssignedDateFieldUniversalIdentifiers,

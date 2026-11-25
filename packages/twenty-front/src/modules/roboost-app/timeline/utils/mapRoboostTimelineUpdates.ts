@@ -10,12 +10,43 @@ export const mapRoboostTimelineUpdates = ({
   timelineActivities,
   getAction,
   createdTitle,
+  getMergeTitle,
 }: {
   timelineActivities: TimelineActivity[];
   getAction: (timelineActivity: TimelineActivity) => string | null;
   createdTitle: string;
+  getMergeTitle?: (event: string, otherRecordName: string) => string;
 }): RoboostFeedItem[] =>
   timelineActivities.flatMap((timelineActivity): RoboostFeedItem[] => {
+    const mergeEvent = timelineActivity.properties?.roboostEvent;
+
+    // Merges and unmerges are written as "updated" rows with a merge marker
+    if (isNonEmptyString(mergeEvent) && isDefined(getMergeTitle)) {
+      const actorName = timelineActivity.properties?.actorName;
+
+      return [
+        {
+          id: `update-${timelineActivity.id}`,
+          kind: 'update',
+          typeKey: 'recordMerged',
+          recordId: null,
+          objectNameSingular: null,
+          date: timelineActivity.happensAt,
+          ownerId: timelineActivity.workspaceMemberId ?? null,
+          ownerName: isNonEmptyString(actorName)
+            ? actorName
+            : getRoboostPersonName(timelineActivity.workspaceMember?.name),
+          creatorId: timelineActivity.workspaceMemberId ?? null,
+          meta: '',
+          title: getMergeTitle(
+            mergeEvent,
+            String(timelineActivity.properties?.otherRecordName ?? ''),
+          ),
+          body: '',
+        },
+      ];
+    }
+
     if (
       isDefined(timelineActivity.linkedRecordId) ||
       getAction(timelineActivity) !== 'created'

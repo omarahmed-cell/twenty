@@ -153,6 +153,33 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     now,
   }),
 
+  mergedRecordIds: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'mergedRecordIds',
+        type: FieldMetadataType.ARRAY,
+        label: i18nLabel(
+          msg({ message: `Merged deal IDs`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `IDs of records merged into this one (HubSpot IDs from the import, CRM IDs from merges here)`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconGitMerge',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
   name: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

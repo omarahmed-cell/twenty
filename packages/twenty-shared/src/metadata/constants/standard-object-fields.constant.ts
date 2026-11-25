@@ -1308,6 +1308,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.company,
     ),
+    mergedRecordIds: {
+      universalIdentifier: '499387a9-dbf9-4412-b371-f1e3058fe2b8',
+    },
     recordSource: {
       universalIdentifier: 'ecad06e4-de16-4d60-8848-d97b8a3e5fe7',
     },
@@ -2137,6 +2140,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.opportunity,
     ),
+    mergedRecordIds: {
+      universalIdentifier: '12143335-f6b2-4501-bb20-b2f02d0fc3dc',
+    },
     recordSource: {
       universalIdentifier: '2f1b7197-6d49-4d1f-adc0-2945287b0db0',
     },
@@ -2327,6 +2333,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.person,
     ),
+    mergedRecordIds: {
+      universalIdentifier: 'eaad1253-3f5f-4fa2-a3ec-bcbf4bf51a62',
+    },
     recordSource: {
       universalIdentifier: '5cb12ad5-ce2f-4c60-89cc-801762ba55fa',
     },
@@ -2574,6 +2583,9 @@ export const STANDARD_OBJECT_FIELDS = {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.service,
     ),
+    mergedRecordIds: {
+      universalIdentifier: '71556d3a-66b9-4cb0-a581-85a08c1153e1',
+    },
     pipeline: { universalIdentifier: '20c6b796-9813-4f13-a4ec-1cedf21949bb' },
     stage: { universalIdentifier: '70dbcbd4-0902-470b-afbf-4897ca88bdaf' },
     stageHistory: {

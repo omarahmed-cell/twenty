@@ -44,5 +44,6 @@ import { SegmentPullService } from 'src/modules/segment/services/segment-pull.se
     SegmentUpdateOnePreQueryHook,
     SegmentUpdateManyPreQueryHook,
   ],
+  exports: [SegmentMembershipSyncService],
 })
 export class SegmentModule {}

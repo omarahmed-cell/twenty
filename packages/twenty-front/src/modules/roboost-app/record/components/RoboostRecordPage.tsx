@@ -1,3 +1,7 @@
+import {
+  RoboostMergedRecordNotice,
+  RoboostMergedRecordRedirect,
+} from '@/roboost-app/merge/components/RoboostMergedRecordRedirect';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
@@ -213,12 +217,22 @@ const RoboostRecordPageContent = ({
   });
 
   if (!isDefined(record)) {
-    return (
+    const message = (
       <div className="rb-recpage-message">
         {loading
           ? t`Loading…`
           : t`This ${objectMetadataItem.labelSingular.toLowerCase()} could not be found.`}
       </div>
+    );
+
+    return loading ? (
+      message
+    ) : (
+      <RoboostMergedRecordRedirect
+        objectNameSingular={objectNameSingular}
+        recordId={recordId}
+        fallback={message}
+      />
     );
   }
 
@@ -490,6 +504,7 @@ const RoboostRecordPageContent = ({
 
   return (
     <div className="rb-recpage">
+      <RoboostMergedRecordNotice />
       <RoboostRecentRecordEffect
         objectNameSingular={objectNameSingular}
         recordId={recordId}
