@@ -45,6 +45,11 @@ export const SettingsRoboostNotifications = () => {
       label: t`Task`,
       description: t`A task is assigned to you, a reminder is due, or tasks are overdue.`,
     },
+    {
+      type: 'merge',
+      label: t`Merge`,
+      description: t`A bulk merge you started has finished.`,
+    },
   ];
 
   return (

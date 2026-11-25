@@ -1,3 +1,4 @@
+import { RoboostDataQualityButton } from '@/roboost-app/merge/components/RoboostDataQualityButton';
 import { ROBOOST_TEAMS } from '@/roboost-app/users-and-teams/graphql/roboostUsersQueries';
 import { type RoboostTeam } from '@/roboost-app/users-and-teams/types/RoboostUsers';
 import { buildRoboostTeamMemberIdsByTeamId } from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
@@ -483,10 +484,10 @@ export const RoboostObjectListPage = ({
             </div>
           </div>
           <span className="rb-sp" />
-          {/* Data quality module is not built yet */}
-          <button type="button" className="rb-hbtn rb-hbtn-ghost">
-            {t`Data quality`}
-          </button>
+          <RoboostDataQualityButton
+            objectMetadataItem={objectMetadataItem}
+            onRecordsChanged={() => refetch()}
+          />
           <Menu
             align="right"
             entries={[

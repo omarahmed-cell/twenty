@@ -44,6 +44,7 @@ export type RoboostImportRow = {
   newAssociations: number;
   errorCount: number;
   hasErrorFile: boolean;
+  duplicateMatchCount?: number | null;
   workspaceMemberId: string | null;
   createdByName: string | null;
   createdAt: string;
@@ -359,8 +360,9 @@ export class RoboostDataTransferService {
     const rows = await this.coreDataSource.query(
       `SELECT id, name, "objectNameSingular", state, "newCount", "updatedCount", "newAssociations",
         "errorCount", ("errorFile" IS NOT NULL) AS "hasErrorFile", "workspaceMemberId",
-        "createdByName", "createdAt", "finishedAt", count(*) OVER ()::int AS total
-      FROM ${this.schema(workspaceId)}."roboostImport"
+        "createdByName", "createdAt", "finishedAt", count(*) OVER ()::int AS total,
+        (to_jsonb(i) ->> 'duplicateMatchCount')::int AS "duplicateMatchCount"
+      FROM ${this.schema(workspaceId)}."roboostImport" i
       WHERE ($1::uuid[] IS NULL OR id = ANY($1::uuid[]))
         AND ($2::text IS NULL OR name ILIKE $2)
         AND ($3::text IS NULL OR "objectNameSingular" = $3)

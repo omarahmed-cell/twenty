@@ -1,3 +1,4 @@
+import { ROBOOST_CHECK_IMPORTED_DUPLICATES } from '@/roboost-app/merge/graphql/roboostDuplicateQueries';
 import {
   ROBOOST_FINISH_IMPORT,
   ROBOOST_START_IMPORT,
@@ -54,7 +55,7 @@ export const useRoboostImportLog = () => {
         : Promise.resolve(undefined);
 
     return {
-      finish: ({
+      finish: async ({
         savedRecords,
         createInputs,
         invalidRows,
@@ -63,11 +64,10 @@ export const useRoboostImportLog = () => {
         createInputs: Row[];
         invalidRows: Row[];
       }) => {
-        const newCount = savedRecords.filter(
-          isRoboostNewlyCreatedRecord,
-        ).length;
+        const newRecords = savedRecords.filter(isRoboostNewlyCreatedRecord);
+        const newCount = newRecords.length;
 
-        return send({
+        await send({
           state: invalidRows.length > 0 ? 'DONE_WITH_ERRORS' : 'DONE',
           newCount,
           updatedCount: savedRecords.length - newCount,
@@ -76,6 +76,21 @@ export const useRoboostImportLog = () => {
           errorFile: toErrorFile(invalidRows),
           recordIds: savedRecords.map(({ id }) => id),
         });
+
+        // New records matching an existing one (extra emails and domains included) become duplicate pairs
+        return newRecords.length === 0
+          ? 0
+          : client
+              .mutate<{ roboostCheckImportedDuplicates: number }>({
+                mutation: ROBOOST_CHECK_IMPORTED_DUPLICATES,
+                variables: {
+                  objectName: objectNameSingular,
+                  importId,
+                  recordIds: newRecords.map(({ id }) => id),
+                },
+              })
+              .then(({ data }) => data?.roboostCheckImportedDuplicates ?? 0)
+              .catch(() => 0);
       },
       fail: ({
         createInputs,

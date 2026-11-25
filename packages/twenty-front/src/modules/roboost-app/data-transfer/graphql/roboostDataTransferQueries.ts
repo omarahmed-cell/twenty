@@ -134,6 +134,7 @@ export const ROBOOST_IMPORTS = gql`
         newAssociations
         errorCount
         hasErrorFile
+        duplicateMatchCount
         workspaceMemberId
         createdByName
         createdAt

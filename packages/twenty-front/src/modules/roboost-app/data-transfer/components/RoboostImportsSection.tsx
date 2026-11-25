@@ -32,6 +32,7 @@ type RoboostImportRow = {
   newAssociations: number;
   errorCount: number;
   hasErrorFile: boolean;
+  duplicateMatchCount: number | null;
   workspaceMemberId: string | null;
   createdByName: string | null;
   createdAt: string;
@@ -43,6 +44,7 @@ type ColumnKey =
   | 'newCount'
   | 'updatedCount'
   | 'newAssociations'
+  | 'duplicateMatches'
   | 'errors'
   | 'createdBy'
   | 'createdAt';
@@ -129,6 +131,7 @@ export const RoboostImportsSection = ({
     newCount: t`New records`,
     updatedCount: t`Updated records`,
     newAssociations: t`New associations`,
+    duplicateMatches: t`Matched existing`,
     errors: t`Errors`,
     createdBy: t`Created by`,
     createdAt: t`Created date`,
@@ -173,6 +176,8 @@ export const RoboostImportsSection = ({
         return row.updatedCount || '--';
       case 'newAssociations':
         return row.newAssociations || '--';
+      case 'duplicateMatches':
+        return row.duplicateMatchCount || '--';
       case 'errors':
         return row.errorCount > 0 ? (
           <span className="rb-dt-errors">
@@ -310,9 +315,12 @@ export const RoboostImportsSection = ({
                 <th
                   key={column}
                   className={cx(
-                    ['newCount', 'updatedCount', 'newAssociations'].includes(
-                      column,
-                    ) && 'is-number',
+                    [
+                      'newCount',
+                      'updatedCount',
+                      'newAssociations',
+                      'duplicateMatches',
+                    ].includes(column) && 'is-number',
                   )}
                 >
                   {columnLabels[column]}
@@ -363,9 +371,12 @@ export const RoboostImportsSection = ({
                   <td
                     key={column}
                     className={cx(
-                      ['newCount', 'updatedCount', 'newAssociations'].includes(
-                        column,
-                      ) && 'is-number',
+                      [
+                        'newCount',
+                        'updatedCount',
+                        'newAssociations',
+                        'duplicateMatches',
+                      ].includes(column) && 'is-number',
                     )}
                   >
                     {renderCell(row, column)}

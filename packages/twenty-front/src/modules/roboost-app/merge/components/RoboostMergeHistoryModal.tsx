@@ -61,7 +61,9 @@ type RoboostMergeHistoryModalProps = {
 const describeColumns = (value: Record<string, unknown>) =>
   Object.values(value)
     .filter((item) => item !== null && item !== '' && item !== undefined)
-    .map((item) => (typeof item === 'object' ? JSON.stringify(item) : String(item)))
+    .map((item) =>
+      typeof item === 'object' ? JSON.stringify(item) : String(item),
+    )
     .join(' · ') || '—';
 
 const RoboostUnmergeConfirmModal = ({
@@ -104,7 +106,9 @@ const RoboostUnmergeConfirmModal = ({
           <Button
             variant="primary"
             tone="danger"
-            disabled={!isDefined(preview) || !preview.isUnmergeable || isWorking}
+            disabled={
+              !isDefined(preview) || !preview.isUnmergeable || isWorking
+            }
             onClick={async () => {
               setIsWorking(true);
               try {
@@ -122,7 +126,8 @@ const RoboostUnmergeConfirmModal = ({
               } catch (error) {
                 enqueueToast({
                   status: 'error',
-                  children: error instanceof Error ? error.message : String(error),
+                  children:
+                    error instanceof Error ? error.message : String(error),
                 });
               } finally {
                 setIsWorking(false);
@@ -268,7 +273,9 @@ export const RoboostMergeHistoryModal = ({
                 ? (merge.secondaryName ?? merge.secondaryId)
                 : (merge.primaryName ?? merge.primaryId);
             const otherId =
-              merge.primaryId === recordId ? merge.secondaryId : merge.primaryId;
+              merge.primaryId === recordId
+                ? merge.secondaryId
+                : merge.primaryId;
             const byName = merge.mergedByName ?? t`someone`;
             const changeCount = merge.changes.length;
             const linkCount = merge.movedLinkCount;
@@ -281,7 +288,9 @@ export const RoboostMergeHistoryModal = ({
                       ? t`${otherName} was merged into this record`
                       : t`This record was merged into ${otherName}`}
                   </span>
-                  <Tag tone={merge.status === 'UNMERGED' ? 'warning' : undefined}>
+                  <Tag
+                    tone={merge.status === 'UNMERGED' ? 'warning' : undefined}
+                  >
                     {statusLabel[merge.status]}
                   </Tag>
                   {merge.isBulk && <Tag>{t`Bulk`}</Tag>}
@@ -305,7 +314,8 @@ export const RoboostMergeHistoryModal = ({
                 <div className="rb-mh-item-body">
                   {changeCount > 0 && (
                     <span>
-                      {t`${changeCount} values changed`}: {merge.changes.join(', ')}
+                      {t`${changeCount} values changed`}:{' '}
+                      {merge.changes.join(', ')}
                     </span>
                   )}
                   <span>{t`${linkCount} associations and activities moved`}</span>

@@ -59,9 +59,10 @@ export class RoboostMergeLogService {
 
   async tableExists(workspaceId: string) {
     const [{ exists }]: { exists: string | null }[] =
-      await this.coreDataSource.query(`SELECT to_regclass($1)::text AS exists`, [
-        `${this.schema(workspaceId)}."roboostMergeLog"`,
-      ]);
+      await this.coreDataSource.query(
+        `SELECT to_regclass($1)::text AS exists`,
+        [`${this.schema(workspaceId)}."roboostMergeLog"`],
+      );
 
     return isDefined(exists);
   }
@@ -302,7 +303,9 @@ export class RoboostMergeLogService {
             Array.isArray(primaryRow.emailsAdditionalEmails)
               ? (primaryRow.emailsAdditionalEmails as string[])
               : []
-          ).filter((email) => !secondaryEmails.has(String(email).toLowerCase()));
+          ).filter(
+            (email) => !secondaryEmails.has(String(email).toLowerCase()),
+          );
 
           assignments.emailsAdditionalEmails = kept.length > 0 ? kept : null;
         }
@@ -321,7 +324,8 @@ export class RoboostMergeLogService {
               ? (primaryRow.domainNameSecondaryLinks as { url?: unknown }[])
               : []
           ).filter(
-            (link) => !secondaryDomains.has(String(link?.url ?? '').toLowerCase()),
+            (link) =>
+              !secondaryDomains.has(String(link?.url ?? '').toLowerCase()),
           );
 
           assignments.domainNameSecondaryLinks = kept.length > 0 ? kept : null;
@@ -422,8 +426,9 @@ export class RoboostMergeLogService {
       objectName,
       recordIds: [log.primaryId, log.secondaryId],
       movedLinks: movedBack,
-      relatedCompanyIds: [secondaryRow.companyId]
-        .filter((id): id is string => typeof id === 'string'),
+      relatedCompanyIds: [secondaryRow.companyId].filter(
+        (id): id is string => typeof id === 'string',
+      ),
     });
 
     this.logger.log(

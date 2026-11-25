@@ -1,4 +1,9 @@
-export type RoboostNotificationType = 'assign' | 'export' | 'import' | 'task';
+export type RoboostNotificationType =
+  | 'assign'
+  | 'export'
+  | 'import'
+  | 'task'
+  | 'merge';
 
 export type RoboostNotificationSubtype =
   | 'assigned_single'
@@ -10,7 +15,8 @@ export type RoboostNotificationSubtype =
   | 'export_ready'
   | 'export_large'
   | 'import_done'
-  | 'import_failed';
+  | 'import_failed'
+  | 'bulk_merge_done';
 
 export type RoboostNotificationRelatedRecord = {
   id: string;

@@ -91,6 +91,9 @@ class RoboostImportDTO {
   @Field(() => Boolean)
   hasErrorFile: boolean;
 
+  @Field(() => Int, { nullable: true })
+  duplicateMatchCount?: number | null;
+
   @Field(() => String, { nullable: true })
   workspaceMemberId: string | null;
 

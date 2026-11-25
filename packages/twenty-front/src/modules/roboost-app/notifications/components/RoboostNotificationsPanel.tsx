@@ -63,6 +63,7 @@ export const RoboostNotificationsPanel = ({
     export: t`Export`,
     import: t`Import`,
     task: t`Task`,
+    merge: t`Merge`,
   };
   const isTrash = tab === 'TRASH';
   const hasSelection = isAllSelected || selectedIds.length > 0;
@@ -247,7 +248,7 @@ export const RoboostNotificationsPanel = ({
               align="right"
               minWidth={160}
               entries={(
-                ['all', 'assign', 'export', 'import', 'task'] as const
+                ['all', 'assign', 'export', 'import', 'task', 'merge'] as const
               ).map((key) => ({
                 id: key,
                 label: typeLabels[key],

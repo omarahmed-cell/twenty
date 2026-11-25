@@ -13,6 +13,7 @@ import { useOpenSpreadsheetImportDialog } from '@/spreadsheet-import/hooks/useOp
 import { spreadsheetImportCreatedRecordsProgressState } from '@/spreadsheet-import/states/spreadsheetImportCreatedRecordsProgressState';
 import { type SpreadsheetImportDialogOptions } from '@/spreadsheet-import/types';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+import { useLingui } from '@lingui/react/macro';
 import { useToast } from 'twenty-ui/components/feedback';
 import { useRoboostImportLog } from '@/roboost-app/data-transfer/hooks/useRoboostImportLog';
 
@@ -24,6 +25,7 @@ export const useOpenObjectRecordsSpreadsheetImportDialog = (
   const { buildSpreadsheetImportFields } = useBuildSpreadsheetImportFields();
 
   const { enqueueToast } = useToast();
+  const { t } = useLingui();
   const { startRoboostImportLog } = useRoboostImportLog();
 
   const { objectMetadataItem } = useObjectMetadataItem({
@@ -90,11 +92,18 @@ export const useOpenObjectRecordsSpreadsheetImportDialog = (
             upsert: true,
           });
 
-          await importLog.finish({
+          const duplicateMatchCount = await importLog.finish({
             savedRecords,
             createInputs,
             invalidRows: data.invalidStructuredRows,
           });
+
+          if (duplicateMatchCount > 0) {
+            enqueueToast({
+              status: 'warning',
+              children: t`${duplicateMatchCount} imported records match existing records (including additional emails and extra domains). Review them in Data quality.`,
+            });
+          }
           await apolloCoreClient.refetchQueries({
             updateCache: (cache) => {
               cache.evict({ fieldName: objectMetadataItem.namePlural });

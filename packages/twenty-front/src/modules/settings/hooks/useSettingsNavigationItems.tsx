@@ -16,6 +16,7 @@ import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import {
   IconAppWindow,
+  IconArrowMerge,
   IconBell,
   IconDatabase,
   IconFileImport,
@@ -180,6 +181,13 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
               label: t`Import & Export`,
               path: SettingsPath.ImportExport,
               Icon: IconFileImport,
+              isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+              indentationLevel: 2,
+            },
+            {
+              label: t`Duplicates`,
+              path: SettingsPath.Duplicates,
+              Icon: IconArrowMerge,
               isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
               indentationLevel: 2,
             },

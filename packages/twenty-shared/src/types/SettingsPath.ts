@@ -6,6 +6,7 @@ export enum SettingsPath {
   Notifications = 'notifications',
   DataManagement = 'data-management',
   ImportExport = 'data-management/import-export',
+  Duplicates = 'data-management/duplicates',
   Accounts = 'accounts',
   AccountDetail = 'accounts/detail/:connectedAccountId',
   NativeAccountApp = 'accounts/apps/:nativeAccountAppId',

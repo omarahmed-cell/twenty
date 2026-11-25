@@ -11,6 +11,7 @@ import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorat
 import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { RoboostMergeActorService } from 'src/modules/roboost-merge/services/roboost-merge-actor.service';
+import { RoboostDuplicateService } from 'src/modules/roboost-merge/services/roboost-duplicate.service';
 import { RoboostMergeService } from 'src/modules/roboost-merge/services/roboost-merge.service';
 
 @ObjectType('RoboostMergeCandidate')
@@ -45,6 +46,7 @@ class RoboostMergedIntoDTO {
 export class RoboostMergeResolver {
   constructor(
     private readonly roboostMergeService: RoboostMergeService,
+    private readonly roboostDuplicateService: RoboostDuplicateService,
     private readonly roboostMergeActorService: RoboostMergeActorService,
   ) {}
 
@@ -98,16 +100,26 @@ export class RoboostMergeResolver {
     @Args('secondaryFieldNames', { type: () => [String] })
     secondaryFieldNames: string[],
   ) {
+    const actor = await this.roboostMergeActorService.resolve(
+      workspace.id,
+      workspaceMemberId,
+    );
     const { mergeId } = await this.roboostMergeService.merge({
       workspaceId: workspace.id,
-      actor: await this.roboostMergeActorService.resolve(
-        workspace.id,
-        workspaceMemberId,
-      ),
+      actor,
       objectName,
       primaryId,
       secondaryId,
       secondaryFieldNames,
+    });
+
+    await this.roboostDuplicateService.markMerged({
+      workspaceId: workspace.id,
+      objectName,
+      primaryId,
+      secondaryId,
+      mergeId,
+      actor,
     });
 
     return mergeId;

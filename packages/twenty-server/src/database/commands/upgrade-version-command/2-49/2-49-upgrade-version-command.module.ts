@@ -40,6 +40,7 @@ import { CreateRoboostScoreTablesCommand } from 'src/database/commands/upgrade-v
 import { CreateRoboostUserPermissionTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795615751436-create-roboost-user-permission-tables.command';
 import { CreateRoboostAccessIndexesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795617366610-create-roboost-access-indexes.command';
 import { ProvisionMergeCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795630106025-provision-merge.command';
+import { CreateRoboostDuplicateTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795631731213-create-roboost-duplicate-tables.command';
 import { ProvisionUsersAndTeamsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795614564967-provision-users-and-teams.command';
 import { CreateRoboostDataTransferTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795544772205-create-roboost-data-transfer-tables.command';
 import { CreateRoboostNotificationTableCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795541802255-create-roboost-notification-table.command';
@@ -119,6 +120,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     CreateRoboostUserPermissionTablesCommand,
     CreateRoboostAccessIndexesCommand,
     ProvisionMergeCommand,
+    CreateRoboostDuplicateTablesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

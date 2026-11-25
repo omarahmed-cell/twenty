@@ -1,4 +1,9 @@
-export type RoboostNotificationType = 'assign' | 'export' | 'import' | 'task';
+export type RoboostNotificationType =
+  | 'assign'
+  | 'export'
+  | 'import'
+  | 'task'
+  | 'merge';
 
 export type RoboostNotificationTab = 'UNREAD' | 'ALL' | 'TRASH';
 

@@ -410,6 +410,14 @@ const SettingsTwoFactorAuthenticationMethod = lazy(() =>
   ),
 );
 
+const SettingsRoboostDuplicates = lazy(() =>
+  import('~/pages/settings/data-management/SettingsRoboostDuplicates').then(
+    (module) => ({
+      default: module.SettingsRoboostDuplicates,
+    }),
+  ),
+);
+
 const SettingsRoboostImportExport = lazy(() =>
   import('~/pages/settings/data-management/SettingsRoboostImportExport').then(
     (module) => ({
@@ -816,6 +824,10 @@ const createSettingsRouteElements = ({
     <Route
       path={SettingsPath.ImportExport}
       element={<SettingsRoboostImportExport />}
+    />
+    <Route
+      path={SettingsPath.Duplicates}
+      element={<SettingsRoboostDuplicates />}
     />
     <Route
       path={SettingsPath.DataManagement}

@@ -82,6 +82,16 @@ export { RECORD_SOURCE_OBJECT_NAMES } from './RecordSourceObjectNames';
 export { RELATION_NESTED_QUERY_KEYWORDS } from './RelationNestedQueriesKeyword';
 export { RESERVED_SUBDOMAINS } from './ReservedSubdomains';
 export type {
+  RoboostDuplicateConfidence,
+  RoboostDuplicatePairStatus,
+  RoboostDuplicateRuleKey,
+  RoboostDuplicateRule,
+} from './RoboostDuplicateRules';
+export {
+  ROBOOST_DUPLICATE_RULES,
+  ROBOOST_DUPLICATE_CONFIDENCE_RANK,
+} from './RoboostDuplicateRules';
+export type {
   RoboostMergeObjectName,
   RoboostMergeFieldMode,
   RoboostMergeFieldPlan,

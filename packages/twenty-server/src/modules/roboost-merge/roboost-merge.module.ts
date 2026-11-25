@@ -24,6 +24,14 @@ import { RoboostMergeActorService } from 'src/modules/roboost-merge/services/rob
 import { RoboostMergeAfterEffectsService } from 'src/modules/roboost-merge/services/roboost-merge-after-effects.service';
 import { RoboostMergeService } from 'src/modules/roboost-merge/services/roboost-merge.service';
 import { SegmentModule } from 'src/modules/segment/segment.module';
+import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
+import {
+  RoboostDuplicateScanCronCommand,
+  RoboostDuplicateScanCronJob,
+} from 'src/modules/roboost-merge/crons/roboost-duplicate-scan.cron';
+import { RoboostBulkMergeJob } from 'src/modules/roboost-merge/jobs/roboost-bulk-merge.job';
+import { RoboostDuplicateResolver } from 'src/modules/roboost-merge/resolvers/roboost-duplicate.resolver';
+import { RoboostDuplicateService } from 'src/modules/roboost-merge/services/roboost-duplicate.service';
 
 @Module({
   imports: [
@@ -31,6 +39,7 @@ import { SegmentModule } from 'src/modules/segment/segment.module';
     RoboostRecordVisibilityModule,
     WorkspaceCacheModule,
     SegmentModule,
+    RoboostNotificationModule,
     CompanyCalculatedFieldsModule,
     PersonCalculatedFieldsModule,
     OpportunityCalculatedFieldsModule,
@@ -44,6 +53,11 @@ import { SegmentModule } from 'src/modules/segment/segment.module';
     RoboostMergeLogResolver,
     RoboostMergeExpiryCronJob,
     RoboostMergeExpiryCronCommand,
+    RoboostDuplicateService,
+    RoboostDuplicateResolver,
+    RoboostBulkMergeJob,
+    RoboostDuplicateScanCronJob,
+    RoboostDuplicateScanCronCommand,
     RoboostMergeRestoreGuardService,
     RoboostMergeRestoreOnePreQueryHook,
     RoboostMergeRestoreManyPreQueryHook,
@@ -53,6 +67,7 @@ import { SegmentModule } from 'src/modules/segment/segment.module';
     RoboostMergeActorService,
     RoboostMergeLogService,
     RoboostMergeExpiryCronCommand,
+    RoboostDuplicateScanCronCommand,
   ],
 })
 export class RoboostMergeModule {}

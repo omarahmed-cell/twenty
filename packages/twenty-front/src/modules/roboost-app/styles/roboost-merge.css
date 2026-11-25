@@ -515,3 +515,179 @@
   color: var(--text);
   font-weight: 600;
 }
+
+.rb-dq-badge {
+  align-items: center;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  color: #fff;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 600;
+  height: 18px;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 5px;
+}
+
+.rb-dq {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rb-dq-bar,
+.rb-dq-filters {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rb-dq-filters > :first-child {
+  flex: 1 1 240px;
+}
+
+.rb-dq-table {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  max-height: 56vh;
+  overflow: auto;
+}
+
+.rb-dq-thead,
+.rb-dq-trow {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.rb-dq-thead {
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.rb-dq-trow:last-child {
+  border-bottom: none;
+}
+
+.rb-dq-pair-grid {
+  grid-template-columns: 1.3fr 1.3fr 90px 1.4fr 120px auto;
+}
+
+.rb-dq-bulk-table .rb-dq-thead,
+.rb-dq-bulk-table .rb-dq-trow {
+  grid-template-columns: 24px 1fr 1fr;
+}
+
+.rb-dq-bulk-table .rb-dq-trow {
+  cursor: pointer;
+}
+
+.rb-dq-record {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rb-dq-record > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-dq-strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.rb-dq-reason {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.rb-dq-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.rb-dq-progress {
+  background: var(--surface-sunken);
+  border-radius: var(--radius-full);
+  height: 6px;
+  overflow: hidden;
+}
+
+.rb-dq-progress > span {
+  background: var(--accent);
+  display: block;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.rb-dq-log {
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  max-height: 260px;
+  overflow: auto;
+  padding-top: 8px;
+}
+
+.rb-dq-log-row {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.rb-dq-failed {
+  color: var(--danger-text);
+}
+
+.rb-dq-settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rb-dq-settings-head {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.rb-dq-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rb-dq-rule {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.rb-dq-rule-label {
+  color: var(--text);
+  flex: 1;
+}
+
+@media (max-width: 760px) {
+  .rb-dq-pair-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

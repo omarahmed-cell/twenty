@@ -329,6 +329,14 @@ export class RoboostMergeService {
     );
   }
 
+  filledFieldCount(context: RoboostMergeObjectContext, row: RawRow) {
+    return context.fields.filter(
+      (mergeField) =>
+        this.fieldMode(mergeField) === 'choice' &&
+        !this.isEmptyField(mergeField, row),
+    ).length;
+  }
+
   // The stage furthest down the funnel is the option with the highest position
   private furthestSelectSide(
     mergeField: MergeField,
