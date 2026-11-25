@@ -23,6 +23,7 @@ import '@/roboost-app/styles/roboost-meeting.css';
 import '@/roboost-app/styles/roboost-forms.css';
 import '@/roboost-app/styles/roboost-layout.css';
 import '@/roboost-app/styles/roboost-users.css';
+import '@/roboost-app/styles/roboost-merge.css';
 import '@/roboost-app/styles/roboost-timeline.css';
 import '@/roboost-app/styles/roboost-notifications.css';
 import '@/roboost-app/styles/roboost-scoring.css';

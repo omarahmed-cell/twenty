@@ -31,6 +31,22 @@ const buildTextMatch = (
       ],
     };
   }
+  if (field.type === FieldMetadataType.EMAILS) {
+    return {
+      or: [
+        { [field.name]: { primaryEmail: { ilike: pattern } } },
+        { [field.name]: { additionalEmails: { ilike: pattern } } },
+      ],
+    };
+  }
+  if (field.name === 'domainName') {
+    return {
+      or: [
+        { [field.name]: { primaryLinkUrl: { ilike: pattern } } },
+        { [field.name]: { secondaryLinks: { ilike: pattern } } },
+      ],
+    };
+  }
   const subField = TEXT_SUBFIELD_BY_TYPE[field.type];
 
   return isDefined(subField)

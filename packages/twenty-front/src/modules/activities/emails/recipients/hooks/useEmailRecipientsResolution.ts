@@ -37,9 +37,16 @@ export const useEmailRecipientsResolution = ({
   const { records: matchedPeople } = useFindManyRecords({
     objectNameSingular: CoreObjectNameSingular.Person,
     filter: {
-      or: recipientKeys.map((recipientKey) => ({
-        emails: { primaryEmail: { ilike: escapeForIlike(recipientKey) } },
-      })),
+      or: recipientKeys.flatMap((recipientKey) => [
+        { emails: { primaryEmail: { ilike: escapeForIlike(recipientKey) } } },
+        {
+          emails: {
+            additionalEmails: {
+              ilike: `%"${escapeForIlike(recipientKey)}"%`,
+            },
+          },
+        },
+      ]),
     },
     recordGqlFields: { id: true, name: true, avatarUrl: true, emails: true },
     limit: MAX_EMAIL_RECIPIENTS,
@@ -62,16 +69,22 @@ export const useEmailRecipientsResolution = ({
 
   for (const personRecord of matchedPeople) {
     const person = getEmailRecipientPersonFromRecord(personRecord);
-    const personKey = getEmailRecipientKey(person.primaryEmail);
+    // An address the person has as an additional email resolves to them too
+    const personKeys = [
+      person.primaryEmail,
+      ...(person.additionalEmails ?? []),
+    ].map(getEmailRecipientKey);
 
-    if (!recipientKeySet.has(personKey)) {
-      continue;
+    for (const personKey of personKeys) {
+      if (!recipientKeySet.has(personKey)) {
+        continue;
+      }
+
+      resolutionByRecipientKey.set(personKey, {
+        ...resolutionByRecipientKey.get(personKey),
+        person,
+      });
     }
-
-    resolutionByRecipientKey.set(personKey, {
-      ...resolutionByRecipientKey.get(personKey),
-      person,
-    });
   }
 
   return { resolutionByRecipientKey };

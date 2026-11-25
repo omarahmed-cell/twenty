@@ -30,7 +30,12 @@ const getDuplicateCheck = (
     ).toLowerCase();
 
     return domain.length > 3 && domain.includes('.')
-      ? { domainName: { primaryLinkUrl: { ilike: `%${domain}%` } } }
+      ? {
+          or: [
+            { domainName: { primaryLinkUrl: { ilike: `%${domain}%` } } },
+            { domainName: { secondaryLinks: { ilike: `%"${domain}"%` } } },
+          ],
+        }
       : undefined;
   }
 
@@ -40,7 +45,12 @@ const getDuplicateCheck = (
       : '';
 
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)
-      ? { emails: { primaryEmail: { ilike: email } } }
+      ? {
+          or: [
+            { emails: { primaryEmail: { ilike: email } } },
+            { emails: { additionalEmails: { ilike: `%"${email}"%` } } },
+          ],
+        }
       : undefined;
   }
 

@@ -4,4 +4,5 @@ export type EmailRecipientPerson = {
   lastName: string;
   avatarUrl: string | null;
   primaryEmail: string;
+  additionalEmails?: string[];
 };

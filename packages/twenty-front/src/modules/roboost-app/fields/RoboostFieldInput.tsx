@@ -3,13 +3,15 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { getRoboostRecordLabel } from '@/roboost-app/fields/getRoboostRecordLabel';
 import { RoboostInlineFieldDropdown } from '@/roboost-app/fields/RoboostInlineFieldDropdown';
+import { RoboostMultiValueInput } from '@/roboost-app/fields/RoboostMultiValueInput';
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
+import { isRoboostMultiDomainField } from '@/roboost-app/fields/isRoboostMultiDomainField';
 import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Input } from '@/roboost-ui/components/Input';
 import { MultiSelect } from '@/roboost-ui/components/MultiSelect';
 import { Select } from '@/roboost-ui/components/Select';
 import { useLingui } from '@lingui/react/macro';
-import { isNumber, isString } from '@sniptt/guards';
+import { isNonEmptyString, isNumber, isString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 
 type CompositeValue = Record<string, unknown> | null | undefined;
@@ -171,7 +173,40 @@ export const RoboostFieldInput = ({
           }
         />
       );
-    case 'link':
+    case 'link': {
+      if (isRoboostMultiDomainField(field)) {
+        const secondaryLinks = Array.isArray(composite?.secondaryLinks)
+          ? (composite.secondaryLinks as { url?: string; label?: string }[])
+          : [];
+
+        return (
+          <RoboostMultiValueInput
+            kind="domain"
+            label={field.label}
+            primary={
+              isString(composite?.primaryLinkUrl)
+                ? composite.primaryLinkUrl
+                : ''
+            }
+            extras={secondaryLinks
+              .map((link) => link.url)
+              .filter(isNonEmptyString)}
+            placeholder={placeholder ?? 'example.com'}
+            invalid={invalid}
+            onChange={(primary, extras) =>
+              onChange({
+                primaryLinkUrl: primary,
+                primaryLinkLabel: composite?.primaryLinkLabel ?? '',
+                secondaryLinks:
+                  extras.length > 0
+                    ? extras.map((url) => ({ url, label: '' }))
+                    : null,
+              })
+            }
+          />
+        );
+      }
+
       return (
         <Input
           value={
@@ -189,20 +224,28 @@ export const RoboostFieldInput = ({
           }
         />
       );
+    }
     case 'email':
       return (
-        <Input
-          type="email"
-          value={
+        <RoboostMultiValueInput
+          kind="email"
+          label={field.label}
+          primary={
             isString(composite?.primaryEmail) ? composite.primaryEmail : ''
+          }
+          extras={
+            Array.isArray(composite?.additionalEmails)
+              ? (composite.additionalEmails as unknown[]).filter(
+                  isNonEmptyString,
+                )
+              : []
           }
           placeholder={placeholder ?? 'name@company.com'}
           invalid={invalid}
-          aria-label={field.label}
-          onChange={(event) =>
+          onChange={(primary, extras) =>
             onChange({
-              primaryEmail: event.target.value,
-              additionalEmails: composite?.additionalEmails ?? null,
+              primaryEmail: primary,
+              additionalEmails: extras.length > 0 ? extras : null,
             })
           }
         />

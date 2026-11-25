@@ -9,4 +9,10 @@ export const getEmailRecipientPersonFromRecord = (
   lastName: personRecord.name?.lastName ?? '',
   avatarUrl: personRecord.avatarUrl ?? null,
   primaryEmail: personRecord.emails?.primaryEmail ?? '',
+  additionalEmails: Array.isArray(personRecord.emails?.additionalEmails)
+    ? personRecord.emails.additionalEmails.filter(
+        (email: unknown): email is string =>
+          typeof email === 'string' && email !== '',
+      )
+    : [],
 });

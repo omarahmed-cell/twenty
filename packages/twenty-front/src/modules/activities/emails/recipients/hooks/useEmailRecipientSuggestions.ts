@@ -52,18 +52,31 @@ const getSuggestion = ({
   avatarColorSeed,
 });
 
+// When the search names one of the person's additional emails, that address is suggested
 const getPersonSuggestion = (
   person: EmailRecipientPerson,
-): EmailRecipientSuggestion =>
-  getSuggestion({
+  searchInput = '',
+): EmailRecipientSuggestion => {
+  const normalizedSearch = searchInput.trim().toLowerCase();
+  const matchedAdditionalEmail =
+    normalizedSearch.includes('@') &&
+    !person.primaryEmail.toLowerCase().includes(normalizedSearch)
+      ? person.additionalEmails?.find((email) =>
+          email.toLowerCase().includes(normalizedSearch),
+        )
+      : undefined;
+  const address = matchedAdditionalEmail ?? person.primaryEmail;
+
+  return getSuggestion({
     suggestionId: `person-${person.id}`,
     fullName: `${person.firstName} ${person.lastName}`.trim(),
-    address: person.primaryEmail,
-    secondaryText: person.primaryEmail,
+    address,
+    secondaryText: address,
     avatarUrl: person.avatarUrl,
     avatarColorSeed: person.id,
     personId: person.id,
   });
+};
 
 export const useEmailRecipientSuggestions = ({
   searchInput,
@@ -175,7 +188,7 @@ export const useEmailRecipientSuggestions = ({
         (contextPersonIds.has(person.id)
           ? contextRankedSuggestions
           : rankedSuggestions
-        ).push(getPersonSuggestion(person));
+        ).push(getPersonSuggestion(person, trimmedSearchInput));
       }
       continue;
     }
@@ -205,7 +218,9 @@ export const useEmailRecipientSuggestions = ({
 
   const recordSuggestions = hasSearchInput
     ? [...contextRankedSuggestions, ...rankedSuggestions]
-    : contextPeople.filter(isSuggestablePerson).map(getPersonSuggestion);
+    : contextPeople
+        .filter(isSuggestablePerson)
+        .map((person) => getPersonSuggestion(person));
 
   const seenRecipientKeys = new Set<string>();
   const dedupedRecordSuggestions = recordSuggestions.filter((suggestion) => {

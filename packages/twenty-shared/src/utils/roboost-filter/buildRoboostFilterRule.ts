@@ -18,6 +18,30 @@ const TEXT_SUBFIELD_BY_TYPE: Record<string, string> = {
   PHONES: 'primaryPhoneNumber',
 };
 
+// Extra emails (contacts) and extra domains (company Domain) are matched as well as the primary value
+const EXTRA_VALUES_SUBFIELD_BY_TYPE: Record<string, string> = {
+  LINKS: 'secondaryLinks',
+  EMAILS: 'additionalEmails',
+};
+
+// The extras are JSON text, so each value sits between double quotes
+const toExtraValuesPattern = (
+  operator: RoboostFilterOperator,
+  escaped: string,
+) => {
+  switch (operator) {
+    case 'containsAnyOf':
+    case 'doesNotContainAnyOf':
+      return `%${escaped}%`;
+    case 'startsWithAnyOf':
+      return `%"${escaped}%`;
+    case 'endsWithAnyOf':
+      return `%${escaped}"%`;
+    default:
+      return `%"${escaped}"%`;
+  }
+};
+
 const toList = (value: RoboostFilterRuleValue) =>
   (Array.isArray(value) ? value : isNonEmptyString(value) ? [value] : [])
     .map((item) => item.trim())
@@ -232,8 +256,31 @@ export const buildRoboostFilterRule = ({
             return escaped;
         }
       });
+      const extraSubField = EXTRA_VALUES_SUBFIELD_BY_TYPE[field.type];
+      const hasExtraValues =
+        isDefined(extraSubField) &&
+        (field.type === 'EMAILS' || field.name === 'domainName');
       const match = anyOf(
-        patterns.map((pattern) => textCondition(field, { ilike: pattern })),
+        patterns.flatMap((pattern, index) => [
+          textCondition(field, { ilike: pattern }),
+          ...(hasExtraValues
+            ? [
+                {
+                  [field.name]: {
+                    [extraSubField]: {
+                      ilike: toExtraValuesPattern(
+                        operator,
+                        values[index]?.replace(
+                          /[%_]/g,
+                          (character) => `\\${character}`,
+                        ) ?? '',
+                      ),
+                    },
+                  },
+                },
+              ]
+            : []),
+        ]),
       );
 
       return operator === 'isNotEqualToAnyOf' ||

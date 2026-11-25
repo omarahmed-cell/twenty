@@ -1,0 +1,91 @@
+/* Extra emails and domains, merge screen, merge history and Manage duplicates */
+
+.rb-mv {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.rb-mv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rb-mv-chips.is-display {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.rb-mv-chip {
+  align-items: center;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  display: inline-flex;
+  font-size: 11px;
+  gap: 2px;
+  max-width: 220px;
+  padding: 1px 4px 1px 8px;
+}
+
+.rb-mv-chip.is-display {
+  flex-shrink: 0;
+  padding: 1px 7px;
+}
+
+.rb-mv-chip-action {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  height: 16px;
+  justify-content: center;
+  padding: 0;
+  width: 16px;
+}
+
+.rb-mv-chip-action:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.rb-mv-add {
+  align-items: center;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--accent-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 12px;
+  gap: 4px;
+  padding: 2px 4px;
+}
+
+.rb-mv-add:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.rb-mv-add-row {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.rb-mv-display {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+}

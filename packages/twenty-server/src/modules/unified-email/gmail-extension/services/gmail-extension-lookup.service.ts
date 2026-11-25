@@ -284,12 +284,12 @@ export class GmailExtensionLookupService {
     const [contacts, companyRows, dealRows] = await Promise.all([
       this.findContacts(
         workspaceId,
-        `concat_ws(' ', person."nameFirstName", person."nameLastName") ILIKE $1 OR person."emailsPrimaryEmail" ILIKE $1`,
+        `concat_ws(' ', person."nameFirstName", person."nameLastName") ILIKE $1 OR person."emailsPrimaryEmail" ILIKE $1 OR person."emailsAdditionalEmails"::text ILIKE $1`,
         [pattern],
       ),
       this.coreDataSource.query(
         `SELECT id, name, "domainNamePrimaryLinkUrl" AS domain FROM "${schemaName}"."company"
-        WHERE "deletedAt" IS NULL AND (name ILIKE $1 OR "domainNamePrimaryLinkUrl" ILIKE $1)
+        WHERE "deletedAt" IS NULL AND (name ILIKE $1 OR "domainNamePrimaryLinkUrl" ILIKE $1 OR "domainNameSecondaryLinks"::text ILIKE $1)
         ORDER BY name LIMIT ${SEARCH_LIMIT}`,
         [pattern],
       ) as Promise<Row[]>,
