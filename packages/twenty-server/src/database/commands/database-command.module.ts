@@ -66,6 +66,7 @@ import { WorkspaceMemberPreCreateModule } from 'src/modules/workspace-member-pre
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
 import { RoboostScoringModule } from 'src/modules/roboost-scoring/roboost-scoring.module';
+import { RoboostMergeModule } from 'src/modules/roboost-merge/roboost-merge.module';
 import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import { TaskCalculatedFieldsModule } from 'src/modules/task-calculated-fields/task-calculated-fields.module';
@@ -95,6 +96,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     TimelineActivityModule,
     RoboostNotificationModule,
     RoboostScoringModule,
+    RoboostMergeModule,
     TaskCalculatedFieldsModule,
     UnifiedEmailModule,
     MeetingCalendarSyncModule,

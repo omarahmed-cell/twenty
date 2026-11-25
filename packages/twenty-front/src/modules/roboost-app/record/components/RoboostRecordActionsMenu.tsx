@@ -1,3 +1,4 @@
+import { RoboostMergeHistoryModal } from '@/roboost-app/merge/components/RoboostMergeHistoryModal';
 import { RoboostMergeModal } from '@/roboost-app/merge/components/RoboostMergeModal';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { ROBOOST_MERGE_OBJECT_NAMES } from 'twenty-shared/constants';
@@ -58,6 +59,7 @@ export const RoboostRecordActionsMenu = ({
   );
   const [copied, setCopied] = useState(false);
   const [isMergeOpen, setIsMergeOpen] = useState(false);
+  const [isMergeHistoryOpen, setIsMergeHistoryOpen] = useState(false);
   const roboostAccess = useRoboostAccess();
   const isMergeObject = (
     ROBOOST_MERGE_OBJECT_NAMES as readonly string[]
@@ -214,6 +216,16 @@ export const RoboostRecordActionsMenu = ({
           },
         ]
       : []),
+    ...(isMergeObject
+      ? [
+          {
+            id: 'merge-history',
+            label: t`Merge history`,
+            icon: 'history' as const,
+            onSelect: () => setIsMergeHistoryOpen(true),
+          },
+        ]
+      : []),
 
     { id: 'clone', label: t`Clone`, icon: 'copy', onSelect: clone },
     {
@@ -269,6 +281,15 @@ export const RoboostRecordActionsMenu = ({
               });
             }
           }}
+        />
+      )}
+      {isMergeHistoryOpen && (
+        <RoboostMergeHistoryModal
+          objectMetadataItem={objectMetadataItem}
+          recordId={record.id}
+          recordName={recordName}
+          onClose={() => setIsMergeHistoryOpen(false)}
+          onChanged={onSaved}
         />
       )}
       <Modal
