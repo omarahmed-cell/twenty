@@ -9,6 +9,7 @@ import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspac
 import { AuthUser } from 'src/engine/decorators/auth/auth-user.decorator';
 import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace-member-id.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { GmailExtensionTokenService } from 'src/modules/unified-email/gmail-extension/services/gmail-extension-token.service';
@@ -52,6 +53,7 @@ class CreatedGmailExtensionTokenDTO {
 export class GmailExtensionTokenResolver {
   constructor(
     private readonly gmailExtensionTokenService: GmailExtensionTokenService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   @Query(() => [GmailExtensionTokenDTO])
@@ -73,6 +75,18 @@ export class GmailExtensionTokenResolver {
   ): Promise<CreatedGmailExtensionTokenDTO> {
     if (!isDefined(workspaceMemberId)) {
       throw new ForbiddenException('A workspace member is required');
+    }
+
+    if (
+      !(await this.roboostRecordVisibilityService.hasToggle(
+        workspace.id,
+        workspaceMemberId,
+        'connectGoogle',
+      ))
+    ) {
+      throw new ForbiddenException(
+        'Connect Google account is turned off for this user',
+      );
     }
 
     return this.gmailExtensionTokenService.create({

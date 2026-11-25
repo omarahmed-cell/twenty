@@ -1,3 +1,4 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
 import { orderRoboostViews } from '@/roboost-app/list/utils/orderRoboostViews';
@@ -53,6 +54,7 @@ export const RoboostViewTabs = ({
   onReset,
 }: RoboostViewTabsProps) => {
   const { t } = useLingui();
+  const canCreateViews = useRoboostAccess().hasToggle('createViews');
   const { getUserVar, getWorkspaceDefault, setUserVar, setWorkspaceDefault } =
     useRoboostUserVars();
   const { performViewApiUpdate } = usePerformViewApiUpdate();
@@ -159,12 +161,16 @@ export const RoboostViewTabs = ({
           isDisabled: !isDirty,
           onSelect: () => isDirty && onReset(),
         },
-        {
-          id: 'clone',
-          label: t`Clone to new view`,
-          icon: 'copy',
-          onSelect: onClone,
-        },
+        ...(canCreateViews
+          ? [
+              {
+                id: 'clone',
+                label: t`Clone to new view`,
+                icon: 'copy' as const,
+                onSelect: onClone,
+              },
+            ]
+          : []),
         {
           id: 'order-default',
           label: t`Make this tab order the default`,
@@ -263,15 +269,17 @@ export const RoboostViewTabs = ({
         />
       )}
       <span className="rb-sp" />
-      <button
-        type="button"
-        className="rb-vtab-add"
-        aria-label={t`Add view`}
-        title={t`Add view`}
-        onClick={onCreate}
-      >
-        <Icon name="plus" size={14} strokeWidth={2} />
-      </button>
+      {canCreateViews && (
+        <button
+          type="button"
+          className="rb-vtab-add"
+          aria-label={t`Add view`}
+          title={t`Add view`}
+          onClick={onCreate}
+        >
+          <Icon name="plus" size={14} strokeWidth={2} />
+        </button>
+      )}
       <Modal
         open={isDefined(renamingView)}
         title={t`Rename view`}

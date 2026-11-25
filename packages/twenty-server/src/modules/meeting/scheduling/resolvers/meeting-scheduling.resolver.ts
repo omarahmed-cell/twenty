@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import {
   BadRequestException,
   ForbiddenException,
@@ -142,6 +143,7 @@ export class MeetingSchedulingResolver {
   constructor(
     private readonly meetingSchedulingService: MeetingSchedulingService,
     private readonly meetingGooglePushService: MeetingGooglePushService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   @Mutation(() => Boolean)
@@ -201,6 +203,19 @@ export class MeetingSchedulingResolver {
     }
     if (input.mode === 'SCHEDULE' && input.attendees.length === 0) {
       throw new BadRequestException('Add at least one attendee');
+    }
+    // Scheduling books the host's Google Calendar, which Connect Google account turned off forbids
+    if (
+      input.mode === 'SCHEDULE' &&
+      !(await this.roboostRecordVisibilityService.hasToggle(
+        workspace.id,
+        input.hostWorkspaceMemberId,
+        'connectGoogle',
+      ))
+    ) {
+      throw new ForbiddenException(
+        'The host has Connect Google account turned off and cannot host meetings',
+      );
     }
 
     try {

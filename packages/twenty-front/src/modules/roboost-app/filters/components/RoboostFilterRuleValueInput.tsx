@@ -1,3 +1,7 @@
+import { useQuery } from '@apollo/client/react';
+import { ROBOOST_TEAMS } from '@/roboost-app/users-and-teams/graphql/roboostUsersQueries';
+import { type RoboostTeam } from '@/roboost-app/users-and-teams/types/RoboostUsers';
+import { toRoboostTeamFilterValue } from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
 import { getRoboostFilterFieldKind } from '@/roboost-app/filters/utils/getRoboostFilterFieldKind';
@@ -16,6 +20,7 @@ type RoboostFilterRuleValueInputProps = {
   field: FieldMetadataItem | undefined;
   rule: RoboostFilterRule;
   onChange: (rule: RoboostFilterRule) => void;
+  canPickTeams?: boolean;
 };
 
 const asList = (value: RoboostFilterRule['value']) =>
@@ -26,8 +31,16 @@ export const RoboostFilterRuleValueInput = ({
   field,
   rule,
   onChange,
+  canPickTeams = false,
 }: RoboostFilterRuleValueInputProps) => {
   const { t } = useLingui();
+  const isMemberRelation =
+    field?.relation?.targetObjectMetadata.nameSingular === 'workspaceMember';
+  const { data: teamsData } = useQuery<{ roboostTeams: RoboostTeam[] }>(
+    ROBOOST_TEAMS,
+    { fetchPolicy: 'cache-first', skip: !canPickTeams || !isMemberRelation },
+  );
+  const teams = teamsData?.roboostTeams ?? [];
   const kind = isDefined(field) ? getRoboostFilterFieldKind(field) : null;
   const values = asList(rule.value);
 
@@ -90,6 +103,39 @@ export const RoboostFilterRuleValueInput = ({
               </button>
             </span>
           ))}
+          {canPickTeams && isMemberRelation && teams.length > 0 && (
+            <Select
+              aria-label={t`Add a team`}
+              placeholder={t`Anyone in a team`}
+              value=""
+              isSearchable
+              options={teams
+                .filter(
+                  (team) => !values.includes(toRoboostTeamFilterValue(team.id)),
+                )
+                .map((team) => ({
+                  value: toRoboostTeamFilterValue(team.id),
+                  label: team.name,
+                }))}
+              onChange={(teamValue) => {
+                const team = teams.find(
+                  (candidate) =>
+                    toRoboostTeamFilterValue(candidate.id) === teamValue,
+                );
+
+                if (isDefined(team)) {
+                  onChange({
+                    ...rule,
+                    value: [...values, teamValue],
+                    labels: {
+                      ...rule.labels,
+                      [teamValue]: t`Team ${team.name}`,
+                    },
+                  });
+                }
+              }}
+            />
+          )}
           <RoboostRecordPicker
             objectNameSingular={
               field.relation?.targetObjectMetadata.nameSingular ?? ''

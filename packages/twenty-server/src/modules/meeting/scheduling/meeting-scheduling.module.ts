@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { Module } from '@nestjs/common';
 
 import { OAuth2ClientManagerModule } from 'src/modules/connected-account/oauth2-client-manager/oauth2-client-manager.module';
@@ -9,7 +10,7 @@ import { MeetingGooglePushService } from 'src/modules/meeting/scheduling/service
 import { MeetingSchedulingService } from 'src/modules/meeting/scheduling/services/meeting-scheduling.service';
 
 @Module({
-  imports: [OAuth2ClientManagerModule],
+  imports: [OAuth2ClientManagerModule, RoboostRecordVisibilityModule],
   providers: [
     MeetingGoogleCalendarService,
     MeetingSchedulingService,

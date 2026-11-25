@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -21,6 +22,7 @@ import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.m
 
 @Module({
   imports: [
+    RoboostRecordVisibilityModule,
     TypeOrmModule.forFeature([WorkspaceEntity]),
     FieldMetadataModule,
     WorkspaceCacheModule,

@@ -151,6 +151,7 @@ export class WorkspaceOrmManager {
       flatRoleTargetByAgentIdMaps,
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
+      roboostRecordAccessMaps,
     } = await this.workspaceCacheService.getOrRecompute(workspaceId, [
       'flatObjectMetadataMaps',
       'flatFieldMetadataMapsOrm',
@@ -164,6 +165,7 @@ export class WorkspaceOrmManager {
       'flatRoleTargetByAgentIdMaps',
       'flatRowLevelPermissionPredicateMaps',
       'flatRowLevelPermissionPredicateGroupMaps',
+      'roboostRecordAccessMaps',
     ]);
 
     const { idByNameSingular: objectIdByNameSingular } =
@@ -190,6 +192,7 @@ export class WorkspaceOrmManager {
       flatRowLevelPermissionPredicateMaps,
       flatRowLevelPermissionPredicateGroupMaps,
       flatValidationRuleMaps,
+      roboostRecordAccessMaps,
       objectIdByNameSingular,
       featureFlagsMap,
       billingEntitlements,

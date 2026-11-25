@@ -14,6 +14,7 @@ type RoboostFilterRuleEditorProps = {
   rule: RoboostFilterRule;
   onChange: (rule: RoboostFilterRule) => void;
   onRemove: () => void;
+  canPickTeams?: boolean;
 };
 
 // Record dates are system fields but are the most common filters (HubSpot's Create date)
@@ -37,6 +38,7 @@ export const RoboostFilterRuleEditor = ({
   rule,
   onChange,
   onRemove,
+  canPickTeams = false,
 }: RoboostFilterRuleEditorProps) => {
   const { t, i18n } = useLingui();
   const fields = getRoboostFilterableFields(objectMetadataItem);
@@ -105,6 +107,7 @@ export const RoboostFilterRuleEditor = ({
             field={field}
             rule={rule}
             onChange={onChange}
+            canPickTeams={canPickTeams}
           />
         </>
       )}

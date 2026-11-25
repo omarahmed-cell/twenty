@@ -10,6 +10,7 @@ import {
 } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import {
   type RoboostScoreActor,
@@ -62,6 +63,7 @@ export class RoboostScoreStoreService {
   constructor(
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   schema(workspaceId: string) {
@@ -91,6 +93,21 @@ export class RoboostScoreStoreService {
   }
 
   // Roles come later; for now scores are managed by workspace admins only
+  // Admins, and members whose Scoring permission "Create and edit scores" is on
+  async canEditScores(workspaceId: string, workspaceMemberId: string) {
+    if (await this.isAdmin(workspaceId, workspaceMemberId)) {
+      return true;
+    }
+
+    const subject =
+      await this.roboostRecordVisibilityService.getSubjectForMember(
+        workspaceId,
+        workspaceMemberId,
+      );
+
+    return subject?.permissions.toggles.scoringEdit === true;
+  }
+
   async isAdmin(workspaceId: string, workspaceMemberId: string) {
     const rows: RawRow[] = await this.coreDataSource.query(
       `SELECT 1 FROM ${this.schema(workspaceId)}."workspaceMember" wm

@@ -113,7 +113,8 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Gmail extension`,
           path: SettingsPath.GmailExtension,
           Icon: IconPuzzle,
-          isHidden: !isUnifiedEmailEnabled,
+          isHidden:
+            !isUnifiedEmailEnabled || !roboostAccess.hasToggle('connectGoogle'),
         },
         {
           label: isAppPreferencesEnabled ? t`App preferences` : t`Accounts`,
@@ -188,7 +189,9 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Layout`,
           path: SettingsPath.Layout,
           Icon: IconAppWindow,
-          isHidden: !permissionFlagMap[PermissionFlagType.LAYOUTS],
+          isHidden:
+            !permissionFlagMap[PermissionFlagType.LAYOUTS] ||
+            !roboostAccess.hasToggle('customizeCards'),
         },
         {
           label: t`Users & Teams`,

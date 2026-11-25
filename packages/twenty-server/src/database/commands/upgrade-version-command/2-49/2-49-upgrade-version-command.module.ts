@@ -38,6 +38,7 @@ import { TurnOffNativeCalendarSyncCommand } from 'src/database/commands/upgrade-
 import { CreateRoboostTaskReminderTableCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795545310151-create-roboost-task-reminder-table.command';
 import { CreateRoboostScoreTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795562107009-create-roboost-score-tables.command';
 import { CreateRoboostUserPermissionTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795615751436-create-roboost-user-permission-tables.command';
+import { CreateRoboostAccessIndexesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795617366610-create-roboost-access-indexes.command';
 import { ProvisionUsersAndTeamsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795614564967-provision-users-and-teams.command';
 import { CreateRoboostDataTransferTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795544772205-create-roboost-data-transfer-tables.command';
 import { CreateRoboostNotificationTableCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795541802255-create-roboost-notification-table.command';
@@ -115,6 +116,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     CreateRoboostScoreTablesCommand,
     ProvisionUsersAndTeamsCommand,
     CreateRoboostUserPermissionTablesCommand,
+    CreateRoboostAccessIndexesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

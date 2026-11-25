@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -32,6 +33,7 @@ import { SentEmailRecorderService } from 'src/modules/unified-email/services/sen
 
 @Module({
   imports: [
+    RoboostRecordVisibilityModule,
     CacheLockModule,
     WorkspaceIteratorModule,
     WorkspaceCacheModule,

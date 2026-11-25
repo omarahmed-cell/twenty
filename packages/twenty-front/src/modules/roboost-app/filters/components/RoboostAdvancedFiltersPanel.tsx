@@ -289,6 +289,7 @@ export const RoboostAdvancedFiltersPanel = ({
                   {index > 0 && <div className="rb-afp-and">{t`and`}</div>}
                   <RoboostFilterRuleEditor
                     objectMetadataItem={objectMetadataItem}
+                    canPickTeams
                     rule={rule}
                     onChange={(nextRule) =>
                       updateGroupRules(group.id, (rules) =>

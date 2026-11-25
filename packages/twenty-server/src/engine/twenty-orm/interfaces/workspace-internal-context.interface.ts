@@ -14,6 +14,8 @@ import { type FlatRowLevelPermissionPredicateGroupMaps } from 'src/engine/metada
 import { type FlatRowLevelPermissionPredicateMaps } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate-maps.type';
 import { type WorkspaceEventEmitter } from 'src/engine/workspace-event-emitter/workspace-event-emitter';
 
+import { type RoboostRecordAccessMaps } from 'src/engine/metadata-modules/role/types/roboost-record-access-maps.type';
+
 export interface WorkspaceInternalContext {
   workspaceId: string;
   flatObjectMetadataMaps: FlatEntityMaps<FlatObjectMetadata>;
@@ -22,6 +24,7 @@ export interface WorkspaceInternalContext {
   flatRowLevelPermissionPredicateMaps: FlatRowLevelPermissionPredicateMaps;
   flatRowLevelPermissionPredicateGroupMaps: FlatRowLevelPermissionPredicateGroupMaps;
   flatValidationRuleMaps?: FlatValidationRuleMaps;
+  roboostRecordAccessMaps?: RoboostRecordAccessMaps;
   objectIdByNameSingular: Record<string, string>;
   featureFlagsMap: Record<FeatureFlagKey, boolean>;
   billingEntitlements: BillingEntitlements;

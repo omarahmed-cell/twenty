@@ -1,3 +1,7 @@
+import {
+  expandRoboostTeamFilterValues,
+  getRoboostTeamIdFromFilterValue,
+} from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostLabelIdentifierFieldName } from '@/roboost-app/fields/getRoboostRecordLabel';
@@ -57,6 +61,7 @@ export const buildRoboostListFilter = ({
   ownerFieldName,
   currentWorkspaceMemberId,
   now,
+  teamMemberIdsByTeamId = {},
 }: {
   objectMetadataItem: EnrichedObjectMetadataItem;
   viewFilter: RecordGqlOperationFilter | undefined;
@@ -65,6 +70,7 @@ export const buildRoboostListFilter = ({
   ownerFieldName: string | undefined;
   currentWorkspaceMemberId: string | undefined;
   now: Date;
+  teamMemberIdsByTeamId?: Record<string, string[]>;
 }): RecordGqlOperationFilter | undefined => {
   const fieldsByName = new Map(
     objectMetadataItem.fields
@@ -103,6 +109,15 @@ export const buildRoboostListFilter = ({
       conditions.push({ [key]: { eq: currentWorkspaceMemberId } });
     } else if (filters.ownerId === 'none') {
       conditions.push({ [key]: { is: 'NULL' } });
+    } else if (isDefined(getRoboostTeamIdFromFilterValue(filters.ownerId))) {
+      conditions.push({
+        [key]: {
+          in: expandRoboostTeamFilterValues(
+            [filters.ownerId],
+            teamMemberIdsByTeamId,
+          ),
+        },
+      });
     } else if (filters.ownerId !== 'me') {
       conditions.push({ [key]: { eq: filters.ownerId } });
     }
@@ -142,7 +157,12 @@ export const buildRoboostListFilter = ({
               ? buildRoboostFilterRule({
                   field,
                   operator: rule.operator,
-                  value: rule.value,
+                  value: Array.isArray(rule.value)
+                    ? expandRoboostTeamFilterValues(
+                        rule.value,
+                        teamMemberIdsByTeamId,
+                      )
+                    : rule.value,
                   now,
                   selectOptionValues: (field.options ?? []).map(
                     (option) => option.value,

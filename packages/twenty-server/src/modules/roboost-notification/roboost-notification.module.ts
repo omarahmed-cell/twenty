@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -20,7 +21,11 @@ import { RoboostAssignNotificationService } from 'src/modules/roboost-notificati
 import { RoboostNotificationService } from 'src/modules/roboost-notification/services/roboost-notification.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WorkspaceEntity]), UserVarsModule],
+  imports: [
+    TypeOrmModule.forFeature([WorkspaceEntity]),
+    UserVarsModule,
+    RoboostRecordVisibilityModule,
+  ],
   providers: [
     RoboostNotificationService,
     RoboostNotificationResolver,

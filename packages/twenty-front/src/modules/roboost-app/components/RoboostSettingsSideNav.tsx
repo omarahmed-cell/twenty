@@ -8,6 +8,7 @@ import {
   getRoboostUsersPath,
   ROBOOST_USERS_AND_TEAMS_PATH,
 } from '@/roboost-app/users-and-teams/utils/getRoboostUsersAndTeamsPath';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import {
   type NavGroup,
   type NavItem,
@@ -26,7 +27,7 @@ import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 const toLayoutNavItems = (
   item: SettingsNavigationItem,
   pathname: string,
-  labels: { forms: string; recordView: string },
+  labels: { forms: string; recordView: string; showForms: boolean },
 ): NavItem[] => {
   const formsPath = getRoboostFormsSettingsPath();
   const recordViewPath = getRoboostRecordViewSettingsPath();
@@ -36,17 +37,21 @@ const toLayoutNavItems = (
       id: ROBOOST_LAYOUT_SETTINGS_PATH,
       label: item.label,
       iconNode: <item.Icon size={18} stroke={1.75} />,
-      href: formsPath,
+      href: labels.showForms ? formsPath : recordViewPath,
       active: false,
     },
-    {
-      id: formsPath,
-      label: labels.forms,
-      icon: 'list',
-      href: formsPath,
-      active: pathname.startsWith(formsPath),
-      isIndented: true,
-    },
+    ...(labels.showForms
+      ? [
+          {
+            id: formsPath,
+            label: labels.forms,
+            icon: 'list' as const,
+            href: formsPath,
+            active: pathname.startsWith(formsPath),
+            isIndented: true,
+          },
+        ]
+      : []),
     {
       id: recordViewPath,
       label: labels.recordView,
@@ -99,6 +104,7 @@ const toUsersAndTeamsNavItems = (
 type SettingsNavLabels = {
   forms: string;
   recordView: string;
+  showForms: boolean;
   users: string;
   teams: string;
 };
@@ -147,6 +153,7 @@ export const RoboostSettingsSideNav = () => {
   const { t } = useLingui();
   const { pathname } = useLocation();
   const sections = useSettingsNavigationItems();
+  const roboostAccess = useRoboostAccess();
 
   const backGroup: NavGroup = {
     items: [
@@ -161,6 +168,7 @@ export const RoboostSettingsSideNav = () => {
       items: toNavItems(section.items, pathname, {
         forms: t`Forms`,
         recordView: t`Record view`,
+        showForms: roboostAccess.isAdmin || !roboostAccess.isLoaded,
         users: t`Users`,
         teams: t`Teams`,
       }),

@@ -59,12 +59,14 @@ export class RoboostScoreService {
 
   async assertAdmin({ workspaceId, workspaceMemberId }: Scope) {
     if (
-      !(await this.roboostScoreStoreService.isAdmin(
+      !(await this.roboostScoreStoreService.canEditScores(
         workspaceId,
         workspaceMemberId,
       ))
     ) {
-      throw new ForbiddenException('Only workspace admins can change scores');
+      throw new ForbiddenException(
+        'Creating and editing scores is turned off for this user',
+      );
     }
 
     return this.roboostScoreStoreService.getMemberActor(

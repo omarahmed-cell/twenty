@@ -5,6 +5,7 @@ import { isDefined } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
 import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services/user-vars.service';
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import {
   type RoboostNotificationInput,
@@ -53,6 +54,7 @@ export class RoboostNotificationService {
     @InjectDataSource()
     private readonly coreDataSource: DataSource,
     private readonly userVarsService: UserVarsService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   private table(workspaceId: string) {
@@ -98,6 +100,20 @@ export class RoboostNotificationService {
           workspaceId: input.workspaceId,
           workspaceMemberId: input.recipientWorkspaceMemberId,
           type: input.type,
+        }))
+      ) {
+        return null;
+      }
+
+      // A notification never points at a record its recipient can't open
+      if (
+        isDefined(input.target.objectNameSingular) &&
+        isDefined(input.target.recordId) &&
+        !(await this.roboostRecordVisibilityService.canViewRecord({
+          workspaceId: input.workspaceId,
+          workspaceMemberId: input.recipientWorkspaceMemberId,
+          objectNameSingular: input.target.objectNameSingular,
+          recordId: input.target.recordId,
         }))
       ) {
         return null;

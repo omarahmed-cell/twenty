@@ -117,6 +117,13 @@ import {
 import { WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
 import { compileNamedParameters } from 'src/engine/twenty-orm/sql/utils/compile-named-parameters.util';
 import { escapeIdentifier } from 'src/engine/workspace-manager/workspace-migration/utils/remove-sql-injection.util';
+import { type RoboostRecordAccessSubject } from 'src/engine/metadata-modules/role/types/roboost-record-access-maps.type';
+import {
+  buildRoboostRecordAccessCondition,
+  isRoboostCreateAllowed,
+  type RoboostRecordAccessCondition,
+} from 'src/engine/twenty-orm/utils/build-roboost-record-access-condition.util';
+import { findRoboostAssociationViolation } from 'src/engine/twenty-orm/utils/find-roboost-association-violation.util';
 import { serializeJsonbWriteValue } from 'src/engine/twenty-orm/sql/utils/serialize-jsonb-write-value.util';
 import {
   type WorkspaceRelationShape,
@@ -1919,6 +1926,8 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       return;
     }
 
+    this.validateRoboostWriteIsPermitted({ operationType, updatedColumns });
+
     validateOperationIsPermittedOrThrow({
       entityName: this.options.tableShape.nameSingular,
       operationType,
@@ -1933,6 +1942,49 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
       authContext: this.options.authContext,
       featureFlagsMap: this.options.internalContext.featureFlagsMap,
     });
+  }
+
+  private validateRoboostWriteIsPermitted({
+    operationType,
+    updatedColumns,
+  }: {
+    operationType: MutationKind | 'insert';
+    updatedColumns: string[];
+  }): void {
+    const subject = this.resolveRoboostRecordAccessSubject();
+
+    if (!isDefined(subject)) {
+      return;
+    }
+
+    const objectNameSingular = this.options.flatObjectMetadata.nameSingular;
+
+    if (
+      operationType === 'insert' &&
+      !isRoboostCreateAllowed({ subject, objectNameSingular })
+    ) {
+      throw new PermissionsException(
+        `${PermissionsExceptionMessage.PERMISSION_DENIED}: creating "${objectNameSingular}" records is turned off for this user`,
+        PermissionsExceptionCode.PERMISSION_DENIED,
+      );
+    }
+
+    const associationViolation = findRoboostAssociationViolation({
+      subject,
+      flatObjectMetadata: this.options.flatObjectMetadata,
+      flatObjectMetadataMaps:
+        this.options.internalContext.flatObjectMetadataMaps,
+      flatFieldMetadataMaps: this.options.internalContext.flatFieldMetadataMaps,
+      operationType,
+      updatedColumns,
+    });
+
+    if (isDefined(associationViolation)) {
+      throw new PermissionsException(
+        `${PermissionsExceptionMessage.PERMISSION_DENIED}: ${associationViolation}`,
+        PermissionsExceptionCode.PERMISSION_DENIED,
+      );
+    }
   }
 
   // An update must not move a record out of the update policy. Records it
@@ -2197,7 +2249,7 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
 
     switch (policy.kind) {
       case 'open':
-        return;
+        break;
       case 'denied':
         this.denyAccessForAlias({
           queryBuilder,
@@ -2213,11 +2265,82 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
           alias,
           ...this.compileRowAccessExpression(policy.expression),
         });
-
-        return;
+        break;
       default:
         assertUnreachable(policy);
     }
+
+    const roboostCondition = this.buildRoboostRecordAccessConditionForAlias({
+      alias,
+      flatObjectMetadata,
+      operationType,
+    });
+
+    if (roboostCondition.kind === 'denied') {
+      this.denyAccessForAlias({
+        queryBuilder,
+        alias,
+        flatObjectMetadata,
+        operationType,
+      });
+
+      return;
+    }
+
+    if (roboostCondition.kind === 'gated') {
+      this.addConditionForAlias({
+        queryBuilder,
+        alias,
+        sql: roboostCondition.sql,
+        parameters: roboostCondition.parameters,
+      });
+    }
+  }
+
+  // A user on their private Users & Teams role gets the per-user permissions saved for that role
+  private resolveRoboostRecordAccessSubject():
+    | RoboostRecordAccessSubject
+    | undefined {
+    const subjectByRoleId =
+      this.options.internalContext.roboostRecordAccessMaps?.subjectByRoleId;
+
+    if (
+      this.options.shouldBypassPermissionChecks ||
+      !isDefined(subjectByRoleId) ||
+      this.options.authContext?.type === 'system'
+    ) {
+      return undefined;
+    }
+
+    return getRoleIdsFromRolePermissionConfig(this.options.rolePermissionConfig)
+      .map((roleId) => subjectByRoleId[roleId])
+      .find(isDefined);
+  }
+
+  private buildRoboostRecordAccessConditionForAlias({
+    alias,
+    flatObjectMetadata,
+    operationType,
+  }: {
+    alias: string;
+    flatObjectMetadata: FlatObjectMetadata;
+    operationType: OperationType;
+  }): RoboostRecordAccessCondition {
+    const subject = this.resolveRoboostRecordAccessSubject();
+
+    if (!isDefined(subject)) {
+      return { kind: 'open' };
+    }
+
+    return buildRoboostRecordAccessCondition({
+      subject,
+      objectNameSingular: flatObjectMetadata.nameSingular,
+      operationType,
+      alias,
+      schemaName: this.options.tableShapeByObjectMetadataId(
+        flatObjectMetadata.id,
+      ).schemaName,
+    });
   }
 
   private buildRowAccessPolicyForAlias({
@@ -2355,16 +2478,47 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
         operationType,
       });
 
-      switch (policy.kind) {
-        case 'open':
-          return true;
-        case 'denied':
-          return false;
-        case 'gated':
-          return this.compileRowAccessExpression(policy.expression);
-        default:
-          return assertUnreachable(policy);
+      const roboostCondition = this.buildRoboostRecordAccessConditionForAlias({
+        alias: tableAlias,
+        flatObjectMetadata: this.options.flatObjectMetadata,
+        operationType,
+      });
+
+      if (roboostCondition.kind === 'denied') {
+        return false;
       }
+
+      const policyAccess = ((): boolean | SqlCondition => {
+        switch (policy.kind) {
+          case 'open':
+            return true;
+          case 'denied':
+            return false;
+          case 'gated':
+            return this.compileRowAccessExpression(policy.expression);
+          default:
+            return assertUnreachable(policy);
+        }
+      })();
+
+      if (roboostCondition.kind === 'open' || policyAccess === false) {
+        return policyAccess;
+      }
+
+      if (policyAccess === true) {
+        return {
+          sql: roboostCondition.sql,
+          parameters: roboostCondition.parameters,
+        };
+      }
+
+      return {
+        sql: `(${policyAccess.sql}) AND (${roboostCondition.sql})`,
+        parameters: {
+          ...policyAccess.parameters,
+          ...roboostCondition.parameters,
+        },
+      };
     } catch (error) {
       if (
         error instanceof PermissionsException &&

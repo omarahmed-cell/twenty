@@ -25,6 +25,7 @@ import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
 import { GmailExtensionLogService } from 'src/modules/unified-email/gmail-extension/services/gmail-extension-log.service';
 import { GmailExtensionLookupService } from 'src/modules/unified-email/gmail-extension/services/gmail-extension-lookup.service';
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import {
   type GmailExtensionCaller,
   GmailExtensionTokenService,
@@ -74,7 +75,66 @@ export class GmailExtensionController {
     private readonly emailContactFindOrCreateService: EmailContactFindOrCreateService,
     private readonly emailTrackingService: EmailTrackingService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
+
+  // The extension shows only records the caller may open, like the CRM itself
+  private async keepVisible<
+    TResult extends {
+      contacts: { id: string }[];
+      companies: { id: string }[];
+      deals: { id: string }[];
+      addresses?: {
+        contact: { id: string } | null;
+        openDeals: { id: string }[];
+      }[];
+    },
+  >(caller: GmailExtensionCaller, result: TResult): Promise<TResult> {
+    const visibleIdsOf = async (
+      objectNameSingular: string,
+      records: { id: string }[],
+    ) =>
+      new Set(
+        await this.roboostRecordVisibilityService.filterVisibleRecordIds({
+          workspaceId: caller.workspaceId,
+          workspaceMemberId: caller.workspaceMemberId,
+          objectNameSingular,
+          recordIds: records.map(({ id }) => id),
+        }),
+      );
+    const [contactIds, companyIds, dealIds] = await Promise.all([
+      visibleIdsOf('person', [
+        ...result.contacts,
+        ...(result.addresses ?? [])
+          .map(({ contact }) => contact)
+          .filter(isDefined),
+      ]),
+      visibleIdsOf('company', result.companies),
+      visibleIdsOf('opportunity', [
+        ...result.deals,
+        ...(result.addresses ?? []).flatMap(({ openDeals }) => openDeals),
+      ]),
+    ]);
+
+    return {
+      ...result,
+      contacts: result.contacts.filter(({ id }) => contactIds.has(id)),
+      companies: result.companies.filter(({ id }) => companyIds.has(id)),
+      deals: result.deals.filter(({ id }) => dealIds.has(id)),
+      ...(isDefined(result.addresses)
+        ? {
+            addresses: result.addresses.map((address) => ({
+              ...address,
+              contact:
+                isDefined(address.contact) && contactIds.has(address.contact.id)
+                  ? address.contact
+                  : null,
+              openDeals: address.openDeals.filter(({ id }) => dealIds.has(id)),
+            })),
+          }
+        : {}),
+    };
+  }
 
   private async authenticate(
     authorization: string | undefined,
@@ -85,6 +145,18 @@ export class GmailExtensionController {
 
     if (!isDefined(caller)) {
       throw new UnauthorizedException('Invalid or revoked extension token');
+    }
+
+    if (
+      !(await this.roboostRecordVisibilityService.hasToggle(
+        caller.workspaceId,
+        caller.workspaceMemberId,
+        'connectGoogle',
+      ))
+    ) {
+      throw new UnauthorizedException(
+        'Connect Google account is turned off for this user',
+      );
     }
 
     return caller;
@@ -116,9 +188,12 @@ export class GmailExtensionController {
       .filter(isNonEmptyString)
       .slice(0, 100);
 
-    return this.gmailExtensionLookupService.lookupAddresses(
-      caller.workspaceId,
-      addresses,
+    return this.keepVisible(
+      caller,
+      await this.gmailExtensionLookupService.lookupAddresses(
+        caller.workspaceId,
+        addresses,
+      ),
     );
   }
 
@@ -129,9 +204,12 @@ export class GmailExtensionController {
   ) {
     const caller = await this.authenticate(authorization);
 
-    return this.gmailExtensionLookupService.search(
-      caller.workspaceId,
-      (query ?? '').slice(0, 100),
+    return this.keepVisible(
+      caller,
+      await this.gmailExtensionLookupService.search(
+        caller.workspaceId,
+        (query ?? '').slice(0, 100),
+      ),
     );
   }
 

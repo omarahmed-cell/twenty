@@ -1,3 +1,4 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
 import { cx } from '@/roboost-ui/utils/cx';
@@ -35,13 +36,14 @@ export const RoboostRecordContainer = ({
 }: RoboostRecordContainerProps) => {
   const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const canArrangeCards = useRoboostAccess().hasToggle('arrangeCards');
   const [isDraggable, setIsDraggable] = useState(false);
 
   return (
     <section
       className={cx('rb-rc', isDropTarget && 'is-drop-target')}
       aria-label={title}
-      draggable={isDraggable}
+      draggable={canArrangeCards && isDraggable}
       onDragStart={(event) => {
         event.dataTransfer.effectAllowed = 'move';
         onDragStart(id);
@@ -60,14 +62,16 @@ export const RoboostRecordContainer = ({
       }}
     >
       <div className={cx('rb-rc-head', !isOpen && 'is-plain')}>
-        <span
-          className="rb-rc-drag"
-          title={t`Drag to reorder`}
-          onMouseDown={() => setIsDraggable(true)}
-          onMouseUp={() => setIsDraggable(false)}
-        >
-          <Icon name="grip" size={14} />
-        </span>
+        {canArrangeCards && (
+          <span
+            className="rb-rc-drag"
+            title={t`Drag to reorder`}
+            onMouseDown={() => setIsDraggable(true)}
+            onMouseUp={() => setIsDraggable(false)}
+          >
+            <Icon name="grip" size={14} />
+          </span>
+        )}
         <button
           type="button"
           className={cx('rb-rc-chev', !isOpen && 'is-closed')}

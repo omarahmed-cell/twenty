@@ -9,6 +9,11 @@ import { RolePermissionFlagModule } from 'src/engine/metadata-modules/role-permi
 import { RoleModule } from 'src/engine/metadata-modules/role/role.module';
 import { UserRoleModule } from 'src/engine/metadata-modules/user-role/user-role.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
+import {
+  ROBOOST_ACCESS_QUERY_HOOKS,
+  RoboostAccessHookService,
+} from 'src/modules/users-and-teams/query-hooks/roboost-access.pre-query.hooks';
 import { RoboostUsersSyncCommand } from 'src/modules/users-and-teams/commands/roboost-users-sync.command';
 import { RoboostUsersResolver } from 'src/modules/users-and-teams/resolvers/roboost-users.resolver';
 import { RoboostRoleSyncService } from 'src/modules/users-and-teams/services/roboost-role-sync.service';
@@ -26,6 +31,7 @@ import { RoboostUsersService } from 'src/modules/users-and-teams/services/roboos
     WorkspaceInvitationModule,
     WorkspaceCacheModule,
     WorkspaceIteratorModule,
+    RoboostRecordVisibilityModule,
   ],
   providers: [
     RoboostUserPermissionStoreService,
@@ -33,6 +39,8 @@ import { RoboostUsersService } from 'src/modules/users-and-teams/services/roboos
     RoboostUsersService,
     RoboostUsersResolver,
     RoboostUsersSyncCommand,
+    RoboostAccessHookService,
+    ...ROBOOST_ACCESS_QUERY_HOOKS,
   ],
   exports: [RoboostUsersService, RoboostUserPermissionStoreService],
 })

@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { Module } from '@nestjs/common';
 
 import { CoreCommonApiModule } from 'src/engine/api/common/core-common-api.module';
@@ -21,6 +22,7 @@ import { SegmentPullService } from 'src/modules/segment/services/segment-pull.se
 
 @Module({
   imports: [
+    RoboostRecordVisibilityModule,
     ActorModule,
     ApplicationModule,
     CacheLockModule,

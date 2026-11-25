@@ -1,5 +1,10 @@
+import { ROBOOST_TEAMS } from '@/roboost-app/users-and-teams/graphql/roboostUsersQueries';
+import { type RoboostTeam } from '@/roboost-app/users-and-teams/types/RoboostUsers';
+import { buildRoboostTeamMemberIdsByTeamId } from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
 import { ROBOOST_LOG_EXPORT } from '@/roboost-app/data-transfer/graphql/roboostDataTransferQueries';
-import { useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -92,6 +97,11 @@ export const RoboostObjectListPage = ({
   objectMetadataItem,
 }: RoboostObjectListPageProps) => {
   const { t } = useLingui();
+  const roboostAccess = useRoboostAccess();
+  const { data: teamsData } = useQuery<{ roboostTeams: RoboostTeam[] }>(
+    ROBOOST_TEAMS,
+    { fetchPolicy: 'cache-first' },
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const apolloCoreClient = useApolloCoreClient();
   const { objectMetadataItems } = useObjectMetadataItems();
@@ -292,6 +302,9 @@ export const RoboostObjectListPage = ({
     ownerFieldName: ownerField?.name,
     currentWorkspaceMemberId: currentWorkspaceMember?.id,
     now: new Date(),
+    teamMemberIdsByTeamId: buildRoboostTeamMemberIdsByTeamId(
+      teamsData?.roboostTeams ?? [],
+    ),
   });
 
   const sortField = isDefined(sort)
@@ -438,6 +451,21 @@ export const RoboostObjectListPage = ({
   const hasAmountField = activeFields.some((field) => field.name === 'amount');
   const boardFilter: RecordGqlOperationFilter = filter ?? {};
 
+  const objectNameSingular = objectMetadataItem.nameSingular;
+  const canCreateRecords = canRoboostWriteObject(
+    roboostAccess,
+    objectNameSingular,
+    'create',
+  );
+  const canDeleteRecords = canRoboostWriteObject(
+    roboostAccess,
+    objectNameSingular,
+    'delete',
+  );
+  const canBulkDelete = roboostAccess.hasToggle('bulkDelete');
+  const canExport = roboostAccess.hasToggle('export');
+  const canImport = canCreateRecords && roboostAccess.hasToggle('import');
+
   return (
     <SpreadsheetImportProvider>
       <RoboostListNavigationEffect
@@ -462,27 +490,44 @@ export const RoboostObjectListPage = ({
           <Menu
             align="right"
             entries={[
-              {
-                id: 'export',
-                label:
-                  selectedIds.length > 0
-                    ? t`Export ${selectedIds.length} selected`
-                    : t`Export this view`,
-                icon: 'download',
-                onSelect: exportRecords,
-              },
-              {
-                id: 'delete',
-                label: t`Delete selected`,
-                icon: 'trash',
-                isDanger: true,
-                isDisabled: selectedIds.length === 0,
-                onSelect: () => {
-                  if (selectedIds.length > 0) {
-                    setIsDeleteOpen(true);
-                  }
-                },
-              },
+              ...(canExport
+                ? [
+                    {
+                      id: 'export',
+                      label:
+                        selectedIds.length > 0
+                          ? t`Export ${selectedIds.length} selected`
+                          : t`Export this view`,
+                      icon: 'download' as const,
+                      onSelect: exportRecords,
+                    },
+                  ]
+                : []),
+              ...(canDeleteRecords
+                ? [
+                    {
+                      id: 'delete',
+                      label: t`Delete selected`,
+                      icon: 'trash' as const,
+                      isDanger: true,
+                      isDisabled:
+                        selectedIds.length === 0 ||
+                        (selectedIds.length > 1 && !canBulkDelete),
+                      hint:
+                        selectedIds.length > 1 && !canBulkDelete
+                          ? t`Bulk delete is off for you`
+                          : undefined,
+                      onSelect: () => {
+                        if (
+                          selectedIds.length === 1 ||
+                          (selectedIds.length > 1 && canBulkDelete)
+                        ) {
+                          setIsDeleteOpen(true);
+                        }
+                      },
+                    },
+                  ]
+                : []),
               { id: 'sep', isSeparator: true },
               {
                 id: 'classic',
@@ -502,25 +547,29 @@ export const RoboostObjectListPage = ({
               </button>
             )}
           />
-          <button
-            type="button"
-            className="rb-hbtn"
-            onClick={() => openObjectRecordsSpreadsheetImportDialog()}
-          >
-            {t`Import`}
-          </button>
-          <button
-            type="button"
-            className="rb-hbtn rb-hbtn-accent"
-            onClick={() =>
-              openCreatePanel({
-                objectNameSingular: objectMetadataItem.nameSingular,
-              })
-            }
-          >
-            <Icon name="plus" size={14} strokeWidth={2} />
-            {t`Create ${objectMetadataItem.labelSingular.toLowerCase()}`}
-          </button>
+          {canImport && (
+            <button
+              type="button"
+              className="rb-hbtn"
+              onClick={() => openObjectRecordsSpreadsheetImportDialog()}
+            >
+              {t`Import`}
+            </button>
+          )}
+          {canCreateRecords && (
+            <button
+              type="button"
+              className="rb-hbtn rb-hbtn-accent"
+              onClick={() =>
+                openCreatePanel({
+                  objectNameSingular: objectMetadataItem.nameSingular,
+                })
+              }
+            >
+              <Icon name="plus" size={14} strokeWidth={2} />
+              {t`Create ${objectMetadataItem.labelSingular.toLowerCase()}`}
+            </button>
+          )}
         </div>
 
         <div className="rb-list-shell">
@@ -654,15 +703,17 @@ export const RoboostObjectListPage = ({
                 >
                   <Icon name="refresh" size={16} />
                 </button>
-                <button
-                  type="button"
-                  className="rb-hbtn"
-                  disabled={isExporting}
-                  onClick={exportRecords}
-                >
-                  <Icon name="download" size={14} />
-                  {isExporting ? t`Exporting…` : t`Export`}
-                </button>
+                {canExport && (
+                  <button
+                    type="button"
+                    className="rb-hbtn"
+                    disabled={isExporting}
+                    onClick={exportRecords}
+                  >
+                    <Icon name="download" size={14} />
+                    {isExporting ? t`Exporting…` : t`Export`}
+                  </button>
+                )}
               </span>
             </div>
           )}

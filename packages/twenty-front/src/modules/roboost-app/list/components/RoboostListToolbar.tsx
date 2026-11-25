@@ -1,3 +1,10 @@
+import { useQuery } from '@apollo/client/react';
+import { ROBOOST_TEAMS } from '@/roboost-app/users-and-teams/graphql/roboostUsersQueries';
+import { type RoboostTeam } from '@/roboost-app/users-and-teams/types/RoboostUsers';
+import {
+  getRoboostTeamIdFromFilterValue,
+  toRoboostTeamFilterValue,
+} from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
@@ -87,6 +94,11 @@ export const RoboostListToolbar = ({
     limit: 200,
     skip: !isDefined(ownerField),
   });
+  const { data: teamsData } = useQuery<{ roboostTeams: RoboostTeam[] }>(
+    ROBOOST_TEAMS,
+    { fetchPolicy: 'cache-first', skip: !isDefined(ownerField) },
+  );
+  const teams = teamsData?.roboostTeams ?? [];
 
   const dateRangeLabels: Record<RoboostDateRange, string> = {
     any: t`Any time`,
@@ -160,9 +172,17 @@ export const RoboostListToolbar = ({
         ? t`Me`
         : filters.ownerId === 'none'
           ? t`No owner`
-          : getRoboostPersonName(
-              members.find((member) => member.id === filters.ownerId)?.name,
-            );
+          : isDefined(getRoboostTeamIdFromFilterValue(filters.ownerId))
+            ? t`Team ${
+                teams.find(
+                  (team) =>
+                    team.id ===
+                    getRoboostTeamIdFromFilterValue(filters.ownerId),
+                )?.name ?? ''
+              }`
+            : getRoboostPersonName(
+                members.find((member) => member.id === filters.ownerId)?.name,
+              );
 
   const addableFields = [...fieldsByName.values()].filter(
     (field) =>
@@ -262,6 +282,10 @@ export const RoboostListToolbar = ({
                 { id: 'any', label: t`Anyone` },
                 { id: 'me', label: t`Me` },
                 { id: 'none', label: t`No owner` },
+                ...teams.map((team) => ({
+                  id: toRoboostTeamFilterValue(team.id),
+                  label: t`Anyone in team ${team.name}`,
+                })),
                 ...members.map((member) => ({
                   id: member.id,
                   label: getRoboostPersonName(member.name),

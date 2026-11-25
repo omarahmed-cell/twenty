@@ -6,6 +6,8 @@ import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { ROBOOST_NAV_DEFINITION } from '@/roboost-app/constants/RoboostNavDefinition';
 import { ROBOOST_USER_VAR_KEYS } from '@/roboost-app/constants/RoboostUserVarKeys';
 import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
+import { canRoboostViewObject } from '@/roboost-app/users-and-teams/utils/canRoboostViewObject';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { roboostNavCollapsedState } from '@/roboost-app/states/roboostNavCollapsedState';
 import { type NavGroup, SideNav } from '@/roboost-ui/components/SideNav';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
@@ -22,6 +24,7 @@ export const RoboostAppSideNav = () => {
   );
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
   const { setUserVar } = useRoboostUserVars();
+  const roboostAccess = useRoboostAccess();
 
   // Totals only: one row each, the count comes from totalCount
   const { totalCount: contactCount } = useFindManyRecords({
@@ -90,7 +93,10 @@ export const RoboostAppSideNav = () => {
         (item) => item.namePlural === entry.objectNamePlural && item.isActive,
       );
 
-      if (!isDefined(objectMetadataItem)) {
+      if (
+        !isDefined(objectMetadataItem) ||
+        !canRoboostViewObject(roboostAccess, objectMetadataItem.nameSingular)
+      ) {
         return [];
       }
 

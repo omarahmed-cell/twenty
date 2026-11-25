@@ -6,7 +6,8 @@ import {
 } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import { Tabs } from '@/roboost-ui/components/Tabs';
 import { useLingui } from '@lingui/react/macro';
-import { Link, useNavigate } from 'react-router-dom';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 type RoboostLayoutSettingsTab = 'forms' | 'record-view';
 
@@ -20,7 +21,26 @@ export const RoboostLayoutSettingsPage = ({
 }: RoboostLayoutSettingsPageProps) => {
   const { t } = useLingui();
   const navigate = useNavigate();
+  const access = useRoboostAccess();
   const tabLabel = tab === 'forms' ? t`Forms` : t`Record view`;
+
+  // Forms are admin-only; Record view needs Customize cards
+  if (access.isLoaded && !access.isAdmin) {
+    if (!access.hasToggle('customizeCards')) {
+      return <Navigate to="/settings/profile" replace />;
+    }
+
+    if (tab === 'forms') {
+      return <Navigate to={getRoboostRecordViewSettingsPath()} replace />;
+    }
+  }
+
+  const tabs = [
+    ...(access.isAdmin || !access.isLoaded
+      ? [{ id: 'forms', label: t`Forms` }]
+      : []),
+    { id: 'record-view', label: t`Record view` },
+  ];
 
   return (
     <div className="rb-ui rb-forms-page">
@@ -34,10 +54,7 @@ export const RoboostLayoutSettingsPage = ({
       <h1 className="rb-forms-title">{t`Layout`}</h1>
       <Tabs
         className="rb-layout-tabs"
-        tabs={[
-          { id: 'forms', label: t`Forms` },
-          { id: 'record-view', label: t`Record view` },
-        ]}
+        tabs={tabs}
         value={tab}
         onChange={(id) =>
           navigate(

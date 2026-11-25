@@ -16,6 +16,7 @@ import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorato
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AuthWorkspaceMemberId } from 'src/engine/decorators/auth/auth-workspace-member-id.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { AuthPrincipalGuard } from 'src/engine/guards/auth-principal.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import {
@@ -167,6 +168,7 @@ export class RoboostScoreResolver {
   constructor(
     private readonly roboostScoreService: RoboostScoreService,
     private readonly roboostScoreStoreService: RoboostScoreStoreService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   @Query(() => [RoboostScoreDTO])
@@ -192,7 +194,10 @@ export class RoboostScoreResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string | undefined,
   ) {
     return isDefined(workspaceMemberId)
-      ? this.roboostScoreStoreService.isAdmin(workspace.id, workspaceMemberId)
+      ? this.roboostScoreStoreService.canEditScores(
+          workspace.id,
+          workspaceMemberId,
+        )
       : false;
   }
 
@@ -232,6 +237,7 @@ export class RoboostScoreResolver {
   @Query(() => RoboostScoreRecordResultDTO, { nullable: true })
   async roboostExplainScore(
     @AuthWorkspace() workspace: WorkspaceEntity,
+    @AuthWorkspaceMemberId() workspaceMemberId: string | undefined,
     @Args('fieldMetadataId', { type: () => String }) fieldMetadataId: string,
     @Args('recordId', { type: () => String }) recordId: string,
   ): Promise<RoboostScoreRecordResultDTO | null> {
@@ -245,6 +251,18 @@ export class RoboostScoreResolver {
       return null;
     }
     const { score, result, version } = explanation;
+
+    if (
+      !isDefined(workspaceMemberId) ||
+      !(await this.roboostRecordVisibilityService.canViewRecord({
+        workspaceId: workspace.id,
+        workspaceMemberId,
+        objectNameSingular: score.objectName,
+        recordId,
+      }))
+    ) {
+      return null;
+    }
 
     return {
       scoreId: score.id,

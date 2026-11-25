@@ -22,6 +22,10 @@ export const ROBOOST_NAV_DEFINITION: RoboostNavGroupDefinition[] = [
       { id: 'people', icon: 'contacts', objectNamePlural: 'people' },
       { id: 'opportunities', icon: 'deals', objectNamePlural: 'opportunities' },
       { id: 'services', icon: 'services', objectNamePlural: 'services' },
+      { id: 'products', icon: 'archive', objectNamePlural: 'products' },
+      { id: 'lineItems', icon: 'list', objectNamePlural: 'lineItems' },
+      { id: 'segments', icon: 'segment', objectNamePlural: 'segments' },
+      { id: 'dashboards', icon: 'dashboard', objectNamePlural: 'dashboards' },
     ],
   },
   {
