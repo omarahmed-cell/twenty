@@ -70,6 +70,53 @@ describe('evaluateFilterConditions', () => {
         expect(result).toBe(false);
       });
 
+      it('should match any current member of a team (RELATION)', () => {
+        const teamMemberIdsByTeamId = { 'team-1': ['member-a', 'member-b'] };
+
+        expect(
+          evaluateFilterConditions({
+            filters: [
+              createFilter(
+                ViewFilterOperand.IS,
+                'member-b',
+                'team-1',
+                'RELATION',
+              ),
+            ],
+            teamMemberIdsByTeamId,
+          }),
+        ).toBe(true);
+        expect(
+          evaluateFilterConditions({
+            filters: [
+              createFilter(
+                ViewFilterOperand.IS,
+                'member-c',
+                'team-1',
+                'RELATION',
+              ),
+            ],
+            teamMemberIdsByTeamId,
+          }),
+        ).toBe(false);
+        expect(
+          evaluateFilterConditions({
+            filters: [
+              createFilter(
+                ViewFilterOperand.IS,
+                'member-a',
+                JSON.stringify({
+                  isCurrentWorkspaceMemberSelected: false,
+                  selectedRecordIds: ['team-1'],
+                }),
+                'RELATION',
+              ),
+            ],
+            teamMemberIdsByTeamId,
+          }),
+        ).toBe(true);
+      });
+
       it('should return false when values are equal (IsNot RELATION)', () => {
         const filter = createFilter(
           ViewFilterOperand.IS_NOT,

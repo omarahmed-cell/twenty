@@ -263,17 +263,26 @@ export class RoboostNotificationService {
       ],
     );
 
+    const hiddenIds = await this.findHiddenNotificationIds(
+      workspaceId,
+      workspaceMemberId,
+      rows,
+    );
+
     return {
-      items: rows.slice(0, pageSize).map((row) => ({
-        ...row,
-        createdAt: new Date(row.createdAt).toISOString(),
-        readAt: isDefined(row.readAt)
-          ? new Date(row.readAt).toISOString()
-          : null,
-        trashedAt: isDefined(row.trashedAt)
-          ? new Date(row.trashedAt).toISOString()
-          : null,
-      })),
+      items: rows
+        .slice(0, pageSize)
+        .filter((row) => !hiddenIds.has(row.id))
+        .map((row) => ({
+          ...row,
+          createdAt: new Date(row.createdAt).toISOString(),
+          readAt: isDefined(row.readAt)
+            ? new Date(row.readAt).toISOString()
+            : null,
+          trashedAt: isDefined(row.trashedAt)
+            ? new Date(row.trashedAt).toISOString()
+            : null,
+        })),
       hasMore: rows.length > pageSize,
     };
   }
@@ -289,7 +298,100 @@ export class RoboostNotificationService {
         [workspaceMemberId],
       );
 
-    return row ?? { unread: 0, all: 0, trash: 0 };
+    const counts = row ?? { unread: 0, all: 0, trash: 0 };
+    const targetRows: {
+      id: string;
+      targetObjectNameSingular: string | null;
+      targetRecordId: string | null;
+      isRead: boolean;
+      isTrashed: boolean;
+    }[] = await this.coreDataSource.query(
+      `SELECT id, "targetObjectNameSingular", "targetRecordId", "isRead", "isTrashed"
+      FROM ${this.table(workspaceId)}
+      WHERE "recipientWorkspaceMemberId" = $1 AND "targetRecordId" IS NOT NULL`,
+      [workspaceMemberId],
+    );
+    const hiddenIds = await this.findHiddenNotificationIds(
+      workspaceId,
+      workspaceMemberId,
+      targetRows,
+    );
+
+    for (const targetRow of targetRows) {
+      if (!hiddenIds.has(targetRow.id)) {
+        continue;
+      }
+
+      if (targetRow.isTrashed) {
+        counts.trash -= 1;
+      } else {
+        counts.all -= 1;
+        counts.unread -= targetRow.isRead ? 0 : 1;
+      }
+    }
+
+    return counts;
+  }
+
+  // A notification stays hidden while its recipient can't open its record, for example after losing access
+  private async findHiddenNotificationIds(
+    workspaceId: string,
+    workspaceMemberId: string,
+    rows: {
+      id: string;
+      targetObjectNameSingular: string | null;
+      targetRecordId: string | null;
+    }[],
+  ): Promise<Set<string>> {
+    const recordIdsByObject = new Map<string, Set<string>>();
+
+    for (const row of rows) {
+      if (
+        isDefined(row.targetObjectNameSingular) &&
+        isDefined(row.targetRecordId)
+      ) {
+        const recordIds =
+          recordIdsByObject.get(row.targetObjectNameSingular) ?? new Set();
+
+        recordIds.add(row.targetRecordId);
+        recordIdsByObject.set(row.targetObjectNameSingular, recordIds);
+      }
+    }
+
+    const visibleKeys = new Set<string>();
+
+    for (const [objectNameSingular, recordIds] of recordIdsByObject) {
+      try {
+        for (const recordId of await this.roboostRecordVisibilityService.filterVisibleRecordIds(
+          {
+            workspaceId,
+            workspaceMemberId,
+            objectNameSingular,
+            recordIds: [...recordIds],
+          },
+        )) {
+          visibleKeys.add(`${objectNameSingular}:${recordId}`);
+        }
+      } catch {
+        // Objects without a table of their own (exports, imports) carry no record access
+        for (const recordId of recordIds) {
+          visibleKeys.add(`${objectNameSingular}:${recordId}`);
+        }
+      }
+    }
+
+    return new Set(
+      rows
+        .filter(
+          (row) =>
+            isDefined(row.targetObjectNameSingular) &&
+            isDefined(row.targetRecordId) &&
+            !visibleKeys.has(
+              `${row.targetObjectNameSingular}:${row.targetRecordId}`,
+            ),
+        )
+        .map((row) => row.id),
+    );
   }
 
   // $1 is always the recipient; Select all filters by tab and type, otherwise by ids
