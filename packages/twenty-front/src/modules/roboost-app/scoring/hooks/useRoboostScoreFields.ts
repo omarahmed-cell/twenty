@@ -3,10 +3,12 @@ import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataIte
 import { getRoboostFilterableFields } from '@/roboost-app/filters/components/RoboostFilterRuleEditor';
 import { useRoboostFieldGroups } from '@/roboost-app/list/hooks/useRoboostFieldGroups';
 import { getRoboostScoreFieldIcon } from '@/roboost-app/scoring/utils/getRoboostScoreFieldIcon';
+import { getRoboostScoreIdOfField } from '@/roboost-app/scoring/utils/getRoboostScoreIdOfField';
 import { type SelectOption } from '@/roboost-ui/components/Select';
 import { useLingui } from '@lingui/react/macro';
 
-// Only the scored object's own properties, grouped like the record page; the score's own property is left out
+// Only the scored object's own properties, grouped like the record page. Score properties are left
+// out: scores write without record events, so a score reading another would go stale
 export const useRoboostScoreFields = (
   objectMetadataItem: EnrichedObjectMetadataItem,
   linkedFieldMetadataId: string | null,
@@ -15,7 +17,11 @@ export const useRoboostScoreFields = (
   const groups = useRoboostFieldGroups(objectMetadataItem);
   const filterableFields = getRoboostFilterableFields(
     objectMetadataItem,
-  ).filter((field) => field.id !== linkedFieldMetadataId);
+  ).filter(
+    (field) =>
+      field.id !== linkedFieldMetadataId &&
+      getRoboostScoreIdOfField(field) === undefined,
+  );
   const filterableIds = new Set(filterableFields.map((field) => field.id));
   const groupTitleByFieldId = new Map<string, string>();
 
