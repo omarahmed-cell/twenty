@@ -29,7 +29,6 @@ type ProvisionDealFieldsCommandOptions = ProvisionedWorkspaceCommandOptions & {
 
 const SEEDED_FIELD_NAMES_BY_OBJECT = {
   opportunity: [
-    'team',
     'dealCollaborators',
     'ownerAssignedDate',
     'lastActivityDate',
@@ -46,6 +45,8 @@ const SEEDED_FIELD_NAMES_BY_OBJECT = {
 
 const DEAL_FIELD_SEED_UNIVERSAL_IDENTIFIERS = [
   STANDARD_OBJECTS.opportunityCollaborator.universalIdentifier,
+  // Deal Team, removed by upgrade:2-49:remove-hubspot-team-fields
+  'df1a7520-16f7-4753-bd3b-66fdfdd15683',
   ...Object.entries(SEEDED_FIELD_NAMES_BY_OBJECT).flatMap(
     ([objectName, fieldNames]) =>
       fieldNames.map(
