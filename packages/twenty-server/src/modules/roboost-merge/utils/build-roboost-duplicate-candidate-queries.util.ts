@@ -71,7 +71,7 @@ export const buildRoboostDuplicateCandidateQueries = ({
         SELECT a.id AS a, b.id AS b FROM n a JOIN n b
           ON left(a.value, 5) = left(b.value, 5) AND a.country = b.country AND a.id < b.id
         WHERE length(a.value) >= 3 AND length(b.value) >= 3
-          AND (a.value = b.value OR (least(length(a.value), length(b.value)) >= 5 AND (a.value LIKE b.value || '%' OR b.value LIKE a.value || '%')))`,
+          AND (a.value = b.value OR (least(length(a.value), length(b.value)) >= 8 AND least(length(a.value), length(b.value)) >= 0.6 * greatest(length(a.value), length(b.value)) AND (a.value LIKE b.value || '%' OR b.value LIKE a.value || '%')))`,
       });
     }
   }
