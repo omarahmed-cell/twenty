@@ -1,3 +1,4 @@
+import { RoboostLoadModeModule } from 'src/engine/core-modules/roboost-load-mode/roboost-load-mode.module';
 import { Module } from '@nestjs/common';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
@@ -84,6 +85,7 @@ import { FileApiModule } from './file/file-api.module';
 
 @Module({
   imports: [
+    RoboostLoadModeModule,
     EnvironmentModule,
     TwentyConfigModule.forRoot(),
     HealthModule,

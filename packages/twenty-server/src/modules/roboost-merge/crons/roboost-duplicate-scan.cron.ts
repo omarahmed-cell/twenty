@@ -5,6 +5,7 @@ import { Command, CommandRunner } from 'nest-commander';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
 import { Repository } from 'typeorm';
 
+import { RoboostLoadModeService } from 'src/engine/core-modules/roboost-load-mode/roboost-load-mode.service';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
 import { Process } from 'src/engine/core-modules/message-queue/decorators/process.decorator';
 import { Processor } from 'src/engine/core-modules/message-queue/decorators/processor.decorator';
@@ -24,6 +25,7 @@ export class RoboostDuplicateScanCronJob {
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly roboostDuplicateService: RoboostDuplicateService,
+    private readonly roboostLoadModeService: RoboostLoadModeService,
   ) {}
 
   @Process(RoboostDuplicateScanCronJob.name)
@@ -35,7 +37,10 @@ export class RoboostDuplicateScanCronJob {
 
     for (const { id: workspaceId } of workspaces) {
       try {
-        if (!(await this.roboostDuplicateService.tablesExist(workspaceId))) {
+        if (
+          !(await this.roboostDuplicateService.tablesExist(workspaceId)) ||
+          (await this.roboostLoadModeService.isOn(workspaceId))
+        ) {
           continue;
         }
 

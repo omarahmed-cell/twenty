@@ -68,6 +68,7 @@ import { RoboostDuplicateService } from 'src/modules/roboost-merge/services/robo
   ],
   exports: [
     RoboostMergeService,
+    RoboostDuplicateService,
     RoboostMergeActorService,
     RoboostMergeLogService,
     RoboostMergeExpiryCronCommand,

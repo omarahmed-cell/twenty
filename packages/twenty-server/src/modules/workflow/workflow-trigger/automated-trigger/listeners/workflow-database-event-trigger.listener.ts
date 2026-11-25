@@ -1,3 +1,5 @@
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
+import { RoboostLoadModeService } from 'src/engine/core-modules/roboost-load-mode/roboost-load-mode.service';
 import { buildCoreDispatchIds } from 'src/engine/core-modules/workflow/utils/build-core-dispatch-ids.util';
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -62,6 +64,7 @@ type TriggerEvaluationArgs = {
   eventPayload: ObjectRecordEvent;
   eventListener: DatabaseEventTriggerListener;
   action: DatabaseEventAction;
+  teamMemberIdsByTeamId?: Record<string, string[]>;
 };
 
 @Injectable()
@@ -79,6 +82,8 @@ export class WorkflowDatabaseEventTriggerListener {
     private readonly recordAccessPolicyService: RecordAccessPolicyService,
     private readonly applicationService: ApplicationService,
     private readonly coreEntityCacheService: CoreEntityCacheService,
+    private readonly roboostLoadModeService: RoboostLoadModeService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   @OnDatabaseBatchEvent('*', DatabaseEventAction.CREATED)
@@ -366,6 +371,15 @@ export class WorkflowDatabaseEventTriggerListener {
       return;
     }
 
+    if (await this.roboostLoadModeService.isOn(workspaceId)) {
+      return;
+    }
+
+    const teamMemberIdsByTeamId =
+      await this.roboostRecordVisibilityService.getTeamMemberIdsByTeamId(
+        workspaceId,
+      );
+
     const workspace = await this.coreEntityCacheService.get(
       'workspaceEntity',
       workspaceId,
@@ -418,6 +432,7 @@ export class WorkflowDatabaseEventTriggerListener {
           eventPayload,
           eventListener,
           action,
+          teamMemberIdsByTeamId,
         });
 
         if (shouldTriggerJob) {
@@ -542,10 +557,15 @@ export class WorkflowDatabaseEventTriggerListener {
     eventPayload,
     eventListener,
     action,
+    teamMemberIdsByTeamId,
   }: TriggerEvaluationArgs) {
     return (
       this.eventMatchesWatchedFields({ eventPayload, eventListener, action }) &&
-      this.eventMatchesRecordFilter({ eventPayload, eventListener })
+      this.eventMatchesRecordFilter({
+        eventPayload,
+        eventListener,
+        teamMemberIdsByTeamId,
+      })
     );
   }
 
@@ -576,7 +596,11 @@ export class WorkflowDatabaseEventTriggerListener {
   private eventMatchesRecordFilter({
     eventPayload,
     eventListener,
-  }: Pick<TriggerEvaluationArgs, 'eventPayload' | 'eventListener'>) {
+    teamMemberIdsByTeamId,
+  }: Pick<
+    TriggerEvaluationArgs,
+    'eventPayload' | 'eventListener' | 'teamMemberIdsByTeamId'
+  >) {
     const { filter } =
       eventListener.settings as BaseDatabaseEventTriggerSettings;
 
@@ -589,6 +613,7 @@ export class WorkflowDatabaseEventTriggerListener {
         stepFilters: filter.stepFilters,
         stepFilterGroups: filter.stepFilterGroups,
         context: { [TRIGGER_STEP_ID]: eventPayload },
+        teamMemberIdsByTeamId,
       });
     } catch (error) {
       this.logger.error(

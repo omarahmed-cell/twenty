@@ -4,6 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { isDefined } from 'twenty-shared/utils';
 import { DataSource } from 'typeorm';
 
+import { RoboostLoadModeService } from 'src/engine/core-modules/roboost-load-mode/roboost-load-mode.service';
 import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services/user-vars.service';
 import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
@@ -55,6 +56,7 @@ export class RoboostNotificationService {
     private readonly coreDataSource: DataSource,
     private readonly userVarsService: UserVarsService,
     private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
+    private readonly roboostLoadModeService: RoboostLoadModeService,
   ) {}
 
   private table(workspaceId: string) {
@@ -95,6 +97,10 @@ export class RoboostNotificationService {
 
   async notify(input: RoboostNotificationInput): Promise<string | null> {
     try {
+      if (await this.roboostLoadModeService.isOn(input.workspaceId)) {
+        return null;
+      }
+
       if (
         !(await this.isTypeEnabled({
           workspaceId: input.workspaceId,

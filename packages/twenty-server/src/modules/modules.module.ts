@@ -31,6 +31,7 @@ import { MeetingSchedulingModule } from 'src/modules/meeting/scheduling/meeting-
 import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
 import { RoboostScoringModule } from 'src/modules/roboost-scoring/roboost-scoring.module';
 import { RoboostMergeModule } from 'src/modules/roboost-merge/roboost-merge.module';
+import { RoboostLoadModeCommandModule } from 'src/modules/roboost-load-mode/roboost-load-mode.module';
 import { UsersAndTeamsModule } from 'src/modules/users-and-teams/users-and-teams.module';
 import { MeetingCalendarSyncModule } from 'src/modules/meeting/calendar-sync/meeting-calendar-sync.module';
 import { MeetingArtifactsModule } from 'src/modules/meeting/artifacts/meeting-artifacts.module';
@@ -104,6 +105,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     RoboostScoringModule,
     UsersAndTeamsModule,
     RoboostMergeModule,
+    RoboostLoadModeCommandModule,
     MeetingCalendarSyncModule,
     MeetingArtifactsModule,
     NoteQueryHookModule,

@@ -7,6 +7,7 @@ import {
   type RoboostScoreObjectName,
 } from 'twenty-shared/utils';
 
+import { RoboostLoadModeService } from 'src/engine/core-modules/roboost-load-mode/roboost-load-mode.service';
 import { OnDatabaseBatchEvent } from 'src/engine/api/graphql/graphql-query-runner/decorators/on-database-batch-event.decorator';
 import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
@@ -35,6 +36,7 @@ export class RoboostScoreRecordListener {
     private readonly roboostScoreStoreService: RoboostScoreStoreService,
     @InjectMessageQueue(MessageQueue.workspaceQueue)
     private readonly messageQueueService: MessageQueueService,
+    private readonly roboostLoadModeService: RoboostLoadModeService,
   ) {}
 
   @OnDatabaseBatchEvent('*', DatabaseEventAction.CREATED)
@@ -64,7 +66,8 @@ export class RoboostScoreRecordListener {
 
     try {
       if (
-        !(await this.roboostScoreStoreService.tablesExist(batch.workspaceId))
+        !(await this.roboostScoreStoreService.tablesExist(batch.workspaceId)) ||
+        (await this.roboostLoadModeService.isOn(batch.workspaceId))
       ) {
         return;
       }

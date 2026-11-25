@@ -45,6 +45,7 @@ import { TimelineActivityModule } from 'src/modules/timeline/timeline-activity.m
   ],
   exports: [
     RoboostScoreStoreService,
+    RoboostScoreRecalcService,
     RoboostScoreVerifyCronCommand,
     RoboostScoreFreezeImportedCommand,
   ],

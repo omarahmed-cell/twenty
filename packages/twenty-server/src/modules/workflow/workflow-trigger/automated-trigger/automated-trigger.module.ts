@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { WorkflowVersionCoreModule } from 'src/engine/core-modules/workflow/workflow-version-core.module';
 import { Module } from '@nestjs/common';
 
@@ -17,6 +18,7 @@ import { WorkflowDatabaseEventTriggerListener } from 'src/modules/workflow/workf
 
 @Module({
   imports: [
+    RoboostRecordVisibilityModule,
     ApplicationModule,
     CoreEntityCacheModule,
     WorkflowVersionCoreModule,
