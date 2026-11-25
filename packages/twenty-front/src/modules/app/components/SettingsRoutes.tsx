@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { RoboostLayoutSettingsPage } from '@/roboost-app/layout/components/RoboostLayoutSettingsPage';
 import { RoboostUsersAndTeamsPage } from '@/roboost-app/users-and-teams/components/RoboostUsersAndTeamsPage';
+import { RoboostEditPermissionsPage } from '@/roboost-app/users-and-teams/components/RoboostEditPermissionsPage';
+import { RoboostCompareAccessPage } from '@/roboost-app/users-and-teams/components/RoboostCompareAccessPage';
 import {
   createRoutesFromElements,
   Navigate,
@@ -794,6 +796,14 @@ const createSettingsRouteElements = ({
     <Route
       path="users-and-teams/teams"
       element={<RoboostUsersAndTeamsPage tab="teams" />}
+    />
+    <Route
+      path="users-and-teams/users/:workspaceMemberId/permissions"
+      element={<RoboostEditPermissionsPage />}
+    />
+    <Route
+      path="users-and-teams/compare/:firstWorkspaceMemberId/:secondWorkspaceMemberId"
+      element={<RoboostCompareAccessPage />}
     />
     <Route
       path={SettingsPath.GmailExtension}
