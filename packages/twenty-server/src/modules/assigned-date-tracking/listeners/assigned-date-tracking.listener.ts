@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { type ObjectRecordBaseEvent } from 'twenty-shared/database-events';
 import { isDefined } from 'twenty-shared/utils';
 
+import { RoboostLoadModeService } from 'src/engine/core-modules/roboost-load-mode/roboost-load-mode.service';
 import { OnDatabaseBatchEvent } from 'src/engine/api/graphql/graphql-query-runner/decorators/on-database-batch-event.decorator';
 import { DatabaseEventAction } from 'src/engine/api/graphql/graphql-query-runner/enums/database-event-action';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
@@ -27,6 +28,7 @@ export class AssignedDateTrackingListener {
   constructor(
     @InjectMessageQueue(MessageQueue.workspaceQueue)
     private readonly messageQueueService: MessageQueueService,
+    private readonly roboostLoadModeService: RoboostLoadModeService,
   ) {}
 
   @OnDatabaseBatchEvent('*', DatabaseEventAction.CREATED)
@@ -45,6 +47,11 @@ export class AssignedDateTrackingListener {
   }
 
   private async handleBatch(batch: AssignedDateEventBatch, isUpdate: boolean) {
+    // A migration load writes the HubSpot dates and history itself
+    if (await this.roboostLoadModeService.isOn(batch.workspaceId)) {
+      return;
+    }
+
     const objectNameSingular = batch.objectMetadata?.nameSingular;
     const configs = ASSIGNED_DATE_TRACKING_CONFIGS.filter(
       (config) => config.objectNameSingular === objectNameSingular,
