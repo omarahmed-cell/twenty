@@ -48,57 +48,59 @@ export const RoboostScoreHistoryPanel = ({
 
   return (
     <>
-      <SidePanel title={t`Version history`} width={440} onClose={onClose}>
-        <div className="rb-sch">
-          {versions.length === 0 && (
-            <p className="rb-sc-hint">
-              {loading ? t`Loading` : t`No version has been published yet.`}
-            </p>
-          )}
-          {versions.map((version) => {
-            const versionNumber = version.version;
-            const publishedAt = formatRoboostDateTime(version.publishedAt);
-            const publishedBy = version.publishedByName ?? t`Unknown`;
+      {!isDefined(viewed) && (
+        <SidePanel title={t`Version history`} width={440} onClose={onClose}>
+          <div className="rb-sch">
+            {versions.length === 0 && (
+              <p className="rb-sc-hint">
+                {loading ? t`Loading` : t`No version has been published yet.`}
+              </p>
+            )}
+            {versions.map((version) => {
+              const versionNumber = version.version;
+              const publishedAt = formatRoboostDateTime(version.publishedAt);
+              const publishedBy = version.publishedByName ?? t`Unknown`;
 
-            return (
-              <div key={version.id} className="rb-sch-item">
-                <div className="rb-sch-head">
-                  <strong>{t`v${versionNumber}`}</strong>
-                  {versionNumber === currentVersionNumber && (
-                    <span className="rb-sc-badge is-current">{t`Published`}</span>
+              return (
+                <div key={version.id} className="rb-sch-item">
+                  <div className="rb-sch-head">
+                    <strong>{t`v${versionNumber}`}</strong>
+                    {versionNumber === currentVersionNumber && (
+                      <span className="rb-sc-badge is-current">{t`Published`}</span>
+                    )}
+                    <span className="rb-sp" />
+                    <span className="rb-dt-muted">{publishedAt}</span>
+                  </div>
+                  <div className="rb-dt-muted">{t`by ${publishedBy}`}</div>
+                  {isDefined(version.note) && (
+                    <p className="rb-sch-note">{version.note}</p>
                   )}
-                  <span className="rb-sp" />
-                  <span className="rb-dt-muted">{publishedAt}</span>
-                </div>
-                <div className="rb-dt-muted">{t`by ${publishedBy}`}</div>
-                {isDefined(version.note) && (
-                  <p className="rb-sch-note">{version.note}</p>
-                )}
-                <div className="rb-sch-actions">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    icon="eye"
-                    onClick={() => setViewed(version)}
-                  >
-                    {t`View`}
-                  </Button>
-                  {editor.canEdit && (
+                  <div className="rb-sch-actions">
                     <Button
                       size="sm"
                       variant="secondary"
-                      icon="history"
-                      onClick={() => onRestore(version)}
+                      icon="eye"
+                      onClick={() => setViewed(version)}
                     >
-                      {t`Restore as draft`}
+                      {t`View`}
                     </Button>
-                  )}
+                    {editor.canEdit && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        icon="history"
+                        onClick={() => onRestore(version)}
+                      >
+                        {t`Restore as draft`}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </SidePanel>
+              );
+            })}
+          </div>
+        </SidePanel>
+      )}
       {isDefined(viewed) && isDefined(viewedCriteria) && (
         <Modal
           title={t`Version ${viewedNumber}`}
