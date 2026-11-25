@@ -183,11 +183,14 @@ const RoboostRecordPageContent = ({
   const { record, loading, refetch } = useFindOneRecord({
     objectNameSingular,
     objectRecordId: recordId,
-    recordGqlFields: getRoboostListRecordGqlFields(
-      objectMetadataItem,
-      loadedFields,
-      objectMetadataItems,
-    ),
+    recordGqlFields: {
+      ...getRoboostListRecordGqlFields(
+        objectMetadataItem,
+        loadedFields,
+        objectMetadataItems,
+      ),
+      deletedAt: true,
+    },
   });
 
   const {
@@ -502,7 +505,7 @@ const RoboostRecordPageContent = ({
     </>
   );
 
-  return (
+  const page = (
     <div className="rb-recpage">
       <RoboostMergedRecordNotice />
       <RoboostRecentRecordEffect
@@ -559,5 +562,16 @@ const RoboostRecordPageContent = ({
         right={right}
       />
     </div>
+  );
+
+  // The record page also loads trashed records, so a merged one is redirected here too
+  return isDefined(record.deletedAt) ? (
+    <RoboostMergedRecordRedirect
+      objectNameSingular={objectNameSingular}
+      recordId={recordId}
+      fallback={page}
+    />
+  ) : (
+    page
   );
 };
