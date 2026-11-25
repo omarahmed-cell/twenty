@@ -1200,6 +1200,20 @@ export const STANDARD_OBJECTS = {
       }),
     },
   },
+  team: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.team,
+    fields: STANDARD_OBJECT_FIELDS.team,
+    indexes: {},
+  },
+  teamMembership: {
+    universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.teamMembership,
+    fields: STANDARD_OBJECT_FIELDS.teamMembership,
+    indexes: {
+      workspaceMemberIdIndex: {
+        universalIdentifier: '7d5e5d0d-ae4a-4ed8-be49-2f5c5ea47d56',
+      },
+    },
+  },
   propertyGroup: {
     universalIdentifier: STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyGroup,
     fields: STANDARD_OBJECT_FIELDS.propertyGroup,
@@ -1796,6 +1810,9 @@ export const STANDARD_OBJECTS = {
       opportunityIdIndex: {
         universalIdentifier: '773c96f3-6540-4517-933b-9264dbd872ef',
       },
+      serviceOwnerIdIndex: {
+        universalIdentifier: 'c5d3fcf2-2996-4b4d-80a6-419d13b5124b',
+      },
       searchVectorGinIndex: {
         universalIdentifier: 'bde7f1c3-9e77-49bd-9fa4-58df4494668c',
       },
@@ -2003,6 +2020,9 @@ export const STANDARD_OBJECTS = {
       },
       pulledFromIdIndex: {
         universalIdentifier: '7feecaa1-c24b-4fcc-8f40-1cda2fc02ca3',
+      },
+      segmentOwnerIdIndex: {
+        universalIdentifier: 'c4f57573-b2c0-44a5-9739-984b3b6d98e4',
       },
     },
     views: {

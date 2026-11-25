@@ -9,6 +9,8 @@ import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { SegmentSyncJob } from 'src/modules/segment/jobs/segment-sync.job';
 import { SegmentSyncListener } from 'src/modules/segment/listeners/segment-sync.listener';
+import { SegmentCreateManyPreQueryHook } from 'src/modules/segment/query-hooks/segment-create-many.pre-query.hook';
+import { SegmentCreateOnePreQueryHook } from 'src/modules/segment/query-hooks/segment-create-one.pre-query.hook';
 import { SegmentUpdateManyPreQueryHook } from 'src/modules/segment/query-hooks/segment-update-many.pre-query.hook';
 import { SegmentUpdateOnePreQueryHook } from 'src/modules/segment/query-hooks/segment-update-one.pre-query.hook';
 import { SegmentMembershipResolver } from 'src/modules/segment/resolvers/segment-membership.resolver';
@@ -35,6 +37,8 @@ import { SegmentPullService } from 'src/modules/segment/services/segment-pull.se
     SegmentMembershipResolver,
     SegmentSyncJob,
     SegmentSyncListener,
+    SegmentCreateOnePreQueryHook,
+    SegmentCreateManyPreQueryHook,
     SegmentUpdateOnePreQueryHook,
     SegmentUpdateManyPreQueryHook,
   ],

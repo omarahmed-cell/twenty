@@ -52,6 +52,7 @@ import { buildServiceStandardFlatIndexMetadatas } from 'src/engine/workspace-man
 import { buildProductStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-product-standard-flat-index-metadata.util';
 import { buildLineItemStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-line-item-standard-flat-index-metadata.util';
 import { buildSegmentStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-segment-standard-flat-index-metadata.util';
+import { buildTeamMembershipStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-team-membership-standard-flat-index-metadata.util';
 import { buildSegmentMemberStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-segment-member-standard-flat-index-metadata.util';
 import { buildPersonStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-person-standard-flat-index-metadata.util';
 import { buildRecordShareStandardFlatIndexMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/index/compute-record-share-standard-flat-index-metadata.util';
@@ -129,6 +130,7 @@ const STANDARD_FLAT_INDEX_METADATA_BUILDERS_BY_OBJECT_NAME = {
   lineItem: buildLineItemStandardFlatIndexMetadatas,
   segment: buildSegmentStandardFlatIndexMetadatas,
   segmentMember: buildSegmentMemberStandardFlatIndexMetadatas,
+  teamMembership: buildTeamMembershipStandardFlatIndexMetadatas,
   recordShare: buildRecordShareStandardFlatIndexMetadatas,
   shortLink: buildShortLinkStandardFlatIndexMetadatas,
   task: buildTaskStandardFlatIndexMetadatas,

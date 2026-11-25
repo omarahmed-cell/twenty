@@ -44,6 +44,8 @@ export const SEARCH_FIELDS_BY_STANDARD_OBJECT_NAME = {
   serviceStageHistory: [{ name: 'id', type: FieldMetadataType.UUID }],
   pipeline: [{ name: 'name', type: FieldMetadataType.TEXT }],
   pipelineStage: [{ name: 'label', type: FieldMetadataType.TEXT }],
+  team: [{ name: 'name', type: FieldMetadataType.TEXT }],
+  teamMembership: [{ name: 'id', type: FieldMetadataType.UUID }],
   propertyGroup: [{ name: 'name', type: FieldMetadataType.TEXT }],
   propertyGroupMembership: [{ name: 'id', type: FieldMetadataType.UUID }],
   propertyLogicRule: [{ name: 'id', type: FieldMetadataType.UUID }],

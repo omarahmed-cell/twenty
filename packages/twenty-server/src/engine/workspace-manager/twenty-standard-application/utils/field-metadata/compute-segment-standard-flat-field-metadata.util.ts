@@ -241,6 +241,37 @@ export const buildSegmentStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  segmentOwner: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'segmentOwner',
+      label: i18nLabel(
+        msg({ message: `Segment owner`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The workspace member who owns this segment; defaults to its creator`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUserCircle',
+      isNullable: true,
+      targetObjectName: 'workspaceMember',
+      targetFieldName: 'ownedSegments',
+      settings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: RelationOnDeleteAction.SET_NULL,
+        joinColumnName: 'segmentOwnerId',
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   name: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,

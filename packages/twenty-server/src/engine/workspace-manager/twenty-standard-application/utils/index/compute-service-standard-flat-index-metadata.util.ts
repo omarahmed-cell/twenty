@@ -67,4 +67,16 @@ export const buildServiceStandardFlatIndexMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  serviceOwnerIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'serviceOwnerIdIndex',
+      relatedFieldNames: ['serviceOwner'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

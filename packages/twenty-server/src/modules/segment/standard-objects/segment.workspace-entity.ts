@@ -5,10 +5,13 @@ import {
 
 import { BaseWorkspaceEntity } from 'src/engine/twenty-orm/base.workspace-entity';
 import { type EntityRelation } from 'src/engine/workspace-manager/workspace-migration/types/entity-relation.interface';
+import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 import { type SegmentMemberWorkspaceEntity } from 'src/modules/segment/standard-objects/segment-member.workspace-entity';
 
 export class SegmentWorkspaceEntity extends BaseWorkspaceEntity {
   name: string | null;
+  segmentOwner: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
+  segmentOwnerId: string | null;
   targetObject: SegmentTargetObject | null;
   memberCount: number;
   position: number;

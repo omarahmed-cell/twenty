@@ -1788,6 +1788,22 @@ export const STANDARD_OBJECT_FIELDS = {
       universalIdentifier: '190eee8a-1faf-4e0e-97ec-ab225e2f216f',
     },
   },
+  team: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.team,
+    ),
+    name: { universalIdentifier: '67d32491-c6d9-4854-9813-3c2d260502be' },
+  },
+  teamMembership: {
+    ...buildStandardObjectSystemFields(
+      STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.teamMembership,
+    ),
+    teamId: { universalIdentifier: '74d41544-6dba-4b30-9f1b-8530c46c23eb' },
+    workspaceMemberId: {
+      universalIdentifier: '586d39b7-e343-4deb-93cf-de3a867e3bcd',
+    },
+    isMain: { universalIdentifier: '4e4bdece-e20e-47d4-8808-4f04eda561ba' },
+  },
   propertyGroup: {
     ...buildStandardObjectSystemFields(
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.propertyGroup,
@@ -2566,6 +2582,12 @@ export const STANDARD_OBJECT_FIELDS = {
     recordSource: {
       universalIdentifier: 'dff416a3-1805-4127-a434-df4c45354eef',
     },
+    serviceOwner: {
+      universalIdentifier: 'a73e23e6-7e75-4b28-89f4-4a5bd99aa61e',
+    },
+    serviceOwnerAssignedDate: {
+      universalIdentifier: '56726dbc-7213-4cab-8a13-6bc225793ecd',
+    },
     name: { universalIdentifier: '120f9f98-08d8-4ca3-8af3-5f8911565f64' },
     company: { universalIdentifier: 'a10f3e30-45d3-4ae3-ad28-44d02b7b9bbb' },
     pointOfContact: {
@@ -2721,6 +2743,9 @@ export const STANDARD_OBJECT_FIELDS = {
       STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.segment,
     ),
     name: { universalIdentifier: '453c4101-a03d-4743-b282-dc60ea8c0f47' },
+    segmentOwner: {
+      universalIdentifier: '18b77357-08de-454f-974c-23202e70c419',
+    },
     targetObject: {
       universalIdentifier: '5a1c9077-d655-4f0c-a4a6-854fd4d00672',
     },
@@ -3125,6 +3150,12 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     collaboratingOpportunities: {
       universalIdentifier: '6c559b88-f7ff-4b5d-b4fb-30737b4918b7',
+    },
+    ownedServices: {
+      universalIdentifier: '58796899-9dee-48d1-9c02-c46db09f1ebd',
+    },
+    ownedSegments: {
+      universalIdentifier: '71acdf66-c823-4b04-b798-288070c39915',
     },
     memberStatus: {
       universalIdentifier: '99afa2ca-4188-4aa1-bb58-d63d63968fac',

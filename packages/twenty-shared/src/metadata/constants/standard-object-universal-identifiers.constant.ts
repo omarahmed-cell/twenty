@@ -69,6 +69,8 @@ export const STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS = {
   messageParticipant: '20202020-a433-4456-aa2d-fd9cb26b774a',
   messageThread: '20202020-849a-4c3e-84f5-a25a7d802271',
   messageThreadTarget: '378ad1b0-592d-4084-80ee-86fef44725b9',
+  team: 'd32caa96-4b02-4a7b-926e-4668bee90143',
+  teamMembership: '855bff76-a8de-40e8-86c4-34a5fb62ad3a',
 } as const;
 
 export type StandardObjectWithUniversalIdentifierName =

@@ -42,6 +42,8 @@ export const STANDARD_OBJECT_ICONS = {
   serviceStageHistory: 'IconTimelineEvent',
   pipeline: 'IconTimelineEvent',
   pipelineStage: 'IconProgressCheck',
+  team: 'IconUsersGroup',
+  teamMembership: 'IconUserPlus',
   propertyGroup: 'IconFolder',
   propertyGroupMembership: 'IconFolderPlus',
   propertyLogicRule: 'IconListCheck',

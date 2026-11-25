@@ -22,6 +22,7 @@ export const STANDARD_CALCULATED_FIELD_NAMES = new Set([
   'numberOfOpenDeals',
   'ownerAssignedDate',
   'sdrOwnerAssignedDate',
+  'serviceOwnerAssignedDate',
   'timeInCurrentStage',
   'totalPrice',
   'weightedAmount',

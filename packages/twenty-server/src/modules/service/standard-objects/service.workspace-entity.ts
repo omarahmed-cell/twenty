@@ -14,6 +14,7 @@ import { type NoteTargetWorkspaceEntity } from 'src/modules/note/standard-object
 import { type OpportunityWorkspaceEntity } from 'src/modules/opportunity/standard-objects/opportunity.workspace-entity';
 import { type PersonWorkspaceEntity } from 'src/modules/person/standard-objects/person.workspace-entity';
 import { type TaskTargetWorkspaceEntity } from 'src/modules/task/standard-objects/task-target.workspace-entity';
+import { type WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 import { type TimelineActivityWorkspaceEntity } from 'src/modules/timeline/standard-objects/timeline-activity.workspace-entity';
 
 export class ServiceWorkspaceEntity extends BaseWorkspaceEntity {
@@ -27,6 +28,9 @@ export class ServiceWorkspaceEntity extends BaseWorkspaceEntity {
   pointOfContactId: string | null;
   opportunity: EntityRelation<OpportunityWorkspaceEntity> | null;
   opportunityId: string | null;
+  serviceOwner: EntityRelation<WorkspaceMemberWorkspaceEntity> | null;
+  serviceOwnerId: string | null;
+  serviceOwnerAssignedDate: string | null;
   pipeline: string;
   stage: string;
   stageHistory: EntityRelation<ServiceStageHistoryWorkspaceEntity[]>;

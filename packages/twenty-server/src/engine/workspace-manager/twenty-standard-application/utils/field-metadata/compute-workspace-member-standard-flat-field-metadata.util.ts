@@ -1469,6 +1469,64 @@ export const buildWorkspaceMemberStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  ownedServices: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'ownedServices',
+      label: i18nLabel(
+        msg({ message: `Owned services`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Services this workspace member owns`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconBriefcase',
+      isNullable: true,
+      targetObjectName: 'service',
+      targetFieldName: 'serviceOwner',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  ownedSegments: createStandardRelationFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      type: FieldMetadataType.RELATION,
+      morphId: null,
+      fieldName: 'ownedSegments',
+      label: i18nLabel(
+        msg({ message: `Owned segments`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Segments this workspace member owns`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconUsersGroup',
+      isNullable: true,
+      targetObjectName: 'segment',
+      targetFieldName: 'segmentOwner',
+      settings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
   collaboratingOpportunities: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

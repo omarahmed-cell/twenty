@@ -42,6 +42,8 @@ import { buildEmailTrackingEventStandardFlatFieldMetadatas } from 'src/engine/wo
 import { buildServiceStageHistoryStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-service-stage-history-standard-flat-field-metadata.util';
 import { buildPipelineStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-pipeline-standard-flat-field-metadata.util';
 import { buildPipelineStageStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-pipeline-stage-standard-flat-field-metadata.util';
+import { buildTeamStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-team-standard-flat-field-metadata.util';
+import { buildTeamMembershipStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-team-membership-standard-flat-field-metadata.util';
 import { buildPropertyGroupStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-group-standard-flat-field-metadata.util';
 import { buildPropertyGroupMembershipStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-group-membership-standard-flat-field-metadata.util';
 import { buildPropertyLogicRuleStandardFlatFieldMetadatas } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-property-logic-rule-standard-flat-field-metadata.util';
@@ -122,6 +124,8 @@ const STANDARD_FLAT_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   serviceStageHistory: buildServiceStageHistoryStandardFlatFieldMetadatas,
   pipeline: buildPipelineStandardFlatFieldMetadatas,
   pipelineStage: buildPipelineStageStandardFlatFieldMetadatas,
+  team: buildTeamStandardFlatFieldMetadatas,
+  teamMembership: buildTeamMembershipStandardFlatFieldMetadatas,
   propertyGroup: buildPropertyGroupStandardFlatFieldMetadatas,
   propertyGroupMembership:
     buildPropertyGroupMembershipStandardFlatFieldMetadatas,

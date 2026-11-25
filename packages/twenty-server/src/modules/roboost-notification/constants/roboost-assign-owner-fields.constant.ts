@@ -27,7 +27,10 @@ export const ROBOOST_ASSIGN_OWNER_FIELDS: Record<
     { fieldName: 'customerSuccessResponsible', assignedDateFieldName: null },
   ],
   service: [
-    { fieldName: 'owner', assignedDateFieldName: 'ownerAssignedDate' },
+    {
+      fieldName: 'serviceOwner',
+      assignedDateFieldName: 'serviceOwnerAssignedDate',
+    },
     { fieldName: 'customerSuccessResponsible', assignedDateFieldName: null },
   ],
 };

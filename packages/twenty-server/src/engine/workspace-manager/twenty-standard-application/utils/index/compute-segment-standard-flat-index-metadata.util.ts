@@ -43,4 +43,16 @@ export const buildSegmentStandardFlatIndexMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  segmentOwnerIdIndex: createStandardIndexFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      indexName: 'segmentOwnerIdIndex',
+      relatedFieldNames: ['segmentOwner'],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
 });

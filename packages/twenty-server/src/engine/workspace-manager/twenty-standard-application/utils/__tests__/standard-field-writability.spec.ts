@@ -53,6 +53,8 @@ describe('Standard field writability', () => {
   const companyAssignedDateFieldUniversalIdentifiers = new Set([
     STANDARD_OBJECTS.company.fields.ownerAssignedDate.universalIdentifier,
     STANDARD_OBJECTS.company.fields.sdrOwnerAssignedDate.universalIdentifier,
+    STANDARD_OBJECTS.service.fields.serviceOwnerAssignedDate
+      .universalIdentifier,
   ]);
 
   const taskServerWrittenFieldUniversalIdentifiers = new Set([
@@ -118,7 +120,7 @@ describe('Standard field writability', () => {
         ),
     );
 
-    expect(serverWrittenFlatFieldMetadatas).toHaveLength(31);
+    expect(serverWrittenFlatFieldMetadatas).toHaveLength(32);
     expect(
       serverWrittenFlatFieldMetadatas.every(
         (flatFieldMetadata) =>

@@ -53,6 +53,8 @@ export enum CoreObjectNameSingular {
   Product = 'product',
   LineItem = 'lineItem',
   Segment = 'segment',
+  Team = 'team',
+  TeamMembership = 'teamMembership',
   SegmentMember = 'segmentMember',
   Task = 'task',
   TaskTarget = 'taskTarget',
