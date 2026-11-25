@@ -26,7 +26,13 @@ import {
 } from 'src/modules/roboost-notification/types/roboost-notification.type';
 
 const TABS: RoboostNotificationTab[] = ['UNREAD', 'ALL', 'TRASH'];
-const TYPES: RoboostNotificationType[] = ['assign', 'export', 'import', 'task'];
+const TYPES: RoboostNotificationType[] = [
+  'assign',
+  'export',
+  'import',
+  'task',
+  'merge',
+];
 const ACTIONS = ['READ', 'UNREAD', 'TRASH', 'RESTORE', 'DELETE'] as const;
 
 @ObjectType('RoboostNotification')
