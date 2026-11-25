@@ -691,3 +691,26 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+.rb-dq-more {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 12px 0;
+}
+.rb-dq-threshold {
+  align-items: center;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  padding-top: 12px;
+}
+.rb-dq-threshold input[type='range'] {
+  accent-color: var(--accent);
+  flex: 1;
+  max-width: 280px;
+}
+.rb-dq-threshold-value {
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+}

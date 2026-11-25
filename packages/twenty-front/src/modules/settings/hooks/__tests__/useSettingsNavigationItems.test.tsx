@@ -97,7 +97,7 @@ describe('useSettingsNavigationItems', () => {
     jotaiStore.set(billingState.atom, mockBilling);
   });
 
-  it('should hide workspace settings when no permissions', () => {
+  it('should mark workspace settings as not permitted when no permissions', () => {
     setPermissionFlags([]);
 
     const { result } = renderHook(() => useSettingsNavigationItems(), {
@@ -108,7 +108,11 @@ describe('useSettingsNavigationItems', () => {
       (section) => section.label === 'Workspace',
     );
 
-    expect(workspaceSection?.items.every((item) => item.isHidden)).toBe(true);
+    expect(
+      workspaceSection?.items.every(
+        (item) => item.isHidden === true || item.isNoPermission === true,
+      ),
+    ).toBe(true);
   });
 
   it('should show workspace settings when has permissions', () => {
@@ -130,7 +134,11 @@ describe('useSettingsNavigationItems', () => {
       (section) => section.label === 'Workspace',
     );
 
-    expect(workspaceSection?.items.some((item) => !item.isHidden)).toBe(true);
+    expect(
+      workspaceSection?.items.some(
+        (item) => item.isHidden !== true && item.isNoPermission !== true,
+      ),
+    ).toBe(true);
   });
 
   it('should hide billing navigation when billing is disabled', () => {
@@ -236,7 +244,7 @@ describe('useSettingsNavigationItems', () => {
 
     expect(accountsItem?.label).toBe('App preferences');
     expect(accountsItem?.Icon).toBe(IconApps);
-    expect(accountsItem?.isHidden).toBe(false);
+    expect(accountsItem?.isNoPermission).toBe(false);
     expect(accountsItem?.subItems).toBeUndefined();
   });
 });

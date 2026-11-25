@@ -2282,7 +2282,6 @@ export const STANDARD_OBJECT_FIELDS = {
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.meetingTarget,
       }),
     },
-    team: { universalIdentifier: 'df1a7520-16f7-4753-bd3b-66fdfdd15683' },
     dealCollaborators: {
       universalIdentifier: 'acb590ca-c49d-4067-b0ef-ef98d6aed58c',
     },
@@ -2481,9 +2480,6 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     lifecycleStage: {
       universalIdentifier: 'e86c704e-49a9-4a09-8304-8aaed1d05aa5',
-    },
-    team: {
-      universalIdentifier: '4a38fc60-2cdb-4228-891e-b8490663612e',
     },
     contactOwner: {
       universalIdentifier: '0590242c-ad51-46ac-abba-679c027e55b1',

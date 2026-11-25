@@ -27,6 +27,8 @@ type RoboostRecordPickerProps = {
   isClearable?: boolean;
   isDisabled?: boolean;
   autoOpen?: boolean;
+  // Extra choices listed above the records, such as teams in a people picker
+  leadingOptions?: { id: string; label: string }[];
 };
 
 const getRecordSubtitle = (record: Record<string, unknown>) => {
@@ -49,6 +51,7 @@ export const RoboostRecordPicker = ({
   isClearable = true,
   isDisabled = false,
   autoOpen = false,
+  leadingOptions = [],
 }: RoboostRecordPickerProps) => {
   const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(false);
@@ -175,6 +178,28 @@ export const RoboostRecordPicker = ({
                 <span className="rb-menu-label">{t`Clear`}</span>
               </button>
             )}
+            {leadingOptions
+              .filter((option) =>
+                option.label
+                  .toLowerCase()
+                  .includes(debouncedSearch.trim().toLowerCase()),
+              )
+              .map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className="rb-menu-item"
+                  role="option"
+                  aria-selected={option.label === selectedLabel}
+                  onClick={() => {
+                    onSelect(option);
+                    setIsOpen(false);
+                  }}
+                >
+                  <Icon name="contacts" size={16} />
+                  <span className="rb-menu-label">{option.label}</span>
+                </button>
+              ))}
             {records.map((record) => {
               const label = getRoboostRecordLabel(record, objectMetadataItem);
               const subtitle = getRecordSubtitle(record);

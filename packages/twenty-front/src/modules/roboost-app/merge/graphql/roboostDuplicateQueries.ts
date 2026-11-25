@@ -7,8 +7,24 @@ export const ROBOOST_DUPLICATE_OVERVIEW = gql`
 `;
 
 export const ROBOOST_DUPLICATE_PAIRS = gql`
-  query RoboostDuplicatePairs($objectName: String!, $status: String!) {
-    roboostDuplicatePairs(objectName: $objectName, status: $status)
+  query RoboostDuplicatePairs(
+    $objectName: String!
+    $status: String!
+    $confidence: String
+    $search: String
+    $sort: String
+    $offset: Int
+    $limit: Int
+  ) {
+    roboostDuplicatePairs(
+      objectName: $objectName
+      status: $status
+      confidence: $confidence
+      search: $search
+      sort: $sort
+      offset: $offset
+      limit: $limit
+    )
   }
 `;
 
@@ -19,8 +35,16 @@ export const ROBOOST_SCAN_DUPLICATES = gql`
 `;
 
 export const ROBOOST_SAVE_DUPLICATE_RULES = gql`
-  mutation RoboostSaveDuplicateRules($objectName: String!, $rules: JSON!) {
-    roboostSaveDuplicateRules(objectName: $objectName, rules: $rules)
+  mutation RoboostSaveDuplicateRules(
+    $objectName: String!
+    $rules: JSON!
+    $similarityThreshold: Float
+  ) {
+    roboostSaveDuplicateRules(
+      objectName: $objectName
+      rules: $rules
+      similarityThreshold: $similarityThreshold
+    )
   }
 `;
 

@@ -8,6 +8,8 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { type RecordGqlOperationFilter } from '@/types/RecordGqlOperationFilter';
 import { isDefined } from '@/utils/validation/isDefined';
 
+export const ROBOOST_TEAM_FILTER_VALUE_PREFIX = 'team:';
+
 export type RoboostFilterRuleValue = string | string[] | null;
 
 const DAY_IN_MS = 24 * 3600 * 1000;
@@ -468,12 +470,22 @@ export const buildRoboostFilterRule = ({
         return undefined;
       }
       const key = `${field.name}Id`;
+      // "team:<id>" picks a team; the server matches whoever is in it when the query runs
+      const ids = [
+        ...new Set(
+          values.map((value) =>
+            value.startsWith(ROBOOST_TEAM_FILTER_VALUE_PREFIX)
+              ? value.slice(ROBOOST_TEAM_FILTER_VALUE_PREFIX.length)
+              : value,
+          ),
+        ),
+      ];
 
       return operator === 'isNoneOf'
         ? {
-            or: [{ not: { [key]: { in: values } } }, { [key]: { is: 'NULL' } }],
+            or: [{ not: { [key]: { in: ids } } }, { [key]: { is: 'NULL' } }],
           }
-        : { [key]: { in: values } };
+        : { [key]: { in: ids } };
     }
     default:
       return undefined;

@@ -13,6 +13,7 @@ import {
   type RoboostBulkMergeRun,
   type RoboostDuplicateOverview,
   type RoboostDuplicatePair,
+  type RoboostDuplicatePairPage,
 } from '@/roboost-app/merge/types/RoboostDuplicate';
 import { formatRoboostDateTime } from '@/roboost-app/utils/formatRoboostDateTime';
 import { Button } from '@/roboost-ui/components/Button';
@@ -25,10 +26,10 @@ import { type RoboostTone } from '@/roboost-ui/types/RoboostTone';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import { useLingui } from '@lingui/react/macro';
 import { saveAs } from 'file-saver';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Link } from 'react-router-dom';
 import {
-  ROBOOST_DUPLICATE_CONFIDENCE_RANK,
   ROBOOST_DUPLICATE_RULES,
   type RoboostDuplicateConfidence,
 } from 'twenty-shared/constants';
@@ -170,16 +171,22 @@ export const RoboostManageDuplicatesModal = ({
     variables: { objectName },
     fetchPolicy: 'network-only',
   });
+  const [debouncedSearch] = useDebounce(search.trim(), 300);
   const {
     data: pairsData,
     loading: isLoadingPairs,
     refetch: refetchPairs,
-  } = useQuery<{ roboostDuplicatePairs: RoboostDuplicatePair[] }>(
+    fetchMore: fetchMorePairs,
+  } = useQuery<{ roboostDuplicatePairs: RoboostDuplicatePairPage }>(
     ROBOOST_DUPLICATE_PAIRS,
     {
       variables: {
         objectName,
         status: tab === 'rejected' ? 'REJECTED' : 'OPEN',
+        confidence: confidenceFilter === '' ? null : confidenceFilter,
+        search: debouncedSearch === '' ? null : debouncedSearch,
+        sort,
+        offset: 0,
       },
       fetchPolicy: 'network-only',
       skip: tab === 'bulk',
@@ -203,31 +210,28 @@ export const RoboostManageDuplicatesModal = ({
   const labelPlural = objectMetadataItem.labelPlural.toLowerCase();
   const lastScanAt = overview?.settings.lastScanAt ?? null;
 
-  const pairs = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    const filtered = (pairsData?.roboostDuplicatePairs ?? []).filter(
-      (pair) =>
-        (confidenceFilter === '' || pair.confidence === confidenceFilter) &&
-        (term === '' ||
-          [pair.recordA, pair.recordB].some((record) =>
-            `${record.name} ${record.keyText}`.toLowerCase().includes(term),
-          )),
-    );
+  const pairPage = pairsData?.roboostDuplicatePairs;
+  const pairs = pairPage?.items ?? [];
+  const nextOffset = pairPage?.nextOffset ?? null;
 
-    return [...filtered].sort((left, right) => {
-      if (sort === 'confidence') {
-        return (
-          ROBOOST_DUPLICATE_CONFIDENCE_RANK[right.confidence] -
-            ROBOOST_DUPLICATE_CONFIDENCE_RANK[left.confidence] ||
-          right.detectedAt.localeCompare(left.detectedAt)
-        );
-      }
+  const loadMorePairs = () => {
+    if (nextOffset === null) {
+      return;
+    }
 
-      return sort === 'newest'
-        ? right.detectedAt.localeCompare(left.detectedAt)
-        : left.detectedAt.localeCompare(right.detectedAt);
+    fetchMorePairs({
+      variables: { offset: nextOffset },
+      updateQuery: (previous, { fetchMoreResult }) => ({
+        roboostDuplicatePairs: {
+          ...fetchMoreResult.roboostDuplicatePairs,
+          items: [
+            ...previous.roboostDuplicatePairs.items,
+            ...fetchMoreResult.roboostDuplicatePairs.items,
+          ],
+        },
+      }),
     });
-  }, [pairsData, confidenceFilter, search, sort]);
+  };
 
   const refreshAll = () => {
     refetchOverview();
@@ -491,6 +495,20 @@ export const RoboostManageDuplicatesModal = ({
                   </div>
                 );
               })}
+              {nextOffset !== null && (
+                <div className="rb-dq-more">
+                  <Button
+                    variant="secondary"
+                    disabled={isLoadingPairs}
+                    onClick={loadMorePairs}
+                  >
+                    {t`Load more`}
+                  </Button>
+                  <span className="rb-dt-muted">
+                    {t`Showing ${pairs.length} of about ${pairPage?.totalCount ?? pairs.length} pairs`}
+                  </span>
+                </div>
+              )}
               {!isLoadingPairs && pairs.length === 0 && (
                 <div className="rb-dt-empty">
                   {tab === 'rejected'

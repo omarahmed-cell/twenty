@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
+import { ROBOOST_NEW_MEMBER_PROVISIONER } from 'src/engine/core-modules/user-workspace/services/roboost-new-member-access.service';
 import { UserWorkspaceModule } from 'src/engine/core-modules/user-workspace/user-workspace.module';
 import { WorkspaceInvitationModule } from 'src/engine/core-modules/workspace-invitation/workspace-invitation.module';
 import { ObjectPermissionModule } from 'src/engine/metadata-modules/object-permission/object-permission.module';
@@ -37,6 +38,10 @@ import { RoboostUsersService } from 'src/modules/users-and-teams/services/roboos
     RoboostUserPermissionStoreService,
     RoboostRoleSyncService,
     RoboostUsersService,
+    {
+      provide: ROBOOST_NEW_MEMBER_PROVISIONER,
+      useExisting: RoboostUsersService,
+    },
     RoboostUsersResolver,
     RoboostUsersSyncCommand,
     RoboostAccessHookService,

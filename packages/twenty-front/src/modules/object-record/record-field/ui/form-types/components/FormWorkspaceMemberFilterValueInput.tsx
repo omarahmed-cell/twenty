@@ -20,6 +20,7 @@ import {
   type ParsedWorkspaceMemberFilterValue,
   parseWorkspaceMemberFilterValue,
 } from '@/object-record/record-field/ui/form-types/utils/parseWorkspaceMemberFilterValue';
+import { useRoboostTeamOptions } from '@/roboost-app/users-and-teams/hooks/useRoboostTeamOptions';
 import { useRecordsForSelect } from '@/object-record/select/hooks/useRecordsForSelect';
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
 import { Field } from 'twenty-ui/primitives/input';
@@ -153,6 +154,13 @@ export const FormWorkspaceMemberFilterValueInput = ({
     onChange('');
   }, [onChange, onClear]);
 
+  const teams = useRoboostTeamOptions(true);
+  const teamItems: SelectableItem[] = teams.map((team) => ({
+    id: team.id,
+    name: t`Team: ${team.name}`,
+    isSelected: selectedRecordIds.includes(team.id),
+  }));
+
   const triggerDisplayText = useMemo(() => {
     const selectedRecordNames = [
       ...recordsToSelect,
@@ -171,6 +179,7 @@ export const FormWorkspaceMemberFilterValueInput = ({
       : [];
 
     const selectedItemNames = [
+      ...teamItems.filter((item) => item.isSelected).map((item) => item.name),
       ...selectedCurrentMemberNames,
       ...selectedRecordNames,
     ];
@@ -190,6 +199,7 @@ export const FormWorkspaceMemberFilterValueInput = ({
     recordsToSelect,
     selectedRecordIds,
     selectedRecords,
+    teamItems,
   ]);
 
   const triggerContent = (
@@ -254,6 +264,7 @@ export const FormWorkspaceMemberFilterValueInput = ({
               width={GenericDropdownContentWidth.ExtraLarge}
             >
               <FormWorkspaceMemberFilterValueInputDropdownContent
+                teamItems={teamItems}
                 searchFilter={searchFilter}
                 onSearchChange={setSearchFilter}
                 isCurrentWorkspaceMemberSelected={

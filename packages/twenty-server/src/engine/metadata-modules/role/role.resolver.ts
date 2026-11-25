@@ -1,3 +1,4 @@
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import {
   UseFilters,
   UseGuards,
@@ -102,13 +103,19 @@ export class RoleResolver {
     private readonly applicationService: ApplicationService,
     private readonly rowLevelPermissionPredicateService: RowLevelPermissionPredicateService,
     private readonly workspaceManyOrAllFlatEntityMapsCacheService: WorkspaceManyOrAllFlatEntityMapsCacheService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   @Query(() => [RoleDTO])
   async getRoles(
     @AuthWorkspace() workspace: WorkspaceEntity,
   ): Promise<RoleDTO[]> {
-    return this.roleService.getWorkspaceRoles(workspace.id);
+    const privateRoleIds =
+      await this.roboostRecordVisibilityService.getPrivateRoleIds(workspace.id);
+
+    return (await this.roleService.getWorkspaceRoles(workspace.id)).filter(
+      (role) => !privateRoleIds.has(role.id),
+    );
   }
 
   @Query(() => RoleDTO)
@@ -117,8 +124,10 @@ export class RoleResolver {
     @Args('id', { type: () => UUIDScalarType }) id: string,
   ): Promise<RoleDTO> {
     const role = await this.roleService.getRoleById(id, workspace.id);
+    const privateRoleIds =
+      await this.roboostRecordVisibilityService.getPrivateRoleIds(workspace.id);
 
-    if (!isDefined(role)) {
+    if (!isDefined(role) || privateRoleIds.has(role.id)) {
       throw new PermissionsException(
         PermissionsExceptionMessage.ROLE_NOT_FOUND,
         PermissionsExceptionCode.ROLE_NOT_FOUND,

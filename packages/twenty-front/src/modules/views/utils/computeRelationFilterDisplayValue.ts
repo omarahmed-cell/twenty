@@ -10,6 +10,7 @@ export const computeRelationFilterDisplayValue = ({
   targetObjectMetadataItems,
   selectedRecordsByObjectNamePlural,
   isCurrentWorkspaceMemberSelected,
+  extraLabels = [],
 }: {
   targetObjectMetadataItems: Pick<
     EnrichedObjectMetadataItem,
@@ -17,6 +18,7 @@ export const computeRelationFilterDisplayValue = ({
   >[];
   selectedRecordsByObjectNamePlural: Record<string, ObjectRecord[]>;
   isCurrentWorkspaceMemberSelected: boolean;
+  extraLabels?: string[];
 }): string => {
   const selectedRecordNames = targetObjectMetadataItems.flatMap(
     (targetObjectMetadataItem) =>
@@ -33,6 +35,7 @@ export const computeRelationFilterDisplayValue = ({
   );
 
   const labelValueItems = [
+    ...extraLabels,
     ...(isCurrentWorkspaceMemberSelected ? [t`Me`] : []),
     ...selectedRecordNames,
   ];

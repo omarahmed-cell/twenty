@@ -15,9 +15,11 @@ import { MessageChannelEntity } from 'src/engine/metadata-modules/message-channe
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
 import { ConnectedAccountModule } from 'src/modules/connected-account/connected-account.module';
 import { TargetModule } from 'src/engine/core-modules/target/target.module';
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 
 @Module({
   imports: [
+    RoboostRecordVisibilityModule,
     FileUrlModule,
     UserModule,
     ConnectedAccountModule,

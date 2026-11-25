@@ -1,8 +1,11 @@
 import { ForbiddenException, UseGuards } from '@nestjs/common';
-import { Args, Int, Mutation, Query } from '@nestjs/graphql';
+import { Args, Float, Int, Mutation, Query } from '@nestjs/graphql';
 
 import GraphQLJSON from 'graphql-type-json';
-import { type RoboostDuplicatePairStatus } from 'twenty-shared/constants';
+import {
+  type RoboostDuplicateConfidence,
+  type RoboostDuplicatePairStatus,
+} from 'twenty-shared/constants';
 
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
 import { InjectMessageQueue } from 'src/engine/core-modules/message-queue/decorators/message-queue.decorator';
@@ -72,14 +75,31 @@ export class RoboostDuplicateResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string | undefined,
     @Args('objectName', { type: () => String }) objectName: string,
     @Args('status', { type: () => String }) status: string,
+    @Args('confidence', { type: () => String, nullable: true })
+    confidence: string | null,
+    @Args('search', { type: () => String, nullable: true })
+    search: string | null,
+    @Args('sort', { type: () => String, nullable: true }) sort: string | null,
+    @Args('offset', { type: () => Int, nullable: true }) offset: number | null,
+    @Args('limit', { type: () => Int, nullable: true }) limit: number | null,
   ) {
-    return this.roboostDuplicateService.listPairs({
+    return this.roboostDuplicateService.listPairsPage({
       workspaceId: workspace.id,
       actor: await this.actor(workspace.id, workspaceMemberId),
       objectName,
       status: PAIR_STATUSES.includes(status as RoboostDuplicatePairStatus)
         ? (status as RoboostDuplicatePairStatus)
         : 'OPEN',
+      confidence: ['EXACT', 'HIGH', 'POSSIBLE'].includes(confidence ?? '')
+        ? (confidence as RoboostDuplicateConfidence)
+        : null,
+      search,
+      sort:
+        sort === 'newest' || sort === 'oldest' || sort === 'confidence'
+          ? sort
+          : 'confidence',
+      offset: offset ?? 0,
+      limit: limit ?? undefined,
     });
   }
 
@@ -134,12 +154,15 @@ export class RoboostDuplicateResolver {
     @AuthWorkspaceMemberId() workspaceMemberId: string | undefined,
     @Args('objectName', { type: () => String }) objectName: string,
     @Args('rules', { type: () => GraphQLJSON }) rules: Record<string, boolean>,
+    @Args('similarityThreshold', { type: () => Float, nullable: true })
+    similarityThreshold: number | null,
   ) {
     return this.roboostDuplicateService.saveRuleSettings({
       workspaceId: workspace.id,
       actor: await this.actor(workspace.id, workspaceMemberId),
       objectName,
       rules,
+      similarityThreshold,
     });
   }
 

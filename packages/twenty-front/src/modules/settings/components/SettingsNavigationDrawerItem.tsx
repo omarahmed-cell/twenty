@@ -3,7 +3,7 @@ import { useMatch, useResolvedPath } from 'react-router-dom';
 import { type SettingsNavigationItem } from '@/settings/hooks/useSettingsNavigationItems';
 import { NavigationDrawerItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerItem';
 import { type NavigationDrawerSubItemState } from '@/ui/navigation/navigation-drawer/types/NavigationDrawerSubItemState';
-import { getSettingsPath, isDefined } from 'twenty-shared/utils';
+import { getSettingsPath } from 'twenty-shared/utils';
 
 type SettingsNavigationDrawerItemProps = {
   item: SettingsNavigationItem;
@@ -25,7 +25,7 @@ export const SettingsNavigationDrawerItem = ({
 
   const isActive = !!item.path && !!matchResult && !hasActiveSubItem;
 
-  if (isDefined(item.isHidden) && item.isHidden) {
+  if (item.isHidden === true || item.isNoPermission === true) {
     return null;
   }
 

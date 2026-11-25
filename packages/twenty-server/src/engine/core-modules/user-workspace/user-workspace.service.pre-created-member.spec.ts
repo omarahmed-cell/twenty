@@ -91,6 +91,7 @@ const setup = (workspaceMembers: StoredWorkspaceMember[]) => {
   const userRepository = { exists: jest.fn(async () => false) };
   const workspaceCacheService = { invalidateAndRecompute: jest.fn() };
   const userRoleService = { assignRoleToManyUserWorkspace: jest.fn() };
+  const roboostNewMemberAccessService = { provision: jest.fn() };
 
   const workspaceMemberAccessService = new WorkspaceMemberAccessService(
     userRepository as never,
@@ -98,6 +99,7 @@ const setup = (workspaceMembers: StoredWorkspaceMember[]) => {
     workspaceOrmManager as never,
     workspaceCacheService as never,
     userRoleService as never,
+    roboostNewMemberAccessService as never,
   );
 
   const userWorkspaceService = new UserWorkspaceService(
@@ -119,6 +121,7 @@ const setup = (workspaceMembers: StoredWorkspaceMember[]) => {
     {} as never,
     workspaceCacheService as never,
     workspaceMemberAccessService,
+    roboostNewMemberAccessService as never,
   );
 
   return {

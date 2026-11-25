@@ -1,6 +1,7 @@
 import { RoboostMergeHistoryModal } from '@/roboost-app/merge/components/RoboostMergeHistoryModal';
 import { RoboostMergeModal } from '@/roboost-app/merge/components/RoboostMergeModal';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
 import { ROBOOST_MERGE_OBJECT_NAMES } from 'twenty-shared/constants';
 import { useCreateManyNavigationMenuItems } from '@/navigation-menu-item/common/hooks/useCreateManyNavigationMenuItems';
 import { useDeleteManyNavigationMenuItems } from '@/navigation-menu-item/common/hooks/useDeleteManyNavigationMenuItems';
@@ -67,9 +68,7 @@ export const RoboostRecordActionsMenu = ({
   const mergeSetting = roboostAccess.getObjectPermissions(
     objectMetadataItem.nameSingular,
   )?.merge;
-  const canMerge =
-    isMergeObject &&
-    (!isDefined(mergeSetting) || mergeSetting.scope !== 'NONE');
+  const canMerge = !isDefined(mergeSetting) || mergeSetting.scope !== 'NONE';
 
   const favoriteItem = navigationMenuItems.find(
     (item) =>
@@ -206,12 +205,13 @@ export const RoboostRecordActionsMenu = ({
           recordFilter: { id: { in: [record.id] } },
         }),
     },
-    ...(canMerge
+    ...(isMergeObject
       ? [
           {
             id: 'merge',
             label: t`Merge`,
             icon: 'merge' as const,
+            isNoPermission: !canMerge,
             onSelect: () => setIsMergeOpen(true),
           },
         ]
@@ -227,7 +227,17 @@ export const RoboostRecordActionsMenu = ({
         ]
       : []),
 
-    { id: 'clone', label: t`Clone`, icon: 'copy', onSelect: clone },
+    {
+      id: 'clone',
+      label: t`Clone`,
+      icon: 'copy',
+      isNoPermission: !canRoboostWriteObject(
+        roboostAccess,
+        objectMetadataItem.nameSingular,
+        'create',
+      ),
+      onSelect: clone,
+    },
     {
       id: 'classic',
       label: t`Open classic record page`,
@@ -240,6 +250,11 @@ export const RoboostRecordActionsMenu = ({
       label: t`Delete`,
       icon: 'trash',
       isDanger: true,
+      isNoPermission: !canRoboostWriteObject(
+        roboostAccess,
+        objectMetadataItem.nameSingular,
+        'delete',
+      ),
       onSelect: () => setIsDeleteOpen(true),
     },
   ];

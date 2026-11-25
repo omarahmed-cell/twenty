@@ -60,6 +60,8 @@ export type SettingsNavigationItem = {
   indentationLevel?: NavigationDrawerItemIndentationLevel;
   matchSubPages?: boolean;
   isHidden?: boolean;
+  // Shown with the no-permission cursor and tooltip in the Roboost settings nav, hidden in the classic one
+  isNoPermission?: boolean;
   subItems?: SettingsNavigationItem[];
   modifier?: NavigationDrawerItemModifier;
 };
@@ -114,14 +116,15 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Gmail extension`,
           path: SettingsPath.GmailExtension,
           Icon: IconPuzzle,
-          isHidden:
-            !isUnifiedEmailEnabled || !roboostAccess.hasToggle('connectGoogle'),
+          isHidden: !isUnifiedEmailEnabled,
+          isNoPermission: !roboostAccess.hasToggle('connectGoogle'),
         },
         {
           label: isAppPreferencesEnabled ? t`App preferences` : t`Accounts`,
           path: SettingsPath.Accounts,
           Icon: isAppPreferencesEnabled ? IconApps : IconAt,
-          isHidden: !permissionFlagMap[PermissionFlagType.CONNECTED_ACCOUNTS],
+          isNoPermission:
+            !permissionFlagMap[PermissionFlagType.CONNECTED_ACCOUNTS],
           subItems: isAppPreferencesEnabled
             ? undefined
             : [
@@ -154,19 +157,19 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`General`,
           path: SettingsPath.General,
           Icon: IconSettings2,
-          isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
         },
         {
           label: t`Data model`,
           path: SettingsPath.Objects,
           Icon: IconHierarchy,
-          isHidden: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
           subItems: [
             {
               label: t`Properties`,
               path: SettingsPath.Properties,
               Icon: IconListSearch,
-              isHidden: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
+              isNoPermission: !permissionFlagMap[PermissionFlagType.DATA_MODEL],
               indentationLevel: 2,
             },
           ],
@@ -175,20 +178,20 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Data management`,
           path: SettingsPath.ImportExport,
           Icon: IconDatabase,
-          isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
           subItems: [
             {
               label: t`Import & Export`,
               path: SettingsPath.ImportExport,
               Icon: IconFileImport,
-              isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+              isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
               indentationLevel: 2,
             },
             {
               label: t`Duplicates`,
               path: SettingsPath.Duplicates,
               Icon: IconArrowMerge,
-              isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+              isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
               indentationLevel: 2,
             },
           ],
@@ -197,7 +200,7 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Layout`,
           path: SettingsPath.Layout,
           Icon: IconAppWindow,
-          isHidden:
+          isNoPermission:
             !permissionFlagMap[PermissionFlagType.LAYOUTS] ||
             !roboostAccess.hasToggle('customizeCards'),
         },
@@ -205,21 +208,21 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Users & Teams`,
           path: SettingsPath.WorkspaceMembersPage,
           Icon: IconUsers,
-          isHidden: !roboostAccess.canSeeUserTable,
+          isHidden: !roboostAccess.isLoaded,
+          isNoPermission: !roboostAccess.canSeeUserTable,
         },
         {
           label: t`Billing`,
           path: SettingsPath.Billing,
           Icon: IconCreditCard,
-          isHidden:
-            !isBillingEnabled ||
-            !permissionFlagMap[PermissionFlagType.WORKSPACE],
+          isHidden: !isBillingEnabled,
+          isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
         },
         {
           label: t`Developers`,
           path: SettingsPath.Developers,
           Icon: IconCode,
-          isHidden:
+          isNoPermission:
             !permissionFlagMap[PermissionFlagType.API_KEYS_AND_WEBHOOKS],
         },
         // TODO: Re-enable when integrations page is ready
@@ -227,25 +230,25 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
         //   label: t`Integrations`,
         //   path: SettingsPath.Integrations,
         //   Icon: IconApps,
-        //   isHidden: !permissionFlagMap[PermissionFlagType.API_KEYS_AND_WEBHOOKS],
+        //   isNoPermission: !permissionFlagMap[PermissionFlagType.API_KEYS_AND_WEBHOOKS],
         // },
         {
           label: t`Apps`,
           path: SettingsPath.Applications,
           Icon: IconApps,
-          isHidden: !permissionFlagMap[PermissionFlagType.APPLICATIONS],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.APPLICATIONS],
         },
         {
           label: t`AI`,
           path: SettingsPath.AI,
           Icon: IconSparkles,
-          isHidden: !permissionFlagMap[PermissionFlagType.AI_SETTINGS],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.AI_SETTINGS],
         },
         {
           label: t`Communication`,
           path: SettingsPath.WorkspaceCommunications,
           Icon: IconMessageCircle,
-          isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
         },
       ],
     },
@@ -262,7 +265,7 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           label: t`Community`,
           path: SettingsPath.Community,
           Icon: IconUsers,
-          isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE],
+          isNoPermission: !permissionFlagMap[PermissionFlagType.WORKSPACE],
         },
         {
           label: t`Support`,

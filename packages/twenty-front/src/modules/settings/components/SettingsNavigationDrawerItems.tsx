@@ -103,7 +103,9 @@ export const SettingsNavigationDrawerItems = () => {
   return (
     <StyledSectionsContainer>
       {settingsNavigationItems.map((section) => {
-        const allItemsHidden = section.items.every((item) => item.isHidden);
+        const allItemsHidden = section.items.every(
+          (item) => item.isHidden === true || item.isNoPermission === true,
+        );
         if (allItemsHidden) {
           return null;
         }

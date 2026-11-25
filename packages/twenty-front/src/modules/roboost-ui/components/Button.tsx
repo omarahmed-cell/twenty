@@ -1,6 +1,7 @@
 import { Icon } from '@/roboost-ui/components/Icon';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { type MouseEvent, type ReactNode } from 'react';
 
 export type ButtonProps = {
@@ -12,6 +13,7 @@ export type ButtonProps = {
   children?: ReactNode;
   type?: 'button' | 'submit';
   disabled?: boolean;
+  isNoPermission?: boolean;
   title?: string;
   className?: string;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -30,6 +32,7 @@ export const Button = ({
   children,
   type = 'button',
   disabled,
+  isNoPermission = false,
   title,
   className,
   onClick,
@@ -55,6 +58,8 @@ export const Button = ({
     aria-expanded={ariaExpanded}
     aria-haspopup={ariaHasPopup}
     aria-pressed={ariaPressed}
+    data-rb-no-permission={getRoboostNoPermissionAttribute(!isNoPermission)}
+    aria-disabled={!isNoPermission ? undefined : true}
   >
     {icon !== undefined && <Icon name={icon} size={16} />}
     {children !== undefined && children !== null && <span>{children}</span>}

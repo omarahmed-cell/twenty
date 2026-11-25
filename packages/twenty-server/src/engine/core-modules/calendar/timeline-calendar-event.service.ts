@@ -12,6 +12,7 @@ import { type TimelineCalendarEventsWithTotalDTO } from 'src/engine/core-modules
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
 import { RelatedPersonIdsService } from 'src/engine/core-modules/related-person-ids/services/related-person-ids.service';
 import { type TargetFilter } from 'src/engine/core-modules/target/utils/get-target-field-name-for-object-record.util';
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { MessageCalendarTargetReadinessService } from 'src/engine/core-modules/target/services/message-calendar-target-readiness.service';
 import { CalendarChannelEntity } from 'src/engine/metadata-modules/calendar-channel/entities/calendar-channel.entity';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
@@ -36,6 +37,7 @@ export class TimelineCalendarEventService {
     private readonly relatedPersonIdsService: RelatedPersonIdsService,
     private readonly fileUrlService: FileUrlService,
     private readonly messageCalendarTargetReadinessService: MessageCalendarTargetReadinessService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   async getCalendarEventsFromPersonIds({
@@ -347,17 +349,43 @@ export class TimelineCalendarEventService {
     page: number;
     pageSize: number;
   }): Promise<TimelineCalendarEventsWithTotalDTO> {
-    const personIds = await this.relatedPersonIdsService.getRelatedPersonIds({
-      workspaceId,
-      objectNameSingular,
-      recordId,
-    });
+    const canViewRecord =
+      await this.roboostRecordVisibilityService.canViewRecord({
+        workspaceId,
+        workspaceMemberId: currentWorkspaceMemberId,
+        objectNameSingular,
+        recordId,
+      });
+
+    if (!canViewRecord) {
+      return {
+        totalNumberOfCalendarEvents: 0,
+        timelineCalendarEvents: [],
+        relatedPersonIds: [],
+      };
+    }
+
     const targetFilter =
       await this.messageCalendarTargetReadinessService.resolveTargetFilter({
         objectNameSingular,
         recordId,
         workspaceId,
       });
+    const relatedPersonIds =
+      await this.relatedPersonIdsService.getRelatedPersonIds({
+        workspaceId,
+        objectNameSingular,
+        recordId,
+      });
+    // Without event targets an event is linked to the record only through its attendees, so it needs one the user can view
+    const personIds = isDefined(targetFilter)
+      ? relatedPersonIds
+      : await this.roboostRecordVisibilityService.filterVisibleRecordIds({
+          workspaceId,
+          workspaceMemberId: currentWorkspaceMemberId,
+          objectNameSingular: 'person',
+          recordIds: relatedPersonIds,
+        });
 
     if (!isDefined(targetFilter) && personIds.length === 0) {
       return {

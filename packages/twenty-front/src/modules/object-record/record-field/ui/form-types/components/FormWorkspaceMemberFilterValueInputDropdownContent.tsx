@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro';
 import { isNonEmptyArray } from 'twenty-shared/utils';
 import { Dropdown } from 'twenty-ui/components/navigation';
-import { IconUserCircle } from 'twenty-ui/icon';
+import { IconUserCircle, IconUsers } from 'twenty-ui/icon';
 import { Avatar } from 'twenty-ui/primitives/data-display';
 import { Field } from 'twenty-ui/primitives/input';
 
@@ -12,6 +12,7 @@ import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 import { normalizeSearchText } from 'twenty-ui/utilities';
 
 type FormWorkspaceMemberFilterValueInputDropdownContentProps = {
+  teamItems?: SelectableItem[];
   searchFilter: string;
   onSearchChange: (value: string) => void;
   isCurrentWorkspaceMemberSelected: boolean;
@@ -25,6 +26,7 @@ type FormWorkspaceMemberFilterValueInputDropdownContentProps = {
 };
 
 export const FormWorkspaceMemberFilterValueInputDropdownContent = ({
+  teamItems = [],
   searchFilter,
   onSearchChange,
   isCurrentWorkspaceMemberSelected,
@@ -35,6 +37,9 @@ export const FormWorkspaceMemberFilterValueInputDropdownContent = ({
 }: FormWorkspaceMemberFilterValueInputDropdownContentProps) => {
   const isMeVisible = normalizeSearchText(t`Me`).includes(
     normalizeSearchText(searchFilter),
+  );
+  const visibleTeamItems = teamItems.filter((item) =>
+    normalizeSearchText(item.name).includes(normalizeSearchText(searchFilter)),
   );
   const items = [...filteredSelectedRecords, ...recordsToSelect];
   const hasNoResults = !loading && !isMeVisible && !isNonEmptyArray(items);
@@ -49,6 +54,28 @@ export const FormWorkspaceMemberFilterValueInputDropdownContent = ({
           aria-label={t`Search workspace members`}
         />
       </Field.Root>
+      {visibleTeamItems.length > 0 && (
+        <Dropdown.Section>
+          {visibleTeamItems.map((item) => (
+            <Dropdown.OptionItem
+              key={item.id}
+              selected={item.isSelected}
+              disabled={loading}
+              indicator="checkbox"
+              startIcon={<SelectOptionIcon Icon={IconUsers} />}
+              onSelect={() =>
+                onSelectChange({
+                  itemToSelect: item,
+                  isNewSelectedValue: !item.isSelected,
+                })
+              }
+            >
+              {item.name}
+            </Dropdown.OptionItem>
+          ))}
+        </Dropdown.Section>
+      )}
+      {visibleTeamItems.length > 0 && <Dropdown.Separator />}
       {isMeVisible && (
         <Dropdown.Section>
           <Dropdown.OptionItem

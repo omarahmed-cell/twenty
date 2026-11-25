@@ -6,6 +6,7 @@ import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient
 import { FormMultiTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormMultiTextFieldInput';
 import { FormSelectFieldInput } from '@/object-record/record-field/ui/form-types/components/FormSelectFieldInput';
 import { FormTextFieldInput } from '@/object-record/record-field/ui/form-types/components/FormTextFieldInput';
+import { useRoboostTeamOptions } from '@/roboost-app/users-and-teams/hooks/useRoboostTeamOptions';
 import { useMyConnectedAccounts } from '@/settings/accounts/hooks/useMyConnectedAccounts';
 import { useTriggerApisOAuth } from '@/settings/accounts/hooks/useTriggerApiOAuth';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
@@ -77,6 +78,8 @@ export const WorkflowEditActionEmailBase = ({
 
   const redirectUrl = `/object/workflow/${workflowVisualizerWorkflowId}`;
 
+  const teams = useRoboostTeamOptions(true);
+  const [recipientsInputKey, setRecipientsInputKey] = useState(0);
   const { formData, handleFieldChange, handleFieldsChange, saveAction } =
     useEmailForm({
       action,
@@ -276,6 +279,7 @@ export const WorkflowEditActionEmailBase = ({
             </>
           )}
           <FormMultiTextFieldInput
+            key={`to-${recipientsInputKey}`}
             label={t`To`}
             placeholder={t`Enter emails, comma-separated`}
             readonly={actionOptions.readonly}
@@ -288,6 +292,34 @@ export const WorkflowEditActionEmailBase = ({
             }}
             VariablePicker={WorkflowVariablePicker}
           />
+          {teams.length > 0 && !actionOptions.readonly && (
+            <FormSelectFieldInput
+              key={`team-${recipientsInputKey}`}
+              label={t`Team`}
+              hint={t`Adds everyone in the team when the email is sent`}
+              placeholder={t`Add a team as recipient`}
+              defaultValue={undefined}
+              options={teams.map((team) => ({
+                value: team.id,
+                label: t`Team: ${team.name}`,
+              }))}
+              onChange={(teamId) => {
+                if (!isDefined(teamId)) {
+                  return;
+                }
+                const token = `team:${teamId}`;
+                const current = formData.recipients.to ?? '';
+
+                if (!current.includes(token)) {
+                  handleFieldChange('recipients', {
+                    ...formData.recipients,
+                    to: current.trim() === '' ? token : `${current}, ${token}`,
+                  });
+                }
+                setRecipientsInputKey((key) => key + 1);
+              }}
+            />
+          )}
           {visibleAdvancedFields.cc && (
             <FormMultiTextFieldInput
               label={t`CC`}

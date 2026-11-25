@@ -12,6 +12,7 @@ import { relationTargetFieldMetadataIdUsedInDropdownComponentState } from '@/obj
 import { selectedOperandInDropdownComponentState } from '@/object-record/object-filter-dropdown/states/selectedOperandInDropdownComponentState';
 import { currentRecordFiltersComponentState } from '@/object-record/record-filter/states/currentRecordFiltersComponentState';
 import { useWorkspaceMemberFilterItemSections } from '@/object-record/object-filter-dropdown/hooks/useWorkspaceMemberFilterItemSections';
+import { useRoboostTeamOptions } from '@/roboost-app/users-and-teams/hooks/useRoboostTeamOptions';
 import { MultipleSelectDropdown } from '@/object-record/select/components/MultipleSelectDropdown';
 import { useRecordsForSelect } from '@/object-record/select/hooks/useRecordsForSelect';
 import { type SelectableItem } from '@/object-record/select/types/SelectableItem';
@@ -28,7 +29,7 @@ import {
   jsonRelationFilterValueSchema,
 } from 'twenty-shared/utils';
 import { doNotTranslate } from 'twenty-shared/i18n';
-import { IconUserCircle } from 'twenty-ui/icon';
+import { IconUserCircle, IconUsers } from 'twenty-ui/icon';
 import { allowRequestsToTwentyIconsState } from '@/client-config/states/allowRequestsToTwentyIcons';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
@@ -145,9 +146,17 @@ const ObjectFilterDropdownRecordSelectContent = ({
     AvatarIcon: IconUserCircle,
   };
 
+  const teams = useRoboostTeamOptions(objectNameSingular === 'workspaceMember');
+  const teamSelectableItems: SelectableItem[] = teams.map((team) => ({
+    id: team.id,
+    name: t`Team: ${team.name}`,
+    isSelected: selectedRecordIds.includes(team.id),
+    AvatarIcon: IconUsers,
+  }));
+
   const pinnedSelectableItems: SelectableItem[] =
     objectNameSingular === 'workspaceMember'
-      ? [currentWorkspaceMemberSelectableItem]
+      ? [...teamSelectableItems, currentWorkspaceMemberSelectableItem]
       : [];
 
   const filteredPinnedSelectableItems = pinnedSelectableItems.filter((item) =>
@@ -202,7 +211,12 @@ const ObjectFilterDropdownRecordSelectContent = ({
       ? [currentWorkspaceMemberSelectableItem.name]
       : [];
 
+    const selectedTeamNames = teamSelectableItems
+      .filter((item) => newSelectedRecordIds.includes(item.id))
+      .map((item) => item.name);
+
     const selectedItemNames = [
+      ...selectedTeamNames,
       ...selectedPinnedItemNames,
       ...selectedRecordNames,
     ];

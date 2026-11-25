@@ -5,6 +5,7 @@ import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { getRoboostTriggerElement } from '@/roboost-ui/utils/getRoboostTriggerElement';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { useLingui } from '@lingui/react/macro';
 import {
   type FocusEvent,
@@ -23,12 +24,19 @@ export type MenuEntry =
       isSelected?: boolean;
       isDanger?: boolean;
       isDisabled?: boolean;
+      isNoPermission?: boolean;
       hint?: string;
       description?: string;
       keepMenuOpen?: boolean;
       onSelect: () => void;
     }
-  | { id: string; label: string; icon?: RoboostIconName; href: string }
+  | {
+      id: string;
+      label: string;
+      icon?: RoboostIconName;
+      href: string;
+      isNoPermission?: boolean;
+    }
   | { id: string; isSeparator: true }
   | { id: string; heading: string };
 
@@ -201,6 +209,12 @@ export const Menu = ({
                     to={entry.href}
                     role="menuitem"
                     className="rb-menu-item"
+                    data-rb-no-permission={getRoboostNoPermissionAttribute(
+                      entry.isNoPermission !== true,
+                    )}
+                    aria-disabled={
+                      entry.isNoPermission !== true ? undefined : true
+                    }
                     onClick={() => close()}
                   >
                     {content}
@@ -218,14 +232,24 @@ export const Menu = ({
                       : 'menuitem'
                   }
                   aria-checked={entry.isSelected}
-                  aria-disabled={entry.isDisabled}
+                  aria-disabled={
+                    entry.isDisabled === true ||
+                    entry.isNoPermission === true ||
+                    undefined
+                  }
                   className={cx(
                     'rb-menu-item',
                     entry.isDanger === true && 'rb-menu-item-danger',
                     entry.isDisabled === true && 'is-disabled',
                   )}
                   aria-selected={entry.isSelected}
+                  data-rb-no-permission={getRoboostNoPermissionAttribute(
+                    entry.isNoPermission !== true,
+                  )}
                   onClick={() => {
+                    if (entry.isNoPermission === true) {
+                      return;
+                    }
                     entry.onSelect();
                     if (!keepOpenOnSelect && entry.keepMenuOpen !== true) {
                       close();

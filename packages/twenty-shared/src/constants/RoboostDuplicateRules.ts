@@ -55,7 +55,7 @@ export const ROBOOST_DUPLICATE_RULES: RoboostDuplicateRule[] = [
   {
     key: 'personSameNameSameCompany',
     objectName: 'person',
-    label: 'Same name and same company',
+    label: 'Similar full name and same company',
     confidence: 'HIGH',
     defaultEnabled: true,
   },

@@ -41,10 +41,12 @@ export const findMatchingBranch = ({
   branches,
   stepFilterGroups,
   resolvedFilters,
+  teamMemberIdsByTeamId,
 }: {
   branches: StepIfElseBranch[];
   stepFilterGroups: StepFilterGroup[];
   resolvedFilters: ResolvedFilter[];
+  teamMemberIdsByTeamId?: Record<string, string[]>;
 }): StepIfElseBranch => {
   for (const branch of branches) {
     if (
@@ -75,6 +77,7 @@ export const findMatchingBranch = ({
     return evaluateFilterConditions({
       filterGroups: branchFilterGroups,
       filters: branchFilters,
+      teamMemberIdsByTeamId,
     });
   });
 

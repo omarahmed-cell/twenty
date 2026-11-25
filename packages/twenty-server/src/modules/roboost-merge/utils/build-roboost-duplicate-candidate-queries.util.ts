@@ -6,6 +6,8 @@ import {
 export type RoboostDuplicateCandidateQuery = {
   ruleKey: RoboostDuplicateRuleKey;
   sql: string;
+  // Batched queries take $1 = the batch of "a" record ids and $2 = the similarity threshold
+  isBatched?: boolean;
 };
 
 const LEGAL_SUFFIXES =
@@ -16,6 +18,13 @@ const normalizeDomainSql = (expression: string) =>
 
 const normalizeNameSql = (expression: string) =>
   `regexp_replace(regexp_replace(lower(coalesce(${expression}, '')), '\\m(${LEGAL_SUFFIXES})\\M', '', 'g'), '[[:space:][:punct:]]+', '', 'g')`;
+
+// The trigram index is built on this exact expression, so the scan can use it
+export const ROBOOST_COMPANY_NAME_TRIGRAM_EXPRESSION =
+  normalizeNameSql('"name"');
+
+const personFullNameSql = (alias: string) =>
+  `lower(trim(coalesce(${alias}."nameFirstName", '') || ' ' || coalesce(${alias}."nameLastName", '')))`;
 
 const jsonArraySql = (column: string) =>
   `jsonb_array_elements(CASE WHEN jsonb_typeof(t."${column}") = 'array' THEN t."${column}" ELSE '[]'::jsonb END)`;
@@ -59,19 +68,22 @@ export const buildRoboostDuplicateCandidateQueries = ({
     }
 
     if (enabledRuleKeys.has('companySimilarNameSameCountry') && has('name')) {
-      const country = has('addressAddressCountry')
-        ? `lower(trim(coalesce(t."addressAddressCountry", '')))`
-        : `''`;
+      const countryOf = (alias: string) =>
+        has('addressAddressCountry')
+          ? `lower(trim(coalesce(${alias}."addressAddressCountry", '')))`
+          : `''`;
+      const nameOf = (alias: string) => normalizeNameSql(`${alias}."name"`);
 
       queries.push({
         ruleKey: 'companySimilarNameSameCountry',
-        sql: `WITH n AS (
-          SELECT t.id, ${normalizeNameSql('t.name')} AS value, ${country} AS country FROM ${table} t WHERE t."deletedAt" IS NULL
-        )
-        SELECT a.id AS a, b.id AS b FROM n a JOIN n b
-          ON left(a.value, 5) = left(b.value, 5) AND a.country = b.country AND a.id < b.id
-        WHERE length(a.value) >= 3 AND length(b.value) >= 3
-          AND (a.value = b.value OR (least(length(a.value), length(b.value)) >= 8 AND least(length(a.value), length(b.value)) >= 0.6 * greatest(length(a.value), length(b.value)) AND (a.value LIKE b.value || '%' OR b.value LIKE a.value || '%')))`,
+        isBatched: true,
+        sql: `SELECT a.id AS a, b.id AS b FROM ${table} a
+          JOIN ${table} b ON b.id > a.id AND b."deletedAt" IS NULL
+            AND ${nameOf('b')} OPERATOR(public.%) ${nameOf('a')}
+            AND ${countryOf('a')} = ${countryOf('b')}
+          WHERE a.id = ANY($1::uuid[]) AND a."deletedAt" IS NULL
+            AND length(${nameOf('a')}) >= 3 AND length(${nameOf('b')}) >= 3
+            AND public.similarity(${nameOf('a')}, ${nameOf('b')}) >= $2`,
       });
     }
   }
@@ -121,12 +133,13 @@ export const buildRoboostDuplicateCandidateQueries = ({
     ) {
       queries.push({
         ruleKey: 'personSameNameSameCompany',
-        sql: `WITH n AS (
-          SELECT t.id, t."companyId" AS company, lower(trim(concat_ws(' ', t."nameFirstName", t."nameLastName"))) AS value
-          FROM ${table} t WHERE t."deletedAt" IS NULL AND t."companyId" IS NOT NULL
-        )
-        SELECT a.id AS a, b.id AS b FROM n a JOIN n b ON a.value = b.value AND a.company = b.company AND a.id < b.id
-        WHERE a.value <> ''`,
+        isBatched: true,
+        sql: `SELECT a.id AS a, b.id AS b FROM ${table} a
+          JOIN ${table} b ON b."companyId" = a."companyId" AND b.id <> a.id AND b."deletedAt" IS NULL
+          WHERE a.id = ANY($1::uuid[]) AND a."deletedAt" IS NULL AND a."companyId" IS NOT NULL
+            AND ${personFullNameSql('a')} <> '' AND ${personFullNameSql('b')} <> ''
+            AND a.id < b.id
+            AND public.similarity(${personFullNameSql('a')}, ${personFullNameSql('b')}) >= $2`,
       });
     }
   }

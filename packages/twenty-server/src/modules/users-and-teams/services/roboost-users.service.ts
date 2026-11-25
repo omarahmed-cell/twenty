@@ -214,11 +214,24 @@ export class RoboostUsersService {
       );
     }
 
-    if (!isDefined(row) || !isDefined(member.userWorkspaceId)) {
+    if (!isDefined(row)) {
       return {
         isAdmin: member.isAdmin,
-        permissions: row?.permissions ?? buildDefaultRoboostPermissions(),
+        permissions: buildDefaultRoboostPermissions(),
       };
+    }
+
+    if (!isDefined(member.userWorkspaceId)) {
+      if (row.desiredRole !== 'ADMIN' && !isDefined(row.roleId)) {
+        await this.applyMemberRole({
+          workspaceId,
+          member,
+          permissions: row.permissions,
+          existingRoleId: null,
+        });
+      }
+
+      return { isAdmin: member.isAdmin, permissions: row.permissions };
     }
 
     if (member.isAdmin) {
@@ -245,6 +258,29 @@ export class RoboostUsersService {
     }
 
     return { isAdmin: false, permissions: row.permissions };
+  }
+
+  // Runs from sign-up, invite accept and pre-create, before the member gets a token
+  async provisionNewMember({
+    workspaceId,
+    workspaceMemberId,
+    userWorkspaceId,
+  }: {
+    workspaceId: string;
+    workspaceMemberId?: string;
+    userWorkspaceId?: string;
+  }): Promise<void> {
+    const member = (await this.listMembers(workspaceId)).find(
+      (row) =>
+        row.workspaceMemberId === workspaceMemberId ||
+        (isDefined(userWorkspaceId) && row.userWorkspaceId === userWorkspaceId),
+    );
+
+    if (!isDefined(member)) {
+      return;
+    }
+
+    await this.ensureProvisioned(workspaceId, member.workspaceMemberId);
   }
 
   private async applyMemberRole({

@@ -72,7 +72,12 @@ export class RoboostRecordVisibilityService {
     );
 
     if (!isDefined(subject)) {
-      return recordIds;
+      return (await this.canMemberRoleReadAllRecords(
+        workspaceId,
+        workspaceMemberId,
+      ))
+        ? recordIds
+        : [];
     }
 
     const schemaName = getWorkspaceSchemaName(workspaceId);
@@ -109,6 +114,61 @@ export class RoboostRecordVisibilityService {
     );
 
     return rows.map((row) => row.id);
+  }
+
+  // Members without a private role are Admins (full access) or on the default Member role (no access)
+  private async canMemberRoleReadAllRecords(
+    workspaceId: string,
+    workspaceMemberId: string,
+  ): Promise<boolean> {
+    const rows: { canReadAllObjectRecords: boolean }[] =
+      await this.coreDataSource.query(
+        `SELECT r."canReadAllObjectRecords" FROM "${getWorkspaceSchemaName(workspaceId)}"."workspaceMember" wm
+        JOIN core."userWorkspace" uw ON uw."userId" = wm."userId" AND uw."workspaceId" = $1 AND uw."deletedAt" IS NULL
+        JOIN core."roleTarget" rt ON rt."userWorkspaceId" = uw.id
+        JOIN core."role" r ON r.id = rt."roleId"
+        WHERE wm.id = $2`,
+        [workspaceId, workspaceMemberId],
+      );
+
+    return rows.some((row) => row.canReadAllObjectRecords === true);
+  }
+
+  // Workflow filters run in memory, so a team picked in a member filter is expanded here
+  async getTeamMemberIdsByTeamId(
+    workspaceId: string,
+  ): Promise<Record<string, string[]>> {
+    const schemaName = getWorkspaceSchemaName(workspaceId);
+    const tables: { exists: boolean }[] = await this.coreDataSource.query(
+      `SELECT to_regclass($1) IS NOT NULL AS exists`,
+      [`"${schemaName}"."teamMembership"`],
+    );
+
+    if (tables[0]?.exists !== true) {
+      return {};
+    }
+
+    const rows: { teamId: string; workspaceMemberId: string }[] =
+      await this.coreDataSource.query(
+        `SELECT "teamId", "workspaceMemberId" FROM "${schemaName}"."teamMembership" WHERE "deletedAt" IS NULL`,
+      );
+    const result: Record<string, string[]> = {};
+
+    for (const row of rows) {
+      (result[row.teamId] ??= []).push(row.workspaceMemberId);
+    }
+
+    return result;
+  }
+
+  // Private Users & Teams roles are managed per member and never offered in role pickers
+  async getPrivateRoleIds(workspaceId: string): Promise<Set<string>> {
+    const { roboostRecordAccessMaps } =
+      await this.workspaceCacheService.getOrRecompute(workspaceId, [
+        'roboostRecordAccessMaps',
+      ]);
+
+    return new Set(Object.keys(roboostRecordAccessMaps.subjectByRoleId));
   }
 
   async canViewRecord(args: {

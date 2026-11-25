@@ -24,6 +24,7 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { RoboostTopBar } from '@/roboost-app/components/RoboostTopBar';
 import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { AppShell } from '@/roboost-ui/components/AppShell';
+import { NoPermissionLayer } from '@/roboost-ui/components/NoPermissionLayer';
 import { useShowFullscreen } from '@/ui/layout/fullscreen/hooks/useShowFullscreen';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { styled } from '@linaria/react';
@@ -102,6 +103,7 @@ export const DefaultLayout = () => {
               <PageDragDropProvider>
                 <KeyboardShortcutMenu />
                 {isRoboostUiEnabled && <RoboostPreferencesEffect />}
+                {isRoboostUiEnabled && <NoPermissionLayer />}
                 {isRoboostUiEnabled && <RoboostCreateRecordPanel />}
                 {isRoboostUiEnabled && <RoboostPropertiesPanel />}
                 {isRoboostUiEnabled && <RoboostFieldHistoryPanel />}

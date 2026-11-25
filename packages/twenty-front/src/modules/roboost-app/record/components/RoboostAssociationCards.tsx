@@ -1,3 +1,4 @@
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostRecordLabel } from '@/roboost-app/fields/getRoboostRecordLabel';
@@ -69,6 +70,7 @@ type RoboostAssociationCardProps = {
   tagField: FieldMetadataItem | undefined;
   lineFields: FieldMetadataItem[];
   onRemove?: () => void;
+  canRemove?: boolean;
 };
 
 export const RoboostAssociationCard = ({
@@ -77,6 +79,7 @@ export const RoboostAssociationCard = ({
   tagField,
   lineFields,
   onRemove,
+  canRemove = true,
 }: RoboostAssociationCardProps) => {
   const { t } = useLingui();
   const name =
@@ -129,7 +132,9 @@ export const RoboostAssociationCard = ({
             type="button"
             className="rb-rc-iconbtn"
             aria-label={t`Remove association`}
-            title={t`Remove association`}
+            title={canRemove ? t`Remove association` : undefined}
+            data-rb-no-permission={getRoboostNoPermissionAttribute(canRemove)}
+            aria-disabled={canRemove ? undefined : true}
             onClick={onRemove}
           >
             <Icon name="x" size={13} />

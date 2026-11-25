@@ -1,5 +1,6 @@
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
@@ -17,7 +18,13 @@ import {
   isNonEmptyArray,
   isValidUuid,
 } from 'twenty-shared/utils';
-import { In, IsNull, LessThanOrEqual, type Repository } from 'typeorm';
+import {
+  DataSource,
+  In,
+  IsNull,
+  LessThanOrEqual,
+  type Repository,
+} from 'typeorm';
 import { z } from 'zod';
 
 import { FileEntity } from 'src/engine/core-modules/file/entities/file.entity';
@@ -49,6 +56,9 @@ type ParentThreadContext = {
   references?: string[];
 };
 
+const TEAM_RECIPIENT_PREFIX = 'team:';
+const TEAM_RECIPIENT_PATTERN =
+  /team:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/gi;
 @Injectable()
 export class EmailComposerService {
   private readonly logger = new Logger(EmailComposerService.name);
@@ -60,7 +70,54 @@ export class EmailComposerService {
     @InjectWorkspaceScopedRepository(FileEntity)
     private readonly fileRepository: WorkspaceScopedRepository<FileEntity>,
     private readonly fileService: FileService,
+    @InjectDataSource()
+    private readonly coreDataSource: DataSource,
   ) {}
+
+  // A "team:<id>" recipient (workflow email step) means every current member of that team
+  private async expandTeamRecipients(
+    workspaceId: string,
+    parameters: ComposeEmailParams,
+  ): Promise<ComposeEmailParams> {
+    const recipients = parameters.recipients;
+    const fields = [recipients?.to, recipients?.cc, recipients?.bcc];
+
+    if (!fields.some((value) => value?.includes(TEAM_RECIPIENT_PREFIX))) {
+      return parameters;
+    }
+
+    const schemaName = getWorkspaceSchemaName(workspaceId);
+    const rows: { teamId: string; email: string }[] =
+      await this.coreDataSource.query(
+        `SELECT tm."teamId", wm."userEmail" AS email
+        FROM "${schemaName}"."teamMembership" tm
+        JOIN "${schemaName}"."workspaceMember" wm ON wm.id = tm."workspaceMemberId" AND wm."deletedAt" IS NULL
+        WHERE tm."deletedAt" IS NULL AND coalesce(wm."memberStatus", 'ACTIVE') = 'ACTIVE' AND coalesce(wm."userEmail", '') <> ''`,
+      );
+    const emailsByTeamId = new Map<string, string[]>();
+
+    for (const row of rows) {
+      emailsByTeamId.set(row.teamId, [
+        ...(emailsByTeamId.get(row.teamId) ?? []),
+        row.email,
+      ]);
+    }
+
+    const expand = (value: string | undefined) =>
+      value?.replace(TEAM_RECIPIENT_PATTERN, (_match, teamId: string) =>
+        (emailsByTeamId.get(teamId.toLowerCase()) ?? []).join(', '),
+      );
+
+    return {
+      ...parameters,
+      recipients: {
+        ...recipients,
+        to: expand(recipients.to) ?? '',
+        cc: expand(recipients.cc),
+        bcc: expand(recipients.bcc),
+      },
+    };
+  }
 
   private async getConnectedAccountOrThrow({
     connectedAccountId,
@@ -381,7 +438,9 @@ export class EmailComposerService {
     let recipients: { to: string[]; cc: string[]; bcc: string[] };
 
     try {
-      recipients = this.normalizeRecipients(parameters);
+      recipients = this.normalizeRecipients(
+        await this.expandTeamRecipients(workspaceId, parameters),
+      );
       this.assertRecipientCountWithinLimit(recipients);
     } catch (error) {
       return {

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { type WorkflowAction } from 'src/modules/workflow/workflow-executor/interfaces/workflow-action.interface';
 
 import {
@@ -14,8 +15,12 @@ import { evaluateStepFilters } from 'src/modules/workflow/workflow-executor/work
 
 @Injectable()
 export class FilterWorkflowAction implements WorkflowAction {
+  constructor(
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
+  ) {}
+
   async execute(input: WorkflowActionInput): Promise<WorkflowActionOutput> {
-    const { currentStepId, steps, context } = input;
+    const { currentStepId, steps, context, runInfo } = input;
 
     const step = findStepOrThrow({
       stepId: currentStepId,
@@ -43,6 +48,10 @@ export class FilterWorkflowAction implements WorkflowAction {
       stepFilters,
       stepFilterGroups,
       context,
+      teamMemberIdsByTeamId:
+        await this.roboostRecordVisibilityService.getTeamMemberIdsByTeamId(
+          runInfo.workspaceId,
+        ),
     });
 
     return {

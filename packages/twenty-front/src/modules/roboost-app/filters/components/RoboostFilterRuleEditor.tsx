@@ -38,7 +38,7 @@ export const RoboostFilterRuleEditor = ({
   rule,
   onChange,
   onRemove,
-  canPickTeams = false,
+  canPickTeams = true,
 }: RoboostFilterRuleEditorProps) => {
   const { t, i18n } = useLingui();
   const fields = getRoboostFilterableFields(objectMetadataItem);

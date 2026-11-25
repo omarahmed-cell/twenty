@@ -1,5 +1,7 @@
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
 import { Button } from '@/roboost-ui/components/Button';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
@@ -19,6 +21,7 @@ export const RoboostNewRecordMenu = () => {
   const { t } = useLingui();
   const { objectMetadataItems } = useObjectMetadataItems();
   const openCreatePanel = useOpenRoboostCreatePanel();
+  const roboostAccess = useRoboostAccess();
 
   const entries: MenuEntry[] = CREATE_MENU_OBJECTS.flatMap(
     ({ nameSingular, icon }) => {
@@ -32,6 +35,11 @@ export const RoboostNewRecordMenu = () => {
               id: nameSingular,
               label: objectMetadataItem.labelSingular,
               icon,
+              isNoPermission: !canRoboostWriteObject(
+                roboostAccess,
+                nameSingular,
+                'create',
+              ),
               onSelect: () =>
                 openCreatePanel({ objectNameSingular: nameSingular }),
             },
@@ -51,6 +59,11 @@ export const RoboostNewRecordMenu = () => {
           label: t`Quick lead`,
           icon: 'user',
           hint: t`Contact and company`,
+          isNoPermission: !canRoboostWriteObject(
+            roboostAccess,
+            'person',
+            'create',
+          ),
           onSelect: () => openCreatePanel({ objectNameSingular: 'person' }),
         },
       ]

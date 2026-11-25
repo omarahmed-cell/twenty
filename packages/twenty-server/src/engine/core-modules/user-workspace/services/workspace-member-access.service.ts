@@ -14,6 +14,7 @@ import {
   NotFoundError,
   UserInputError,
 } from 'src/engine/core-modules/graphql/utils/graphql-errors.util';
+import { RoboostNewMemberAccessService } from 'src/engine/core-modules/user-workspace/services/roboost-new-member-access.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { UserRoleService } from 'src/engine/metadata-modules/user-role/user-role.service';
@@ -58,6 +59,7 @@ export class WorkspaceMemberAccessService {
     private readonly workspaceOrmManager: WorkspaceOrmManager,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly userRoleService: UserRoleService,
+    private readonly roboostNewMemberAccessService: RoboostNewMemberAccessService,
   ) {}
 
   private runWithWorkspaceMemberRepository<TResult>(
@@ -261,6 +263,11 @@ export class WorkspaceMemberAccessService {
     await this.workspaceCacheService.invalidateAndRecompute(workspaceId, [
       'flatWorkspaceMemberMaps',
     ]);
+
+    await this.roboostNewMemberAccessService.provision({
+      workspaceId,
+      workspaceMemberId: workspaceMember.id,
+    });
 
     return workspaceMember;
   }

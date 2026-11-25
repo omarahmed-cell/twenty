@@ -54,7 +54,13 @@ import { ProvisionUnifiedEmailFieldsCommand } from 'src/database/commands/upgrad
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
+import { RemoveHubspotTeamFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795647999218-remove-hubspot-team-fields.command';
+import { EnableRoboostFuzzyDuplicatesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795648222603-enable-roboost-fuzzy-duplicates.command';
+import { RemoveMemberRoleAccessCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795646261352-remove-member-role-access.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
+import { ObjectPermissionModule } from 'src/engine/metadata-modules/object-permission/object-permission.module';
+import { RolePermissionFlagModule } from 'src/engine/metadata-modules/role-permission-flag/role-permission-flag.module';
+import { RoleModule } from 'src/engine/metadata-modules/role/role.module';
 import { WorkspaceSchemaManagerModule } from 'src/engine/twenty-orm/workspace-schema-manager/workspace-schema-manager.module';
 import { WorkspaceCacheModule } from 'src/engine/workspace-cache/workspace-cache.module';
 import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
@@ -63,7 +69,10 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
   imports: [
     ApplicationModule,
     FieldMetadataModule,
+    ObjectPermissionModule,
     PipelineModule,
+    RoleModule,
+    RolePermissionFlagModule,
     WorkspaceCacheModule,
     WorkspaceIteratorModule,
     WorkspaceMigrationModule,
@@ -121,6 +130,9 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     CreateRoboostAccessIndexesCommand,
     ProvisionMergeCommand,
     CreateRoboostDuplicateTablesCommand,
+    RemoveMemberRoleAccessCommand,
+    RemoveHubspotTeamFieldsCommand,
+    EnableRoboostFuzzyDuplicatesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

@@ -1,3 +1,4 @@
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useRoboostUserVars } from '@/roboost-app/hooks/useRoboostUserVars';
@@ -161,16 +162,13 @@ export const RoboostViewTabs = ({
           isDisabled: !isDirty,
           onSelect: () => isDirty && onReset(),
         },
-        ...(canCreateViews
-          ? [
-              {
-                id: 'clone',
-                label: t`Clone to new view`,
-                icon: 'copy' as const,
-                onSelect: onClone,
-              },
-            ]
-          : []),
+        {
+          id: 'clone',
+          label: t`Clone to new view`,
+          icon: 'copy' as const,
+          isNoPermission: !canCreateViews,
+          onSelect: onClone,
+        },
         {
           id: 'order-default',
           label: t`Make this tab order the default`,
@@ -269,17 +267,17 @@ export const RoboostViewTabs = ({
         />
       )}
       <span className="rb-sp" />
-      {canCreateViews && (
-        <button
-          type="button"
-          className="rb-vtab-add"
-          aria-label={t`Add view`}
-          title={t`Add view`}
-          onClick={onCreate}
-        >
-          <Icon name="plus" size={14} strokeWidth={2} />
-        </button>
-      )}
+      <button
+        type="button"
+        className="rb-vtab-add"
+        aria-label={t`Add view`}
+        title={canCreateViews ? t`Add view` : undefined}
+        data-rb-no-permission={getRoboostNoPermissionAttribute(canCreateViews)}
+        aria-disabled={canCreateViews ? undefined : true}
+        onClick={onCreate}
+      >
+        <Icon name="plus" size={14} strokeWidth={2} />
+      </button>
       <Modal
         open={isDefined(renamingView)}
         title={t`Rename view`}

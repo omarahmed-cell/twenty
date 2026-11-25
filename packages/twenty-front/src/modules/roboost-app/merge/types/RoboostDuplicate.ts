@@ -40,7 +40,14 @@ export type RoboostDuplicateOverview = {
     rules: RoboostDuplicateRuleSetting[];
     lastScanAt: string | null;
     lastScanPairCount: number | null;
+    similarityThreshold: number | null;
   };
+};
+
+export type RoboostDuplicatePairPage = {
+  items: RoboostDuplicatePair[];
+  nextOffset: number | null;
+  totalCount: number;
 };
 
 export type RoboostBulkMergePair = {

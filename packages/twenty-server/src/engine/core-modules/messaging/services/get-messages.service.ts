@@ -8,6 +8,7 @@ import { TimelineMessagingService } from 'src/engine/core-modules/messaging/serv
 import { formatThreads } from 'src/engine/core-modules/messaging/utils/format-threads.util';
 import { RelatedPersonIdsService } from 'src/engine/core-modules/related-person-ids/services/related-person-ids.service';
 import { type TargetFilter } from 'src/engine/core-modules/target/utils/get-target-field-name-for-object-record.util';
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { MessageCalendarTargetReadinessService } from 'src/engine/core-modules/target/services/message-calendar-target-readiness.service';
 
 @Injectable()
@@ -16,6 +17,7 @@ export class GetMessagesService {
     private readonly timelineMessagingService: TimelineMessagingService,
     private readonly relatedPersonIdsService: RelatedPersonIdsService,
     private readonly messageCalendarTargetReadinessService: MessageCalendarTargetReadinessService,
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
   ) {}
 
   async getMessagesFromPersonIds(
@@ -81,17 +83,43 @@ export class GetMessagesService {
     page = 1,
     pageSize: number = TIMELINE_THREADS_DEFAULT_PAGE_SIZE,
   ): Promise<TimelineThreadsWithTotalDTO> {
-    const personIds = await this.relatedPersonIdsService.getRelatedPersonIds({
-      workspaceId,
-      objectNameSingular,
-      recordId,
-    });
+    const canViewRecord =
+      await this.roboostRecordVisibilityService.canViewRecord({
+        workspaceId,
+        workspaceMemberId,
+        objectNameSingular,
+        recordId,
+      });
+
+    if (!canViewRecord) {
+      return {
+        totalNumberOfThreads: 0,
+        timelineThreads: [],
+        relatedPersonIds: [],
+      };
+    }
+
     const targetFilter =
       await this.messageCalendarTargetReadinessService.resolveTargetFilter({
         objectNameSingular,
         recordId,
         workspaceId,
       });
+    const relatedPersonIds =
+      await this.relatedPersonIdsService.getRelatedPersonIds({
+        workspaceId,
+        objectNameSingular,
+        recordId,
+      });
+    // Without thread targets a thread is linked to the record only through its contacts, so it needs one the user can view
+    const personIds = isDefined(targetFilter)
+      ? relatedPersonIds
+      : await this.roboostRecordVisibilityService.filterVisibleRecordIds({
+          workspaceId,
+          workspaceMemberId,
+          objectNameSingular: 'person',
+          recordIds: relatedPersonIds,
+        });
 
     if (!isDefined(targetFilter) && personIds.length === 0) {
       return {

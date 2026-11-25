@@ -1,3 +1,4 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import {
   RoboostMergedRecordNotice,
   RoboostMergedRecordRedirect,
@@ -118,6 +119,7 @@ const RoboostRecordPageContent = ({
   const [isRightOpenedOnNarrow, setIsRightOpenedOnNarrow] = useState(false);
   const isSidePanelOpened = useAtomStateValue(isSidePanelOpenedState);
   const layout = useRoboostRecordLayout(objectNameSingular);
+  const roboostAccess = useRoboostAccess();
   const {
     layout: recordLayout,
     associations,
@@ -275,6 +277,7 @@ const RoboostRecordPageContent = ({
       label: t`Reset order to default`,
       icon: 'refresh',
       isDisabled: !layout.hasPersonalOrder,
+      isNoPermission: !roboostAccess.hasToggle('arrangeCards'),
       onSelect: () => layout.resetToDefault(),
     },
     {
@@ -282,6 +285,7 @@ const RoboostRecordPageContent = ({
       label: t`Edit record view`,
       icon: 'external-link',
       href: recordViewSettingsPath,
+      isNoPermission: !roboostAccess.hasToggle('customizeCards'),
     },
   ];
 
@@ -411,6 +415,9 @@ const RoboostRecordPageContent = ({
                 label: t`Properties settings`,
                 icon: 'external-link',
                 href: propertiesSettingsPath,
+                isNoPermission: !roboostAccess.hasToggle(
+                  'editPropertySettings',
+                ),
               },
             ])}
             isDropTarget={dropTargetId === `left:${card.id}`}

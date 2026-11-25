@@ -1,3 +1,4 @@
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
@@ -62,16 +63,18 @@ export const RoboostRecordContainer = ({
       }}
     >
       <div className={cx('rb-rc-head', !isOpen && 'is-plain')}>
-        {canArrangeCards && (
-          <span
-            className="rb-rc-drag"
-            title={t`Drag to reorder`}
-            onMouseDown={() => setIsDraggable(true)}
-            onMouseUp={() => setIsDraggable(false)}
-          >
-            <Icon name="grip" size={14} />
-          </span>
-        )}
+        <span
+          className="rb-rc-drag"
+          title={canArrangeCards ? t`Drag to reorder` : undefined}
+          data-rb-no-permission={getRoboostNoPermissionAttribute(
+            canArrangeCards,
+          )}
+          aria-disabled={canArrangeCards ? undefined : true}
+          onMouseDown={() => setIsDraggable(true)}
+          onMouseUp={() => setIsDraggable(false)}
+        >
+          <Icon name="grip" size={14} />
+        </span>
         <button
           type="button"
           className={cx('rb-rc-chev', !isOpen && 'is-closed')}

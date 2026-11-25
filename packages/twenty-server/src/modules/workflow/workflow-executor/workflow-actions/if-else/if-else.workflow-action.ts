@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { RoboostRecordVisibilityService } from 'src/engine/metadata-modules/role/services/roboost-record-visibility.service';
 import { type WorkflowAction } from 'src/modules/workflow/workflow-executor/interfaces/workflow-action.interface';
 
 import {
@@ -15,8 +16,12 @@ import { findMatchingBranch } from 'src/modules/workflow/workflow-executor/workf
 
 @Injectable()
 export class IfElseWorkflowAction implements WorkflowAction {
+  constructor(
+    private readonly roboostRecordVisibilityService: RoboostRecordVisibilityService,
+  ) {}
+
   async execute(input: WorkflowActionInput): Promise<WorkflowActionOutput> {
-    const { currentStepId, steps, context } = input;
+    const { currentStepId, steps, context, runInfo } = input;
 
     const step = findStepOrThrow({
       stepId: currentStepId,
@@ -52,6 +57,10 @@ export class IfElseWorkflowAction implements WorkflowAction {
       branches,
       stepFilterGroups,
       resolvedFilters,
+      teamMemberIdsByTeamId:
+        await this.roboostRecordVisibilityService.getTeamMemberIdsByTeamId(
+          runInfo.workspaceId,
+        ),
     });
 
     return {

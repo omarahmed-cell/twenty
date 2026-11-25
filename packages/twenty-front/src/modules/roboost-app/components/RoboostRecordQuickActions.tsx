@@ -1,3 +1,6 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { useComposeEmailForTargetRecord } from '@/activities/emails/hooks/useComposeEmailForTargetRecord';
 import {
   type RoboostActivityType,
@@ -123,6 +126,9 @@ export const RoboostRecordQuickActions = ({
     });
 
   const { openComposer } = useComposeEmailForTargetRecord(targetRecord);
+  const roboostAccess = useRoboostAccess();
+  const canCreate = (objectNameSingular: string) =>
+    canRoboostWriteObject(roboostAccess, objectNameSingular, 'create');
 
   const actions: {
     key: string;
@@ -130,24 +136,34 @@ export const RoboostRecordQuickActions = ({
     icon: RoboostIconName;
     onClick: () => void;
     isDisabled?: boolean;
+    isAllowed: boolean;
   }[] = [
     {
       key: 'note',
       label: t`Note`,
       icon: 'note',
+      isAllowed: canCreate('note'),
       onClick: () => openActivity('note'),
     },
-    { key: 'email', label: t`Email`, icon: 'mail', onClick: openComposer },
+    {
+      key: 'email',
+      label: t`Email`,
+      icon: 'mail',
+      isAllowed: canCreate('email'),
+      onClick: openComposer,
+    },
     {
       key: 'call',
       label: t`Call`,
       icon: 'phone',
+      isAllowed: canCreate('call'),
       onClick: () => openActivity('call'),
     },
     {
       key: 'task',
       label: t`Task`,
       icon: 'tasks',
+      isAllowed: canCreate('task'),
       onClick: () => openActivity('task'),
     },
   ];
@@ -159,6 +175,10 @@ export const RoboostRecordQuickActions = ({
           key={action.key}
           type="button"
           disabled={action.isDisabled}
+          data-rb-no-permission={getRoboostNoPermissionAttribute(
+            action.isAllowed,
+          )}
+          aria-disabled={action.isAllowed ? undefined : true}
           onClick={action.onClick}
         >
           <StyledActionIcon>
@@ -174,12 +194,14 @@ export const RoboostRecordQuickActions = ({
               id: 'schedule-meeting',
               label: t`Schedule meeting`,
               icon: 'calendar',
+              isNoPermission: !canCreate('meeting'),
               onSelect: () => openMeeting('SCHEDULE'),
             },
             {
               id: 'log-meeting',
               label: t`Log meeting`,
               icon: 'history',
+              isNoPermission: !canCreate('meeting'),
               onSelect: () => openMeeting('LOG'),
             },
           ]}
@@ -206,18 +228,21 @@ export const RoboostRecordQuickActions = ({
               id: 'whatsapp',
               label: t`Log WhatsApp`,
               icon: 'whatsapp',
+              isNoPermission: !canCreate('communication'),
               onSelect: () => openActivity('whatsapp'),
             },
             {
               id: 'linkedin',
               label: t`Log LinkedIn message`,
               icon: 'linkedin',
+              isNoPermission: !canCreate('communication'),
               onSelect: () => openActivity('linkedin'),
             },
             {
               id: 'sms',
               label: t`Log SMS`,
               icon: 'sms',
+              isNoPermission: !canCreate('communication'),
               onSelect: () => openActivity('sms'),
             },
             ...(moreEntries.length > 0

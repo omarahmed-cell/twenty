@@ -1,6 +1,6 @@
 import {
-  expandRoboostTeamFilterValues,
   getRoboostTeamIdFromFilterValue,
+  toRoboostMemberFilterIds,
 } from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
@@ -77,7 +77,6 @@ export const buildRoboostListFilter = ({
   ownerFieldName,
   currentWorkspaceMemberId,
   now,
-  teamMemberIdsByTeamId = {},
 }: {
   objectMetadataItem: EnrichedObjectMetadataItem;
   viewFilter: RecordGqlOperationFilter | undefined;
@@ -86,7 +85,6 @@ export const buildRoboostListFilter = ({
   ownerFieldName: string | undefined;
   currentWorkspaceMemberId: string | undefined;
   now: Date;
-  teamMemberIdsByTeamId?: Record<string, string[]>;
 }): RecordGqlOperationFilter | undefined => {
   const fieldsByName = new Map(
     objectMetadataItem.fields
@@ -128,10 +126,7 @@ export const buildRoboostListFilter = ({
     } else if (isDefined(getRoboostTeamIdFromFilterValue(filters.ownerId))) {
       conditions.push({
         [key]: {
-          in: expandRoboostTeamFilterValues(
-            [filters.ownerId],
-            teamMemberIdsByTeamId,
-          ),
+          in: toRoboostMemberFilterIds([filters.ownerId]),
         },
       });
     } else if (filters.ownerId !== 'me') {
@@ -173,12 +168,7 @@ export const buildRoboostListFilter = ({
               ? buildRoboostFilterRule({
                   field,
                   operator: rule.operator,
-                  value: Array.isArray(rule.value)
-                    ? expandRoboostTeamFilterValues(
-                        rule.value,
-                        teamMemberIdsByTeamId,
-                      )
-                    : rule.value,
+                  value: rule.value,
                   now,
                   selectOptionValues: (field.options ?? []).map(
                     (option) => option.value,

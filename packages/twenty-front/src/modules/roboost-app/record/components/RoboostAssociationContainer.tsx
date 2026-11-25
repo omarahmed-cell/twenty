@@ -7,6 +7,8 @@ import {
   getRoboostRecordLabel,
 } from '@/roboost-app/fields/getRoboostRecordLabel';
 import { RoboostRecordPicker } from '@/roboost-app/fields/RoboostRecordPicker';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
 import { useOpenRoboostCreatePanel } from '@/roboost-app/hooks/useOpenRoboostCreatePanel';
 import { getRoboostListRecordGqlFields } from '@/roboost-app/list/utils/getRoboostListRecordGqlFields';
 import {
@@ -68,8 +70,15 @@ export const RoboostAssociationContainer = ({
   const [tagFilter, setTagFilter] = useState<string[]>([]);
   const [sort, setSort] = useState<RoboostAssociationSort>('newest');
   const [isPicking, setIsPicking] = useState(false);
+  const roboostAccess = useRoboostAccess();
+  const canEditAssociations = roboostAccess.hasToggle('editAssociations');
 
   const target = association.targetObjectMetadataItem;
+  const canCreateTarget = canRoboostWriteObject(
+    roboostAccess,
+    target.nameSingular,
+    'create',
+  );
   const targetLabel = target.labelSingular.toLowerCase();
   const { tagField, lineFields } = getRoboostAssociationCardFields(
     target,
@@ -191,12 +200,14 @@ export const RoboostAssociationContainer = ({
       id: 'existing',
       label: t`Associate an existing ${targetLabel}`,
       icon: 'link',
+      isNoPermission: !canEditAssociations,
       onSelect: () => setIsPicking(true),
     },
     {
       id: 'create',
       label: t`Create a new ${targetLabel}`,
       icon: 'plus',
+      isNoPermission: !canCreateTarget,
       onSelect: openCreate,
     },
   ];
@@ -268,6 +279,7 @@ export const RoboostAssociationContainer = ({
             variant="secondary"
             size="sm"
             icon="plus"
+            isNoPermission={!canCreateTarget}
             onClick={openCreate}
           >
             {t`Add ${targetLabel}`}
@@ -354,6 +366,7 @@ export const RoboostAssociationContainer = ({
                 tagField={tagField}
                 lineFields={lineFields}
                 onRemove={() => removeAssociation(record.id)}
+                canRemove={canEditAssociations}
               />
             ))}
             {visibleRecords.length === 0 && shownRecords.length > 0 && (

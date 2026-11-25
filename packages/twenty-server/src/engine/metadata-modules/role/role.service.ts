@@ -455,24 +455,29 @@ export class RoleService {
     return rolesToDelete.map(fromFlatRoleToRoleDto);
   }
 
+  // Real workspaces get a Member role with no access: every member runs on their private Users & Teams role
   public async createMemberRole({
     workspaceId,
     ownerFlatApplication,
+    hasNoAccess = false,
   }: {
     ownerFlatApplication: FlatApplication;
     workspaceId: string;
+    hasNoAccess?: boolean;
   }): Promise<RoleDTO> {
     return this.createRole({
       input: {
         label: MEMBER_ROLE_LABEL,
-        description: 'Member role',
+        description: hasNoAccess
+          ? 'Default role with no access. Members run on their private Users & Teams role.'
+          : 'Member role',
         icon: 'IconUser',
         canUpdateAllSettings: false,
-        canAccessAllTools: true,
-        canReadAllObjectRecords: true,
-        canUpdateAllObjectRecords: true,
-        canSoftDeleteAllObjectRecords: true,
-        canDestroyAllObjectRecords: true,
+        canAccessAllTools: !hasNoAccess,
+        canReadAllObjectRecords: !hasNoAccess,
+        canUpdateAllObjectRecords: !hasNoAccess,
+        canSoftDeleteAllObjectRecords: !hasNoAccess,
+        canDestroyAllObjectRecords: !hasNoAccess,
         canBeAssignedToUsers: true,
         canBeAssignedToAgents: false,
         canBeAssignedToApiKeys: false,

@@ -2,6 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { Brackets, type WhereExpressionBuilder } from 'typeorm';
 import { compositeTypeDefinitions, RelationType } from 'twenty-shared/types';
 import { capitalize, isDefined } from 'twenty-shared/utils';
+import { STANDARD_OBJECTS } from 'twenty-shared/metadata';
 
 import { MAX_RELATION_FILTER_DEPTH } from 'src/engine/api/common/common-args-processors/filter-arg-processor/constants/max-relation-filter-depth.constant';
 import { type ObjectRecordFilter } from 'src/engine/api/graphql/workspace-query-builder/interfaces/object-record.interface';
@@ -11,6 +12,7 @@ import {
 } from 'src/engine/api/graphql/graphql-query-runner/errors/graphql-query-runner.exception';
 import { addRelationJoinAliasToQueryBuilder } from 'src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/utils/add-relation-join-alias.util';
 import { resolveObjectSharing } from 'src/engine/core-modules/record-share/utils/resolve-object-sharing.util';
+import { addRoboostTeamMembersToCondition } from 'src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/utils/add-roboost-team-members-to-condition.util';
 import { assertFieldIsReadableOrThrow } from 'src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/utils/assert-field-is-readable-or-throw.util';
 import { resolveFilterKeyFieldMetadata } from 'src/engine/api/graphql/graphql-query-runner/graphql-query-parsers/utils/resolve-filter-key-field-metadata.util';
 import { assertArrayOperatorValueIsNonEmptyArray } from 'src/engine/api/graphql/graphql-query-runner/utils/assert-array-operator-value-is-non-empty-array.util';
@@ -31,6 +33,7 @@ import {
 
 import { GraphqlQueryFilterConditionParser } from './graphql-query-filter-condition.parser';
 import { type WorkspaceSelectQueryBuilder } from 'src/engine/twenty-orm/query-builder/workspace-select-query-builder';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 export class GraphqlQueryFilterFieldParser {
   private flatObjectMetadata: FlatObjectMetadata;
@@ -141,7 +144,7 @@ export class GraphqlQueryFilterFieldParser {
 
     assertArrayOperatorValueIsNonEmptyArray({ operator, value, key });
 
-    const { sql, params } = computeWhereConditionParts({
+    const conditionParts = computeWhereConditionParts({
       operator,
       objectNameSingular,
       key,
@@ -149,12 +152,50 @@ export class GraphqlQueryFilterFieldParser {
       fieldMetadataType: fieldMetadata.type,
       useDirectTableReference,
     });
+    const { sql, params } = this.isWorkspaceMemberJoinColumn(fieldMetadata)
+      ? addRoboostTeamMembersToCondition({
+          conditionParts,
+          operator,
+          value,
+          fieldReference: useDirectTableReference
+            ? `"${key}"`
+            : `"${objectNameSingular}"."${key}"`,
+          schemaName: getWorkspaceSchemaName(
+            this.flatObjectMetadata.workspaceId,
+          ),
+        })
+      : conditionParts;
 
     if (isFirst) {
       queryBuilder.where(sql, params);
     } else {
       queryBuilder.andWhere(sql, params);
     }
+  }
+
+  // A member filter value can be a team id, meaning whoever is in that team when the query runs
+  private isWorkspaceMemberJoinColumn(
+    fieldMetadata: OrmFlatFieldMetadata,
+  ): boolean {
+    if (
+      !isDefined(this.flatObjectMetadataMaps) ||
+      !isDefined(fieldMetadata.relationTargetObjectMetadataId) ||
+      !isMorphOrRelationFlatFieldMetadata(fieldMetadata) ||
+      fieldMetadata.settings?.relationType !== RelationType.MANY_TO_ONE
+    ) {
+      return false;
+    }
+
+    return (
+      this.flatObjectMetadataMaps.universalIdentifierById[
+        fieldMetadata.relationTargetObjectMetadataId
+      ] === STANDARD_OBJECTS.workspaceMember.universalIdentifier &&
+      isDefined(
+        this.flatObjectMetadataMaps.byUniversalIdentifier[
+          STANDARD_OBJECTS.teamMembership.universalIdentifier
+        ],
+      )
+    );
   }
 
   private parseRelationSubFilter({

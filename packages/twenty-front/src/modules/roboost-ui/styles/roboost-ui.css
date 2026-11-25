@@ -2513,3 +2513,32 @@
   border-top-color: transparent;
   left: -5px;
 }
+
+/* ---------- No permission ---------- */
+[data-rb-no-permission],
+[data-rb-no-permission] * {
+  cursor: not-allowed !important;
+}
+[data-rb-no-permission] {
+  opacity: 0.5;
+}
+[data-rb-no-permission] * {
+  pointer-events: none;
+}
+.rb-noperm-tip {
+  background: var(--tooltip-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  color: var(--text-on-accent);
+  font: 500 12px/16px var(--font-sans);
+  padding: 5px 9px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.rb-floating:has(> .rb-noperm-tip) {
+  pointer-events: none;
+  z-index: 2000;
+}
+.rb-floating:has(> .rb-noperm-tip) > .rb-floating-arrow {
+  display: none;
+}

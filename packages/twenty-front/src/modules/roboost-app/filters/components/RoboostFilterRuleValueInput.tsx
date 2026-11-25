@@ -31,7 +31,7 @@ export const RoboostFilterRuleValueInput = ({
   field,
   rule,
   onChange,
-  canPickTeams = false,
+  canPickTeams = true,
 }: RoboostFilterRuleValueInputProps) => {
   const { t } = useLingui();
   const isMemberRelation =
@@ -103,39 +103,6 @@ export const RoboostFilterRuleValueInput = ({
               </button>
             </span>
           ))}
-          {canPickTeams && isMemberRelation && teams.length > 0 && (
-            <Select
-              aria-label={t`Add a team`}
-              placeholder={t`Anyone in a team`}
-              value=""
-              isSearchable
-              options={teams
-                .filter(
-                  (team) => !values.includes(toRoboostTeamFilterValue(team.id)),
-                )
-                .map((team) => ({
-                  value: toRoboostTeamFilterValue(team.id),
-                  label: team.name,
-                }))}
-              onChange={(teamValue) => {
-                const team = teams.find(
-                  (candidate) =>
-                    toRoboostTeamFilterValue(candidate.id) === teamValue,
-                );
-
-                if (isDefined(team)) {
-                  onChange({
-                    ...rule,
-                    value: [...values, teamValue],
-                    labels: {
-                      ...rule.labels,
-                      [teamValue]: t`Team ${team.name}`,
-                    },
-                  });
-                }
-              }}
-            />
-          )}
           <RoboostRecordPicker
             objectNameSingular={
               field.relation?.targetObjectMetadata.nameSingular ?? ''
@@ -143,6 +110,19 @@ export const RoboostFilterRuleValueInput = ({
             selectedLabel=""
             placeholder={t`Add a value`}
             isClearable={false}
+            leadingOptions={
+              canPickTeams && isMemberRelation
+                ? teams
+                    .filter(
+                      (team) =>
+                        !values.includes(toRoboostTeamFilterValue(team.id)),
+                    )
+                    .map((team) => ({
+                      id: toRoboostTeamFilterValue(team.id),
+                      label: t`Team: ${team.name}`,
+                    }))
+                : []
+            }
             onSelect={(record) => {
               if (isDefined(record) && !values.includes(record.id)) {
                 onChange({

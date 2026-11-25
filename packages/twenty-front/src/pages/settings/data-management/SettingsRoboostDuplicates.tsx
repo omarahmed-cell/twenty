@@ -45,7 +45,17 @@ const RoboostDuplicateObjectCard = ({
   const lastScanAt = overview?.settings.lastScanAt ?? null;
   const openCount = overview?.openCount ?? 0;
 
-  const toggleRule = async (key: string, isEnabled: boolean) => {
+  const similarityThreshold = overview?.settings.similarityThreshold ?? null;
+  const [draftThreshold, setDraftThreshold] = useState<number | null>(null);
+  const shownThreshold = draftThreshold ?? similarityThreshold;
+
+  const save = async ({
+    ruleChange,
+    threshold,
+  }: {
+    ruleChange?: { key: string; isEnabled: boolean };
+    threshold?: number;
+  }) => {
     try {
       await saveRules({
         variables: {
@@ -54,11 +64,15 @@ const RoboostDuplicateObjectCard = ({
             ...Object.fromEntries(
               rules.map((rule) => [rule.key, rule.isEnabled]),
             ),
-            [key]: isEnabled,
+            ...(isDefined(ruleChange)
+              ? { [ruleChange.key]: ruleChange.isEnabled }
+              : {}),
           },
+          similarityThreshold: threshold ?? null,
         },
       });
       await refetch();
+      setDraftThreshold(null);
     } catch (error) {
       enqueueToast({
         status: 'error',
@@ -66,6 +80,9 @@ const RoboostDuplicateObjectCard = ({
       });
     }
   };
+
+  const toggleRule = (key: string, isEnabled: boolean) =>
+    save({ ruleChange: { key, isEnabled } });
 
   const scanNow = async () => {
     setIsScanning(true);
@@ -140,6 +157,36 @@ const RoboostDuplicateObjectCard = ({
           );
         })}
       </div>
+      {isDefined(shownThreshold) && (
+        <div className="rb-dq-threshold">
+          <label htmlFor={`rb-dq-threshold-${objectName}`}>
+            {objectName === 'person'
+              ? t`Name similarity needed for contacts`
+              : t`Name similarity needed for companies`}
+          </label>
+          <input
+            id={`rb-dq-threshold-${objectName}`}
+            type="range"
+            min={0.3}
+            max={1}
+            step={0.05}
+            value={shownThreshold}
+            onChange={(event) => setDraftThreshold(Number(event.target.value))}
+            onPointerUp={() =>
+              isDefined(draftThreshold) && save({ threshold: draftThreshold })
+            }
+            onKeyUp={() =>
+              isDefined(draftThreshold) && save({ threshold: draftThreshold })
+            }
+          />
+          <span className="rb-dq-threshold-value">
+            {`${Math.round(shownThreshold * 100)}%`}
+          </span>
+          <span className="rb-dt-sub">
+            {t`Higher finds fewer, closer matches. Applies from the next scan.`}
+          </span>
+        </div>
+      )}
     </div>
   );
 };
@@ -168,7 +215,7 @@ export const SettingsRoboostDuplicates = () => {
           <div className="rb-dt-card rb-dt-intro">
             <div>
               <h3 className="rb-dt-title">{t`Duplicate rules`}</h3>
-              <p className="rb-dt-sub">{t`The scan runs every night after 00:37 UTC and finds pairs with these rules. Turn a rule off to stop it creating pairs; pairs marked Not duplicates stay hidden. Users with Merge on an object see its pairs under Data quality on the list.`}</p>
+              <p className="rb-dt-sub">{t`The scan runs every night at 00:45 UTC and finds pairs with these rules. Turn a rule off to stop it creating pairs; pairs marked Not duplicates stay hidden. Users with Merge on an object see its pairs under Data quality on the list.`}</p>
             </div>
           </div>
           {mergeObjects.map((objectMetadataItem) => (

@@ -28,6 +28,7 @@ import { FileCorePictureService } from 'src/engine/core-modules/file/file-core-p
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
 import { extractFileIdFromUrl } from 'src/engine/core-modules/file/files-field/utils/extract-file-id-from-url.util';
 import { OnboardingService } from 'src/engine/core-modules/onboarding/onboarding.service';
+import { RoboostNewMemberAccessService } from 'src/engine/core-modules/user-workspace/services/roboost-new-member-access.service';
 import { WorkspaceMemberAccessService } from 'src/engine/core-modules/user-workspace/services/workspace-member-access.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { WorkflowRunRecordShareService } from 'src/engine/core-modules/workflow/services/workflow-run-record-share.service';
@@ -79,6 +80,7 @@ export class UserWorkspaceService {
     private readonly workflowRunRecordShareService: WorkflowRunRecordShareService,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly workspaceMemberAccessService: WorkspaceMemberAccessService,
+    private readonly roboostNewMemberAccessService: RoboostNewMemberAccessService,
   ) {}
 
   async findById(id: string): Promise<UserWorkspaceEntity | null> {
@@ -285,6 +287,11 @@ export class UserWorkspaceService {
       workspaceId: workspace.id,
       userWorkspaceIds: [userWorkspace.id],
       roleId: resolvedRoleId,
+    });
+
+    await this.roboostNewMemberAccessService.provision({
+      workspaceId: workspace.id,
+      userWorkspaceId: userWorkspace.id,
     });
 
     await this.workspaceInvitationService.invalidateWorkspaceInvitation(

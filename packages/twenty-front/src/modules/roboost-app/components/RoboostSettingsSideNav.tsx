@@ -118,10 +118,13 @@ const toNavItems = (
   items
     .filter((item) => item.isHidden !== true)
     .flatMap((item) => {
-      if (item.path === SettingsPath.Layout) {
+      if (item.path === SettingsPath.Layout && item.isNoPermission !== true) {
         return toLayoutNavItems(item, pathname, labels);
       }
-      if (item.path === SettingsPath.WorkspaceMembersPage) {
+      if (
+        item.path === SettingsPath.WorkspaceMembersPage &&
+        item.isNoPermission !== true
+      ) {
         return toUsersAndTeamsNavItems(item, pathname, labels);
       }
       const href = isDefined(item.path)
@@ -139,12 +142,15 @@ const toNavItems = (
         href,
         active: isActive,
         isIndented,
+        isNoPermission: item.isNoPermission,
         onClick: item.onClick,
       };
 
       return [
         navItem,
-        ...toNavItems(item.subItems ?? [], pathname, labels, true),
+        ...(item.isNoPermission === true
+          ? []
+          : toNavItems(item.subItems ?? [], pathname, labels, true)),
       ];
     });
 

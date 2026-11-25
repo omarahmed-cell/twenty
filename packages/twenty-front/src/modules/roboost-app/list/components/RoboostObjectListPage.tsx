@@ -1,11 +1,9 @@
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { RoboostDataQualityButton } from '@/roboost-app/merge/components/RoboostDataQualityButton';
-import { ROBOOST_TEAMS } from '@/roboost-app/users-and-teams/graphql/roboostUsersQueries';
-import { type RoboostTeam } from '@/roboost-app/users-and-teams/types/RoboostUsers';
-import { buildRoboostTeamMemberIdsByTeamId } from '@/roboost-app/users-and-teams/utils/roboostTeamFilterValue';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
 import { ROBOOST_LOG_EXPORT } from '@/roboost-app/data-transfer/graphql/roboostDataTransferQueries';
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useMutation } from '@apollo/client/react';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -99,10 +97,6 @@ export const RoboostObjectListPage = ({
 }: RoboostObjectListPageProps) => {
   const { t } = useLingui();
   const roboostAccess = useRoboostAccess();
-  const { data: teamsData } = useQuery<{ roboostTeams: RoboostTeam[] }>(
-    ROBOOST_TEAMS,
-    { fetchPolicy: 'cache-first' },
-  );
   const [searchParams, setSearchParams] = useSearchParams();
   const apolloCoreClient = useApolloCoreClient();
   const { objectMetadataItems } = useObjectMetadataItems();
@@ -303,9 +297,6 @@ export const RoboostObjectListPage = ({
     ownerFieldName: ownerField?.name,
     currentWorkspaceMemberId: currentWorkspaceMember?.id,
     now: new Date(),
-    teamMemberIdsByTeamId: buildRoboostTeamMemberIdsByTeamId(
-      teamsData?.roboostTeams ?? [],
-    ),
   });
 
   const sortField = isDefined(sort)
@@ -491,44 +482,34 @@ export const RoboostObjectListPage = ({
           <Menu
             align="right"
             entries={[
-              ...(canExport
-                ? [
-                    {
-                      id: 'export',
-                      label:
-                        selectedIds.length > 0
-                          ? t`Export ${selectedIds.length} selected`
-                          : t`Export this view`,
-                      icon: 'download' as const,
-                      onSelect: exportRecords,
-                    },
-                  ]
-                : []),
-              ...(canDeleteRecords
-                ? [
-                    {
-                      id: 'delete',
-                      label: t`Delete selected`,
-                      icon: 'trash' as const,
-                      isDanger: true,
-                      isDisabled:
-                        selectedIds.length === 0 ||
-                        (selectedIds.length > 1 && !canBulkDelete),
-                      hint:
-                        selectedIds.length > 1 && !canBulkDelete
-                          ? t`Bulk delete is off for you`
-                          : undefined,
-                      onSelect: () => {
-                        if (
-                          selectedIds.length === 1 ||
-                          (selectedIds.length > 1 && canBulkDelete)
-                        ) {
-                          setIsDeleteOpen(true);
-                        }
-                      },
-                    },
-                  ]
-                : []),
+              {
+                id: 'export',
+                label:
+                  selectedIds.length > 0
+                    ? t`Export ${selectedIds.length} selected`
+                    : t`Export this view`,
+                icon: 'download' as const,
+                isNoPermission: !canExport,
+                onSelect: exportRecords,
+              },
+              {
+                id: 'delete',
+                label:
+                  selectedIds.length > 1
+                    ? t`Delete ${selectedIds.length} selected`
+                    : t`Delete selected`,
+                icon: 'trash' as const,
+                isDanger: true,
+                isDisabled: selectedIds.length === 0,
+                isNoPermission:
+                  !canDeleteRecords ||
+                  (selectedIds.length > 1 && !canBulkDelete),
+                onSelect: () => {
+                  if (selectedIds.length > 0) {
+                    setIsDeleteOpen(true);
+                  }
+                },
+              },
               { id: 'sep', isSeparator: true },
               {
                 id: 'classic',
@@ -548,29 +529,31 @@ export const RoboostObjectListPage = ({
               </button>
             )}
           />
-          {canImport && (
-            <button
-              type="button"
-              className="rb-hbtn"
-              onClick={() => openObjectRecordsSpreadsheetImportDialog()}
-            >
-              {t`Import`}
-            </button>
-          )}
-          {canCreateRecords && (
-            <button
-              type="button"
-              className="rb-hbtn rb-hbtn-accent"
-              onClick={() =>
-                openCreatePanel({
-                  objectNameSingular: objectMetadataItem.nameSingular,
-                })
-              }
-            >
-              <Icon name="plus" size={14} strokeWidth={2} />
-              {t`Create ${objectMetadataItem.labelSingular.toLowerCase()}`}
-            </button>
-          )}
+          <button
+            type="button"
+            className="rb-hbtn"
+            data-rb-no-permission={getRoboostNoPermissionAttribute(canImport)}
+            aria-disabled={canImport ? undefined : true}
+            onClick={() => openObjectRecordsSpreadsheetImportDialog()}
+          >
+            {t`Import`}
+          </button>
+          <button
+            type="button"
+            className="rb-hbtn rb-hbtn-accent"
+            data-rb-no-permission={getRoboostNoPermissionAttribute(
+              canCreateRecords,
+            )}
+            aria-disabled={canCreateRecords ? undefined : true}
+            onClick={() =>
+              openCreatePanel({
+                objectNameSingular: objectMetadataItem.nameSingular,
+              })
+            }
+          >
+            <Icon name="plus" size={14} strokeWidth={2} />
+            {t`Create ${objectMetadataItem.labelSingular.toLowerCase()}`}
+          </button>
         </div>
 
         <div className="rb-list-shell">
@@ -704,17 +687,19 @@ export const RoboostObjectListPage = ({
                 >
                   <Icon name="refresh" size={16} />
                 </button>
-                {canExport && (
-                  <button
-                    type="button"
-                    className="rb-hbtn"
-                    disabled={isExporting}
-                    onClick={exportRecords}
-                  >
-                    <Icon name="download" size={14} />
-                    {isExporting ? t`Exporting…` : t`Export`}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="rb-hbtn"
+                  disabled={isExporting}
+                  data-rb-no-permission={getRoboostNoPermissionAttribute(
+                    canExport,
+                  )}
+                  aria-disabled={canExport ? undefined : true}
+                  onClick={exportRecords}
+                >
+                  <Icon name="download" size={14} />
+                  {isExporting ? t`Exporting…` : t`Export`}
+                </button>
               </span>
             </div>
           )}

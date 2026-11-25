@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { RoboostRecordVisibilityModule } from 'src/engine/metadata-modules/role/roboost-record-visibility.module';
 import { ApiKeyModule } from 'src/engine/core-modules/api-key/api-key.module';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { AiAgentRoleModule } from 'src/engine/metadata-modules/ai/ai-agent-role/ai-agent-role.module';
@@ -22,6 +23,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
 
 @Module({
   imports: [
+    RoboostRecordVisibilityModule,
     UserRoleModule,
     AiAgentRoleModule,
     ApplicationModule,

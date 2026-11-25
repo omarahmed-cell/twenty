@@ -349,7 +349,10 @@ export {
 export { removePropertiesFromRecord } from './removePropertiesFromRecord';
 export { removeUndefinedFields } from './removeUndefinedFields';
 export type { RoboostFilterRuleValue } from './roboost-filter/buildRoboostFilterRule';
-export { buildRoboostFilterRule } from './roboost-filter/buildRoboostFilterRule';
+export {
+  ROBOOST_TEAM_FILTER_VALUE_PREFIX,
+  buildRoboostFilterRule,
+} from './roboost-filter/buildRoboostFilterRule';
 export type { RoboostDatePresetRangeKey } from './roboost-filter/getRoboostDatePresetRange';
 export { getRoboostDatePresetRange } from './roboost-filter/getRoboostDatePresetRange';
 export type { RoboostFilterField } from './roboost-filter/getRoboostFilterFieldKind';

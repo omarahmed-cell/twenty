@@ -35,7 +35,7 @@ const PERSON_FIELD_SEED_UNIVERSAL_IDENTIFIERS = [
   PERSON_FIELDS.lifecycleStage,
   PERSON_FIELDS.dateEnteredCurrentStage,
   PERSON_FIELDS.timeInCurrentStage,
-  PERSON_FIELDS.team,
+  { universalIdentifier: '4a38fc60-2cdb-4228-891e-b8490663612e' },
   PERSON_FIELDS.contactOwner,
   PERSON_FIELDS.contactSdrOwner,
   PERSON_FIELDS.ownerAssignedDate,

@@ -2,6 +2,7 @@ import { FrameLogo } from '@/roboost-ui/components/FrameLogo';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { type RoboostIconName } from '@/roboost-ui/types/RoboostIconName';
 import { cx } from '@/roboost-ui/utils/cx';
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { useLingui } from '@lingui/react/macro';
 import { type CSSProperties, Fragment, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -16,6 +17,7 @@ export type NavItem = {
   active?: boolean;
   href?: string;
   isIndented?: boolean;
+  isNoPermission?: boolean;
   onClick?: () => void;
 };
 
@@ -84,6 +86,10 @@ export const SideNav = ({
                 aria-current={item.active === true ? 'page' : undefined}
                 aria-label={collapsed ? item.label : undefined}
                 data-tip={item.label}
+                data-rb-no-permission={getRoboostNoPermissionAttribute(
+                  item.isNoPermission !== true,
+                )}
+                aria-disabled={item.isNoPermission !== true ? undefined : true}
                 onClick={(event) => {
                   if (item.onClick !== undefined) {
                     event.preventDefault();

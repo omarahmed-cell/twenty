@@ -68,6 +68,32 @@ export type RoboostBulkMergeResult = {
   message: string | null;
 };
 
+const SCAN_BATCH_SIZE = 2000;
+const PAIR_PAGE_SIZE = 100;
+const PAIR_CHUNK_SIZE = 500;
+
+export type RoboostDuplicatePairSort = 'confidence' | 'newest' | 'oldest';
+const MIN_SIMILARITY_THRESHOLD = 0.3;
+
+// Similar names (companies) and similar full names (contacts) use trigram similarity
+const DEFAULT_SIMILARITY_THRESHOLD = { company: 0.6, person: 0.7 } as const;
+
+type RoboostFuzzyObjectName = keyof typeof DEFAULT_SIMILARITY_THRESHOLD;
+
+const isFuzzyObject = (
+  objectName: RoboostMergeObjectName,
+): objectName is RoboostFuzzyObjectName =>
+  objectName in DEFAULT_SIMILARITY_THRESHOLD;
+
+// pg_trgm's % operator prefilters at its 0.3 default, so lower thresholds would miss pairs
+const clampSimilarityThreshold = (value: unknown, fallback: number) => {
+  const number = Number(value);
+
+  return value === null || value === undefined || !Number.isFinite(number)
+    ? fallback
+    : Math.min(1, Math.max(MIN_SIMILARITY_THRESHOLD, number));
+};
+
 const quote = (identifier: string) => `"${identifier.replace(/"/g, '""')}"`;
 
 const toIso = (value: unknown) =>
@@ -194,6 +220,12 @@ export class RoboostDuplicateService {
       })),
       lastScanAt: toIso(rows[0]?.lastScanAt),
       lastScanPairCount: (rows[0]?.lastScanPairCount as number | null) ?? null,
+      similarityThreshold: isFuzzyObject(objectName)
+        ? clampSimilarityThreshold(
+            rows[0]?.similarityThreshold,
+            DEFAULT_SIMILARITY_THRESHOLD[objectName],
+          )
+        : null,
     };
   }
 
@@ -202,11 +234,13 @@ export class RoboostDuplicateService {
     actor,
     objectName: rawObjectName,
     rules,
+    similarityThreshold,
   }: {
     workspaceId: string;
     actor: RoboostMergeActor;
     objectName: string;
     rules: Record<string, boolean>;
+    similarityThreshold?: number | null;
   }) {
     const objectName =
       this.roboostMergeService.assertMergeObject(rawObjectName);
@@ -239,6 +273,19 @@ export class RoboostDuplicateService {
       ON CONFLICT ("objectName") DO UPDATE SET rules = EXCLUDED.rules`,
       [objectName, JSON.stringify(cleaned)],
     );
+
+    if (isFuzzyObject(objectName) && typeof similarityThreshold === 'number') {
+      await this.coreDataSource.query(
+        `UPDATE ${this.schema(workspaceId)}."roboostDuplicateSettings" SET "similarityThreshold" = $2 WHERE "objectName" = $1`,
+        [
+          objectName,
+          clampSimilarityThreshold(
+            similarityThreshold,
+            DEFAULT_SIMILARITY_THRESHOLD[objectName],
+          ),
+        ],
+      );
+    }
 
     return this.getRuleSettings(workspaceId, objectName);
   }
@@ -288,9 +335,23 @@ export class RoboostDuplicateService {
         continue;
       }
 
-      const rows: { a: string; b: string }[] = await this.coreDataSource.query(
-        query.sql,
-      );
+      let rows: { a: string; b: string }[] = [];
+
+      try {
+        rows =
+          query.isBatched === true
+            ? await this.runBatchedCandidateQuery(
+                context,
+                query.sql,
+                settings.similarityThreshold ?? 1,
+              )
+            : await this.coreDataSource.query(query.sql);
+      } catch (error) {
+        this.logger.error(
+          `Workspace ${workspaceId}: duplicate rule ${query.ruleKey} failed: ${(error as Error).message}`,
+        );
+        continue;
+      }
 
       for (const { a, b } of rows) {
         const key = `${a}:${b}`;
@@ -318,6 +379,35 @@ export class RoboostDuplicateService {
     }
 
     return [...pairs.values()];
+  }
+
+  // Pages through the records so the similarity join never holds the whole table at once
+  private async runBatchedCandidateQuery(
+    context: RoboostMergeObjectContext,
+    sql: string,
+    similarityThreshold: number,
+  ): Promise<{ a: string; b: string }[]> {
+    const rows: { a: string; b: string }[] = [];
+    let lastId = '00000000-0000-0000-0000-000000000000';
+
+    for (;;) {
+      const batch: { id: string }[] = await this.coreDataSource.query(
+        `SELECT id FROM ${this.roboostMergeService.table(context)} WHERE "deletedAt" IS NULL AND id > $1 ORDER BY id LIMIT ${SCAN_BATCH_SIZE}`,
+        [lastId],
+      );
+
+      if (batch.length === 0) {
+        return rows;
+      }
+
+      rows.push(
+        ...(await this.coreDataSource.query(sql, [
+          batch.map(({ id }) => id),
+          similarityThreshold,
+        ])),
+      );
+      lastId = batch[batch.length - 1].id;
+    }
   }
 
   // A full scan refreshes open pairs and drops the ones that no longer match; rejected pairs stay rejected
@@ -434,33 +524,69 @@ export class RoboostDuplicateService {
     );
   }
 
-  // Pairs where both records are still live and the user may merge both
-  async listPairs({
+  // Reads pair rows in chunks (both records live), so lists and counts work at any table size
+  private async *iteratePairRows({
+    workspaceId,
+    context,
+    objectName,
+    status,
+    confidence,
+    sort = 'confidence',
+    offset = 0,
+  }: {
+    workspaceId: string;
+    context: RoboostMergeObjectContext;
+    objectName: RoboostMergeObjectName;
+    status: RoboostDuplicatePairStatus;
+    confidence?: RoboostDuplicateConfidence | null;
+    sort?: RoboostDuplicatePairSort;
+    offset?: number;
+  }): AsyncGenerator<{ rows: RawRow[]; offset: number }> {
+    const table = this.roboostMergeService.table(context);
+    const orderBy =
+      sort === 'oldest'
+        ? `p."detectedAt" ASC, p.id`
+        : sort === 'newest'
+          ? `p."detectedAt" DESC, p.id`
+          : `CASE p.confidence WHEN 'EXACT' THEN 0 WHEN 'HIGH' THEN 1 ELSE 2 END, p."detectedAt" DESC, p.id`;
+    let cursor = offset;
+
+    for (;;) {
+      const rows: RawRow[] = await this.coreDataSource.query(
+        `SELECT p.* FROM ${this.schema(workspaceId)}."roboostDuplicatePair" p
+        WHERE p."objectName" = $1 AND p.status = $2 AND ($3::text IS NULL OR p.confidence = $3)
+          AND EXISTS (SELECT 1 FROM ${table} r WHERE r.id = p."recordAId" AND r."deletedAt" IS NULL)
+          AND EXISTS (SELECT 1 FROM ${table} r WHERE r.id = p."recordBId" AND r."deletedAt" IS NULL)
+        ORDER BY ${orderBy} OFFSET $4 LIMIT ${PAIR_CHUNK_SIZE}`,
+        [objectName, status, confidence ?? null, cursor],
+      );
+
+      if (rows.length === 0) {
+        return;
+      }
+
+      yield { rows, offset: cursor };
+      cursor += rows.length;
+
+      if (rows.length < PAIR_CHUNK_SIZE) {
+        return;
+      }
+    }
+  }
+
+  private async toPairItems({
     workspaceId,
     actor,
-    objectName: rawObjectName,
-    status,
+    context,
+    objectName,
+    rows,
   }: {
     workspaceId: string;
     actor: RoboostMergeActor;
-    objectName: string;
-    status: RoboostDuplicatePairStatus;
-  }): Promise<RoboostDuplicatePairItem[]> {
-    const objectName =
-      this.roboostMergeService.assertMergeObject(rawObjectName);
-
-    await this.assertCanManage(workspaceId, actor, objectName);
-
-    if (!(await this.tablesExist(workspaceId))) {
-      return [];
-    }
-
-    const rows: RawRow[] = await this.coreDataSource.query(
-      `SELECT * FROM ${this.schema(workspaceId)}."roboostDuplicatePair"
-      WHERE "objectName" = $1 AND status = $2
-      ORDER BY "detectedAt" DESC LIMIT 5000`,
-      [objectName, status],
-    );
+    context: RoboostMergeObjectContext;
+    objectName: RoboostMergeObjectName;
+    rows: RawRow[];
+  }): Promise<(RoboostDuplicatePairItem | null)[]> {
     const recordIds = [
       ...new Set(
         rows.flatMap((row) => [
@@ -469,10 +595,6 @@ export class RoboostDuplicateService {
         ]),
       ),
     ];
-    const context = await this.roboostMergeService.getObjectContext(
-      workspaceId,
-      objectName,
-    );
     const mergeable = new Set(
       await this.roboostMergeService.filterMergeableIds(
         workspaceId,
@@ -486,28 +608,173 @@ export class RoboostDuplicateService {
       recordIds.filter((id) => mergeable.has(id)),
     );
 
-    return rows.flatMap((row) => {
+    return rows.map((row) => {
       const recordA = summaries.get(row.recordAId as string);
       const recordB = summaries.get(row.recordBId as string);
 
       if (!isDefined(recordA) || !isDefined(recordB)) {
-        return [];
+        return null;
       }
 
-      return [
-        {
-          id: row.id as string,
-          confidence: row.confidence as RoboostDuplicateConfidence,
-          reasons: parseJson<RoboostDuplicateRuleKey[]>(row.reasons, []),
-          status: row.status as RoboostDuplicatePairStatus,
-          detectedAt: toIso(row.detectedAt) as string,
-          resolvedAt: toIso(row.resolvedAt),
-          resolvedByName: (row.resolvedByName as string | null) ?? null,
-          recordA,
-          recordB,
-        },
-      ];
+      return {
+        id: row.id as string,
+        confidence: row.confidence as RoboostDuplicateConfidence,
+        reasons: parseJson<RoboostDuplicateRuleKey[]>(row.reasons, []),
+        status: row.status as RoboostDuplicatePairStatus,
+        detectedAt: toIso(row.detectedAt) as string,
+        resolvedAt: toIso(row.resolvedAt),
+        resolvedByName: (row.resolvedByName as string | null) ?? null,
+        recordA,
+        recordB,
+      };
     });
+  }
+
+  // Every pair where both records are still live and the user may merge both
+  async listPairs({
+    workspaceId,
+    actor,
+    objectName: rawObjectName,
+    status,
+    confidence,
+  }: {
+    workspaceId: string;
+    actor: RoboostMergeActor;
+    objectName: string;
+    status: RoboostDuplicatePairStatus;
+    confidence?: RoboostDuplicateConfidence;
+  }): Promise<RoboostDuplicatePairItem[]> {
+    const objectName =
+      this.roboostMergeService.assertMergeObject(rawObjectName);
+
+    await this.assertCanManage(workspaceId, actor, objectName);
+
+    if (!(await this.tablesExist(workspaceId))) {
+      return [];
+    }
+
+    const context = await this.roboostMergeService.getObjectContext(
+      workspaceId,
+      objectName,
+    );
+    const items: RoboostDuplicatePairItem[] = [];
+
+    for await (const { rows } of this.iteratePairRows({
+      workspaceId,
+      context,
+      objectName,
+      status,
+      confidence,
+    })) {
+      items.push(
+        ...(
+          await this.toPairItems({
+            workspaceId,
+            actor,
+            context,
+            objectName,
+            rows,
+          })
+        ).filter(isDefined),
+      );
+    }
+
+    return items;
+  }
+
+  // One page of the Manage duplicates list; nextOffset continues after the last pair row read
+  async listPairsPage({
+    workspaceId,
+    actor,
+    objectName: rawObjectName,
+    status,
+    confidence,
+    search,
+    sort,
+    offset = 0,
+    limit = PAIR_PAGE_SIZE,
+  }: {
+    workspaceId: string;
+    actor: RoboostMergeActor;
+    objectName: string;
+    status: RoboostDuplicatePairStatus;
+    confidence?: RoboostDuplicateConfidence | null;
+    search?: string | null;
+    sort?: RoboostDuplicatePairSort;
+    offset?: number;
+    limit?: number;
+  }): Promise<{
+    items: RoboostDuplicatePairItem[];
+    nextOffset: number | null;
+    totalCount: number;
+  }> {
+    const objectName =
+      this.roboostMergeService.assertMergeObject(rawObjectName);
+
+    await this.assertCanManage(workspaceId, actor, objectName);
+
+    if (!(await this.tablesExist(workspaceId))) {
+      return { items: [], nextOffset: null, totalCount: 0 };
+    }
+
+    const context = await this.roboostMergeService.getObjectContext(
+      workspaceId,
+      objectName,
+    );
+    const term = (search ?? '').trim().toLowerCase();
+    const pageSize = Math.min(Math.max(limit, 1), 500);
+    const items: RoboostDuplicatePairItem[] = [];
+    let nextOffset: number | null = null;
+
+    for await (const { rows, offset: chunkOffset } of this.iteratePairRows({
+      workspaceId,
+      context,
+      objectName,
+      status,
+      confidence,
+      sort,
+      offset: Math.max(offset, 0),
+    })) {
+      const chunkItems = await this.toPairItems({
+        workspaceId,
+        actor,
+        context,
+        objectName,
+        rows,
+      });
+
+      for (const [index, item] of chunkItems.entries()) {
+        if (
+          isDefined(item) &&
+          (term === '' ||
+            [item.recordA, item.recordB].some((record) =>
+              `${record.name} ${record.keyText}`.toLowerCase().includes(term),
+            ))
+        ) {
+          items.push(item);
+        }
+
+        if (items.length >= pageSize) {
+          nextOffset =
+            index + 1 < chunkItems.length || rows.length === PAIR_CHUNK_SIZE
+              ? chunkOffset + index + 1
+              : null;
+          break;
+        }
+      }
+
+      if (items.length >= pageSize) {
+        break;
+      }
+    }
+
+    const [{ count }] = await this.coreDataSource.query(
+      `SELECT count(*)::int AS count FROM ${this.schema(workspaceId)}."roboostDuplicatePair"
+      WHERE "objectName" = $1 AND status = $2 AND ($3::text IS NULL OR confidence = $3)`,
+      [objectName, status, confidence ?? null],
+    );
+
+    return { items, nextOffset, totalCount: count };
   }
 
   async openPairCount(
@@ -522,19 +789,49 @@ export class RoboostDuplicateService {
         workspaceId,
         actor.workspaceMemberId,
         mergeObject,
-      )) === 'NONE'
+      )) === 'NONE' ||
+      !(await this.tablesExist(workspaceId))
     ) {
       return 0;
     }
 
-    return (
-      await this.listPairs({
-        workspaceId,
-        actor,
-        objectName,
-        status: 'OPEN',
-      })
-    ).length;
+    const context = await this.roboostMergeService.getObjectContext(
+      workspaceId,
+      mergeObject,
+    );
+    let count = 0;
+
+    for await (const { rows } of this.iteratePairRows({
+      workspaceId,
+      context,
+      objectName: mergeObject,
+      status: 'OPEN',
+    })) {
+      const recordIds = [
+        ...new Set(
+          rows.flatMap((row) => [
+            row.recordAId as string,
+            row.recordBId as string,
+          ]),
+        ),
+      ];
+      const mergeable = new Set(
+        await this.roboostMergeService.filterMergeableIds(
+          workspaceId,
+          actor.workspaceMemberId,
+          mergeObject,
+          recordIds,
+        ),
+      );
+
+      count += rows.filter(
+        (row) =>
+          mergeable.has(row.recordAId as string) &&
+          mergeable.has(row.recordBId as string),
+      ).length;
+    }
+
+    return count;
   }
 
   async setRejected({
@@ -662,7 +959,13 @@ export class RoboostDuplicateService {
     await this.assertCanBulkMerge(workspaceId, actor, objectName);
 
     const pairs = (
-      await this.listPairs({ workspaceId, actor, objectName, status: 'OPEN' })
+      await this.listPairs({
+        workspaceId,
+        actor,
+        objectName,
+        status: 'OPEN',
+        confidence: 'EXACT',
+      })
     ).filter(
       (pair) =>
         pair.confidence === 'EXACT' &&

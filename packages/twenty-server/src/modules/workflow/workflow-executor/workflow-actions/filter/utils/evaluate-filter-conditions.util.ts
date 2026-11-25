@@ -44,8 +44,11 @@ type ResolvedFilter = Omit<
   operand: ViewFilterOperand;
 };
 
+export type TeamMemberIdsByTeamId = Record<string, string[]>;
+
 function evaluateFilter(
   filter: ResolvedFilterWithPotentiallyDeprecatedOperand,
+  teamMemberIdsByTeamId: TeamMemberIdsByTeamId = {},
 ): boolean {
   const filterWithConvertedOperand = {
     ...filter,
@@ -86,11 +89,17 @@ function evaluateFilter(
     case 'RATING':
       return evaluateRatingFilter(filterWithConvertedOperand);
     case 'RELATION':
-      return evaluateRelationFilter(filterWithConvertedOperand);
+      return evaluateRelationFilter(
+        filterWithConvertedOperand,
+        teamMemberIdsByTeamId,
+      );
     case 'CURRENCY':
       return evaluateCurrencyFilter(filterWithConvertedOperand);
     case 'ACTOR':
-      return evaluateActorFilter(filterWithConvertedOperand);
+      return evaluateActorFilter(
+        filterWithConvertedOperand,
+        teamMemberIdsByTeamId,
+      );
     default:
       return evaluateDefaultFilter(filterWithConvertedOperand);
   }
@@ -100,6 +109,7 @@ function evaluateFilterGroup(
   groupId: string,
   filterGroups: StepFilterGroup[],
   filters: ResolvedFilter[],
+  teamMemberIdsByTeamId: TeamMemberIdsByTeamId,
 ): boolean {
   const group = filterGroups.find((g) => g.id === groupId);
 
@@ -116,10 +126,17 @@ function evaluateFilterGroup(
 
   const groupFilters = filters.filter((f) => f.stepFilterGroupId === groupId);
 
-  const filterResults = groupFilters.map((filter) => evaluateFilter(filter));
+  const filterResults = groupFilters.map((filter) =>
+    evaluateFilter(filter, teamMemberIdsByTeamId),
+  );
 
   const childGroupResults = childGroups.map((childGroup) =>
-    evaluateFilterGroup(childGroup.id, filterGroups, filters),
+    evaluateFilterGroup(
+      childGroup.id,
+      filterGroups,
+      filters,
+      teamMemberIdsByTeamId,
+    ),
   );
 
   const allResults = [...filterResults, ...childGroupResults];
@@ -416,7 +433,36 @@ function evaluateRatingFilter(filter: ResolvedFilter): boolean {
   }
 }
 
-function evaluateRelationFilter(filter: ResolvedFilter): boolean {
+// A team id on the right side matches any of the team's current members
+const expandRelationRightIds = (
+  rightValue: unknown,
+  teamMemberIdsByTeamId: TeamMemberIdsByTeamId,
+): unknown[] => {
+  let ids: unknown[] = [rightValue];
+
+  if (typeof rightValue === 'string' && rightValue.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(rightValue) as { selectedRecordIds?: unknown };
+
+      if (Array.isArray(parsed.selectedRecordIds)) {
+        ids = parsed.selectedRecordIds;
+      }
+    } catch {
+      ids = [rightValue];
+    }
+  }
+
+  return ids.flatMap((id) =>
+    typeof id === 'string' && isDefined(teamMemberIdsByTeamId[id])
+      ? teamMemberIdsByTeamId[id]
+      : [id],
+  );
+};
+
+function evaluateRelationFilter(
+  filter: ResolvedFilter,
+  teamMemberIdsByTeamId: TeamMemberIdsByTeamId = {},
+): boolean {
   // compare only the ids. If the left operand is the relation object, get the id
   const leftValue =
     isObject(filter.leftOperand) && 'id' in filter.leftOperand
@@ -430,9 +476,14 @@ function evaluateRelationFilter(filter: ResolvedFilter): boolean {
 
   switch (filter.operand) {
     case ViewFilterOperand.IS:
-      return leftValue === rightValue;
+      return expandRelationRightIds(rightValue, teamMemberIdsByTeamId).includes(
+        leftValue,
+      );
     case ViewFilterOperand.IS_NOT:
-      return leftValue !== rightValue;
+      return !expandRelationRightIds(
+        rightValue,
+        teamMemberIdsByTeamId,
+      ).includes(leftValue);
     case ViewFilterOperand.IS_EMPTY:
       return !isNonEmptyString(leftValue);
     case ViewFilterOperand.IS_NOT_EMPTY:
@@ -602,7 +653,10 @@ function evaluateSelectFilter(filter: ResolvedFilter): boolean {
   }
 }
 
-function evaluateActorFilter(filter: ResolvedFilter): boolean {
+function evaluateActorFilter(
+  filter: ResolvedFilter,
+  teamMemberIdsByTeamId: TeamMemberIdsByTeamId,
+): boolean {
   const { compositeFieldSubFieldName } = filter;
 
   if (compositeFieldSubFieldName === 'source') {
@@ -610,7 +664,7 @@ function evaluateActorFilter(filter: ResolvedFilter): boolean {
   }
 
   if (compositeFieldSubFieldName === 'workspaceMemberId') {
-    return evaluateRelationFilter(filter);
+    return evaluateRelationFilter(filter, teamMemberIdsByTeamId);
   }
 
   return evaluateTextAndArrayFilter(filter, 'TEXT', compositeFieldSubFieldName);
@@ -619,9 +673,11 @@ function evaluateActorFilter(filter: ResolvedFilter): boolean {
 export function evaluateFilterConditions({
   filterGroups = [],
   filters = [],
+  teamMemberIdsByTeamId = {},
 }: {
   filterGroups?: StepFilterGroup[];
   filters?: ResolvedFilter[];
+  teamMemberIdsByTeamId?: TeamMemberIdsByTeamId;
 }): boolean {
   if (filterGroups.length === 0 && filters.length === 0) {
     return true;
@@ -642,13 +698,20 @@ export function evaluateFilterConditions({
   const rootGroups = filterGroups.filter((g) => !g.parentStepFilterGroupId);
 
   if (rootGroups.length === 0 && filters.length > 0) {
-    const filterResults = filters.map((filter) => evaluateFilter(filter));
+    const filterResults = filters.map((filter) =>
+      evaluateFilter(filter, teamMemberIdsByTeamId),
+    );
 
     return filterResults.every((result) => result);
   }
 
   const rootResults = rootGroups.map((rootGroup) =>
-    evaluateFilterGroup(rootGroup.id, filterGroups, filters),
+    evaluateFilterGroup(
+      rootGroup.id,
+      filterGroups,
+      filters,
+      teamMemberIdsByTeamId,
+    ),
   );
 
   return rootResults.every((result) => result);

@@ -1,5 +1,4 @@
 import { Button } from '@/roboost-ui/components/Button';
-import { Checkbox } from '@/roboost-ui/components/Checkbox';
 import { Modal } from '@/roboost-ui/components/Modal';
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
@@ -31,7 +30,7 @@ export const RoboostMergeCompanyConflictModal = ({
   return (
     <Modal
       title={t`These records belong to different companies`}
-      subtitle={t`Which company should be the primary company of the merged record?`}
+      subtitle={t`Which company does the merged record keep?`}
       width={520}
       onClose={onClose}
       footer={
@@ -71,12 +70,6 @@ export const RoboostMergeCompanyConflictModal = ({
             <span className="rb-dt-muted">{t`(from secondary)`}</span>
           </span>
         </label>
-        <Checkbox checked disabled>
-          {t`Keep the other company associated too (not as primary)`}
-        </Checkbox>
-        <p className="rb-ut-hint">
-          {t`A record here links to one company only, so the other company can't stay associated. It is kept in the merge history, and Unmerge brings it back.`}
-        </p>
       </div>
     </Modal>
   );

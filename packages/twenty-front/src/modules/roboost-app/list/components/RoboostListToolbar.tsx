@@ -173,7 +173,7 @@ export const RoboostListToolbar = ({
         : filters.ownerId === 'none'
           ? t`No owner`
           : isDefined(getRoboostTeamIdFromFilterValue(filters.ownerId))
-            ? t`Team ${
+            ? t`Team: ${
                 teams.find(
                   (team) =>
                     team.id ===
@@ -279,13 +279,13 @@ export const RoboostListToolbar = ({
               value={ownerLabel}
               isActive={filters.ownerId !== 'any'}
               entries={[
+                ...teams.map((team) => ({
+                  id: toRoboostTeamFilterValue(team.id),
+                  label: t`Team: ${team.name}`,
+                })),
                 { id: 'any', label: t`Anyone` },
                 { id: 'me', label: t`Me` },
                 { id: 'none', label: t`No owner` },
-                ...teams.map((team) => ({
-                  id: toRoboostTeamFilterValue(team.id),
-                  label: t`Anyone in team ${team.name}`,
-                })),
                 ...members.map((member) => ({
                   id: member.id,
                   label: getRoboostPersonName(member.name),

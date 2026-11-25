@@ -1,3 +1,4 @@
+import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNoPermissionAttributes';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { RoboostManageDuplicatesModal } from '@/roboost-app/merge/components/RoboostManageDuplicatesModal';
 import { ROBOOST_DUPLICATE_OVERVIEW } from '@/roboost-app/merge/graphql/roboostDuplicateQueries';
@@ -31,13 +32,11 @@ export const RoboostDataQualityButton = ({
   });
   const overview = data?.roboostDuplicateOverview;
 
-  if (
-    !isMergeObject ||
-    overview?.isAvailable !== true ||
-    overview.mergeScope === 'NONE'
-  ) {
+  if (!isMergeObject || overview?.isAvailable !== true) {
     return null;
   }
+
+  const canMerge = overview.mergeScope !== 'NONE';
 
   const isOpen = searchParams.get('duplicates') === 'open';
   const openCount = overview.openCount;
@@ -64,10 +63,12 @@ export const RoboostDataQualityButton = ({
       <button
         type="button"
         className="rb-hbtn rb-hbtn-ghost"
+        data-rb-no-permission={getRoboostNoPermissionAttribute(canMerge)}
+        aria-disabled={canMerge ? undefined : true}
         onClick={() => setOpen(true)}
       >
         {t`Data quality`}
-        {openCount > 0 && (
+        {canMerge && openCount > 0 && (
           <span
             className="rb-dq-badge"
             aria-label={t`${openCount} possible duplicate pairs`}
@@ -76,7 +77,7 @@ export const RoboostDataQualityButton = ({
           </span>
         )}
       </button>
-      {isOpen && (
+      {isOpen && canMerge && (
         <RoboostManageDuplicatesModal
           objectMetadataItem={objectMetadataItem}
           initialBulkMergeId={searchParams.get('bulk')}

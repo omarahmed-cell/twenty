@@ -64,18 +64,40 @@ export const useComputeRecordRelationFilterDisplayValue = ({
     [recordFilter.value],
   );
 
+  // A people filter can hold team ids (Users & Teams); their names come from the team object
+  const isWorkspaceMemberFilter = targetObjectMetadataItems.some(
+    (item) => item.nameSingular === 'workspaceMember',
+  );
+
   const operationSignatures = useMemo(
     () =>
       isNonEmptyArray(selectedRecordIds)
-        ? targetObjectMetadataItems.map(
-            (targetObjectMetadataItem): RecordGqlOperationSignature => ({
-              objectNameSingular: targetObjectMetadataItem.nameSingular,
-              variables: { filter: { id: { in: selectedRecordIds } } },
-              fields: buildIdentifierGqlFields(targetObjectMetadataItem),
-            }),
-          )
+        ? [
+            ...targetObjectMetadataItems.map(
+              (targetObjectMetadataItem): RecordGqlOperationSignature => ({
+                objectNameSingular: targetObjectMetadataItem.nameSingular,
+                variables: { filter: { id: { in: selectedRecordIds } } },
+                fields: buildIdentifierGqlFields(targetObjectMetadataItem),
+              }),
+            ),
+            ...(isWorkspaceMemberFilter &&
+            objectMetadataItems.some((item) => item.nameSingular === 'team')
+              ? [
+                  {
+                    objectNameSingular: 'team',
+                    variables: { filter: { id: { in: selectedRecordIds } } },
+                    fields: { id: true, name: true },
+                  } satisfies RecordGqlOperationSignature,
+                ]
+              : []),
+          ]
         : [],
-    [selectedRecordIds, targetObjectMetadataItems],
+    [
+      selectedRecordIds,
+      targetObjectMetadataItems,
+      isWorkspaceMemberFilter,
+      objectMetadataItems,
+    ],
   );
 
   const { result, loading } = useCombinedFindManyRecords({
@@ -91,6 +113,9 @@ export const useComputeRecordRelationFilterDisplayValue = ({
     targetObjectMetadataItems,
     selectedRecordsByObjectNamePlural: result,
     isCurrentWorkspaceMemberSelected: isCurrentWorkspaceMemberSelected ?? false,
+    extraLabels: ((result.teams ?? []) as { name?: string }[]).map(
+      (team) => t`Team: ${team.name ?? ''}`,
+    ),
   });
 
   return { displayValue, loading };
