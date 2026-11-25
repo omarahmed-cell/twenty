@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
+import { randomUUID } from 'crypto';
+
 import { computeMetadataNameFromLabel } from 'twenty-shared/metadata';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -10,6 +12,7 @@ import { getWorkspaceContext } from 'src/engine/twenty-orm/storage/orm-workspace
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 import { RoboostScoreEngineService } from 'src/modules/roboost-scoring/services/roboost-score-engine.service';
+import { type RecordLayoutWorkspaceEntity } from 'src/modules/properties/standard-objects/record-layout.workspace-entity';
 import { type PropertyGroupMembershipWorkspaceEntity } from 'src/modules/properties/standard-objects/property-group-membership.workspace-entity';
 import { type PropertyGroupWorkspaceEntity } from 'src/modules/properties/standard-objects/property-group.workspace-entity';
 
@@ -144,6 +147,7 @@ export class RoboostScorePropertyService {
     });
 
     await this.addToScoresGroup(workspaceId, objectMetadataId, field.id);
+    await this.addToRecordLayouts(workspaceId, objectMetadataId, field.name);
 
     return field;
   }
@@ -172,6 +176,7 @@ export class RoboostScorePropertyService {
       },
     });
     await this.addToScoresGroup(workspaceId, objectMetadataId, field.id);
+    await this.addToRecordLayouts(workspaceId, objectMetadataId, field.name);
   }
 
   async getObjectMetadataId(workspaceId: string, objectName: string) {
@@ -215,6 +220,74 @@ export class RoboostScorePropertyService {
       workspaceId,
       deleteOneFieldInput: { id: field.id },
     });
+  }
+
+  // Saved record layouts list their fields by name, so a new score property would not show on
+  // the record page (nor its "Why this score?") until someone adds it; it goes in a Scores card
+  private async addToRecordLayouts(
+    workspaceId: string,
+    objectMetadataId: string,
+    fieldName: string,
+  ) {
+    try {
+      await this.roboostScoreEngineService.runInWorkspace(
+        workspaceId,
+        async () => {
+          const repository =
+            this.workspaceOrmManager.getRepository<RecordLayoutWorkspaceEntity>(
+              'recordLayout',
+              { shouldBypassPermissionChecks: true },
+            );
+          const layouts = await repository.find({
+            where: { objectMetadataId },
+          });
+
+          for (const recordLayout of layouts) {
+            const layout = recordLayout.layout as {
+              left?: { id: string; title?: string; fieldNames?: string[] }[];
+            } | null;
+
+            if (!isDefined(layout) || !Array.isArray(layout.left)) {
+              continue;
+            }
+            if (
+              layout.left.some((card) => card.fieldNames?.includes(fieldName))
+            ) {
+              continue;
+            }
+            const scoresCard = layout.left.find(
+              (card) => card.title === ROBOOST_SCORES_PROPERTY_GROUP_NAME,
+            );
+            const left = isDefined(scoresCard)
+              ? layout.left.map((card) =>
+                  card === scoresCard
+                    ? {
+                        ...card,
+                        fieldNames: [...(card.fieldNames ?? []), fieldName],
+                      }
+                    : card,
+                )
+              : [
+                  {
+                    id: randomUUID(),
+                    title: ROBOOST_SCORES_PROPERTY_GROUP_NAME,
+                    fieldNames: [fieldName],
+                  },
+                  ...layout.left,
+                ];
+
+            await repository.update(
+              { id: recordLayout.id },
+              { layout: { ...layout, left } },
+            );
+          }
+        },
+      );
+    } catch (error) {
+      this.logger.warn(
+        `Could not add ${fieldName} to the record layouts: ${error}`,
+      );
+    }
   }
 
   private async addToScoresGroup(
