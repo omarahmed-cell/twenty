@@ -81,6 +81,25 @@ export { RECORD_SOURCE_LABELS } from './RecordSourceLabels';
 export { RECORD_SOURCE_OBJECT_NAMES } from './RecordSourceObjectNames';
 export { RELATION_NESTED_QUERY_KEYWORDS } from './RelationNestedQueriesKeyword';
 export { RESERVED_SUBDOMAINS } from './ReservedSubdomains';
+export type {
+  RoboostOwnershipField,
+  RoboostActivityOwnership,
+} from './RoboostOwnershipFields';
+export {
+  ROBOOST_OWNERSHIP_FIELDS,
+  ROBOOST_ACTIVITY_OWNERSHIP,
+  ROBOOST_ACTIVITY_TARGET_COLUMNS,
+} from './RoboostOwnershipFields';
+export {
+  ROBOOST_PERMISSION_REGISTRY,
+  ROBOOST_ADMIN_ONLY_AREAS,
+} from './RoboostPermissionRegistry';
+export type { RoboostToggleObjectPermission } from './RoboostToggleObjectPermissions';
+export {
+  ROBOOST_TOGGLE_OBJECT_PERMISSIONS,
+  ROBOOST_ASSOCIATION_OBJECT_NAMES,
+  ROBOOST_ASSOCIATION_JUNCTION_OBJECT_NAMES,
+} from './RoboostToggleObjectPermissions';
 export { SEGMENT_TARGET_OBJECT_NAME_SINGULARS } from './SegmentTargetObjectNameSingulars';
 export { SERVICE_PIPELINE_SEED } from './ServicePipelineSeed';
 export { STANDARD_OBJECT_RECORDS_UNDER_OBJECT_RECORDS_PERMISSIONS } from './StandardObjectRecordsUnderObjectRecordsPermissions';

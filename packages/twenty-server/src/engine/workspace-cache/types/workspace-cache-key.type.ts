@@ -20,6 +20,7 @@ import { type AllFlatEntityMaps } from 'src/engine/metadata-modules/flat-entity/
 import { type UserWorkspaceRoleMap } from 'src/engine/metadata-modules/role-target/types/user-workspace-role-map.type';
 import { type FlatRowLevelPermissionPredicateGroupMaps } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate-group-maps.type';
 import { type FlatRowLevelPermissionPredicateMaps } from 'src/engine/metadata-modules/row-level-permission-predicate/types/flat-row-level-permission-predicate-maps.type';
+import { type RoboostRecordAccessMaps } from 'src/engine/metadata-modules/role/types/roboost-record-access-maps.type';
 import { type UsageLimits } from 'src/engine/core-modules/usage-limit/types/usage-limits.type';
 
 export type AdditionalCacheDataMaps = {
@@ -36,6 +37,7 @@ export type AdditionalCacheDataMaps = {
   billingEntitlements: BillingEntitlements;
   workflowAutomatedTriggerMaps: WorkflowAutomatedTriggerMaps;
   usageLimits: UsageLimits;
+  roboostRecordAccessMaps: RoboostRecordAccessMaps;
 };
 
 export type WorkspaceCacheDataMap = AllFlatEntityMaps<true> &

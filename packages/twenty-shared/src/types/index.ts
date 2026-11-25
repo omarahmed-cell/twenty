@@ -316,6 +316,20 @@ export type { RelationUpdatePayload } from './RelationUpdatePayload';
 export type { RemoveSuffix } from './RemoveSuffix';
 export type { RestrictedFieldPermissions } from './RestrictedFieldPermissions';
 export type { RestrictedFieldsPermissions } from './RestrictedFieldsPermissions';
+export type {
+  RoboostRecordScope,
+  RoboostScopeSetting,
+  RoboostObjectSettingKey,
+  RoboostObjectPermissions,
+  RoboostUserPermissions,
+  RoboostUserRole,
+  RoboostPermissionObjectItem,
+  RoboostPermissionToggle,
+  RoboostPermissionToggleGroupItem,
+  RoboostPermissionItem,
+  RoboostPermissionSection,
+  RoboostPermissionDifference,
+} from './RoboostPermissions';
 export type { RowLevelPermissionPredicate } from './RowLevelPermissionPredicate';
 export type { RowLevelPermissionPredicateGroup } from './RowLevelPermissionPredicateGroup';
 export { RowLevelPermissionPredicateGroupLogicalOperator } from './RowLevelPermissionPredicateGroupLogicalOperator';

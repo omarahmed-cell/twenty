@@ -1,0 +1,468 @@
+/* Settings > Users & Teams, Edit permissions and Compare access */
+
+.rb-ut-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rb-ut-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-height: 36px;
+}
+
+.rb-ut-subtabs .rb-tablist {
+  border-bottom: none;
+}
+
+.rb-ut-card {
+  border-radius: var(--radius-lg);
+}
+
+.rb-ut-table td {
+  vertical-align: middle;
+}
+
+.rb-ut-name-cell {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-height: 30px;
+  min-width: 260px;
+}
+
+.rb-ut-name {
+  color: var(--text);
+  font-weight: 550;
+}
+
+.rb-ut-row-actions {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.rb-ut-row:hover .rb-ut-row-actions,
+.rb-ut-row:focus-within .rb-ut-row-actions,
+.rb-ut-row-actions:has([aria-expanded='true']) {
+  opacity: 1;
+}
+
+.rb-ut-access {
+  color: var(--text-secondary);
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-ut-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rb-ut-label {
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 600;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.rb-ut-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+.rb-ut-error {
+  color: var(--danger-text);
+  font-size: 12px;
+  margin: 0;
+}
+
+.rb-ut-team-members {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.rb-ut-team-member {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px;
+}
+
+.rb-ut-team-member:last-child {
+  border-bottom: none;
+}
+
+.rb-ut-team-members .rb-ut-hint {
+  padding: 10px;
+}
+
+.rb-ut-history {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rb-ut-history-filters {
+  display: flex;
+  gap: 12px;
+}
+
+.rb-ut-history-list {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.rb-ut-history-item {
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 110px 1fr;
+  padding: 10px 12px;
+}
+
+.rb-ut-history-item:last-child {
+  border-bottom: none;
+}
+
+.rb-ut-history-when {
+  font-size: 12px;
+}
+
+.rb-ut-history-what {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  gap: 3px;
+}
+
+.rb-ut-history-setting {
+  color: var(--text);
+  font-weight: 550;
+}
+
+.rb-ut-history-change {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rb-ut-history-from {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+
+.rb-ut-history-to {
+  color: var(--text);
+}
+
+/* Edit permissions */
+
+.rb-pe-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+}
+
+.rb-pe-head-sub {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.rb-pe-admin-note {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  color: var(--accent-text);
+  font-size: 13px;
+  margin-top: 10px;
+  padding: 10px 12px;
+}
+
+.rb-pe-layout {
+  align-items: flex-start;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  margin-top: 16px;
+}
+
+.rb-pe-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 12px;
+}
+
+.rb-pe-nav nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rb-pe-nav-item {
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 6px 10px;
+  text-decoration: none;
+}
+
+.rb-pe-nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.rb-pe-nav-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.rb-pe-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.rb-pe-content-head {
+  display: flex;
+}
+
+.rb-pe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scroll-margin-top: 12px;
+}
+
+.rb-pe-section-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.rb-pe-help {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.rb-pe-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.rb-pe-card-head {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.rb-pe-card-toggle {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  font: inherit;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.rb-pe-card-title {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rb-pe-card-summary {
+  color: var(--text-secondary);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-pe-master {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.rb-pe-card-body {
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 14px;
+}
+
+.rb-pe-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.rb-pe-rows.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.rb-pe-row {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.rb-pe-row:last-child {
+  border-bottom: none;
+}
+
+.rb-pe-row-label {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rb-pe-row-help {
+  color: var(--text-muted);
+  flex-basis: 100%;
+  font-size: 12px;
+  margin: 0;
+}
+
+.rb-pe-later {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 1px 7px;
+}
+
+.rb-pe-row-control {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.rb-pe-row-control .rb-select {
+  min-width: 220px;
+}
+
+/* Compare access */
+
+.rb-cmp-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.rb-cmp-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.rb-cmp-col-head {
+  align-items: center;
+  background: var(--surface-sunken);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  position: sticky;
+  top: 0;
+}
+
+.rb-cmp-name {
+  font-weight: 650;
+}
+
+.rb-cmp-section {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 12px 14px 4px;
+  text-transform: uppercase;
+}
+
+.rb-cmp-row {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  gap: 12px;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 6px 14px;
+}
+
+.rb-cmp-row.is-different {
+  background: var(--warning-soft);
+  box-shadow: inset 3px 0 0 var(--warning-border);
+}
+
+.rb-cmp-label {
+  color: var(--text-secondary);
+}
+
+.rb-cmp-value {
+  color: var(--text);
+  font-weight: 550;
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .rb-pe-layout,
+  .rb-cmp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rb-pe-nav {
+    position: static;
+  }
+}

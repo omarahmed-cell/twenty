@@ -4,6 +4,11 @@ import {
   ROBOOST_LAYOUT_SETTINGS_PATH,
 } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import {
+  getRoboostTeamsPath,
+  getRoboostUsersPath,
+  ROBOOST_USERS_AND_TEAMS_PATH,
+} from '@/roboost-app/users-and-teams/utils/getRoboostUsersAndTeamsPath';
+import {
   type NavGroup,
   type NavItem,
   SideNav,
@@ -53,10 +58,55 @@ const toLayoutNavItems = (
   ];
 };
 
+// Settings → Users & Teams has its two tabs as sub-items too
+const toUsersAndTeamsNavItems = (
+  item: SettingsNavigationItem,
+  pathname: string,
+  labels: { users: string; teams: string },
+): NavItem[] => {
+  const usersPath = getRoboostUsersPath();
+  const teamsPath = getRoboostTeamsPath();
+
+  return [
+    {
+      id: ROBOOST_USERS_AND_TEAMS_PATH,
+      label: item.label,
+      iconNode: <item.Icon size={18} stroke={1.75} />,
+      href: usersPath,
+      active: false,
+    },
+    {
+      id: usersPath,
+      label: labels.users,
+      icon: 'user',
+      href: usersPath,
+      active:
+        pathname.startsWith(usersPath) ||
+        pathname.startsWith(`${ROBOOST_USERS_AND_TEAMS_PATH}/compare`),
+      isIndented: true,
+    },
+    {
+      id: teamsPath,
+      label: labels.teams,
+      icon: 'contacts',
+      href: teamsPath,
+      active: pathname.startsWith(teamsPath),
+      isIndented: true,
+    },
+  ];
+};
+
+type SettingsNavLabels = {
+  forms: string;
+  recordView: string;
+  users: string;
+  teams: string;
+};
+
 const toNavItems = (
   items: SettingsNavigationItem[],
   pathname: string,
-  labels: { forms: string; recordView: string },
+  labels: SettingsNavLabels,
   isIndented = false,
 ): NavItem[] =>
   items
@@ -64,6 +114,9 @@ const toNavItems = (
     .flatMap((item) => {
       if (item.path === SettingsPath.Layout) {
         return toLayoutNavItems(item, pathname, labels);
+      }
+      if (item.path === SettingsPath.WorkspaceMembersPage) {
+        return toUsersAndTeamsNavItems(item, pathname, labels);
       }
       const href = isDefined(item.path)
         ? getSettingsPath(item.path)
@@ -108,6 +161,8 @@ export const RoboostSettingsSideNav = () => {
       items: toNavItems(section.items, pathname, {
         forms: t`Forms`,
         recordView: t`Record view`,
+        users: t`Users`,
+        teams: t`Teams`,
       }),
     })),
   ].filter((group) => group.items.length > 0);

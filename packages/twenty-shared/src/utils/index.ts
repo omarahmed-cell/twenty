@@ -363,6 +363,21 @@ export {
   isRoboostValuelessFilterOperator,
   isRoboostTwoValueFilterOperator,
 } from './roboost-filter/roboost-filter-operator';
+export {
+  getRoboostPermissionObjectItems,
+  getRoboostPermissionToggles,
+  findRoboostPermissionObjectItem,
+  buildDefaultRoboostPermissions,
+  normalizeRoboostPermissions,
+} from './roboost-permissions/roboost-permissions-defaults';
+export {
+  ROBOOST_SCOPE_LABELS,
+  ROBOOST_SETTING_LABELS,
+  formatRoboostScopeSetting,
+  summarizeRoboostPermissionItem,
+  summarizeRoboostAccess,
+  diffRoboostPermissions,
+} from './roboost-permissions/roboost-permissions-summary';
 export { safeParseRelativeDateFilterJsonStringified } from './safeParseRelativeDateFilterJsonStringified';
 export type {
   RoboostRuleSetMatch,

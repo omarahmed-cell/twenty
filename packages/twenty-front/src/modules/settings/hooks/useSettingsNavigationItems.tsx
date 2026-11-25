@@ -5,6 +5,7 @@ import { currentUserState } from '@/auth/states/currentUserState';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { billingState } from '@/client-config/states/billingState';
 import { supportChatState } from '@/client-config/states/supportChatState';
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { permissionFlagMapSelector } from '@/settings/roles/states/permissionFlagMapSelector';
 import { getDocumentationUrl } from '@/support/utils/getDocumentationUrl';
 import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
@@ -78,6 +79,7 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
     isNonEmptyString(supportChat.supportFrontChatId);
 
   const permissionFlagMap = useAtomStateValue(permissionFlagMapSelector);
+  const roboostAccess = useRoboostAccess();
   const isAppPreferencesEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_APP_PREFERENCES_ENABLED,
   );
@@ -189,10 +191,10 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           isHidden: !permissionFlagMap[PermissionFlagType.LAYOUTS],
         },
         {
-          label: t`Members`,
+          label: t`Users & Teams`,
           path: SettingsPath.WorkspaceMembersPage,
           Icon: IconUsers,
-          isHidden: !permissionFlagMap[PermissionFlagType.WORKSPACE_MEMBERS],
+          isHidden: !roboostAccess.canSeeUserTable,
         },
         {
           label: t`Billing`,

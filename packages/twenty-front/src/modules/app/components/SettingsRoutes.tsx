@@ -1,11 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { RoboostLayoutSettingsPage } from '@/roboost-app/layout/components/RoboostLayoutSettingsPage';
+import { RoboostUsersAndTeamsPage } from '@/roboost-app/users-and-teams/components/RoboostUsersAndTeamsPage';
 import {
   createRoutesFromElements,
   Navigate,
   Outlet,
   type Params,
-  parsePath,
   Route,
   useLocation,
   useParams,
@@ -394,20 +394,6 @@ const SettingsAiPrompts = lazy(() =>
   })),
 );
 
-const SettingsWorkspaceMembers = lazy(() =>
-  import('~/pages/settings/members/SettingsWorkspaceMembers').then(
-    (module) => ({
-      default: module.SettingsWorkspaceMembers,
-    }),
-  ),
-);
-
-const SettingsWorkspaceMember = lazy(() =>
-  import('~/pages/settings/members/SettingsWorkspaceMember').then((module) => ({
-    default: module.SettingsWorkspaceMember,
-  })),
-);
-
 const SettingsProfile = lazy(() =>
   import('~/pages/settings/profile/SettingsProfile').then((module) => ({
     default: module.SettingsProfile,
@@ -756,36 +742,6 @@ const SettingsCommunity = lazy(() =>
   })),
 );
 
-const SettingsRoleCreate = lazy(() =>
-  import('~/pages/settings/members/roles/SettingsRoleCreate').then(
-    (module) => ({
-      default: module.SettingsRoleCreate,
-    }),
-  ),
-);
-
-const SettingsRoleEdit = lazy(() =>
-  import('~/pages/settings/members/roles/SettingsRoleEdit').then((module) => ({
-    default: module.SettingsRoleEdit,
-  })),
-);
-
-const SettingsRoleObjectLevel = lazy(() =>
-  import('~/pages/settings/members/roles/SettingsRoleObjectLevel').then(
-    (module) => ({
-      default: module.SettingsRoleObjectLevel,
-    }),
-  ),
-);
-
-const SettingsRoleAddObjectLevel = lazy(() =>
-  import('~/pages/settings/members/roles/SettingsRoleAddObjectLevel').then(
-    (module) => ({
-      default: module.SettingsRoleAddObjectLevel,
-    }),
-  ),
-);
-
 type CreateSettingsRouteObjectsArgs = {
   isAdminPageEnabled?: boolean;
 };
@@ -799,18 +755,6 @@ const MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE: SettingsRouteHandle = {
 const EXPANDABLE_SETTINGS_ROUTE_HANDLE: SettingsRouteHandle = {
   ...MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE,
   isLocationExpandableFromSidePanel: true,
-};
-
-const MEMBERS_LIST_SETTINGS_ROUTE_HANDLE: SettingsRouteHandle = {
-  ...MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE,
-  isLocationExpandableFromSidePanel: ({ location }) => {
-    const hash =
-      typeof location === 'string'
-        ? (parsePath(location).hash ?? '')
-        : (location.hash ?? '');
-
-    return hash === '' || hash === '#team' || hash === '#roles';
-  },
 };
 
 const createSettingsRouteElements = ({
@@ -838,6 +782,18 @@ const createSettingsRouteElements = ({
     <Route
       path="roboost-layout/record-view/:objectNameSingular?"
       element={<RoboostLayoutSettingsPage tab="record-view" />}
+    />
+    <Route
+      path="users-and-teams"
+      element={<Navigate to="/settings/users-and-teams/users" replace />}
+    />
+    <Route
+      path="users-and-teams/users"
+      element={<RoboostUsersAndTeamsPage tab="users" />}
+    />
+    <Route
+      path="users-and-teams/teams"
+      element={<RoboostUsersAndTeamsPage tab="teams" />}
     />
     <Route
       path={SettingsPath.GmailExtension}
@@ -1011,22 +967,13 @@ const createSettingsRouteElements = ({
       <Route path={SettingsPath.Layout} element={<SettingsLayout />} />
     </Route>
     <Route
-      element={
-        <SettingsProtectedRouteWrapper
-          settingsPermission={PermissionFlagType.WORKSPACE_MEMBERS}
-        />
-      }
-    >
-      <Route
-        path={SettingsPath.WorkspaceMembersPage}
-        element={<SettingsWorkspaceMembers />}
-        handle={MEMBERS_LIST_SETTINGS_ROUTE_HANDLE}
-      />
-      <Route
-        path={SettingsPath.WorkspaceMemberPage}
-        element={<SettingsWorkspaceMember />}
-      />
-    </Route>
+      path={SettingsPath.WorkspaceMembersPage}
+      element={<Navigate to="/settings/users-and-teams/users" replace />}
+    />
+    <Route
+      path={SettingsPath.WorkspaceMemberPage}
+      element={<Navigate to="/settings/users-and-teams/users" replace />}
+    />
     <Route
       element={
         <SettingsProtectedRouteWrapper
@@ -1115,44 +1062,19 @@ const createSettingsRouteElements = ({
         handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
       />
     </Route>
-    <Route
-      element={
-        <SettingsProtectedRouteWrapper
-          settingsPermission={PermissionFlagType.ROLES}
-        />
-      }
-    >
+    {[
+      SettingsPath.Roles,
+      SettingsPath.RoleDetail,
+      SettingsPath.RoleCreate,
+      SettingsPath.RoleObjectLevel,
+      SettingsPath.RoleAddObjectLevel,
+    ].map((rolePath) => (
       <Route
-        path={SettingsPath.Roles}
-        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
-        element={
-          <Navigate
-            to={`/settings/${SettingsPath.WorkspaceMembersPage}#roles`}
-            replace
-          />
-        }
+        key={rolePath}
+        path={rolePath}
+        element={<Navigate to="/settings/users-and-teams/users" replace />}
       />
-      <Route
-        path={SettingsPath.RoleDetail}
-        element={<SettingsRoleEdit />}
-        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
-      />
-      <Route
-        path={SettingsPath.RoleCreate}
-        element={<SettingsRoleCreate />}
-        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
-      />
-      <Route
-        path={SettingsPath.RoleObjectLevel}
-        element={<SettingsRoleObjectLevel />}
-        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
-      />
-      <Route
-        path={SettingsPath.RoleAddObjectLevel}
-        element={<SettingsRoleAddObjectLevel />}
-        handle={MAIN_AND_SIDE_PANEL_SETTINGS_ROUTE_HANDLE}
-      />
-    </Route>
+    ))}
     <Route
       element={
         <SettingsProtectedRouteWrapper
