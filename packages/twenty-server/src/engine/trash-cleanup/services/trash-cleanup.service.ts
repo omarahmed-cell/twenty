@@ -1,13 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 
+import { ROBOOST_MERGE_OBJECT_NAMES } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
-import { In, LessThan } from 'typeorm';
+import { DataSource, In, LessThan, Not } from 'typeorm';
 
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
 import { TRASH_CLEANUP_BATCH_SIZE } from 'src/engine/trash-cleanup/constants/trash-cleanup-batch-size.constant';
 import { TRASH_CLEANUP_MAX_RECORDS_PER_WORKSPACE } from 'src/engine/trash-cleanup/constants/trash-cleanup-max-records-per-workspace.constant';
 import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
+import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
 export type TrashCleanupInput = {
   workspaceId: string;
@@ -22,6 +25,8 @@ export class TrashCleanupService {
   private readonly batchSize = TRASH_CLEANUP_BATCH_SIZE;
 
   constructor(
+    @InjectDataSource()
+    private readonly coreDataSource: DataSource,
     private readonly flatEntityMapsCacheService: WorkspaceManyOrAllFlatEntityMapsCacheService,
     private readonly workspaceOrmManager: WorkspaceOrmManager,
   ) {}
@@ -100,6 +105,10 @@ export class TrashCleanupService {
     }
 
     const authContext = buildSystemAuthContext(workspaceId);
+    const mergeProtectedIds = await this.findMergeProtectedIds(
+      workspaceId,
+      objectName,
+    );
 
     return this.workspaceOrmManager.executeInWorkspaceContext(async () => {
       const repository = this.workspaceOrmManager.getRepository(objectName, {
@@ -116,6 +125,9 @@ export class TrashCleanupService {
           select: ['id'],
           where: {
             deletedAt: LessThan(cutoffDate),
+            ...(mergeProtectedIds.length > 0
+              ? { id: Not(In(mergeProtectedIds)) }
+              : {}),
           },
           order: { deletedAt: 'ASC' },
           take,
@@ -134,6 +146,36 @@ export class TrashCleanupService {
 
       return deleted;
     }, authContext);
+  }
+
+  // Merged records stay in the trash for the 30-day unmerge window; the merge expiry cron deletes them
+  private async findMergeProtectedIds(
+    workspaceId: string,
+    objectName: string,
+  ): Promise<string[]> {
+    if (
+      !(ROBOOST_MERGE_OBJECT_NAMES as readonly string[]).includes(objectName)
+    ) {
+      return [];
+    }
+
+    const table = `"${getWorkspaceSchemaName(workspaceId)}"."roboostMergeLog"`;
+    const [{ exists }]: { exists: string | null }[] =
+      await this.coreDataSource.query(
+        `SELECT to_regclass($1)::text AS exists`,
+        [table],
+      );
+
+    if (!isDefined(exists)) {
+      return [];
+    }
+
+    const rows: { secondaryId: string }[] = await this.coreDataSource.query(
+      `SELECT "secondaryId" FROM ${table} WHERE "objectName" = $1 AND status = 'MERGED'`,
+      [objectName],
+    );
+
+    return rows.map((row) => row.secondaryId);
   }
 
   private calculateCutoffDate(trashRetentionDays: number): Date {

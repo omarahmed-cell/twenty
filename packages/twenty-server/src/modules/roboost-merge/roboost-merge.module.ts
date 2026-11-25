@@ -6,6 +6,8 @@ import { CompanyCalculatedFieldsModule } from 'src/modules/company-calculated-fi
 import { OpportunityCalculatedFieldsModule } from 'src/modules/opportunity-calculated-fields/opportunity-calculated-fields.module';
 import { PersonCalculatedFieldsModule } from 'src/modules/person-calculated-fields/person-calculated-fields.module';
 import {
+  RoboostMergeDestroyManyPreQueryHook,
+  RoboostMergeDestroyOnePreQueryHook,
   RoboostMergeRestoreGuardService,
   RoboostMergeRestoreManyPreQueryHook,
   RoboostMergeRestoreOnePreQueryHook,
@@ -61,6 +63,8 @@ import { RoboostDuplicateService } from 'src/modules/roboost-merge/services/robo
     RoboostMergeRestoreGuardService,
     RoboostMergeRestoreOnePreQueryHook,
     RoboostMergeRestoreManyPreQueryHook,
+    RoboostMergeDestroyOnePreQueryHook,
+    RoboostMergeDestroyManyPreQueryHook,
   ],
   exports: [
     RoboostMergeService,

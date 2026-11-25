@@ -11,7 +11,7 @@ import { WorkspaceQueryHook } from 'src/engine/api/graphql/workspace-query-runne
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { getWorkspaceSchemaName } from 'src/engine/workspace-datasource/utils/get-workspace-schema-name.util';
 
-// A merged record comes back only through Unmerge, never through a normal restore from the trash
+// A merged record comes back only through Unmerge, and stays in the trash until the unmerge window ends
 @Injectable()
 export class RoboostMergeRestoreGuardService {
   constructor(
@@ -23,6 +23,7 @@ export class RoboostMergeRestoreGuardService {
     authContext: WorkspaceAuthContext,
     objectName: string,
     payload: { id?: string; filter?: { id?: { eq?: string; in?: string[] } } },
+    operation: 'restore' | 'destroy' = 'restore',
   ) {
     if (
       !(ROBOOST_MERGE_OBJECT_NAMES as readonly string[]).includes(objectName)
@@ -58,7 +59,9 @@ export class RoboostMergeRestoreGuardService {
 
     if (merged.length > 0) {
       throw new BadRequestException(
-        'This record was merged into another one. An admin can bring it back with Unmerge from the merge history.',
+        operation === 'restore'
+          ? 'This record was merged into another one. An admin can bring it back with Unmerge from the merge history.'
+          : 'This record was merged into another one and is kept for 30 days so it can be unmerged. It is deleted automatically after that.',
       );
     }
   }
@@ -89,6 +92,46 @@ export class RoboostMergeRestoreManyPreQueryHook implements WorkspacePreQueryHoo
     payload: TPayload,
   ): Promise<TPayload> {
     await this.guard.assertNotMerged(authContext, objectName, payload as never);
+
+    return payload;
+  }
+}
+
+@WorkspaceQueryHook(`*.destroyOne`)
+export class RoboostMergeDestroyOnePreQueryHook implements WorkspacePreQueryHookInstance {
+  constructor(private readonly guard: RoboostMergeRestoreGuardService) {}
+
+  async execute<TPayload>(
+    authContext: WorkspaceAuthContext,
+    objectName: string,
+    payload: TPayload,
+  ): Promise<TPayload> {
+    await this.guard.assertNotMerged(
+      authContext,
+      objectName,
+      payload as never,
+      'destroy',
+    );
+
+    return payload;
+  }
+}
+
+@WorkspaceQueryHook(`*.destroyMany`)
+export class RoboostMergeDestroyManyPreQueryHook implements WorkspacePreQueryHookInstance {
+  constructor(private readonly guard: RoboostMergeRestoreGuardService) {}
+
+  async execute<TPayload>(
+    authContext: WorkspaceAuthContext,
+    objectName: string,
+    payload: TPayload,
+  ): Promise<TPayload> {
+    await this.guard.assertNotMerged(
+      authContext,
+      objectName,
+      payload as never,
+      'destroy',
+    );
 
     return payload;
   }
