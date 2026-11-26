@@ -49,7 +49,7 @@ export const RoboostMergeCompanyConflictModal = ({
         <label className="rb-mg-conflict-option">
           <input
             type="radio"
-            name="rb-mg-company"
+            name="rb-mg-company-conflict"
             checked={side === 'primary'}
             onChange={() => setSide('primary')}
           />
@@ -61,7 +61,7 @@ export const RoboostMergeCompanyConflictModal = ({
         <label className="rb-mg-conflict-option">
           <input
             type="radio"
-            name="rb-mg-company"
+            name="rb-mg-company-conflict"
             checked={side === 'secondary'}
             onChange={() => setSide('secondary')}
           />
