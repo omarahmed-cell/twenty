@@ -68,22 +68,22 @@ export const buildRoboostDuplicateCandidateQueries = ({
     }
 
     if (enabledRuleKeys.has('companySimilarNameSameCountry') && has('name')) {
-      const countryOf = (alias: string) =>
-        has('addressAddressCountry')
-          ? `lower(trim(coalesce(${alias}."addressAddressCountry", '')))`
-          : `''`;
-      const nameOf = (alias: string) => normalizeNameSql(`${alias}."name"`);
+      const country = has('addressAddressCountry')
+        ? `lower(trim(coalesce(t."addressAddressCountry", '')))`
+        : `''`;
 
+      // Only names in the same country starting with the same two letters are compared, so the
+      // similarity check stays fast at tens of thousands of companies
       queries.push({
         ruleKey: 'companySimilarNameSameCountry',
         isBatched: true,
-        sql: `SELECT a.id AS a, b.id AS b FROM ${table} a
-          JOIN ${table} b ON b.id > a.id AND b."deletedAt" IS NULL
-            AND ${nameOf('b')} OPERATOR(public.%) ${nameOf('a')}
-            AND ${countryOf('a')} = ${countryOf('b')}
-          WHERE a.id = ANY($1::uuid[]) AND a."deletedAt" IS NULL
-            AND length(${nameOf('a')}) >= 3 AND length(${nameOf('b')}) >= 3
-            AND public.similarity(${nameOf('a')}, ${nameOf('b')}) >= $2`,
+        sql: `WITH n AS (
+          SELECT t.id, ${normalizeNameSql('t."name"')} AS value, ${country} AS country FROM ${table} t WHERE t."deletedAt" IS NULL
+        )
+        SELECT a.id AS a, b.id AS b FROM n a
+          JOIN n b ON left(b.value, 2) = left(a.value, 2) AND b.country = a.country AND b.id > a.id
+          WHERE a.id = ANY($1::uuid[]) AND length(a.value) >= 3 AND length(b.value) >= 3
+            AND public.similarity(a.value, b.value) >= $2`,
       });
     }
   }
