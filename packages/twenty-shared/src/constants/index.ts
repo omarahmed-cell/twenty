@@ -81,6 +81,9 @@ export { RECORD_SOURCE_LABELS } from './RecordSourceLabels';
 export { RECORD_SOURCE_OBJECT_NAMES } from './RecordSourceObjectNames';
 export { RELATION_NESTED_QUERY_KEYWORDS } from './RelationNestedQueriesKeyword';
 export { RESERVED_SUBDOMAINS } from './ReservedSubdomains';
+export { ROBOOST_ALL_CURRENCY_CODES } from './RoboostAllCurrencyCodes';
+export { ROBOOST_CURRENCY_MINOR_UNITS } from './RoboostCurrencyMinorUnits';
+export { ROBOOST_CURRENCY_SYMBOLS } from './RoboostCurrencySymbols';
 export type {
   RoboostDuplicateConfidence,
   RoboostDuplicatePairStatus,

@@ -1,0 +1,137 @@
+/* Settings > Currencies, the deal money fields and the line items card */
+.rb-cur-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rb-cur-auto {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rb-cur-auto-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rb-cur-auto-actions,
+.rb-cur-auto-controls,
+.rb-cur-head-actions,
+.rb-cur-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rb-cur-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rb-cur-info {
+  padding: 10px 14px;
+  border: 1px solid var(--info-border, var(--border));
+  border-radius: var(--card-radius, 14px);
+  background: var(--info-soft, var(--surface-sunken));
+  color: var(--text);
+  font-size: 13px;
+}
+
+.rb-cur-warning {
+  padding: 10px 14px;
+  border: 1px solid var(--danger-border, var(--border));
+  border-radius: var(--card-radius, 14px);
+  background: var(--danger-soft, var(--surface-sunken));
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.rb-cur-table td {
+  vertical-align: middle;
+}
+
+.rb-cur-table tr.is-archived td {
+  color: var(--text-muted);
+}
+
+.rb-cur-name {
+  margin-right: 8px;
+}
+
+.rb-cur-updated {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rb-cur-row-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rb-cur-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rb-cur-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.rb-cur-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rb-cur-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.rb-cur-source-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rb-cur-source-row .rb-input {
+  min-width: 280px;
+}
+
+.rb-cur-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rb-cur-log-effective {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius, 14px);
+}
+
+.rb-cur-missing .rb-dt-sub strong {
+  color: var(--text);
+}
+
+.rb-cur-footnote {
+  font-size: 12px;
+}

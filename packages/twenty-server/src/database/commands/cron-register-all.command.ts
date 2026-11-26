@@ -50,6 +50,7 @@ import { RoboostTaskReminderCronCommand } from 'src/modules/roboost-notification
 import { RoboostDuplicateScanCronCommand } from 'src/modules/roboost-merge/crons/roboost-duplicate-scan.cron';
 import { RoboostMergeExpiryCronCommand } from 'src/modules/roboost-merge/crons/roboost-merge-expiry.cron';
 import { RoboostNotificationRetentionCronCommand } from 'src/modules/roboost-notification/crons/commands/roboost-notification-retention.cron.command';
+import { RoboostExchangeRatesCronCommand } from 'src/modules/roboost-currency/crons/commands/roboost-exchange-rates.cron.command';
 import { RoboostScoreVerifyCronCommand } from 'src/modules/roboost-scoring/crons/commands/roboost-score-verify.cron.command';
 import { PropertyHistoryTrimCronCommand } from 'src/modules/timeline/crons/commands/property-history-trim.cron.command';
 import { EmailReplySyncCronCommand } from 'src/modules/unified-email/crons/commands/email-reply-sync.cron.command';
@@ -91,6 +92,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly roboostMergeExpiryCronCommand: RoboostMergeExpiryCronCommand,
     private readonly roboostDuplicateScanCronCommand: RoboostDuplicateScanCronCommand,
     private readonly roboostScoreVerifyCronCommand: RoboostScoreVerifyCronCommand,
+    private readonly roboostExchangeRatesCronCommand: RoboostExchangeRatesCronCommand,
     private readonly roboostTaskReminderCronCommand: RoboostTaskReminderCronCommand,
     private readonly meetingCalendarSyncCronCommand: MeetingCalendarSyncCronCommand,
     private readonly meetingArtifactsCronCommand: MeetingArtifactsCronCommand,
@@ -222,6 +224,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'RoboostDuplicateScan',
         command: this.roboostDuplicateScanCronCommand,
+      },
+      {
+        name: 'RoboostExchangeRates',
+        command: this.roboostExchangeRatesCronCommand,
       },
       {
         name: 'RoboostScoreVerify',

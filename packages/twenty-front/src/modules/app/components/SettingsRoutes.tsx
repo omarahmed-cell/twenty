@@ -426,6 +426,14 @@ const SettingsRoboostImportExport = lazy(() =>
   ),
 );
 
+const SettingsRoboostCurrencies = lazy(() =>
+  import('~/pages/settings/data-management/SettingsRoboostCurrencies').then(
+    (module) => ({
+      default: module.SettingsRoboostCurrencies,
+    }),
+  ),
+);
+
 const SettingsRoboostNotifications = lazy(() =>
   import('~/pages/settings/notifications/SettingsRoboostNotifications').then(
     (module) => ({
@@ -828,6 +836,10 @@ const createSettingsRouteElements = ({
     <Route
       path={SettingsPath.Duplicates}
       element={<SettingsRoboostDuplicates />}
+    />
+    <Route
+      path={SettingsPath.Currencies}
+      element={<SettingsRoboostCurrencies />}
     />
     <Route
       path={SettingsPath.DataManagement}

@@ -69,6 +69,10 @@ export { formatValueForCSV } from './csv/formatValueForCSV';
 export { sanitizeValueForCSVExport } from './csv/sanitizeValueForCSVExport';
 export { convertCurrencyAmountToCurrencyMicros } from './currency/convertCurrencyAmountToCurrencyMicros';
 export { convertCurrencyMicrosToCurrencyAmount } from './currency/convertCurrencyMicrosToCurrencyAmount';
+export { formatRoboostCurrencyName } from './currency/formatRoboostCurrencyName';
+export { formatRoboostCurrencyValue } from './currency/formatRoboostCurrencyValue';
+export type { RoboostCurrencyDetails } from './currency/getRoboostCurrencyDetails';
+export { getRoboostCurrencyDetails } from './currency/getRoboostCurrencyDetails';
 export {
   NON_ISO_DATE_FORMATS,
   ACCEPTED_DATE_FORMATS,
