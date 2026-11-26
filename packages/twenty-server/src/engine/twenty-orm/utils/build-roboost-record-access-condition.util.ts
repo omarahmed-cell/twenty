@@ -2,6 +2,7 @@ import {
   ROBOOST_ACTIVITY_OWNERSHIP,
   ROBOOST_ACTIVITY_TARGET_COLUMNS,
   ROBOOST_OWNERSHIP_FIELDS,
+  ROBOOST_PARENT_RECORD_ACCESS,
   ROBOOST_TOGGLE_OBJECT_PERMISSIONS,
 } from 'twenty-shared/constants';
 import {
@@ -243,6 +244,56 @@ const buildActivityWriteCondition = ({
   };
 };
 
+// View follows the parent's View; adding, editing and removing follow the parent's Edit.
+// Rows with no parent (quote line items) are only for members who can see every parent.
+const buildParentRecordCondition = ({
+  alias,
+  subject,
+  parentObjectNameSingular,
+  foreignKey,
+  settingKey,
+  context,
+}: {
+  alias: string;
+  subject: RoboostRecordAccessSubject;
+  parentObjectNameSingular: string;
+  foreignKey: string;
+  settingKey: 'view' | 'create' | 'edit' | 'delete';
+  context: ScopeContext;
+}): RoboostRecordAccessCondition => {
+  const parentPermissions = subject.permissions.objects[parentObjectNameSingular];
+
+  if (!isDefined(parentPermissions)) {
+    return OPEN;
+  }
+  if (!parentPermissions.enabled) {
+    return DENIED;
+  }
+  const setting =
+    settingKey === 'view' ? parentPermissions.view : parentPermissions.edit;
+
+  if (!isDefined(setting)) {
+    return OPEN;
+  }
+  const parentAlias = 'rbparent';
+  const parentCondition = buildOwnedRecordCondition({
+    alias: parentAlias,
+    objectNameSingular: parentObjectNameSingular,
+    setting,
+    context,
+  });
+
+  if (parentCondition.kind !== 'gated') {
+    return parentCondition;
+  }
+
+  return {
+    kind: 'gated',
+    sql: `${column(alias, foreignKey)} IN (SELECT ${column(parentAlias, 'id')} FROM ${table(context.schemaName, parentObjectNameSingular)} ${escapeIdentifier(parentAlias)} WHERE ${column(parentAlias, 'deletedAt')} IS NULL AND ${parentCondition.sql})`,
+    parameters: {},
+  };
+};
+
 const isAnyToggleOn = (
   permissions: RoboostUserPermissions,
   toggleKeys: string[] | undefined,
@@ -292,12 +343,6 @@ export const buildRoboostRecordAccessCondition = ({
       : DENIED;
   }
 
-  const objectPermissions = subject.permissions.objects[objectNameSingular];
-
-  if (!isDefined(objectPermissions) || operationType === 'insert') {
-    return OPEN;
-  }
-
   const context: ScopeContext = {
     schemaName,
     memberParameter: ROBOOST_RECORD_ACCESS_MEMBER_PARAMETER,
@@ -314,6 +359,28 @@ export const buildRoboostRecordAccessCondition = ({
           },
         }
       : condition;
+
+  const parentRecordAccess = ROBOOST_PARENT_RECORD_ACCESS[objectNameSingular];
+
+  if (isDefined(parentRecordAccess)) {
+    return operationType === 'insert'
+      ? OPEN
+      : withMemberParameter(
+          buildParentRecordCondition({
+            alias,
+            subject,
+            ...parentRecordAccess,
+            settingKey,
+            context,
+          }),
+        );
+  }
+
+  const objectPermissions = subject.permissions.objects[objectNameSingular];
+
+  if (!isDefined(objectPermissions) || operationType === 'insert') {
+    return OPEN;
+  }
 
   if (!objectPermissions.enabled) {
     return DENIED;
@@ -373,6 +440,18 @@ export const isRoboostCreateAllowed = ({
 
   if (isDefined(toggleObjectPermission)) {
     return isAnyToggleOn(subject.permissions, toggleObjectPermission.create);
+  }
+
+  const parentRecordAccess = ROBOOST_PARENT_RECORD_ACCESS[objectNameSingular];
+
+  if (isDefined(parentRecordAccess)) {
+    const parentPermissions =
+      subject.permissions.objects[parentRecordAccess.parentObjectNameSingular];
+
+    return (
+      !isDefined(parentPermissions) ||
+      (parentPermissions.enabled && parentPermissions.edit?.scope !== 'NONE')
+    );
   }
 
   const objectPermissions = subject.permissions.objects[objectNameSingular];

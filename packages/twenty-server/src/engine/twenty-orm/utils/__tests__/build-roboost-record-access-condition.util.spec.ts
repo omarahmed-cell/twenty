@@ -35,6 +35,40 @@ const build = (
   });
 
 describe('buildRoboostRecordAccessCondition', () => {
+  it('gates line items by their deal: View by deal View, Edit and Delete by deal Edit', () => {
+    const subject = buildSubject((draft) => {
+      draft.permissions.objects.opportunity.view = {
+        scope: 'OWN',
+        includeUnassigned: false,
+      };
+      draft.permissions.objects.opportunity.edit = {
+        scope: 'NONE',
+        includeUnassigned: false,
+      };
+    });
+    const view = build(subject, 'lineItem', 'select');
+
+    expect(view.kind === 'gated' && view.sql).toBe(
+      '"company"."dealId" IN (SELECT "rbparent"."id" FROM "workspace_test"."opportunity" "rbparent" WHERE "rbparent"."deletedAt" IS NULL AND "rbparent"."ownerId" = :roboostAccessMemberId)',
+    );
+    expect(build(subject, 'lineItem', 'update')).toEqual({ kind: 'denied' });
+    expect(build(subject, 'lineItem', 'delete')).toEqual({ kind: 'denied' });
+    expect(isRoboostCreateAllowed({ subject, objectNameSingular: 'lineItem' })).toBe(false);
+  });
+
+  it('leaves line items open when deals are View All and Edit All', () => {
+    const subject = buildSubject((draft) => {
+      draft.permissions.objects.opportunity.edit = {
+        scope: 'ALL',
+        includeUnassigned: false,
+      };
+    });
+
+    expect(build(subject, 'lineItem', 'select')).toEqual({ kind: 'open' });
+    expect(build(subject, 'lineItem', 'update')).toEqual({ kind: 'open' });
+    expect(isRoboostCreateAllowed({ subject, objectNameSingular: 'lineItem' })).toBe(true);
+  });
+
   it('leaves View All open and gates Edit to their own and unassigned records', () => {
     const subject = buildSubject();
 

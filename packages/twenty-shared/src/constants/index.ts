@@ -114,6 +114,8 @@ export {
   ROBOOST_ACTIVITY_OWNERSHIP,
   ROBOOST_ACTIVITY_TARGET_COLUMNS,
 } from './RoboostOwnershipFields';
+export type { RoboostParentRecordAccess } from './RoboostParentRecordAccess';
+export { ROBOOST_PARENT_RECORD_ACCESS } from './RoboostParentRecordAccess';
 export {
   ROBOOST_PERMISSION_REGISTRY,
   ROBOOST_ADMIN_ONLY_AREAS,
