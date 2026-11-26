@@ -7,7 +7,7 @@ export const ROBOOST_BOARD_CARD_FIELD_LIMIT = 5;
 
 const DEFAULT_CARD_FIELDS: Record<string, string[]> = {
   opportunity: [
-    'amount',
+    'dealAmount',
     'dateEnteredCurrentStage',
     'productCategorySync',
     'dealProbability',

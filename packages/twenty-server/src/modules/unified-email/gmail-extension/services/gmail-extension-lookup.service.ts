@@ -158,7 +158,7 @@ export class GmailExtensionLookupService {
 
     const rows: Row[] = await this.coreDataSource.query(
       `SELECT opportunity.id, opportunity.name, opportunity.stage::text AS stage,
-        opportunity."amountAmountMicros" AS "amountMicros", opportunity."amountCurrencyCode" AS currency,
+        opportunity."dealAmount" * 1000000 AS "amountMicros", opportunity."currency"::text AS currency,
         opportunity."closeDate", opportunity."companyId"
       FROM "${schemaName}"."opportunity" opportunity
       WHERE opportunity."deletedAt" IS NULL
@@ -319,8 +319,8 @@ export class GmailExtensionLookupService {
 
     const schemaName = getWorkspaceSchemaName(workspaceId);
     const rows: Row[] = await this.coreDataSource.query(
-      `SELECT id, name, stage::text AS stage, "amountAmountMicros" AS "amountMicros",
-        "amountCurrencyCode" AS currency, "closeDate", "companyId"
+      `SELECT id, name, stage::text AS stage, "dealAmount" * 1000000 AS "amountMicros",
+        currency::text AS currency, "closeDate", "companyId"
       FROM "${schemaName}"."opportunity" WHERE id = ANY($1::uuid[])`,
       [ids],
     );

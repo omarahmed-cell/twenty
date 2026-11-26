@@ -1,3 +1,5 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
+import { useRoboostCurrencies } from '@/roboost-app/currencies/hooks/useRoboostCurrencies';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
@@ -63,7 +65,9 @@ export const RoboostFieldInput = ({
 }: RoboostFieldInputProps) => {
   const { t } = useLingui();
   const { objectMetadataItems } = useObjectMetadataItems();
-  const kind = getRoboostFieldEditKind(field);
+  const { isAdmin } = useRoboostAccess();
+  const { byCode } = useRoboostCurrencies();
+  const kind = getRoboostFieldEditKind(field, { isAdmin });
   const composite = value as CompositeValue;
 
   switch (kind) {
@@ -107,6 +111,13 @@ export const RoboostFieldInput = ({
     case 'multiSelect': {
       const isMulti = kind === 'multiSelect';
       const options = [...(field.options ?? [])]
+        // Archived currencies stay on old deals but can't be picked again
+        .filter(
+          (option) =>
+            field.name !== 'currency' ||
+            byCode.get(option.value)?.isArchived !== true ||
+            option.value === value,
+        )
         .sort((first, second) => first.position - second.position)
         .map((option) => ({ value: option.value, label: option.label }));
       const selectedValues = isMulti

@@ -38,7 +38,7 @@ export const computeStandardOpportunityViews = (
         icon: 'IconLayoutKanban',
         mainGroupByFieldName: 'stage',
         kanbanAggregateOperation: AggregateOperations.SUM,
-        kanbanAggregateOperationFieldName: 'amount',
+        kanbanAggregateOperationFieldName: 'amountInCompanyCurrency',
       },
     }),
     opportunityRecordPageFields: createStandardViewFlatMetadata({

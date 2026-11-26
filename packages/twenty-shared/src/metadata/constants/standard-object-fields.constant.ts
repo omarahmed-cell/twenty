@@ -2327,6 +2327,22 @@ export const STANDARD_OBJECT_FIELDS = {
     timeInCurrentStage: {
       universalIdentifier: 'fdd5054b-3e80-4bf4-ad90-9a55ae1fa2c2',
     },
+    currency: { universalIdentifier: '2e06515b-494c-4618-b826-7e9737943948' },
+    dealAmount: {
+      universalIdentifier: '9c787448-968c-4292-ac4c-0df9113e969e',
+    },
+    exchangeRate: {
+      universalIdentifier: '3c5fe613-bc95-4896-a418-a17c4c993912',
+    },
+    exchangeRateMode: {
+      universalIdentifier: 'a33586d3-ba06-457c-b0bf-18b90b3d4316',
+    },
+    amountInCompanyCurrency: {
+      universalIdentifier: '399de178-7bfb-48a0-b994-5e6782da536b',
+    },
+    weightedAmountInCompanyCurrency: {
+      universalIdentifier: '229aa902-7b9b-4c65-98ba-6b5a08887955',
+    },
   },
   person: {
     ...buildStandardObjectSystemFields(

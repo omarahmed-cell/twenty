@@ -58,6 +58,8 @@ import { RemoveHubspotTeamFieldsCommand } from 'src/database/commands/upgrade-ve
 import { EnableRoboostFuzzyDuplicatesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795648222603-enable-roboost-fuzzy-duplicates.command';
 import { AddSequenceAndGmailExtensionSourcesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795696854169-add-sequence-and-gmail-extension-sources.command';
 import { CreateRoboostCurrencyTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795720409964-create-roboost-currency-tables.command';
+import { ProvisionDealMoneyFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795722502399-provision-deal-money-fields.command';
+import { RoboostDealMoneyModule } from 'src/modules/roboost-deal-money/roboost-deal-money.module';
 import { RemoveMemberRoleAccessCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795646261352-remove-member-role-access.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { ObjectPermissionModule } from 'src/engine/metadata-modules/object-permission/object-permission.module';
@@ -75,6 +77,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     PipelineModule,
     RoleModule,
     RolePermissionFlagModule,
+    RoboostDealMoneyModule,
     WorkspaceCacheModule,
     WorkspaceIteratorModule,
     WorkspaceMigrationModule,
@@ -137,6 +140,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     EnableRoboostFuzzyDuplicatesCommand,
     AddSequenceAndGmailExtensionSourcesCommand,
     CreateRoboostCurrencyTablesCommand,
+    ProvisionDealMoneyFieldsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

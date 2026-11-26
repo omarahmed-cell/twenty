@@ -65,6 +65,7 @@ import { ActorLinkModule } from 'src/modules/actor-link/actor-link.module';
 import { WorkspaceMemberPreCreateModule } from 'src/modules/workspace-member-pre-create/workspace-member-pre-create.module';
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { RoboostCurrencyModule } from 'src/modules/roboost-currency/roboost-currency.module';
+import { RoboostDealMoneyModule } from 'src/modules/roboost-deal-money/roboost-deal-money.module';
 import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
 import { RoboostScoringModule } from 'src/modules/roboost-scoring/roboost-scoring.module';
 import { RoboostMergeModule } from 'src/modules/roboost-merge/roboost-merge.module';
@@ -96,6 +97,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     PersonCalculatedFieldsModule,
     TimelineActivityModule,
     RoboostCurrencyModule,
+    RoboostDealMoneyModule,
     RoboostNotificationModule,
     RoboostScoringModule,
     RoboostMergeModule,

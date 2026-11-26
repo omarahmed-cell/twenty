@@ -1,3 +1,4 @@
+import { useRoboostCurrencies } from '@/roboost-app/currencies/hooks/useRoboostCurrencies';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useAggregateRecords } from '@/object-record/hooks/useAggregateRecords';
@@ -68,18 +69,26 @@ export const RoboostBoardColumn = ({
   });
 
   const { data: aggregate } = useAggregateRecords<{
-    amount?: { [AggregateOperations.SUM]?: number };
+    amountInCompanyCurrency?: { [AggregateOperations.SUM]?: number };
+    weightedAmountInCompanyCurrency?: { [AggregateOperations.SUM]?: number };
   }>({
     objectNameSingular: objectMetadataItem.nameSingular,
     filter: columnFilter,
-    recordGqlFieldsAggregate: { amount: [AggregateOperations.SUM] },
+    recordGqlFieldsAggregate: {
+      amountInCompanyCurrency: [AggregateOperations.SUM],
+      weightedAmountInCompanyCurrency: [AggregateOperations.SUM],
+    },
     skip: !hasAmount,
   });
 
-  const currencyCode =
-    (records[0]?.amount as { currencyCode?: string } | undefined)
-      ?.currencyCode ?? 'USD';
-  const totalMicros = Number(aggregate.amount?.[AggregateOperations.SUM] ?? 0);
+  const { companyCurrency } = useRoboostCurrencies();
+  const currencyCode = companyCurrency?.code ?? 'USD';
+  const totalMicros = Number(
+    aggregate.amountInCompanyCurrency?.[AggregateOperations.SUM] ?? 0,
+  );
+  const weightedMicros = Number(
+    aggregate.weightedAmountInCompanyCurrency?.[AggregateOperations.SUM] ?? 0,
+  );
   const probability = stage.probability;
   const tone = getRoboostOptionTone({
     value: stage.value,
@@ -169,13 +178,8 @@ export const RoboostBoardColumn = ({
           </div>
           {isDefined(probability) && (
             <div>
-              <b>
-                {formatRoboostMoney(
-                  (totalMicros * probability) / 100,
-                  currencyCode,
-                )}
-              </b>{' '}
-              ({probability}%) {t`Weighted amount`}
+              <b>{formatRoboostMoney(weightedMicros, currencyCode)}</b> (
+              {probability}%) {t`Weighted amount`}
             </div>
           )}
         </div>

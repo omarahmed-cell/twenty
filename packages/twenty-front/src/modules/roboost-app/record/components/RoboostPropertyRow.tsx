@@ -1,3 +1,4 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
@@ -45,7 +46,8 @@ export const RoboostPropertyRow = ({
   const setRoboostScoreWhy = useSetAtomState(roboostScoreWhyState);
   const isScoreProperty = isDefined(getRoboostScoreIdOfField(field));
   const { copyToClipboard } = useCopyToClipboard();
-  const isEditable = getRoboostFieldEditKind(field) !== null;
+  const { isAdmin } = useRoboostAccess();
+  const isEditable = getRoboostFieldEditKind(field, { isAdmin }) !== null;
 
   const stopRowClick = (event: MouseEvent) => event.stopPropagation();
 

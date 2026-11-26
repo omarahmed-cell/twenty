@@ -11,7 +11,11 @@ import {
   type RecordGqlFields,
   type RecordGqlOperationFilter,
 } from 'twenty-shared/types';
-import { isDefined, type RoboostScoreObjectName } from 'twenty-shared/utils';
+import {
+  formatRoboostCurrencyValue,
+  isDefined,
+  type RoboostScoreObjectName,
+} from 'twenty-shared/utils';
 import { useDebounce } from 'use-debounce';
 
 type PickedRecord = Record<string, unknown> & {
@@ -32,7 +36,13 @@ type RoboostScoreTestPickerProps = {
 };
 
 const FIELDS_BY_OBJECT: Record<RoboostScoreObjectName, RecordGqlFields> = {
-  opportunity: { id: true, name: true, stage: true, amount: true },
+  opportunity: {
+    id: true,
+    name: true,
+    stage: true,
+    dealAmount: true,
+    currency: true,
+  },
   company: { id: true, name: true, domainName: true },
   person: { id: true, name: true, emails: true },
 };
@@ -70,11 +80,11 @@ const describe = (
     const stage =
       stageField?.options?.find((option) => option.value === record.stage)
         ?.label ?? '';
-    const amount = record.amount as
-      | { amountMicros?: number | null; currencyCode?: string | null }
-      | undefined;
-    const amountText = isDefined(amount?.amountMicros)
-      ? `${(Number(amount.amountMicros) / 1_000_000).toLocaleString('en-US')} ${amount.currencyCode ?? ''}`.trim()
+    const amountText = isDefined(record.dealAmount)
+      ? formatRoboostCurrencyValue(
+          Number(record.dealAmount),
+          (record.currency as string | null | undefined) ?? null,
+        )
       : '';
 
     return [stage, amountText].filter((part) => part !== '').join(' · ');

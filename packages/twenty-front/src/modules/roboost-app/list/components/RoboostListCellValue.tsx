@@ -100,7 +100,7 @@ export const RoboostListCellValue = ({
     );
   }
 
-  const text = formatRoboostFieldValue(field, value);
+  const text = formatRoboostFieldValue(field, value, record);
   const isMuted =
     text === '—' ||
     field.type === FieldMetadataType.DATE ||

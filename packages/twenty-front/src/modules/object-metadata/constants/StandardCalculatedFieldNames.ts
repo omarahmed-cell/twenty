@@ -1,6 +1,7 @@
 // Standard fields the server fills itself; names are only trusted on fields that are not UI editable
 export const STANDARD_CALCULATED_FIELD_NAMES = new Set([
   'actualDuration',
+  'amountInCompanyCurrency',
   'assigneeAssignedAt',
   'completedAt',
   'dateEnteredCurrentStage',
@@ -26,4 +27,5 @@ export const STANDARD_CALCULATED_FIELD_NAMES = new Set([
   'timeInCurrentStage',
   'totalPrice',
   'weightedAmount',
+  'weightedAmountInCompanyCurrency',
 ]);

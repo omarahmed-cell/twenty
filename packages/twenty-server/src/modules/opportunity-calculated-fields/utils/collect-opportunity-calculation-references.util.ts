@@ -69,7 +69,10 @@ export const collectOpportunityCalculationReferences = ({
         isUpdate &&
         !hasChanged(before, after, [
           'pointOfContactId',
-          'amount',
+          'dealAmount',
+          'currency',
+          'exchangeRate',
+          'exchangeRateMode',
           'stage',
           'pipeline',
           'closeDate',

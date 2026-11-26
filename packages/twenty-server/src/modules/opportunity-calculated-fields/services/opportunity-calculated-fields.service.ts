@@ -27,6 +27,25 @@ type OpportunityCalculationRow = OpportunityCalculationInput & {
   current: OpportunityCalculatedFieldValues;
 };
 
+const CURRENCY_FIELD_NAMES = new Set<string>([
+  'weightedAmount',
+  'amountInCompanyCurrency',
+  'weightedAmountInCompanyCurrency',
+]);
+const DATE_FIELD_NAMES = new Set<string>([
+  'lastActivityDate',
+  'nextActivityDate',
+]);
+
+// The rate effective on a day: the latest one on or before it (a manual rate wins that day), else the oldest known
+const buildRateSubquery = (schema: string, dayExpression: string) => `coalesce(
+  (SELECT rate."rate" FROM ${schema}."roboostExchangeRate" rate
+    WHERE rate."currencyCode" = opportunity."currency"::text AND rate."effectiveDate" <= ${dayExpression}
+    ORDER BY rate."effectiveDate" DESC, (rate."source" = 'MANUAL') DESC, rate."createdAt" DESC LIMIT 1),
+  (SELECT rate."rate" FROM ${schema}."roboostExchangeRate" rate
+    WHERE rate."currencyCode" = opportunity."currency"::text
+    ORDER BY rate."effectiveDate" ASC, (rate."source" = 'MANUAL') DESC LIMIT 1))`;
+
 @Injectable()
 export class OpportunityCalculatedFieldsService {
   private readonly logger = new Logger(OpportunityCalculatedFieldsService.name);
@@ -196,10 +215,14 @@ export class OpportunityCalculatedFieldsService {
       const changes = Object.fromEntries(
         OPPORTUNITY_CALCULATED_FIELD_NAMES.filter(
           (fieldName) =>
-            !this.isSameValue(row.current[fieldName], computed[fieldName]),
+            !this.isSameValue(
+              row.current[fieldName],
+              computed[fieldName],
+              fieldName,
+            ),
         ).map((fieldName) => [
           fieldName,
-          fieldName === 'weightedAmount' && !isDefined(computed[fieldName])
+          CURRENCY_FIELD_NAMES.has(fieldName) && !isDefined(computed[fieldName])
             ? { amountMicros: null, currencyCode: null }
             : computed[fieldName],
         ]),
@@ -253,7 +276,11 @@ export class OpportunityCalculatedFieldsService {
   }
 
   // Dates come back from Postgres in another ISO form, so they compare as instants
-  private isSameValue(currentValue: unknown, computedValue: unknown) {
+  private isSameValue(
+    currentValue: unknown,
+    computedValue: unknown,
+    fieldName: string,
+  ) {
     if (
       isDefined(currentValue) &&
       typeof currentValue === 'object' &&
@@ -283,7 +310,7 @@ export class OpportunityCalculatedFieldsService {
       return Number(currentValue) === computedValue;
     }
 
-    if (typeof computedValue === 'string') {
+    if (typeof computedValue === 'string' && DATE_FIELD_NAMES.has(fieldName)) {
       return (
         isDefined(currentValue) &&
         new Date(currentValue as string).toISOString() === computedValue
@@ -337,13 +364,29 @@ export class OpportunityCalculatedFieldsService {
           'isClosedWon', opportunity."isClosedWon",
           'isClosedLost', opportunity."isClosedLost",
           'isOpen', opportunity."isOpen",
-          'actualDuration', opportunity."actualDuration"
+          'actualDuration', opportunity."actualDuration",
+          'exchangeRate', opportunity."exchangeRate",
+          'exchangeRateMode', opportunity."exchangeRateMode",
+          'amountInCompanyCurrency', json_build_object(
+            'amountMicros', opportunity."amountInCompanyCurrencyAmountMicros",
+            'currencyCode', opportunity."amountInCompanyCurrencyCurrencyCode"
+          ),
+          'weightedAmountInCompanyCurrency', json_build_object(
+            'amountMicros', opportunity."weightedAmountInCompanyCurrencyAmountMicros",
+            'currencyCode', opportunity."weightedAmountInCompanyCurrencyCurrencyCode"
+          )
         ) AS "current",
         (SELECT pipelineStage."probability" FROM ${schema}."pipelineStage" pipelineStage
           WHERE pipelineStage."value" = opportunity."stage"::text AND pipelineStage."deletedAt" IS NULL
           LIMIT 1) AS "stageProbability",
-        opportunity."amountAmountMicros" AS "amountMicros",
-        opportunity."amountCurrencyCode" AS "amountCurrencyCode",
+        opportunity."dealAmount",
+        opportunity."currency"::text AS "currency",
+        opportunity."exchangeRate" AS "currentExchangeRate",
+        opportunity."exchangeRateMode"::text AS "currentExchangeRateMode",
+        (SELECT currency."code" FROM ${schema}."roboostCurrency" currency
+          WHERE currency."isCompanyCurrency" LIMIT 1) AS "companyCurrency",
+        ${buildRateSubquery(schema, 'current_date')} AS "latestRate",
+        ${buildRateSubquery(schema, 'opportunity."closeDate"::date')} AS "closeDateRate",
         opportunity."createdAt",
         opportunity."closeDate",
         (SELECT pointOfContact."id" FROM ${schema}."person" pointOfContact

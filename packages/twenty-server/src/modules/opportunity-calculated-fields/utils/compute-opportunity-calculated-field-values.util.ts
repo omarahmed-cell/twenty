@@ -21,8 +21,13 @@ export type OpportunityCalculationInput = {
   activityDates: { activityType: string; date: string | Date | null }[] | null;
   nextActivityCandidates: NextActivityCandidate[] | null;
   stageProbability?: number | string | null;
-  amountMicros?: number | string | null;
-  amountCurrencyCode?: string | null;
+  dealAmount?: number | string | null;
+  currency?: string | null;
+  companyCurrency?: string | null;
+  latestRate?: number | string | null;
+  closeDateRate?: number | string | null;
+  currentExchangeRate?: number | string | null;
+  currentExchangeRateMode?: string | null;
   createdAt?: string | Date | null;
   closeDate?: string | Date | null;
 };
@@ -50,6 +55,74 @@ const computeWeightedAmount = ({
   isDefined(amountMicros) && isDefined(probability)
     ? {
         amountMicros: Math.round((amountMicros * probability) / 100),
+        currencyCode: currencyCode ?? null,
+      }
+    : null;
+
+export type ExchangeRateMode = 'AUTO' | 'FROZEN' | 'MANUAL';
+
+// Open deals follow the latest rate; a deal closed on or before today is frozen at its close date rate;
+// an admin's rate stays until the currency changes
+export const computeDealExchangeRate = ({
+  currency,
+  companyCurrency,
+  isClosed,
+  closeDate,
+  now,
+  latestRate,
+  closeDateRate,
+  currentExchangeRate,
+  currentExchangeRateMode,
+}: {
+  currency: string | null | undefined;
+  companyCurrency: string | null | undefined;
+  isClosed: boolean;
+  closeDate: string | Date | null | undefined;
+  now: Date;
+  latestRate: number | null;
+  closeDateRate: number | null;
+  currentExchangeRate: number | null;
+  currentExchangeRateMode: string | null | undefined;
+}): { exchangeRate: number | null; exchangeRateMode: ExchangeRateMode } => {
+  const isClosedInThePast =
+    isClosed &&
+    isDefined(closeDate) &&
+    new Date(closeDate).toISOString().slice(0, 10) <=
+      now.toISOString().slice(0, 10);
+
+  if (currentExchangeRateMode === 'MANUAL' && isDefined(currentExchangeRate)) {
+    return { exchangeRate: currentExchangeRate, exchangeRateMode: 'MANUAL' };
+  }
+  if (!isNonEmptyString(currency)) {
+    return { exchangeRate: null, exchangeRateMode: 'AUTO' };
+  }
+  if (isClosedInThePast) {
+    if (
+      currentExchangeRateMode === 'FROZEN' &&
+      isDefined(currentExchangeRate)
+    ) {
+      return { exchangeRate: currentExchangeRate, exchangeRateMode: 'FROZEN' };
+    }
+
+    return {
+      exchangeRate: currency === companyCurrency ? 1 : closeDateRate,
+      exchangeRateMode: 'FROZEN',
+    };
+  }
+
+  return {
+    exchangeRate: currency === companyCurrency ? 1 : latestRate,
+    exchangeRateMode: 'AUTO',
+  };
+};
+
+const toCurrencyValue = (
+  amount: number | null,
+  currencyCode: string | null | undefined,
+): CurrencyValue | null =>
+  isDefined(amount) && Number.isFinite(amount)
+    ? {
+        amountMicros: Math.round(amount * 1_000_000),
         currencyCode: currencyCode ?? null,
       }
     : null;
@@ -84,6 +157,22 @@ export const computeOpportunityCalculatedFieldValues = ({
   const probability = toNumberOrNull(input.stageProbability);
   const status = getDealStageStatus(probability);
   const isClosed = status !== 'OPEN';
+  const dealAmount = toNumberOrNull(input.dealAmount);
+  const { exchangeRate, exchangeRateMode } = computeDealExchangeRate({
+    currency: input.currency,
+    companyCurrency: input.companyCurrency,
+    isClosed,
+    closeDate: input.closeDate,
+    now,
+    latestRate: toNumberOrNull(input.latestRate),
+    closeDateRate: toNumberOrNull(input.closeDateRate),
+    currentExchangeRate: toNumberOrNull(input.currentExchangeRate),
+    currentExchangeRateMode: input.currentExchangeRateMode,
+  });
+  const amountInCompanyCurrency =
+    isDefined(dealAmount) && isDefined(exchangeRate)
+      ? dealAmount * exchangeRate
+      : null;
 
   return {
     lastActivityDate: pickLatestActivityDate({
@@ -108,10 +197,24 @@ export const computeOpportunityCalculatedFieldValues = ({
     numberOfAssociatedLineItems: input.lineItemCount,
     dealProbability: isDefined(probability) ? probability / 100 : null,
     weightedAmount: computeWeightedAmount({
-      amountMicros: toNumberOrNull(input.amountMicros),
-      currencyCode: input.amountCurrencyCode,
+      amountMicros: isDefined(dealAmount)
+        ? Math.round(dealAmount * 1_000_000)
+        : null,
+      currencyCode: input.currency,
       probability,
     }),
+    exchangeRate,
+    exchangeRateMode,
+    amountInCompanyCurrency: toCurrencyValue(
+      amountInCompanyCurrency,
+      input.companyCurrency,
+    ),
+    weightedAmountInCompanyCurrency: toCurrencyValue(
+      isDefined(amountInCompanyCurrency) && isDefined(probability)
+        ? (amountInCompanyCurrency * probability) / 100
+        : null,
+      input.companyCurrency,
+    ),
     isClosed,
     isClosedWon: status === 'WON',
     isClosedLost: status === 'LOST',

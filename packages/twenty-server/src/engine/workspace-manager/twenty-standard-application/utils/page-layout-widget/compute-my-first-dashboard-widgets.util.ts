@@ -334,7 +334,7 @@ const createPipelineValueByStage = ({
       },
       configuration: {
         configurationType: WidgetConfigurationType.BAR_CHART,
-        aggregateFieldMetadataId: opportunityFields.amount.id,
+        aggregateFieldMetadataId: opportunityFields.amountInCompanyCurrency.id,
         aggregateOperation: AggregateOperations.SUM,
         primaryAxisGroupByFieldMetadataId: opportunityFields.stage.id,
         primaryAxisDateGranularity: ObjectRecordGroupByDateGranularity.DAY,
@@ -411,7 +411,7 @@ const createRevenueTimeline = ({
       },
       configuration: {
         configurationType: WidgetConfigurationType.LINE_CHART,
-        aggregateFieldMetadataId: opportunityFields.amount.id,
+        aggregateFieldMetadataId: opportunityFields.amountInCompanyCurrency.id,
         aggregateOperation: AggregateOperations.SUM,
         primaryAxisGroupByFieldMetadataId: opportunityFields.closeDate.id,
         primaryAxisDateGranularity: ObjectRecordGroupByDateGranularity.DAY,
@@ -664,7 +664,7 @@ const createDealValueCreatedThisMonth = ({
       },
       configuration: {
         configurationType: WidgetConfigurationType.AGGREGATE_CHART,
-        aggregateFieldMetadataId: opportunityFields.amount.id,
+        aggregateFieldMetadataId: opportunityFields.amountInCompanyCurrency.id,
         aggregateOperation: AggregateOperations.SUM,
         displayDataLabel: false,
         filter: filterConfigs.configuration,

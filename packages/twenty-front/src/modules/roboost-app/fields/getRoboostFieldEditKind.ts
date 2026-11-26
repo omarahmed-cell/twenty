@@ -46,6 +46,9 @@ const KIND_BY_TYPE: Partial<Record<FieldMetadataType, RoboostFieldEditKind>> = {
   [FieldMetadataType.RATING]: 'rating',
 };
 
+// Reps see these; only admins change them (the server enforces the same)
+const ADMIN_ONLY_FIELD_NAMES = new Set(['exchangeRate']);
+
 // HubSpot ids link records back to HubSpot; editing them would break the sync
 const HUBSPOT_ID_FIELD_NAME_PATTERN = /^hubspot([A-Z]\w*)?Id$/;
 
@@ -54,9 +57,13 @@ export type RoboostReadOnlyReason = 'calculated' | 'readOnly';
 // Why a field never opens an editor: shown as its hover tooltip
 export const getRoboostReadOnlyReason = (
   field: FieldMetadataItem,
+  { isAdmin = false }: { isAdmin?: boolean } = {},
 ): RoboostReadOnlyReason | null => {
   if (isCalculatedFieldMetadataItem(field)) {
     return 'calculated';
+  }
+  if (ADMIN_ONLY_FIELD_NAMES.has(field.name) && !isAdmin) {
+    return 'readOnly';
   }
   if (
     READ_ONLY_FIELD_NAMES.has(field.name) ||
@@ -73,8 +80,9 @@ export const getRoboostReadOnlyReason = (
 // Null means the field is shown but not edited in place (read-only, rich or composite-heavy types)
 export const getRoboostFieldEditKind = (
   field: FieldMetadataItem,
+  options: { isAdmin?: boolean } = {},
 ): RoboostFieldEditKind | null => {
-  if (getRoboostReadOnlyReason(field) !== null) {
+  if (getRoboostReadOnlyReason(field, options) !== null) {
     return null;
   }
 

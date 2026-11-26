@@ -8,7 +8,7 @@ import { type RoboostCurrency } from '@/roboost-app/currencies/types/RoboostCurr
 export const useRoboostCurrencies = () => {
   const { data, loading, refetch } = useQuery<{
     roboostCurrencies: RoboostCurrency[];
-  }>(ROBOOST_CURRENCIES, { fetchPolicy: 'cache-and-network' });
+  }>(ROBOOST_CURRENCIES, { fetchPolicy: 'cache-first' });
 
   return useMemo(() => {
     const currencies = data?.roboostCurrencies ?? [];

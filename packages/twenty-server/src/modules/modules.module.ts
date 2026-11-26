@@ -29,6 +29,7 @@ import { SegmentModule } from 'src/modules/segment/segment.module';
 import { CommunicationQueryHookModule } from 'src/modules/communication/query-hooks/communication-query-hook.module';
 import { MeetingSchedulingModule } from 'src/modules/meeting/scheduling/meeting-scheduling.module';
 import { RoboostCurrencyModule } from 'src/modules/roboost-currency/roboost-currency.module';
+import { RoboostDealMoneyModule } from 'src/modules/roboost-deal-money/roboost-deal-money.module';
 import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
 import { RoboostScoringModule } from 'src/modules/roboost-scoring/roboost-scoring.module';
 import { RoboostMergeModule } from 'src/modules/roboost-merge/roboost-merge.module';
@@ -103,6 +104,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     MeetingQueryHookModule,
     MeetingSchedulingModule,
     RoboostCurrencyModule,
+    RoboostDealMoneyModule,
     RoboostNotificationModule,
     RoboostScoringModule,
     UsersAndTeamsModule,

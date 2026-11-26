@@ -10,6 +10,10 @@ export const OPPORTUNITY_CALCULATED_FIELD_NAMES = [
   'isClosedLost',
   'isOpen',
   'actualDuration',
+  'exchangeRate',
+  'exchangeRateMode',
+  'amountInCompanyCurrency',
+  'weightedAmountInCompanyCurrency',
 ] as const;
 
 export type OpportunityCalculatedFieldName =

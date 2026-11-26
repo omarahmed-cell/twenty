@@ -232,8 +232,15 @@ export const RoboostActivityExpandedBody = ({
                 >
                   <span className="rb-truncate">
                     {field.name in draft
-                      ? formatRoboostFieldValue(field, draft[field.name])
-                      : formatRoboostFieldValue(field, record[field.name])}
+                      ? formatRoboostFieldValue(field, draft[field.name], {
+                          ...record,
+                          ...draft,
+                        })
+                      : formatRoboostFieldValue(
+                          field,
+                          record[field.name],
+                          record,
+                        )}
                   </span>
                   {canEdit && <Icon name="caret" size={12} />}
                 </button>

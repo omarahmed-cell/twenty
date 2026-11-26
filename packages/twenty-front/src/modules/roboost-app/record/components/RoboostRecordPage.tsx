@@ -165,7 +165,7 @@ const RoboostRecordPageContent = ({
     'domainName',
     'emails',
     'jobTitle',
-    'amount',
+    'dealAmount',
     'stage',
     'status',
     'avatarUrl',

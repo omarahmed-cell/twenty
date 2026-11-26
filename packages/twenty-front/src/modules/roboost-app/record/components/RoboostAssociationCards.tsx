@@ -22,7 +22,7 @@ const TAG_FIELD_NAMES = ['stage', 'status', 'leadStatus', 'lifecycleStage'];
 const LINE_FIELD_NAMES_BY_OBJECT: Record<string, string[]> = {
   person: ['jobTitle', 'emails', 'phones'],
   company: ['domainName', 'address'],
-  opportunity: ['amount', 'closeDate'],
+  opportunity: ['dealAmount', 'closeDate'],
   service: ['pipeline', 'createdAt'],
 };
 
@@ -92,7 +92,7 @@ export const RoboostAssociationCard = ({
   const lines = lineFields
     .map((field) => ({
       label: field.label,
-      value: formatRoboostFieldValue(field, record[field.name]),
+      value: formatRoboostFieldValue(field, record[field.name], record),
     }))
     .filter((line) => isNonEmptyString(line.value) && line.value !== '—');
 

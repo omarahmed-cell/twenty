@@ -15,7 +15,7 @@ export const getRoboostCurrencyDetails = (
 ): RoboostCurrencyDetails => ({
   code,
   name: (CURRENCY_CODE_LABELS[code as CurrencyCode]?.label ?? code).replace(
-    /([a-z])/g,
+    /\b([a-z])/g,
     (letter) => letter.toUpperCase(),
   ),
   symbol: ROBOOST_CURRENCY_SYMBOLS[code] ?? code,

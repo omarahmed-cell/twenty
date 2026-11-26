@@ -30,6 +30,10 @@ describe('computeOpportunityCalculatedFieldValues', () => {
       numberOfAssociatedLineItems: 0,
       dealProbability: null,
       weightedAmount: null,
+      exchangeRate: null,
+      exchangeRateMode: 'AUTO',
+      amountInCompanyCurrency: null,
+      weightedAmountInCompanyCurrency: null,
       isClosed: false,
       isClosedWon: false,
       isClosedLost: false,
@@ -93,8 +97,8 @@ describe('computeOpportunityCalculatedFieldValues', () => {
       expect(
         compute({
           stageProbability: 40,
-          amountMicros: '10000000000',
-          amountCurrencyCode: 'USD',
+          dealAmount: '10000',
+          currency: 'USD',
         }),
       ).toMatchObject({
         dealProbability: 0.4,
@@ -107,9 +111,91 @@ describe('computeOpportunityCalculatedFieldValues', () => {
     it('leaves the weighted amount empty without an amount or a probability', () => {
       expect(compute({ stageProbability: 40 }).weightedAmount).toBeNull();
       expect(
-        compute({ amountMicros: 5000000, amountCurrencyCode: 'EUR' })
-          .weightedAmount,
+        compute({ dealAmount: 5, currency: 'EUR' }).weightedAmount,
       ).toBeNull();
+    });
+
+    it('converts open deals at the latest rate and weights the company amount', () => {
+      expect(
+        compute({
+          stageProbability: 50,
+          dealAmount: 12000,
+          currency: 'SAR',
+          companyCurrency: 'USD',
+          latestRate: 0.266354,
+          closeDateRate: 0.25,
+        }),
+      ).toMatchObject({
+        exchangeRate: 0.266354,
+        exchangeRateMode: 'AUTO',
+        amountInCompanyCurrency: {
+          amountMicros: 3196248000,
+          currencyCode: 'USD',
+        },
+        weightedAmountInCompanyCurrency: {
+          amountMicros: 1598124000,
+          currencyCode: 'USD',
+        },
+      });
+    });
+
+    it('freezes a deal closed in the past at its close date rate, and keeps a frozen rate', () => {
+      const closed = {
+        stageProbability: 100,
+        dealAmount: 1000,
+        currency: 'SAR',
+        companyCurrency: 'USD',
+        closeDate: '2026-01-15T00:00:00.000Z',
+        latestRate: 0.266354,
+        closeDateRate: 0.25,
+      };
+
+      expect(compute(closed)).toMatchObject({
+        exchangeRate: 0.25,
+        exchangeRateMode: 'FROZEN',
+        amountInCompanyCurrency: {
+          amountMicros: 250000000,
+          currencyCode: 'USD',
+        },
+      });
+      expect(
+        compute({
+          ...closed,
+          currentExchangeRate: 0.2601,
+          currentExchangeRateMode: 'FROZEN',
+        }).exchangeRate,
+      ).toBe(0.2601);
+    });
+
+    it('keeps following the latest rate while the close date is in the future', () => {
+      expect(
+        compute({
+          stageProbability: 100,
+          dealAmount: 1000,
+          currency: 'SAR',
+          companyCurrency: 'USD',
+          closeDate: '2099-01-01T00:00:00.000Z',
+          latestRate: 0.266354,
+          closeDateRate: 0.25,
+        }),
+      ).toMatchObject({ exchangeRate: 0.266354, exchangeRateMode: 'AUTO' });
+    });
+
+    it('keeps an admin rate and uses 1 for the company currency', () => {
+      expect(
+        compute({
+          dealAmount: 10,
+          currency: 'SAR',
+          companyCurrency: 'USD',
+          latestRate: 0.26,
+          currentExchangeRate: 0.3,
+          currentExchangeRateMode: 'MANUAL',
+        }),
+      ).toMatchObject({ exchangeRate: 0.3, exchangeRateMode: 'MANUAL' });
+      expect(
+        compute({ dealAmount: 10, currency: 'USD', companyCurrency: 'USD' })
+          .exchangeRate,
+      ).toBe(1);
     });
 
     it('reads won, lost and open from the probability alone', () => {

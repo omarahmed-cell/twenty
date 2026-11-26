@@ -7,7 +7,7 @@ import {
 import { getRoboostDomainLabel } from '@/roboost-app/utils/getRoboostDomainLabel';
 import { getRoboostPersonName } from '@/roboost-app/utils/getRoboostPersonName';
 import { isNonEmptyString, isNumber, isString } from '@sniptt/guards';
-import { isDefined } from 'twenty-shared/utils';
+import { formatRoboostCurrencyValue, isDefined } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 const EMPTY = '—';
@@ -42,13 +42,28 @@ const getRelatedRecordLabel = (value: unknown) => {
       : '';
 };
 
+// A deal's Amount is a plain number shown in the deal's own currency
+const MONEY_NUMBER_FIELDS: Record<string, string> = { dealAmount: 'currency' };
+
 // Read-only display text for the record panel's label-above-value properties
 export const formatRoboostFieldValue = (
   fieldMetadataItem: FieldMetadataItem,
   value: unknown,
+  record?: Record<string, unknown>,
 ): string => {
   if (!isDefined(value) || value === '') {
     return EMPTY;
+  }
+
+  const moneyCurrencyField = MONEY_NUMBER_FIELDS[fieldMetadataItem.name];
+
+  if (isDefined(moneyCurrencyField) && isNumber(value)) {
+    const currency = record?.[moneyCurrencyField];
+
+    return formatRoboostCurrencyValue(
+      value,
+      isString(currency) ? currency : null,
+    );
   }
 
   const composite = asComposite(value);
@@ -73,8 +88,15 @@ export const formatRoboostFieldValue = (
         return String(value);
       }
 
-      return isRoboostPercentageField(fieldMetadataItem)
-        ? formatRoboostPercentage(value)
+      if (isRoboostPercentageField(fieldMetadataItem)) {
+        return formatRoboostPercentage(value);
+      }
+      const decimals = (
+        fieldMetadataItem.settings as { decimals?: number } | null | undefined
+      )?.decimals;
+
+      return isNumber(decimals) && decimals > 3
+        ? value.toLocaleString('en-US', { maximumFractionDigits: decimals })
         : value.toLocaleString('en-US');
     case FieldMetadataType.LINKS: {
       const label = getRoboostDomainLabel(
@@ -101,11 +123,12 @@ export const formatRoboostFieldValue = (
       if (!isNumber(amountMicros)) {
         return EMPTY;
       }
-      const amount = (amountMicros / 1_000_000).toLocaleString('en-US');
-
-      return isNonEmptyString(composite?.currencyCode)
-        ? `${composite.currencyCode} ${amount}`
-        : amount;
+      return formatRoboostCurrencyValue(
+        amountMicros / 1_000_000,
+        isNonEmptyString(composite?.currencyCode)
+          ? composite.currencyCode
+          : null,
+      );
     }
     case FieldMetadataType.FULL_NAME: {
       const name = getRoboostPersonName(

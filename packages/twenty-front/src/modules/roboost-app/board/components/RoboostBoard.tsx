@@ -53,14 +53,14 @@ export const RoboostBoard = ({
   const labelField = findField(
     getRoboostLabelIdentifierFieldName(objectMetadataItem),
   );
-  const hasAmount = isDefined(findField('amount'));
+  const hasAmount = isDefined(findField('amountInCompanyCurrency'));
   const recordGqlFields: RecordGqlFields = {
     ...getRoboostListRecordGqlFields(
       objectMetadataItem,
       [
         labelField,
         ownerField,
-        findField('amount'),
+        findField('dealAmount'),
         findField('stage'),
         ...cardFields,
       ].filter(isDefined),

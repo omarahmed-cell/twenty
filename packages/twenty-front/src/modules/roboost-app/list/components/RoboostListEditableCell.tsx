@@ -1,3 +1,4 @@
+import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
@@ -73,7 +74,8 @@ const RoboostListCellEditor = ({
     Record<string, unknown> | null | undefined
   >(undefined);
   const [error, setError] = useState<string | null>(null);
-  const editKind = getRoboostFieldEditKind(field);
+  const { isAdmin } = useRoboostAccess();
+  const editKind = getRoboostFieldEditKind(field, { isAdmin });
   const isEditing = editor.isEditing;
   const saveOnChoice = editKind !== null && SAVE_ON_CHOICE_KINDS.has(editKind);
   const isInlineDropdown =
@@ -307,8 +309,9 @@ export const RoboostListEditableCell = memo(
     const editor = useRoboostCellEditor(
       getRoboostCellEditorKey(record.id, field.id),
     );
-    const isEditable = getRoboostFieldEditKind(field) !== null;
-    const readOnlyReason = getRoboostReadOnlyReason(field);
+    const { isAdmin } = useRoboostAccess();
+    const isEditable = getRoboostFieldEditKind(field, { isAdmin }) !== null;
+    const readOnlyReason = getRoboostReadOnlyReason(field, { isAdmin });
 
     // A row that leaves the screen must not keep the shared editor slot
     useEffect(

@@ -1,3 +1,4 @@
+import { useRoboostCurrencies } from '@/roboost-app/currencies/hooks/useRoboostCurrencies';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useAggregateRecords } from '@/object-record/hooks/useAggregateRecords';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
@@ -54,36 +55,40 @@ export const RoboostBoardMetrics = ({
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const total = useSum(objectName, 'amount', filter, false);
+  const total = useSum(objectName, 'amountInCompanyCurrency', filter, false);
   const weightedOpen = useSum(
     objectName,
-    'weightedAmount',
+    'weightedAmountInCompanyCurrency',
     openFilter,
-    !hasField('weightedAmount'),
+    !hasField('weightedAmountInCompanyCurrency'),
   );
-  const openValue = useSum(objectName, 'amount', openFilter, !hasOpenFlag);
+  const openValue = useSum(
+    objectName,
+    'amountInCompanyCurrency',
+    openFilter,
+    !hasOpenFlag,
+  );
   const closedWon = useSum(
     objectName,
-    'amount',
+    'amountInCompanyCurrency',
     { and: [filter, { isClosedWon: { eq: true } }] },
     !hasField('isClosedWon'),
   );
   const newAmount = useSum(
     objectName,
-    'amount',
+    'amountInCompanyCurrency',
     { and: [filter, { createdAt: { gte: monthStart.toISOString() } }] },
     false,
   );
   const { records: openRecords } = useFindManyRecords<ObjectRecord>({
     objectNameSingular: objectName,
     filter: openFilter,
-    recordGqlFields: { id: true, createdAt: true, amount: true },
+    recordGqlFields: { id: true, createdAt: true },
     limit: AGE_SAMPLE_LIMIT,
   });
 
-  const currencyCode =
-    (openRecords[0]?.amount as { currencyCode?: string } | undefined)
-      ?.currencyCode ?? 'USD';
+  const { companyCurrency } = useRoboostCurrencies();
+  const currencyCode = companyCurrency?.code ?? 'USD';
   const ages = openRecords
     .map((record) =>
       isString(record.createdAt)

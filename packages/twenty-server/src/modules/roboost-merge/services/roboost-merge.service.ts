@@ -1142,8 +1142,8 @@ export class RoboostMergeService {
       case 'company':
         return String(row.domainNamePrimaryLinkUrl ?? '');
       case 'opportunity': {
-        const amount = isDefined(row.amountAmountMicros)
-          ? `${Math.round(Number(row.amountAmountMicros) / 1_000_000).toLocaleString('en-US')} ${row.amountCurrencyCode ?? ''}`.trim()
+        const amount = isDefined(row.dealAmount)
+          ? `${String(row.currency ?? '')} ${Math.round(Number(row.dealAmount)).toLocaleString('en-US')}`.trim()
           : '';
 
         return [row.stage, amount]

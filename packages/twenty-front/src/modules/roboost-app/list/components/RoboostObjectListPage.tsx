@@ -397,6 +397,7 @@ export const RoboostObjectListPage = ({
               : formatRoboostFieldValue(
                   column.field,
                   record[column.field.name],
+                  record,
                 ),
           ),
         ),
@@ -440,7 +441,9 @@ export const RoboostObjectListPage = ({
     pipelines.find(
       (pipeline) => pipeline.key === getUserVar<string>(pipelineVarKey),
     ) ?? pipelines[0];
-  const hasAmountField = activeFields.some((field) => field.name === 'amount');
+  const hasAmountField = activeFields.some(
+    (field) => field.name === 'amountInCompanyCurrency',
+  );
   const boardFilter: RecordGqlOperationFilter = filter ?? {};
 
   const objectNameSingular = objectMetadataItem.nameSingular;

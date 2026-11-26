@@ -1239,6 +1239,218 @@ export const buildOpportunityStandardFlatFieldMetadatas = ({
     }),
     writability: MetadataWritability.SYSTEM,
   },
+  // Options are synced from Settings > Currencies; these are the ones a new workspace starts with
+  currency: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'currency',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Currency`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The currency of the deal amount, from Settings > Currencies`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCoins',
+      isNullable: true,
+      defaultValue: `'USD'`,
+      options: [
+        {
+          id: '399f231e-2204-410d-bf6a-c27ed4684b0f',
+          value: 'USD',
+          label: 'USD',
+          position: 0,
+          color: 'green',
+        },
+        {
+          id: '7a18aeb2-2f27-44eb-8ea0-54c992a601ec',
+          value: 'JOD',
+          label: 'JOD',
+          position: 1,
+          color: 'blue',
+        },
+        {
+          id: '55644160-62d8-4321-bad7-c4b01b3f7ccb',
+          value: 'SAR',
+          label: 'SAR',
+          position: 2,
+          color: 'turquoise',
+        },
+        {
+          id: '642dde9b-a0e9-47b2-93ae-5ae5c9e77a7d',
+          value: 'TND',
+          label: 'TND',
+          position: 3,
+          color: 'orange',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  dealAmount: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'dealAmount',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Amount`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The deal amount the rep types, in the deal currency`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCurrencyDollar',
+      isNullable: true,
+      settings: { dataType: NumberDataType.FLOAT, decimals: 2, type: 'number' },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  exchangeRate: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'exchangeRate',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Exchange rate`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Company currency per unit of the deal currency: the latest rate while open, frozen at the close date rate once closed. Admins can override it.`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCurrency',
+      isNullable: true,
+      settings: { dataType: NumberDataType.FLOAT, decimals: 6, type: 'number' },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  exchangeRateMode: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'exchangeRateMode',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Exchange rate mode`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Whether the exchange rate follows the latest rate, is frozen at the close date, or was set by an admin`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconLock',
+      isSystem: true,
+      isUIEditable: false,
+      isNullable: true,
+      defaultValue: `'AUTO'`,
+      options: [
+        {
+          id: 'b0772998-7b0c-4e8c-a8dd-3e8354c315ed',
+          value: 'AUTO',
+          label: 'Latest rate',
+          position: 0,
+          color: 'blue',
+        },
+        {
+          id: 'a16c05c0-8fef-47d5-b9b6-a440eeed0786',
+          value: 'FROZEN',
+          label: 'Frozen at close date',
+          position: 1,
+          color: 'gray',
+        },
+        {
+          id: '6512430e-a478-40ed-a85f-70325eece5fd',
+          value: 'MANUAL',
+          label: 'Set by an admin',
+          position: 2,
+          color: 'orange',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  amountInCompanyCurrency: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'amountInCompanyCurrency',
+        type: FieldMetadataType.CURRENCY,
+        label: i18nLabel(
+          msg({
+            message: `Amount in company currency`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Amount times the exchange rate`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCoins',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  weightedAmountInCompanyCurrency: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'weightedAmountInCompanyCurrency',
+        type: FieldMetadataType.CURRENCY,
+        label: i18nLabel(
+          msg({
+            message: `Weighted amount in company currency`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Amount in company currency times the deal probability`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCoins',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
   isClosed: {
     ...createStandardFieldFlatMetadata({
       objectName,

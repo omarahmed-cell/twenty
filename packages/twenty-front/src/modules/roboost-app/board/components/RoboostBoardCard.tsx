@@ -127,7 +127,7 @@ export const RoboostBoardCard = ({
                   ) || '—'}
                 </b>
               ) : (
-                <b>{formatRoboostFieldValue(field, value)}</b>
+                <b>{formatRoboostFieldValue(field, value, record)}</b>
               )}
             </div>
           );

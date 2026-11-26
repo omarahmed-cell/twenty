@@ -150,7 +150,7 @@ export const buildRoboostDuplicateCandidateQueries = ({
     has('name') &&
     has('companyId')
   ) {
-    const amount = has('amountAmountMicros')
+    const amount = has('amountInCompanyCurrencyAmountMicros')
       ? `AND ((a.amount IS NULL AND b.amount IS NULL) OR abs(a.amount - b.amount) <= 0.1 * greatest(abs(a.amount), abs(b.amount)))`
       : '';
     const owner =
@@ -162,7 +162,7 @@ export const buildRoboostDuplicateCandidateQueries = ({
       ruleKey: 'opportunitySameNameCompanyAmount',
       sql: `WITH n AS (
         SELECT t.id, t."companyId" AS company, lower(trim(coalesce(t.name, ''))) AS value,
-          ${has('amountAmountMicros') ? 't."amountAmountMicros"::numeric' : 'NULL::numeric'} AS amount,
+          ${has('amountInCompanyCurrencyAmountMicros') ? 't."amountInCompanyCurrencyAmountMicros"::numeric' : 'NULL::numeric'} AS amount,
           ${has('ownerId') ? 't."ownerId"' : 'NULL::uuid'} AS owner
         FROM ${table} t WHERE t."deletedAt" IS NULL AND t."companyId" IS NOT NULL
       )

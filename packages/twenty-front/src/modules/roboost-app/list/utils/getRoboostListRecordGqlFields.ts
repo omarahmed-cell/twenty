@@ -35,6 +35,10 @@ export const getRoboostListRecordGqlFields = (
   for (const field of fields) {
     if (field.type !== FieldMetadataType.RELATION) {
       recordGqlFields[field.name] = true;
+      // A deal Amount is shown in the deal's currency
+      if (field.name === 'dealAmount') {
+        recordGqlFields.currency = true;
+      }
       continue;
     }
     recordGqlFields[field.name] =
