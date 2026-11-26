@@ -1,3 +1,4 @@
+import { RoboostProductCreatePage } from '@/roboost-app/catalog/components/RoboostProductCreatePage';
 import { getRoboostFormsSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
@@ -272,6 +273,15 @@ export const RoboostCreateRecordPanel = () => {
   }
 
   const close = () => setRoboostCreatePanel(null);
+
+  if (objectMetadataItem.nameSingular === 'product') {
+    return (
+      <RoboostProductCreatePage
+        objectMetadataItem={objectMetadataItem}
+        onClose={close}
+      />
+    );
+  }
 
   return createPortal(
     <div className="rb-ui rb-cpanel-layer">

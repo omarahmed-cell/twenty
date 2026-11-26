@@ -3,6 +3,8 @@ import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-applicat
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  MetadataWritability,
+  NumberDataType,
   RelationType,
 } from 'twenty-shared/types';
 
@@ -416,7 +418,10 @@ export const buildProductStandardFlatFieldMetadatas = ({
           id: '34b1290d-abe8-46df-9ef4-c90fd3f690c9',
           value: 'QUARTERLY',
           label: i18nLabel(
-            msg({ message: `Quarterly`, context: 'fieldMetadata.label' }),
+            msg({
+              message: `Every three months`,
+              context: 'fieldMetadata.label',
+            }),
           ),
           position: 4,
           color: 'purple',
@@ -425,7 +430,10 @@ export const buildProductStandardFlatFieldMetadatas = ({
           id: '15319916-6c97-48d6-b409-9c048ca43967',
           value: 'SEMI_ANNUALLY',
           label: i18nLabel(
-            msg({ message: `Semi-annually`, context: 'fieldMetadata.label' }),
+            msg({
+              message: `Every six months`,
+              context: 'fieldMetadata.label',
+            }),
           ),
           position: 5,
           color: 'pink',
@@ -547,6 +555,128 @@ export const buildProductStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
+  productDescription: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'productDescription',
+      type: FieldMetadataType.RICH_TEXT,
+      label: i18nLabel(
+        msg({ message: `Product description`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `What the product is, with formatting`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconFileText',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  image: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'image',
+      type: FieldMetadataType.FILES,
+      label: i18nLabel(
+        msg({ message: `Image`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The product image`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconPhoto',
+      isNullable: true,
+      settings: { maxNumberOfValues: 1 },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  isActive: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'isActive',
+      type: FieldMetadataType.BOOLEAN,
+      label: i18nLabel(
+        msg({ message: `Active`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Inactive products can't be added to deals`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconToggleRight',
+      isNullable: false,
+      defaultValue: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  term: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'term',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Term (months)`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `How many months a recurring product runs`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconCalendarTime',
+      isNullable: true,
+      settings: { dataType: NumberDataType.INT, decimals: 0, type: 'number' },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  margin: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'margin',
+        type: FieldMetadataType.CURRENCY,
+        label: i18nLabel(
+          msg({ message: `Margin`, context: 'fieldMetadata.label' }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Price in company currency minus unit cost`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconPercentage',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
   lineItems: createStandardRelationFieldFlatMetadata({
     objectName,
     workspaceId,

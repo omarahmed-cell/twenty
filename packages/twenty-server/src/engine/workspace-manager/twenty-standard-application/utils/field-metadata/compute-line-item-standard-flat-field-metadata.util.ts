@@ -3,6 +3,7 @@ import { i18nLabel } from 'src/engine/workspace-manager/twenty-standard-applicat
 import {
   DateDisplayFormat,
   FieldMetadataType,
+  MetadataWritability,
   NumberDataType,
   RelationOnDeleteAction,
   RelationType,
@@ -412,7 +413,10 @@ export const buildLineItemStandardFlatFieldMetadatas = ({
           id: '067dde0d-3cfb-499b-8324-b9bf65107ef4',
           value: 'QUARTERLY',
           label: i18nLabel(
-            msg({ message: `Quarterly`, context: 'fieldMetadata.label' }),
+            msg({
+              message: `Every three months`,
+              context: 'fieldMetadata.label',
+            }),
           ),
           position: 4,
           color: 'purple',
@@ -421,7 +425,10 @@ export const buildLineItemStandardFlatFieldMetadatas = ({
           id: '74bf9016-2cf0-43be-bd41-9b103b96eace',
           value: 'SEMI_ANNUALLY',
           label: i18nLabel(
-            msg({ message: `Semi-annually`, context: 'fieldMetadata.label' }),
+            msg({
+              message: `Every six months`,
+              context: 'fieldMetadata.label',
+            }),
           ),
           position: 5,
           color: 'pink',
@@ -550,11 +557,11 @@ export const buildLineItemStandardFlatFieldMetadatas = ({
       fieldName: 'unitDiscount',
       type: FieldMetadataType.NUMBER,
       label: i18nLabel(
-        msg({ message: `Unit discount`, context: 'fieldMetadata.label' }),
+        msg({ message: `Discount`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
         msg({
-          message: `Discount applied to each unit, as a percentage`,
+          message: `A percentage of the line, or an amount off the line total, as Discount type says`,
           context: 'fieldMetadata.description',
         }),
       ),
@@ -562,8 +569,8 @@ export const buildLineItemStandardFlatFieldMetadatas = ({
       isNullable: true,
       settings: {
         dataType: NumberDataType.FLOAT,
-        decimals: 0,
-        type: 'percentage',
+        decimals: 2,
+        type: 'number',
       },
     },
     standardObjectMetadataRelatedEntityIds,
@@ -582,7 +589,7 @@ export const buildLineItemStandardFlatFieldMetadatas = ({
       ),
       description: i18nLabel(
         msg({
-          message: `Unit price x quantity, less the unit discount`,
+          message: `Quantity x unit price, less the discount, in the deal currency`,
           context: 'fieldMetadata.description',
         }),
       ),
@@ -594,6 +601,216 @@ export const buildLineItemStandardFlatFieldMetadatas = ({
         format: 'full',
         decimals: 2,
       },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  sku: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'sku',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(msg({ message: `SKU`, context: 'fieldMetadata.label' })),
+      description: i18nLabel(
+        msg({
+          message: `The stock keeping unit, copied from the product`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconBarcode',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  description: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'description',
+      type: FieldMetadataType.TEXT,
+      label: i18nLabel(
+        msg({ message: `Description`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `What was sold on this line`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconFileText',
+      isNullable: true,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  unitCost: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'unitCost',
+      type: FieldMetadataType.NUMBER,
+      label: i18nLabel(
+        msg({ message: `Unit cost`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `What one unit costs, in company currency`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconReceipt',
+      isNullable: true,
+      settings: { dataType: NumberDataType.FLOAT, decimals: 2, type: 'number' },
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  discountType: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'discountType',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Discount type`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Whether the discount is a percentage or an amount`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconDiscount',
+      isNullable: true,
+      defaultValue: `'PERCENTAGE'`,
+      options: [
+        {
+          id: 'a416fe2d-d906-4d13-af7a-a0fa15500a22',
+          value: 'PERCENTAGE',
+          label: i18nLabel(
+            msg({ message: `Percentage`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'blue',
+        },
+        {
+          id: 'a361e131-00ff-42de-aec0-b701bdfb64cb',
+          value: 'AMOUNT',
+          label: i18nLabel(
+            msg({ message: `Amount`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'green',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  source: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'source',
+      type: FieldMetadataType.SELECT,
+      label: i18nLabel(
+        msg({ message: `Source`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Where the line item came from: a deal, or a HubSpot quote`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconArrowRight',
+      isNullable: true,
+      defaultValue: `'DEAL'`,
+      options: [
+        {
+          id: '8542ee7b-6198-4afb-a0a8-5bd0b5a3da1d',
+          value: 'DEAL',
+          label: i18nLabel(
+            msg({ message: `Deal`, context: 'fieldMetadata.label' }),
+          ),
+          position: 0,
+          color: 'blue',
+        },
+        {
+          id: '94999f5f-504a-401f-a557-bbcbd4826b04',
+          value: 'QUOTE',
+          label: i18nLabel(
+            msg({ message: `Quote`, context: 'fieldMetadata.label' }),
+          ),
+          position: 1,
+          color: 'purple',
+        },
+      ],
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  totalInCompanyCurrency: {
+    ...createStandardFieldFlatMetadata({
+      objectName,
+      workspaceId,
+      context: {
+        fieldName: 'totalInCompanyCurrency',
+        type: FieldMetadataType.CURRENCY,
+        label: i18nLabel(
+          msg({
+            message: `Total in company currency`,
+            context: 'fieldMetadata.label',
+          }),
+        ),
+        description: i18nLabel(
+          msg({
+            message: `Total price times the deal's exchange rate`,
+            context: 'fieldMetadata.description',
+          }),
+        ),
+        icon: 'IconCoins',
+        isUIEditable: false,
+        isNullable: true,
+      },
+      standardObjectMetadataRelatedEntityIds,
+      dependencyFlatEntityMaps,
+      twentyStandardApplicationId,
+      now,
+    }),
+    writability: MetadataWritability.SYSTEM,
+  },
+  isPriceConverted: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'isPriceConverted',
+      type: FieldMetadataType.BOOLEAN,
+      label: i18nLabel(
+        msg({ message: `Price converted`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `The unit price was converted from the company currency price because the product had none in the deal currency`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconAlertTriangle',
+      isNullable: false,
+      defaultValue: false,
     },
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,

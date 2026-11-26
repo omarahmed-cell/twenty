@@ -1,3 +1,4 @@
+import { buildLineItemTotalsQuery } from 'src/modules/roboost-catalog/utils/build-line-item-totals-query.util';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
@@ -252,6 +253,11 @@ export class OpportunityCalculatedFieldsService {
         );
       }
     }, buildSystemAuthContext(workspaceId));
+
+    await this.coreDataSource.query(
+      buildLineItemTotalsQuery(getWorkspaceSchemaName(workspaceId), 'deals'),
+      [[...changesByOpportunityId.keys()]],
+    );
 
     await this.timelineActivityService.recordCalculatedFieldChanges({
       workspaceId,

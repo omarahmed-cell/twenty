@@ -1,3 +1,4 @@
+import { RoboostLineItemsContainer } from '@/roboost-app/catalog/components/RoboostLineItemsContainer';
 import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import {
@@ -457,6 +458,30 @@ const RoboostRecordPageContent = ({
                 joinColumnName={association.joinColumnName}
                 recordId={recordId}
                 objectNameSingular={objectNameSingular}
+                settingsEntries={containerSettings('right', [])}
+                isDropTarget={isDropTarget}
+                onDragStart={rightHandlers.onDragStart}
+                onDragOver={rightHandlers.onDragOver}
+                onDrop={rightHandlers.onDrop}
+                onDragEnd={rightHandlers.onDragEnd}
+              />
+            </ItemErrorBoundary>
+          );
+        }
+        if (
+          objectNameSingular === 'opportunity' &&
+          association.kind === 'many' &&
+          association.targetObjectMetadataItem.nameSingular === 'lineItem'
+        ) {
+          return (
+            <ItemErrorBoundary
+              itemKind="record page container"
+              key={association.id}
+            >
+              <RoboostLineItemsContainer
+                id={association.id}
+                title={association.title}
+                dealId={recordId}
                 settingsEntries={containerSettings('right', [])}
                 isDropTarget={isDropTarget}
                 onDragStart={rightHandlers.onDragStart}

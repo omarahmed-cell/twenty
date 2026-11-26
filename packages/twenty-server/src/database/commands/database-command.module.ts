@@ -66,6 +66,7 @@ import { WorkspaceMemberPreCreateModule } from 'src/modules/workspace-member-pre
 import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { RoboostCurrencyModule } from 'src/modules/roboost-currency/roboost-currency.module';
 import { RoboostDealMoneyModule } from 'src/modules/roboost-deal-money/roboost-deal-money.module';
+import { RoboostCatalogModule } from 'src/modules/roboost-catalog/roboost-catalog.module';
 import { RoboostNotificationModule } from 'src/modules/roboost-notification/roboost-notification.module';
 import { RoboostScoringModule } from 'src/modules/roboost-scoring/roboost-scoring.module';
 import { RoboostMergeModule } from 'src/modules/roboost-merge/roboost-merge.module';
@@ -98,6 +99,7 @@ import { AutomatedTriggerModule } from 'src/modules/workflow/workflow-trigger/au
     TimelineActivityModule,
     RoboostCurrencyModule,
     RoboostDealMoneyModule,
+    RoboostCatalogModule,
     RoboostNotificationModule,
     RoboostScoringModule,
     RoboostMergeModule,

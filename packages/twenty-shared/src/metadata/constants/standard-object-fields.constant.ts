@@ -2735,6 +2735,15 @@ export const STANDARD_OBJECT_FIELDS = {
     lineItems: {
       universalIdentifier: 'a62c7d5c-e621-4e04-9bcf-06520ff49d17',
     },
+    productDescription: {
+      universalIdentifier: '2522dead-f9da-4a79-899b-7c6bbf0783b2',
+    },
+    image: { universalIdentifier: '0d38b89d-a554-4234-bfd6-39b358906ff0' },
+    isActive: {
+      universalIdentifier: '5b7ee34b-9983-4e56-aca4-30d0925e6b20',
+    },
+    term: { universalIdentifier: '54634efb-e775-4b96-91f3-43ab2cc9c6b5' },
+    margin: { universalIdentifier: 'b197cb68-cf44-4aff-bf48-77cd5b2bbb48' },
   },
   lineItem: {
     ...buildStandardObjectSystemFields(
@@ -2760,6 +2769,23 @@ export const STANDARD_OBJECT_FIELDS = {
     },
     totalPrice: {
       universalIdentifier: '7ec17a65-4715-451e-bbbb-fa91b41652e5',
+    },
+    sku: { universalIdentifier: '6de3174f-70fd-4904-bd06-182d5dddd1e2' },
+    description: {
+      universalIdentifier: '40cfeff1-0354-4d13-8e71-8f4d74d42cf1',
+    },
+    unitCost: {
+      universalIdentifier: '97522259-20c2-4bf2-a0d1-70966c178a90',
+    },
+    discountType: {
+      universalIdentifier: '3c4de449-1712-406a-b4bc-d65c49ef59ae',
+    },
+    source: { universalIdentifier: '30c67563-7199-4c6e-b7df-bc4be5a8f785' },
+    totalInCompanyCurrency: {
+      universalIdentifier: 'b1bfe963-18ca-4149-b642-3868574e6765',
+    },
+    isPriceConverted: {
+      universalIdentifier: '2e31a3ed-677e-44f4-8f9a-788619f22838',
     },
   },
   segment: {

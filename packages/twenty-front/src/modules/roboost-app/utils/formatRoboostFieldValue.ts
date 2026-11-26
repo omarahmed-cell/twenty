@@ -44,6 +44,7 @@ const getRelatedRecordLabel = (value: unknown) => {
 
 // A deal's Amount is a plain number shown in the deal's own currency
 const MONEY_NUMBER_FIELDS: Record<string, string> = { dealAmount: 'currency' };
+const PRICE_FIELD_NAME_PATTERN = /^price([A-Z][a-z]{2})$/;
 
 // Read-only display text for the record panel's label-above-value properties
 export const formatRoboostFieldValue = (
@@ -53,6 +54,15 @@ export const formatRoboostFieldValue = (
 ): string => {
   if (!isDefined(value) || value === '') {
     return EMPTY;
+  }
+
+  // Product "Price SAR" fields carry their currency in the name
+  const priceCurrency = PRICE_FIELD_NAME_PATTERN.exec(
+    fieldMetadataItem.name,
+  )?.[1];
+
+  if (isDefined(priceCurrency) && isNumber(value)) {
+    return formatRoboostCurrencyValue(value, priceCurrency.toUpperCase());
   }
 
   const moneyCurrencyField = MONEY_NUMBER_FIELDS[fieldMetadataItem.name];

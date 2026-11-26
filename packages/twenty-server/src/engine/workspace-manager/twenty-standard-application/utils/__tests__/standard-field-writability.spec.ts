@@ -75,8 +75,14 @@ describe('Standard field writability', () => {
     ),
   );
 
+  const catalogServerComputedFieldUniversalIdentifiers = new Set([
+    STANDARD_OBJECTS.product.fields.margin.universalIdentifier,
+    STANDARD_OBJECTS.lineItem.fields.totalInCompanyCurrency.universalIdentifier,
+  ]);
+
   const serverWrittenFieldUniversalIdentifiers = new Set([
     ...mergedRecordIdsFieldUniversalIdentifiers,
+    ...catalogServerComputedFieldUniversalIdentifiers,
     ...companyServerComputedFieldUniversalIdentifiers,
     ...personServerComputedFieldUniversalIdentifiers,
     ...companyAssignedDateFieldUniversalIdentifiers,
