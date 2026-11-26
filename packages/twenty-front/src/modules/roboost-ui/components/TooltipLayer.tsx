@@ -88,6 +88,9 @@ export const TooltipLayer = () => {
         return;
       }
 
+      setShown((current) =>
+        current?.anchor === tooltipElement ? current : null,
+      );
       timer = setTimeout(
         () =>
           setShown({
