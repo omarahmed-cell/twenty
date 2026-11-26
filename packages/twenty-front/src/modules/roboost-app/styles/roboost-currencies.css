@@ -304,6 +304,7 @@
 .rb-li-list {
   display: flex;
   flex-direction: column;
+  padding: 2px 14px 14px;
 }
 
 .rb-li-row {

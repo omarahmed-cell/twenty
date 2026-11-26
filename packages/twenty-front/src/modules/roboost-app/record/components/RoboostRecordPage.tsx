@@ -480,7 +480,7 @@ const RoboostRecordPageContent = ({
             >
               <RoboostLineItemsContainer
                 id={association.id}
-                title={association.title}
+                title={t`Line items`}
                 dealId={recordId}
                 settingsEntries={containerSettings('right', [])}
                 isDropTarget={isDropTarget}
