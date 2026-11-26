@@ -1654,6 +1654,8 @@ export const STANDARD_OBJECTS = {
         fields: STANDARD_OBJECT_FIELDS.opportunity,
         viewFieldNames: [
           'amount',
+          'dealAmount',
+          'currency',
           'closeDate',
           'stage',
           'company',

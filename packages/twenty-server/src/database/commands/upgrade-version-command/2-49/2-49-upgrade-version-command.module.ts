@@ -59,6 +59,7 @@ import { EnableRoboostFuzzyDuplicatesCommand } from 'src/database/commands/upgra
 import { AddSequenceAndGmailExtensionSourcesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795696854169-add-sequence-and-gmail-extension-sources.command';
 import { CreateRoboostCurrencyTablesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795720409964-create-roboost-currency-tables.command';
 import { ProvisionLineItemFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795724733267-provision-line-item-fields.command';
+import { ProvisionDealMoneyRecordPageFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795729391724-provision-deal-money-record-page-fields.command';
 import { ProvisionProductCatalogFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795724317008-provision-product-catalog-fields.command';
 import { RoboostCatalogModule } from 'src/modules/roboost-catalog/roboost-catalog.module';
 import { ProvisionDealMoneyFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795722502399-provision-deal-money-fields.command';
@@ -147,6 +148,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     ProvisionDealMoneyFieldsCommand,
     ProvisionProductCatalogFieldsCommand,
     ProvisionLineItemFieldsCommand,
+    ProvisionDealMoneyRecordPageFieldsCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}
