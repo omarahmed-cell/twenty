@@ -18,6 +18,8 @@ export enum FieldActorSource {
   APPLICATION = 'APPLICATION',
   FORMS = 'FORMS',
   DOCUMENT_APP = 'DOCUMENT_APP',
+  SEQUENCE = 'SEQUENCE',
+  GMAIL_EXTENSION = 'GMAIL_EXTENSION',
 }
 
 export const actorCompositeType: CompositeType = {
@@ -71,5 +73,6 @@ export type ActorMetadata = {
     workflowId?: string;
     workflowRunId?: string;
     roboostMergeId?: string;
+    importName?: string;
   };
 };

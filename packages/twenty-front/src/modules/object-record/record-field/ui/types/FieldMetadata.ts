@@ -324,6 +324,8 @@ const FieldActorSourceSchema = z.union([
   z.literal('APPLICATION'),
   z.literal('FORMS'),
   z.literal('DOCUMENT_APP'),
+  z.literal('SEQUENCE'),
+  z.literal('GMAIL_EXTENSION'),
 ]);
 
 export const FieldActorValueSchema = z.object({

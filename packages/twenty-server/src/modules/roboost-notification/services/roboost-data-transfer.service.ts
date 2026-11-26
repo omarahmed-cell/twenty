@@ -440,6 +440,46 @@ export class RoboostDataTransferService {
     return rows.map(({ recordId }) => recordId);
   }
 
+  // Records created by an import: the CRM import that created it (its file name), else the name the HubSpot loader stored
+  async getRecordImportSource({
+    workspaceId,
+    objectNameSingular,
+    recordId,
+  }: {
+    workspaceId: string;
+    objectNameSingular: string;
+    recordId: string;
+  }): Promise<{ isImport: boolean; importName: string | null }> {
+    const schema = this.schema(workspaceId);
+    const [table]: { exists: boolean }[] = await this.coreDataSource.query(
+      `SELECT to_regclass($1) IS NOT NULL AS exists`,
+      [`${schema}."${objectNameSingular}"`],
+    );
+
+    if (table?.exists !== true) {
+      return { isImport: false, importName: null };
+    }
+
+    const [row]: { isImport: boolean; importName: string | null }[] =
+      await this.coreDataSource.query(
+        `SELECT r."createdBySource"::text = 'IMPORT' AS "isImport",
+          coalesce(
+            (SELECT i.name FROM ${schema}."roboostImportRecord" ir
+              JOIN ${schema}."roboostImport" i ON i.id = ir."importId"
+              WHERE ir."objectNameSingular" = $2 AND ir."recordId" = r.id
+              ORDER BY i."createdAt" ASC LIMIT 1),
+            nullif(r."createdByContext"->>'importName', '')
+          ) AS "importName"
+        FROM ${schema}."${objectNameSingular}" r
+        WHERE r.id = $1`,
+        [recordId, objectNameSingular],
+      );
+
+    return row?.isImport === true
+      ? { isImport: true, importName: row.importName }
+      : { isImport: false, importName: null };
+  }
+
   // Files go after 30 days; the audit row stays and shows Expired
   async expireExportFiles(workspaceId: string): Promise<number> {
     const result = await this.coreDataSource.query(

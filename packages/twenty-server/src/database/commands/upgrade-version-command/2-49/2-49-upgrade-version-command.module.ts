@@ -56,6 +56,7 @@ import { PipelineModule } from 'src/modules/pipeline/pipeline.module';
 import { DeleteMorphRelationTargetReferencesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1792154485777-delete-morph-relation-target-references.command';
 import { RemoveHubspotTeamFieldsCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795647999218-remove-hubspot-team-fields.command';
 import { EnableRoboostFuzzyDuplicatesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795648222603-enable-roboost-fuzzy-duplicates.command';
+import { AddSequenceAndGmailExtensionSourcesCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795696854169-add-sequence-and-gmail-extension-sources.command';
 import { RemoveMemberRoleAccessCommand } from 'src/database/commands/upgrade-version-command/2-49/2-49-workspace-command-1795646261352-remove-member-role-access.command';
 import { ApplicationModule } from 'src/engine/core-modules/application/application.module';
 import { ObjectPermissionModule } from 'src/engine/metadata-modules/object-permission/object-permission.module';
@@ -133,6 +134,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     RemoveMemberRoleAccessCommand,
     RemoveHubspotTeamFieldsCommand,
     EnableRoboostFuzzyDuplicatesCommand,
+    AddSequenceAndGmailExtensionSourcesCommand,
   ],
 })
 export class V2_49_UpgradeVersionCommandModule {}

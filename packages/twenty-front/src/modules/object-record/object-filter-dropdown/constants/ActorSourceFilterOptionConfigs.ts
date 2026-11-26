@@ -12,6 +12,7 @@ import {
   IconLego,
   IconListCheck,
   IconRobot,
+  IconSend,
   IconSettingsAutomation,
   IconUserCircle,
   IconWebhook,
@@ -84,6 +85,16 @@ export const ACTOR_SOURCE_FILTER_OPTION_CONFIGS: Record<
   [FieldActorSource.DOCUMENT_APP]: {
     label: msg`Document app`,
     AvatarIcon: IconFileText,
+    isIconInverted: true,
+  },
+  [FieldActorSource.SEQUENCE]: {
+    label: msg`Sequence`,
+    AvatarIcon: IconSend,
+    isIconInverted: true,
+  },
+  [FieldActorSource.GMAIL_EXTENSION]: {
+    label: msg`Gmail extension`,
+    AvatarIcon: IconGmail,
     isIconInverted: true,
   },
 };

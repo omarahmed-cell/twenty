@@ -12,6 +12,7 @@ import {
   IconMicrosoftOutlook,
   IconPlug,
   IconRobot,
+  IconSend,
   IconSettingsAutomation,
   IconUpload,
   IconWebhook,
@@ -69,6 +70,10 @@ export const getActorSourceIcon = ({
       return IconListCheck;
     case 'DOCUMENT_APP':
       return IconFileText;
+    case 'SEQUENCE':
+      return IconSend;
+    case 'GMAIL_EXTENSION':
+      return IconGmail;
     default:
       return undefined;
   }

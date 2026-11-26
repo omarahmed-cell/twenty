@@ -13,4 +13,6 @@ export const RECORD_SOURCE_LABELS: Record<FieldActorSource, string> = {
   [FieldActorSource.APPLICATION]: 'Application',
   [FieldActorSource.FORMS]: 'Forms',
   [FieldActorSource.DOCUMENT_APP]: 'Document app',
+  [FieldActorSource.SEQUENCE]: 'Sequence',
+  [FieldActorSource.GMAIL_EXTENSION]: 'Gmail extension',
 };

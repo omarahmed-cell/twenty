@@ -37,6 +37,8 @@ const RECORD_SOURCE_OPTION_COLORS: Record<FieldActorSource, TagColor> = {
   [FieldActorSource.APPLICATION]: 'green',
   [FieldActorSource.FORMS]: 'yellow',
   [FieldActorSource.DOCUMENT_APP]: 'red',
+  [FieldActorSource.SEQUENCE]: 'orange',
+  [FieldActorSource.GMAIL_EXTENSION]: 'sky',
 };
 
 export const buildRecordSourceSelectOptions = (

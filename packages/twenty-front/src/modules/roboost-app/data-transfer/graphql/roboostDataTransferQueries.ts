@@ -172,3 +172,18 @@ export const ROBOOST_IMPORT_RECORD_IDS = gql`
     )
   }
 `;
+
+export const ROBOOST_RECORD_IMPORT_SOURCE = gql`
+  query RoboostRecordImportSource(
+    $objectNameSingular: String!
+    $recordId: String!
+  ) {
+    roboostRecordImportSource(
+      objectNameSingular: $objectNameSingular
+      recordId: $recordId
+    ) {
+      isImport
+      importName
+    }
+  }
+`;

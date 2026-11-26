@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Args, Field, Int, Mutation, ObjectType, Query } from '@nestjs/graphql';
 
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, isValidUuid } from 'twenty-shared/utils';
 
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
@@ -133,6 +133,17 @@ class RoboostImportOptionDTO {
   @Field(() => String)
   name: string;
 }
+
+@ObjectType('RoboostRecordImportSource')
+class RoboostRecordImportSourceDTO {
+  @Field(() => Boolean)
+  isImport: boolean;
+
+  @Field(() => String, { nullable: true })
+  importName: string | null;
+}
+
+const OBJECT_NAME_PATTERN = /^[a-z][a-zA-Z0-9]*$/;
 
 const requireMember = (workspaceMemberId: string | undefined) => {
   if (!isDefined(workspaceMemberId)) {
@@ -363,6 +374,27 @@ export class RoboostDataTransferResolver {
       workspaceId: workspace.id,
       importIds,
       objectNameSingular,
+    });
+  }
+
+  @Query(() => RoboostRecordImportSourceDTO)
+  async roboostRecordImportSource(
+    @AuthWorkspace() workspace: WorkspaceEntity,
+    @Args('objectNameSingular', { type: () => String })
+    objectNameSingular: string,
+    @Args('recordId', { type: () => String }) recordId: string,
+  ): Promise<RoboostRecordImportSourceDTO> {
+    if (
+      !OBJECT_NAME_PATTERN.test(objectNameSingular) ||
+      !isValidUuid(recordId)
+    ) {
+      throw new BadRequestException('Invalid object name or record id');
+    }
+
+    return this.roboostDataTransferService.getRecordImportSource({
+      workspaceId: workspace.id,
+      objectNameSingular,
+      recordId,
     });
   }
 }
