@@ -2,12 +2,10 @@ import { CalendarEventComposerFields } from '@/activities/calendar/components/Ca
 import { useCalendarEventComposer } from '@/activities/calendar/hooks/useCalendarEventComposer';
 import { useTriggerApisOAuth } from '@/settings/accounts/hooks/useTriggerApiOAuth';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
-import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
 import { useSidePanelHistory } from '@/side-panel/hooks/useSidePanelHistory';
 import { useSidePanelMenu } from '@/side-panel/hooks/useSidePanelMenu';
 import { composeCalendarEventInitialValuesComponentState } from '@/side-panel/pages/compose-calendar-event/states/composeCalendarEventInitialValuesComponentState';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
@@ -42,13 +40,6 @@ export const SidePanelComposeCalendarEventPage = () => {
   const composerState = useCalendarEventComposer({
     initialValues: composeCalendarEventInitialValues,
     onCreated: goBackFromSidePanel,
-  });
-
-  useHotkeysOnFocusedElement({
-    keys: ['ctrl+Enter,meta+Enter'],
-    callback: composerState.handleCreate,
-    focusId: SIDE_PANEL_FOCUS_ID,
-    dependencies: [composerState.handleCreate],
   });
 
   const handleAddAccount = () => {
@@ -115,7 +106,6 @@ export const SidePanelComposeCalendarEventPage = () => {
             key="create"
             size="sm"
             startIcon={<IconCalendarEvent />}
-            shortcut={['Mod', 'Enter']}
             onClick={composerState.handleCreate}
             disabled={!composerState.canCreate}
             variant="solid"

@@ -60,6 +60,8 @@
   min-height: 0;
   overflow-y: auto;
   padding: 0 6px 8px 0;
+  /* Both side panels keep the same scrollbar space, so their cards stay the same width */
+  scrollbar-gutter: stable;
 }
 .rb-recpage .rb-rec-main {
   gap: 14px;
@@ -83,9 +85,9 @@
 /* containers */
 .rb-rc {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: none;
   flex: none;
   min-width: 0;
 }
@@ -254,11 +256,6 @@
   gap: 4px;
   text-decoration: none;
 }
-.rb-rp-head {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: -6px;
-}
 
 /* top block */
 .rb-tb {
@@ -349,8 +346,8 @@
 /* association cards */
 .rb-mini {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-inner-radius);
   min-width: 0;
   padding: 10px;
 }

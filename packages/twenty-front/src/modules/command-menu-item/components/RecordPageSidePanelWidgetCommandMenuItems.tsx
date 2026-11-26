@@ -24,7 +24,6 @@ export const RecordPageSidePanelWidgetCommandMenuItems = () => {
               <commandMenuItem.Icon />
             ) : undefined
           }
-          shortcut={commandMenuItem.shortcut}
           onClick={commandMenuItem.onClick}
           disabled={commandMenuItem.disabled}
           variant={commandMenuItem.isPrimaryCTA ? 'solid' : 'outline'}

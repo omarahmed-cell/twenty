@@ -1,3 +1,4 @@
+import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
@@ -359,15 +360,16 @@ export const RoboostAssociationContainer = ({
           )}
           <div className="rb-rc-scroll">
             {visibleRecords.map((record) => (
-              <RoboostAssociationCard
-                key={record.id}
-                record={record}
-                objectMetadataItem={target}
-                tagField={tagField}
-                lineFields={lineFields}
-                onRemove={() => removeAssociation(record.id)}
-                canRemove={canEditAssociations}
-              />
+              <ItemErrorBoundary itemKind="association card" key={record.id}>
+                <RoboostAssociationCard
+                  record={record}
+                  objectMetadataItem={target}
+                  tagField={tagField}
+                  lineFields={lineFields}
+                  onRemove={() => removeAssociation(record.id)}
+                  canRemove={canEditAssociations}
+                />
+              </ItemErrorBoundary>
             ))}
             {visibleRecords.length === 0 && shownRecords.length > 0 && (
               <div className="rb-rc-nomatch">{t`Nothing matches.`}</div>

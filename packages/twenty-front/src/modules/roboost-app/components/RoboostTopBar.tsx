@@ -11,6 +11,7 @@ import { roboostSearchOpenState } from '@/roboost-app/search/states/roboostSearc
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 export const RoboostTopBar = () => {
@@ -22,11 +23,13 @@ export const RoboostTopBar = () => {
   const { signOut } = useAuth();
 
   const memberName = getRoboostPersonName(currentWorkspaceMember?.name);
+  const searchButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
       <div className="rb-topbar-search">
         <button
+          ref={searchButtonRef}
           type="button"
           className="rb-topbar-search-button"
           aria-expanded={roboostSearchOpen}
@@ -36,7 +39,10 @@ export const RoboostTopBar = () => {
           <span className="rb-truncate">{t`Search Roboost CRM`}</span>
         </button>
         {roboostSearchOpen && (
-          <RoboostSearchPopup onClose={() => setRoboostSearchOpen(false)} />
+          <RoboostSearchPopup
+            anchor={searchButtonRef.current}
+            onClose={() => setRoboostSearchOpen(false)}
+          />
         )}
       </div>
       <span className="rb-topbar-spacer" />

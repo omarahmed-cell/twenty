@@ -72,7 +72,6 @@ export const PinnedCommandMenuItemsInlineMeasurements = ({
                   shortLabel,
                   Icon,
                 }}
-                hotKey={shouldShowHotKey ? hotKey : undefined}
                 shouldHideLabel={shouldHideCommandMenuItemLabel(item.id)}
               />
             </NodeDimension>

@@ -1,3 +1,4 @@
+import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import {
   RoboostMergedRecordNotice,
@@ -399,34 +400,35 @@ const RoboostRecordPageContent = ({
         }
 
         return (
-          <RoboostPropertyGroupContainer
-            key={card.id}
-            id={card.id}
-            title={card.title}
-            fields={card.fields}
-            record={loadedRecord}
-            objectMetadataItem={objectMetadataItem}
-            objectMetadataItems={objectMetadataItems}
-            defaultOpen={index < 2}
-            propertiesSettingsPath={recordViewSettingsPath}
-            settingsEntries={containerSettings('left', [
-              {
-                id: 'properties',
-                label: t`Properties settings`,
-                icon: 'external-link',
-                href: propertiesSettingsPath,
-                isNoPermission: !roboostAccess.hasToggle(
-                  'editPropertySettings',
-                ),
-              },
-            ])}
-            isDropTarget={dropTargetId === `left:${card.id}`}
-            onSaved={() => refetch()}
-            onDragStart={leftHandlers.onDragStart}
-            onDragOver={leftHandlers.onDragOver}
-            onDrop={leftHandlers.onDrop}
-            onDragEnd={leftHandlers.onDragEnd}
-          />
+          <ItemErrorBoundary itemKind="record page container" key={card.id}>
+            <RoboostPropertyGroupContainer
+              id={card.id}
+              title={card.title}
+              fields={card.fields}
+              record={loadedRecord}
+              objectMetadataItem={objectMetadataItem}
+              objectMetadataItems={objectMetadataItems}
+              defaultOpen={index < 2}
+              propertiesSettingsPath={recordViewSettingsPath}
+              settingsEntries={containerSettings('left', [
+                {
+                  id: 'properties',
+                  label: t`Properties settings`,
+                  icon: 'external-link',
+                  href: propertiesSettingsPath,
+                  isNoPermission: !roboostAccess.hasToggle(
+                    'editPropertySettings',
+                  ),
+                },
+              ])}
+              isDropTarget={dropTargetId === `left:${card.id}`}
+              onSaved={() => refetch()}
+              onDragStart={leftHandlers.onDragStart}
+              onDragOver={leftHandlers.onDragOver}
+              onDrop={leftHandlers.onDrop}
+              onDragEnd={leftHandlers.onDragEnd}
+            />
+          </ItemErrorBoundary>
         );
       })}
     </>
@@ -434,20 +436,6 @@ const RoboostRecordPageContent = ({
 
   const right = (
     <>
-      <div className="rb-rp-head">
-        <button
-          type="button"
-          className="rb-rc-iconbtn"
-          aria-label={t`Collapse right panel`}
-          title={t`Collapse panel`}
-          onClick={() => {
-            setIsRightOpenedOnNarrow(false);
-            setRoboostRecordRightPanelCollapsed(true);
-          }}
-        >
-          <Icon name="chevron-right" size={14} />
-        </button>
-      </div>
       {rightIds.map((associationId) => {
         const association = associations.find(
           (candidate) => candidate.id === associationId,
@@ -460,19 +448,23 @@ const RoboostRecordPageContent = ({
 
         if (association.kind === 'attachments') {
           return (
-            <RoboostAttachmentsContainer
+            <ItemErrorBoundary
+              itemKind="record page container"
               key={association.id}
-              title={association.title}
-              joinColumnName={association.joinColumnName}
-              recordId={recordId}
-              objectNameSingular={objectNameSingular}
-              settingsEntries={containerSettings('right', [])}
-              isDropTarget={isDropTarget}
-              onDragStart={rightHandlers.onDragStart}
-              onDragOver={rightHandlers.onDragOver}
-              onDrop={rightHandlers.onDrop}
-              onDragEnd={rightHandlers.onDragEnd}
-            />
+            >
+              <RoboostAttachmentsContainer
+                title={association.title}
+                joinColumnName={association.joinColumnName}
+                recordId={recordId}
+                objectNameSingular={objectNameSingular}
+                settingsEntries={containerSettings('right', [])}
+                isDropTarget={isDropTarget}
+                onDragStart={rightHandlers.onDragStart}
+                onDragOver={rightHandlers.onDragOver}
+                onDrop={rightHandlers.onDrop}
+                onDragEnd={rightHandlers.onDragEnd}
+              />
+            </ItemErrorBoundary>
           );
         }
         const related =
@@ -481,32 +473,37 @@ const RoboostRecordPageContent = ({
             : null;
 
         return (
-          <RoboostAssociationContainer
+          <ItemErrorBoundary
+            itemKind="record page container"
             key={association.id}
-            association={association}
-            recordId={recordId}
-            sourceObjectNameSingular={objectNameSingular}
-            relatedRecordId={related?.id ?? null}
-            objectMetadataItems={objectMetadataItems}
-            settingsEntries={containerSettings('right', [
-              {
-                id: 'object-settings',
-                label: t`${association.targetObjectMetadataItem.labelSingular} settings`,
-                icon: 'external-link',
-                href: `/settings/objects/${association.targetObjectMetadataItem.namePlural}`,
-              },
-            ])}
-            isDropTarget={isDropTarget}
-            onSourceRecordChanged={() => refetch()}
-            cardFieldNames={
-              visibleAssociationCards.find((card) => card.id === association.id)
-                ?.fieldNames
-            }
-            onDragStart={rightHandlers.onDragStart}
-            onDragOver={rightHandlers.onDragOver}
-            onDrop={rightHandlers.onDrop}
-            onDragEnd={rightHandlers.onDragEnd}
-          />
+          >
+            <RoboostAssociationContainer
+              association={association}
+              recordId={recordId}
+              sourceObjectNameSingular={objectNameSingular}
+              relatedRecordId={related?.id ?? null}
+              objectMetadataItems={objectMetadataItems}
+              settingsEntries={containerSettings('right', [
+                {
+                  id: 'object-settings',
+                  label: t`${association.targetObjectMetadataItem.labelSingular} settings`,
+                  icon: 'external-link',
+                  href: `/settings/objects/${association.targetObjectMetadataItem.namePlural}`,
+                },
+              ])}
+              isDropTarget={isDropTarget}
+              onSourceRecordChanged={() => refetch()}
+              cardFieldNames={
+                visibleAssociationCards.find(
+                  (card) => card.id === association.id,
+                )?.fieldNames
+              }
+              onDragStart={rightHandlers.onDragStart}
+              onDragOver={rightHandlers.onDragOver}
+              onDrop={rightHandlers.onDrop}
+              onDragEnd={rightHandlers.onDragEnd}
+            />
+          </ItemErrorBoundary>
         );
       })}
     </>
@@ -531,40 +528,42 @@ const RoboostRecordPageContent = ({
         }}
         left={left}
         middle={
-          <RoboostActivityColumn
-            items={feedItems}
-            loading={feedLoading}
-            mainTab={mainTab}
-            onMainTabChange={setMainTab}
-            subTab={subTab}
-            onSubTabChange={(tab) => {
-              setMainTab('activities');
-              setSubTab(tab);
-            }}
-            customizePath={recordViewSettingsPath}
-            overviewSections={recordLayout.overview}
-            isPinned={(item) =>
-              isDefined(item.objectNameSingular) &&
-              isDefined(item.recordId) &&
-              isPinned(item.objectNameSingular, item.recordId)
-            }
-            onTogglePin={(item) => {
-              if (
+          <ItemErrorBoundary itemKind="record page activity column">
+            <RoboostActivityColumn
+              items={feedItems}
+              loading={feedLoading}
+              mainTab={mainTab}
+              onMainTabChange={setMainTab}
+              subTab={subTab}
+              onSubTabChange={(tab) => {
+                setMainTab('activities');
+                setSubTab(tab);
+              }}
+              customizePath={recordViewSettingsPath}
+              overviewSections={recordLayout.overview}
+              isPinned={(item) =>
                 isDefined(item.objectNameSingular) &&
-                isDefined(item.recordId)
-              ) {
-                togglePin(item.objectNameSingular, item.recordId);
+                isDefined(item.recordId) &&
+                isPinned(item.objectNameSingular, item.recordId)
               }
-            }}
-            onChanged={() => {
-              refetchFeed();
-              refetch();
-            }}
-            members={members.map((member) => ({
-              id: member.id,
-              name: getRoboostPersonName(member.name),
-            }))}
-          />
+              onTogglePin={(item) => {
+                if (
+                  isDefined(item.objectNameSingular) &&
+                  isDefined(item.recordId)
+                ) {
+                  togglePin(item.objectNameSingular, item.recordId);
+                }
+              }}
+              onChanged={() => {
+                refetchFeed();
+                refetch();
+              }}
+              members={members.map((member) => ({
+                id: member.id,
+                name: getRoboostPersonName(member.name),
+              }))}
+            />
+          </ItemErrorBoundary>
         }
         right={right}
       />

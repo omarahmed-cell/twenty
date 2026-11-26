@@ -1,4 +1,4 @@
-import { getRoboostZoom } from '@/roboost-ui/utils/getRoboostZoom';
+import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { SEARCH_QUERY } from '@/command-menu/graphql/queries/search';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -54,10 +54,15 @@ type RoboostSearchResult = {
 };
 
 type RoboostSearchPopupProps = {
+  anchor: HTMLElement | null;
   onClose: () => void;
 };
 
-export const RoboostSearchPopup = ({ onClose }: RoboostSearchPopupProps) => {
+// Opens under the top bar search box, never on top of it
+export const RoboostSearchPopup = ({
+  anchor,
+  onClose,
+}: RoboostSearchPopupProps) => {
   const { t } = useLingui();
   const navigateApp = useNavigateApp();
   const apolloCoreClient = useApolloCoreClient();
@@ -157,19 +162,21 @@ export const RoboostSearchPopup = ({ onClose }: RoboostSearchPopupProps) => {
     });
   };
 
-  const anchorRect = document
-    .querySelector('.rb-topbar-search')
-    ?.getBoundingClientRect();
-
-  return createPortal(
-    <div className="rb-ui">
-      <div className="rb-search-scrim" onClick={onClose} />
-      <div
-        style={{
-          left: Math.max(8, (anchorRect?.left ?? 72) / getRoboostZoom() - 36),
-          top: Math.max(4, (anchorRect?.top ?? 10) / getRoboostZoom() - 6),
-        }}
-        className="rb-searchbox"
+  return (
+    <>
+      {createPortal(
+        <div className="rb-ui">
+          <div className="rb-search-scrim" onClick={onClose} />
+        </div>,
+        document.body,
+      )}
+      <FloatingPanel
+        anchor={anchor}
+        side="bottom"
+        align="start"
+        maxHeight={null}
+        minWidth={460}
+        className="rb-popover-panel rb-searchbox"
         role="dialog"
         aria-label={t`Search Roboost CRM`}
         onKeyDown={(event) => {
@@ -282,8 +289,7 @@ export const RoboostSearchPopup = ({ onClose }: RoboostSearchPopupProps) => {
             {t`Close`}
           </span>
         </div>
-      </div>
-    </div>,
-    document.body,
+      </FloatingPanel>
+    </>
   );
 };

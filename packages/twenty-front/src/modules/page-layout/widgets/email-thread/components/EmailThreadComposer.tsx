@@ -7,10 +7,8 @@ import { useAttachEmailFiles } from '@/activities/emails/hooks/useAttachEmailFil
 import { type ReplyContextReady } from '@/activities/emails/hooks/useReplyContext';
 import { type EmailDraftPrefill } from '@/activities/emails/types/EmailDraftPrefill';
 import { EmailThreadComposerFooterEffect } from '@/page-layout/widgets/email-thread/components/EmailThreadComposerFooterEffect';
-import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
 import { useOpenRecordInSidePanel } from '@/side-panel/hooks/useOpenRecordInSidePanel';
 import { type SidePanelFooterCommandMenuItem } from '@/ui/layout/side-panel/types/SidePanelFooterCommandMenuItem';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { t } from '@lingui/core/macro';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -132,19 +130,6 @@ export const EmailThreadComposer = ({
       setIsComposerOpen,
       openAttachmentPicker,
     ]);
-
-  const handleSendHotkey = useCallback(() => {
-    if (isComposerOpen && canSendReply) {
-      handleSend();
-    }
-  }, [isComposerOpen, canSendReply, handleSend]);
-
-  useHotkeysOnFocusedElement({
-    keys: ['ctrl+Enter,meta+Enter'],
-    callback: handleSendHotkey,
-    focusId: SIDE_PANEL_FOCUS_ID,
-    dependencies: [handleSendHotkey],
-  });
 
   return (
     <>

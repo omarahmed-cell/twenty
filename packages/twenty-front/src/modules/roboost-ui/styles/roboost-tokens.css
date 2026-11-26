@@ -63,6 +63,10 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 999px;
+  /* Record page cards match HubSpot: 14px corners (outer and inner measured the same), soft border, no shadow */
+  --card-radius: 14px;
+  --card-inner-radius: 14px;
+  --card-border: #d4d9e0;
 
   --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-sm:
@@ -129,14 +133,15 @@
   --accent-soft-hover: #d8e6fe;
   --accent-border: #b6cdfb;
   --focus-ring: #1c67f9;
-  --frame: #0c3097;
-  --frame-border: rgba(255, 255, 255, 0.12);
-  --frame-text: #c3d2f2;
+  /* The frame is the primary button blue; states darken it so white text stays above 4.5:1 */
+  --frame: var(--accent);
+  --frame-border: rgba(255, 255, 255, 0.28);
+  --frame-text: #ffffff;
   --frame-text-strong: #ffffff;
-  --frame-text-muted: #93a6d6;
-  --frame-active: rgba(255, 255, 255, 0.14);
-  --frame-accent: #59bdf7;
-  --frame-field: rgba(255, 255, 255, 0.14);
+  --frame-text-muted: #ffffff;
+  --frame-active: rgba(0, 18, 64, 0.32);
+  --frame-accent: #ffffff;
+  --frame-field: rgba(0, 18, 64, 0.18);
   --check-fill: var(--accent);
 }
 
@@ -189,6 +194,7 @@
   --info-border: #2a5290;
   --avatar-bg: #223149;
   --avatar-fg: #c8d2e0;
+  --card-border: #33445f;
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -227,13 +233,13 @@
   --accent-border: #2f4f9a;
   --accent-fill: #2f6fe8;
   --focus-ring: #6a9dff;
-  --frame: #06164a;
-  --frame-border: rgba(255, 255, 255, 0.1);
-  --frame-text: #c3d2f2;
+  --frame: var(--accent-fill);
+  --frame-border: rgba(255, 255, 255, 0.28);
+  --frame-text: #ffffff;
   --frame-text-strong: #ffffff;
-  --frame-text-muted: #93a6d6;
-  --frame-active: rgba(255, 255, 255, 0.12);
-  --frame-accent: #59bdf7;
-  --frame-field: rgba(255, 255, 255, 0.12);
+  --frame-text-muted: #ffffff;
+  --frame-active: rgba(0, 12, 48, 0.36);
+  --frame-accent: #ffffff;
+  --frame-field: rgba(0, 12, 48, 0.2);
   --check-fill: var(--accent-fill);
 }

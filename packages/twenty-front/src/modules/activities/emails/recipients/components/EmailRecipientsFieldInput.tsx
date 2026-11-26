@@ -48,7 +48,6 @@ import { DragDropItemDndContext } from '@/ui/utilities/drag-and-drop/context/Dra
 import { usePushFocusItemToFocusStack } from '@/ui/utilities/focus/hooks/usePushFocusItemToFocusStack';
 import { useRemoveFocusItemFromFocusStackById } from '@/ui/utilities/focus/hooks/useRemoveFocusItemFromFocusStackById';
 import { FocusComponentType } from '@/ui/utilities/focus/types/FocusComponentType';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { isKeyboardEventComposing } from '@/ui/utilities/hotkey/utils/isKeyboardEventComposing';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 
@@ -116,7 +115,6 @@ export const EmailRecipientsFieldInput = ({
   label,
   recipients,
   onChange,
-  onSubmit,
   excludedSuggestionKeys = [],
   contextRecord,
 }: EmailRecipientsFieldInputProps) => {
@@ -400,28 +398,6 @@ export const EmailRecipientsFieldInput = ({
     toggleChipSelectionAtIndex(chipIndex);
     focusInput();
   };
-
-  const handleSubmitHotkey = () => {
-    if (inputValue.length > 0) {
-      commitInputAndCloseSuggestions();
-    } else {
-      onSubmit?.();
-    }
-  };
-
-  useHotkeysOnFocusedElement({
-    keys: ['ctrl+Enter,meta+Enter'],
-    callback: handleSubmitHotkey,
-    focusId,
-    dependencies: [handleSubmitHotkey],
-  });
-
-  useHotkeysOnFocusedElement({
-    keys: ['ctrl+Enter,meta+Enter'],
-    callback: handleSubmitHotkey,
-    focusId: suggestionsDropdownId,
-    dependencies: [handleSubmitHotkey],
-  });
 
   const handleInputKeyDown: AutocompleteInputProps['onKeyDown'] = (event) => {
     if (

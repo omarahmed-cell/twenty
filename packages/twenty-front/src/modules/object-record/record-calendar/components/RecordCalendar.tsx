@@ -9,7 +9,6 @@ import { RecordCalendarGrid } from '@/object-record/record-calendar/grid/compone
 import { RECORD_CALENDAR_CARD_CLICK_OUTSIDE_ID } from '@/object-record/record-calendar/record-calendar-card/constants/RecordCalendarCardClickOutsideId';
 import { RecordCalendarComponentInstanceContext } from '@/object-record/record-calendar/states/contexts/RecordCalendarComponentInstanceContext';
 import { recordIndexCalendarLayoutComponentState } from '@/object-record/record-index/states/recordIndexCalendarLayoutComponentState';
-import { RecordSelectionEscapeHotkeyEffect } from '@/object-record/record-selection/components/RecordSelectionEscapeHotkeyEffect';
 import { useResetRecordSelection } from '@/object-record/record-selection/hooks/useResetRecordSelection';
 import { DIALOG_BACKDROP_CLICK_OUTSIDE_ID } from '@/ui/layout/dialog/constants/DialogBackdropClickOutsideId';
 import { PAGE_ACTION_CONTAINER_CLICK_OUTSIDE_ID } from '@/ui/layout/page/constants/PageActionContainerClickOutsideId';
@@ -61,7 +60,6 @@ export const RecordCalendar = () => {
 
   return (
     <StyledContainerContainer>
-      <RecordSelectionEscapeHotkeyEffect />
       <RecordCalendarTopBar />
       <ScrollWrapper
         componentInstanceId={`scroll-wrapper-record-calendar-${recordCalendarId}`}

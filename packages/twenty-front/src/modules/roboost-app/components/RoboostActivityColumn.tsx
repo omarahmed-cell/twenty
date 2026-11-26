@@ -1,3 +1,4 @@
+import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { type RoboostLayoutOverviewSection } from '@/roboost-app/layout/types/RoboostRecordLayout';
 import { RoboostFeedItemView } from '@/roboost-app/components/RoboostFeedItemView';
 import { RoboostActivityTypeFilter } from '@/roboost-app/timeline/components/RoboostActivityTypeFilter';
@@ -391,28 +392,31 @@ export const RoboostActivityColumn = ({
           return (
             <Fragment key={item.id}>
               {showMonth && <StyledMonth>{month}</StyledMonth>}
-              <RoboostFeedItemView
-                item={item}
-                isPinned={isPinned(item)}
-                onTogglePin={() => onTogglePin(item)}
-                onChanged={onChanged}
-                contactByEmail={contactByEmail}
-                thread={
-                  item.kind === 'email' && item.email !== undefined
-                    ? (threadByKey.get(getRoboostEmailThreadKey(item.title)) ??
-                      [])
-                    : []
-                }
-                isExpanded={isItemExpanded(item.id)}
-                onToggleExpanded={(expanded) =>
-                  expanded !== isItemExpanded(item.id) &&
-                  setToggledIds(
-                    toggledIds.includes(item.id)
-                      ? toggledIds.filter((id) => id !== item.id)
-                      : [...toggledIds, item.id],
-                  )
-                }
-              />
+              <ItemErrorBoundary itemKind="timeline card">
+                <RoboostFeedItemView
+                  item={item}
+                  isPinned={isPinned(item)}
+                  onTogglePin={() => onTogglePin(item)}
+                  onChanged={onChanged}
+                  contactByEmail={contactByEmail}
+                  thread={
+                    item.kind === 'email' && item.email !== undefined
+                      ? (threadByKey.get(
+                          getRoboostEmailThreadKey(item.title),
+                        ) ?? [])
+                      : []
+                  }
+                  isExpanded={isItemExpanded(item.id)}
+                  onToggleExpanded={(expanded) =>
+                    expanded !== isItemExpanded(item.id) &&
+                    setToggledIds(
+                      toggledIds.includes(item.id)
+                        ? toggledIds.filter((id) => id !== item.id)
+                        : [...toggledIds, item.id],
+                    )
+                  }
+                />
+              </ItemErrorBoundary>
             </Fragment>
           );
         })}

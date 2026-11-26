@@ -2,7 +2,6 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
-import { Key } from 'ts-key-enum';
 import {
   CoreObjectNameSingular,
   MessageCampaignStatus,
@@ -26,12 +25,10 @@ import { useNumberFormat } from '@/localization/hooks/useNumberFormat';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { FormDateTimeFieldInput } from '@/object-record/record-field/ui/form-types/components/FormDateTimeFieldInput';
 import { SidePanelInformationBanner } from '@/side-panel/components/SidePanelInformationBanner/SidePanelInformationBanner';
-import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
 import { useSidePanelMenu } from '@/side-panel/hooks/useSidePanelMenu';
 import { SendCampaignRecipientsCard } from '@/side-panel/pages/send-campaign/components/SendCampaignRecipientsCard';
 import { FormFieldInputContainer } from '@/ui/input/components/FormFieldInputContainer';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { formatDisplayList } from '~/utils/format/formatDisplayList';
 
 const StyledContainer = styled.div`
@@ -154,13 +151,6 @@ export const SendCampaignForm = ({ campaign }: SendCampaignFormProps) => {
     }
   };
 
-  useHotkeysOnFocusedElement({
-    keys: [`${Key.Control}+${Key.Enter}`, `${Key.Meta}+${Key.Enter}`],
-    callback: handleSend,
-    focusId: SIDE_PANEL_FOCUS_ID,
-    dependencies: [handleSend],
-  });
-
   return (
     <StyledContainer>
       <StyledContent>
@@ -230,7 +220,6 @@ export const SendCampaignForm = ({ campaign }: SendCampaignFormProps) => {
             variant="solid"
             color="accent"
             startIcon={isScheduling ? <IconClock /> : <IconSend />}
-            shortcut={['Mod', 'Enter']}
             loading={isSending}
             disabled={!canSend}
             onClick={handleSend}

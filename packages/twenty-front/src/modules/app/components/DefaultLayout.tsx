@@ -4,7 +4,6 @@ import { AppPageErrorFallback } from '@/error-handler/components/AppPageErrorFal
 import { DefaultLayoutNavigationDrawer } from '@/app/components/DefaultLayoutNavigationDrawer';
 import { FileUploadProvider } from '@/file-upload/components/FileUploadProvider';
 import { InformationBannerIsImpersonating } from '@/information-banner/components/impersonate/InformationBannerIsImpersonating';
-import { KeyboardShortcutMenu } from '@/keyboard-shortcut-menu/components/KeyboardShortcutMenu';
 import { LayoutCustomizationBar } from '@/layout-customization/components/LayoutCustomizationBar';
 import { MobileNavigationBar } from '@/navigation/components/MobileNavigationBar';
 import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/providers/PageDragDropProvider';
@@ -24,7 +23,7 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 import { RoboostTopBar } from '@/roboost-app/components/RoboostTopBar';
 import { useIsRoboostUiEnabled } from '@/roboost-app/hooks/useIsRoboostUiEnabled';
 import { AppShell } from '@/roboost-ui/components/AppShell';
-import { NoPermissionLayer } from '@/roboost-ui/components/NoPermissionLayer';
+import { TooltipLayer } from '@/roboost-ui/components/TooltipLayer';
 import { useShowFullscreen } from '@/ui/layout/fullscreen/hooks/useShowFullscreen';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { styled } from '@linaria/react';
@@ -101,9 +100,8 @@ export const DefaultLayout = () => {
             <LayoutCustomizationBar />
             <StyledPageContainer>
               <PageDragDropProvider>
-                <KeyboardShortcutMenu />
                 {isRoboostUiEnabled && <RoboostPreferencesEffect />}
-                {isRoboostUiEnabled && <NoPermissionLayer />}
+                {isRoboostUiEnabled && <TooltipLayer />}
                 {isRoboostUiEnabled && <RoboostCreateRecordPanel />}
                 {isRoboostUiEnabled && <RoboostPropertiesPanel />}
                 {isRoboostUiEnabled && <RoboostFieldHistoryPanel />}

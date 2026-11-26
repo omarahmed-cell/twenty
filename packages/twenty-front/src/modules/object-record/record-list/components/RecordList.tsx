@@ -7,7 +7,6 @@ import { RecordListRecordGroupsBody } from '@/object-record/record-list/componen
 import { RecordListResponsiveFieldsEffect } from '@/object-record/record-list/components/RecordListResponsiveFieldsEffect';
 import { RecordListSSESubscribeEffect } from '@/object-record/record-list/components/RecordListSSESubscribeEffect';
 import { RecordListComponentInstanceContext } from '@/object-record/record-list/states/contexts/RecordListComponentInstanceContext';
-import { RecordSelectionEscapeHotkeyEffect } from '@/object-record/record-selection/components/RecordSelectionEscapeHotkeyEffect';
 import { ScrollWrapper } from '@/ui/utilities/scroll/components/ScrollWrapper';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
@@ -39,7 +38,6 @@ export const RecordList = () => {
   return (
     <StyledContainer ref={setContainerElement}>
       <RecordListResponsiveFieldsEffect containerElement={containerElement} />
-      <RecordSelectionEscapeHotkeyEffect />
       <RecordListSSESubscribeEffect />
       <RecordIndexRemoveSortingModal />
       <RecordListFieldTooltip>

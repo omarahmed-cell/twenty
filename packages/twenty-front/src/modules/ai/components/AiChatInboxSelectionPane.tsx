@@ -66,20 +66,10 @@ export const AiChatInboxSelectionPane = ({
             })}
           </EmptyState.Title>
           <StyledButtons>
-            <Button
-              size="sm"
-              variant="outline"
-              shortcut={['Esc']}
-              onClick={resetRecordSelection}
-            >
+            <Button size="sm" variant="outline" onClick={resetRecordSelection}>
               {t`Clear selection`}
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              shortcut={['Mod', 'K']}
-              onClick={openSidePanelMenu}
-            >
+            <Button size="sm" variant="outline" onClick={openSidePanelMenu}>
               {t`All actions`}
             </Button>
           </StyledButtons>

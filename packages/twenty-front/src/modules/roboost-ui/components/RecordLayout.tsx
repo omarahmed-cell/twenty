@@ -61,6 +61,18 @@ const RecordPanel = ({
         )}
         <div className="rb-rec-panel-body">{children}</div>
       </div>
+      {side === 'right' && (
+        <button
+          type="button"
+          className="rb-rec-edge-toggle"
+          aria-label={isCollapsed ? t`Expand sidebar` : t`Collapse sidebar`}
+          aria-expanded={!isCollapsed}
+          data-tooltip={isCollapsed ? t`Expand sidebar` : t`Collapse sidebar`}
+          onClick={() => setCollapsed(!isCollapsed)}
+        >
+          <Icon name="columns" size={14} />
+        </button>
+      )}
       <button
         type="button"
         className="rb-rec-rail"

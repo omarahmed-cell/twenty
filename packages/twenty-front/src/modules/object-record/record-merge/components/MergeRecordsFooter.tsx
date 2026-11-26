@@ -1,8 +1,5 @@
-import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
 import { useMergeRecordsActions } from '@/object-record/record-merge/hooks/useMergeRecordsActions';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { styled } from '@linaria/react';
-import { Key } from 'ts-key-enum';
 import { t } from '@lingui/core/macro';
 import { IconArrowMerge } from 'twenty-ui/icon';
 import { Button } from 'twenty-ui/primitives/input';
@@ -35,24 +32,12 @@ export const MergeRecordsFooter = ({
     objectNameSingular,
   });
 
-  useHotkeysOnFocusedElement({
-    keys: [`${Key.Control}+${Key.Enter}`, `${Key.Meta}+${Key.Enter}`],
-    callback: () => {
-      if (!isMerging) {
-        handleMergeRecords();
-      }
-    },
-    focusId: SIDE_PANEL_FOCUS_ID,
-    dependencies: [handleMergeRecords, isMerging],
-  });
-
   return (
     <StyledFooterContainer>
       <StyledFooterActions>
         <Button
           size="md"
           startIcon={<IconArrowMerge />}
-          shortcut={isMerging ? undefined : ['Mod', 'Enter']}
           onClick={handleMergeRecords}
           disabled={isMerging}
           variant="solid"

@@ -316,7 +316,7 @@ describe('LogConsole', () => {
     expect(jotaiStore.get(logConsoleActiveSourceIdState.atom)).toBe('app-logs');
   });
 
-  it('toggles with Mod+J on a page that turns off modifier hotkeys', async () => {
+  it('does nothing on Mod+J, since app keyboard shortcuts are removed', async () => {
     renderWithLogsFeatureFlag(true);
     act(() => {
       jotaiStore.set(isLogConsoleEnabledState.atom, true);
@@ -326,7 +326,7 @@ describe('LogConsole', () => {
 
     await userEvent.keyboard('{Control>}j{/Control}');
 
-    expect(jotaiStore.get(logConsoleDisplayModeState.atom)).toBe('open');
+    expect(jotaiStore.get(logConsoleDisplayModeState.atom)).toBe('collapsed');
 
     await userEvent.keyboard('{Meta>}j{/Meta}');
 

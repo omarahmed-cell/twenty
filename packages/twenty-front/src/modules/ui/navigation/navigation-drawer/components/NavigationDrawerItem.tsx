@@ -1,6 +1,5 @@
 import { type NavigationDrawerItemProps } from '@/ui/navigation/navigation-drawer/types/NavigationDrawerItemProps';
 import { VisuallyHidden } from 'twenty-ui/primitives/accessibility';
-import { isObject } from '@sniptt/guards';
 import { useIsNavigationDrawerContentExpanded } from '@/ui/navigation/navigation-drawer/hooks/useIsNavigationDrawerContentExpanded';
 import { TooltipDelay } from '@/ui/layout/tooltip/constants/TooltipDelay';
 import { NavigationDrawerAnimatedCollapseWrapper } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerAnimatedCollapseWrapper';
@@ -9,7 +8,6 @@ import { StyledNavigationDrawerUnreadDot } from '@/ui/navigation/navigation-draw
 import { NAVIGATION_DRAWER_COLLAPSED_BUTTON_SIZE } from '@/ui/navigation/navigation-drawer/constants/NavigationDrawerCollapsedButtonSize';
 import { NavigationDrawerItemEditingContext } from '@/ui/navigation/navigation-drawer/contexts/NavigationDrawerItemEditingContext';
 import { useNavigationDrawerTooltip } from '@/ui/navigation/navigation-drawer/hooks/useNavigationDrawerTooltip';
-import { useShortcutAccessibleKeyLabels } from '@/ui/navigation/hooks/useShortcutAccessibleKeyLabels';
 import { isNavigationDrawerExpandedState } from '@/ui/navigation/states/isNavigationDrawerExpanded';
 import { useMouseDownNavigation } from '@/ui/navigation/hooks/useMouseDownNavigation';
 import { useIsMobile } from 'twenty-ui/utilities';
@@ -21,10 +19,7 @@ import { Link } from 'react-router-dom';
 import { isAbsoluteUrl, isDefined } from 'twenty-shared/utils';
 import { Badge } from 'twenty-ui/primitives/data-display';
 import { Tooltip } from 'twenty-ui/primitives/surfaces';
-import {
-  Shortcut,
-  OverflowingTextWithTooltip,
-} from 'twenty-ui/primitives/typography';
+import { OverflowingTextWithTooltip } from 'twenty-ui/primitives/typography';
 import { MOBILE_VIEWPORT, useTheme, themeCssVariables } from 'twenty-ui/theme';
 import { openUrlInNewTab } from '~/utils/openUrlInNewTab';
 const DEFAULT_INDENTATION_LEVEL = 1;
@@ -231,7 +226,6 @@ export const NavigationDrawerItem = ({
   isUnread = false,
 }: NavigationDrawerItemProps) => {
   const theme = useTheme();
-  const accessibleKeyLabels = useShortcutAccessibleKeyLabels();
   const editingContent = useContext(NavigationDrawerItemEditingContext);
   const isMobile = useIsMobile();
   const isExpanded = useIsNavigationDrawerContentExpanded();
@@ -243,7 +237,6 @@ export const NavigationDrawerItem = ({
 
   const isSoon = modifier === 'soon';
   const isNew = modifier === 'new';
-  const keyboardKeys = isObject(modifier) ? modifier.keyboard : undefined;
 
   const showBreadcrumb = indentationLevel === 2;
   const showStyledSpacer = isDefined(modifier) || isDefined(rightOptions);
@@ -403,16 +396,6 @@ export const NavigationDrawerItem = ({
             {isNew && (
               <NavigationDrawerAnimatedCollapseWrapper>
                 <Badge>{t`New`}</Badge>
-              </NavigationDrawerAnimatedCollapseWrapper>
-            )}
-
-            {isDefined(keyboardKeys) && (
-              <NavigationDrawerAnimatedCollapseWrapper>
-                <Shortcut
-                  shortcut={keyboardKeys}
-                  sequenceJoinLabel={t`then`}
-                  accessibleKeyLabels={accessibleKeyLabels}
-                />
               </NavigationDrawerAnimatedCollapseWrapper>
             )}
 

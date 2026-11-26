@@ -1,8 +1,5 @@
-import { useCallback } from 'react';
-
 import { EmailComposerFields } from '@/activities/emails/components/EmailComposerFields';
 import { useEmailComposerState } from '@/activities/emails/hooks/useEmailComposerState';
-import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
 import { useSidePanelHistory } from '@/side-panel/hooks/useSidePanelHistory';
 import { composeEmailConnectedAccountIdComponentState } from '@/side-panel/pages/compose-email/states/composeEmailConnectedAccountIdComponentState';
 import { composeEmailContextRecordComponentState } from '@/side-panel/pages/compose-email/states/composeEmailContextRecordComponentState';
@@ -10,7 +7,6 @@ import { composeEmailDefaultInReplyToComponentState } from '@/side-panel/pages/c
 import { composeEmailDefaultSubjectComponentState } from '@/side-panel/pages/compose-email/states/composeEmailDefaultSubjectComponentState';
 import { composeEmailDefaultToComponentState } from '@/side-panel/pages/compose-email/states/composeEmailDefaultToComponentState';
 import { SidePanelFooter } from '@/ui/layout/side-panel/components/SidePanelFooter';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
@@ -77,19 +73,6 @@ export const SidePanelComposeEmailPage = () => {
 
   const canSend = composerState.canSend && !isUploadingAttachments;
 
-  const handleSendHotkey = useCallback(() => {
-    if (canSend) {
-      composerState.handleSend();
-    }
-  }, [canSend, composerState]);
-
-  useHotkeysOnFocusedElement({
-    keys: ['ctrl+Enter,meta+Enter'],
-    callback: handleSendHotkey,
-    focusId: SIDE_PANEL_FOCUS_ID,
-    dependencies: [handleSendHotkey],
-  });
-
   if (!composeEmailConnectedAccountId) {
     return null;
   }
@@ -137,7 +120,6 @@ export const SidePanelComposeEmailPage = () => {
             key="send"
             size="sm"
             startIcon={<IconSend />}
-            shortcut={['Mod', 'Enter']}
             onClick={composerState.handleSend}
             disabled={!canSend}
             variant="solid"

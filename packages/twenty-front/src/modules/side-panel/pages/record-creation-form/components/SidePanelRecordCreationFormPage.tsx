@@ -3,10 +3,6 @@ import { ObjectMetadataIcon } from '@/object-metadata/components/ObjectMetadataI
 import { HeaderIdentifier } from '@/ui/layout/page/components/HeaderIdentifier';
 import { PageCardHeader } from '@/ui/layout/page/components/PageCardHeader';
 import { SidePanelOptionsDropdown } from '@/side-panel/components/SidePanelOptionsDropdown';
-import { SIDE_PANEL_FOCUS_ID } from '@/side-panel/constants/SidePanelFocusId';
-import { currentFocusIdSelector } from '@/ui/utilities/focus/states/currentFocusIdSelector';
-import { useHotkeysOnFocusedElement } from '@/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement';
-import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useObjectMetadataItemById } from '@/object-metadata/hooks/useObjectMetadataItemById';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { getFieldPermissions } from '@/object-metadata/utils/getFieldPermissions';
@@ -34,7 +30,6 @@ import { useId, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
-import { Key } from 'ts-key-enum';
 import { type JsonValue } from 'type-fest';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { isDefined } from 'twenty-shared/utils';
@@ -138,7 +133,6 @@ const SidePanelRecordCreationForm = ({
     useState<ValidationRuleViolation[]>([]);
 
   const { validationRules } = useValidationRules({ objectMetadataId });
-  const currentFocusId = useAtomStateValue(currentFocusIdSelector);
 
   const draftRecord = recordCreationFormDraft ?? initialDraftRecord;
 
@@ -320,20 +314,8 @@ const SidePanelRecordCreationForm = ({
   const handleCreateAnotherClick = () =>
     submitDraftRecord({ shouldKeepOpen: true });
 
-  const containerRef = useHotkeysOnFocusedElement({
-    keys: [
-      `${Key.Meta}+${Key.Enter}`,
-      `${Key.Control}+${Key.Enter}`,
-      `${Key.Alt}+${Key.Enter}`,
-    ],
-    focusId: currentFocusId ?? SIDE_PANEL_FOCUS_ID,
-    callback: (keyboardEvent) =>
-      keyboardEvent.altKey ? handleCreateAnotherClick() : handleCreateClick(),
-    dependencies: [currentFocusId, handleCreateClick, handleCreateAnotherClick],
-  });
-
   return (
-    <StyledContainer ref={containerRef} tabIndex={-1}>
+    <StyledContainer tabIndex={-1}>
       <PageCardHeader
         title={
           <HeaderIdentifier
@@ -411,7 +393,6 @@ const SidePanelRecordCreationForm = ({
           >
             <Dropdown.ActionItem
               startIcon={<IconPlus />}
-              shortcut={['Alt', 'Enter']}
               disabled={isSubmitting}
               onClick={handleCreateAnotherClick}
             >{t`Create another`}</Dropdown.ActionItem>
@@ -430,7 +411,6 @@ const SidePanelRecordCreationForm = ({
             size="sm"
             onClick={handleCreateClick}
             loading={isSubmitting}
-            shortcut={['Mod', 'Enter']}
             data-testid="record-creation-form-create-button"
             variant="solid"
             color="accent"

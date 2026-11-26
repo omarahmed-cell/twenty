@@ -1,3 +1,4 @@
+import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { PageLayoutGridLayoutDragSelector } from '@/page-layout/components/PageLayoutGridLayoutDragSelector';
 import { PageLayoutGridOverlay } from '@/page-layout/components/PageLayoutGridOverlay';
 import { PageLayoutGridResizeHandle } from '@/page-layout/components/PageLayoutGridResizeHandle';
@@ -286,7 +287,9 @@ export const PageLayoutGridLayout = ({ tabId }: PageLayoutGridLayoutProps) => {
               {item.type === 'placeholder' ? (
                 <WidgetPlaceholder />
               ) : (
-                <WidgetRenderer widget={item.widget} />
+                <ItemErrorBoundary itemKind="dashboard widget">
+                  <WidgetRenderer widget={item.widget} />
+                </ItemErrorBoundary>
               )}
             </ReactGridLayoutCardWrapper>
           ))}

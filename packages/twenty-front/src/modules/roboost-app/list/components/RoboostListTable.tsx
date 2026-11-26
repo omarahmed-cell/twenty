@@ -1,3 +1,4 @@
+import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import {
   getRoboostLabelIdentifierFieldName,
@@ -308,19 +309,24 @@ export const RoboostListTable = ({
         </thead>
         <tbody>
           {records.map((record) => (
-            <RoboostListRow
+            <ItemErrorBoundary
+              itemKind="table row"
               key={record.id}
-              record={record}
-              columns={columns}
-              columnStyles={columnStyles}
-              frozenCount={frozenCount}
-              labelFieldName={labelFieldName}
-              objectMetadataItem={objectMetadataItem}
-              objectMetadataItems={objectMetadataItems}
-              isSelected={selectedIds.includes(record.id)}
-              onToggle={toggleRow}
-              onSaved={onSaved}
-            />
+              colSpan={columns.length + 1}
+            >
+              <RoboostListRow
+                record={record}
+                columns={columns}
+                columnStyles={columnStyles}
+                frozenCount={frozenCount}
+                labelFieldName={labelFieldName}
+                objectMetadataItem={objectMetadataItem}
+                objectMetadataItems={objectMetadataItems}
+                isSelected={selectedIds.includes(record.id)}
+                onToggle={toggleRow}
+                onSaved={onSaved}
+              />
+            </ItemErrorBoundary>
           ))}
         </tbody>
       </table>

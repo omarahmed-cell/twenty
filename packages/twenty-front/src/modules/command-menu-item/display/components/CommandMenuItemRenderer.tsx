@@ -2,11 +2,9 @@ import { type CommandMenuItemDefinition } from '@/command-menu-item/types/Comman
 import { AppMenuItem } from '@/applications/components/AppMenuItem';
 import { useIsThirdPartyApplication } from '@/applications/hooks/useIsThirdPartyApplication';
 import { CommandMenuContext } from '@/command-menu-item/contexts/CommandMenuContext';
-import { CommandMenuItemButtonHotkeyEffect } from '@/command-menu-item/display/components/CommandMenuItemButtonHotkeyEffect';
 import { CommandListItemLoader } from '@/command-menu-item/display/components/CommandListItemLoader';
 import { CommandMenuDropdownActionItem } from '@/command-menu-item/display/components/CommandMenuDropdownActionItem';
 import { useCommandMenuItemDisplay } from '@/command-menu-item/display/hooks/useCommandMenuItemDisplay';
-import { getCommandMenuItemButtonHotKey } from '@/command-menu-item/display/utils/getCommandMenuItemButtonHotKey';
 import { CommandMenuButton } from '@/command-menu/components/CommandMenuButton';
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { SelectableListItem } from '@/ui/layout/selectable-list/components/SelectableListItem';
@@ -16,7 +14,7 @@ import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/com
 import { useAtomComponentFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateValue';
 import { styled } from '@linaria/react';
 import { useContext } from 'react';
-import { assertUnreachable, isDefined } from 'twenty-shared/utils';
+import { assertUnreachable } from 'twenty-shared/utils';
 
 const StyledPreviewWrapper = styled.div`
   cursor: not-allowed;
@@ -39,7 +37,6 @@ const CommandMenuItemButtonRenderer = ({
   item,
   isPrimaryAction = false,
   shouldHideLabel = false,
-  shouldShowHotKey = false,
 }: CommandMenuItemButtonRendererProps) => {
   const { isInPreviewMode } = useContext(CommandMenuContext);
   const {
@@ -57,17 +54,13 @@ const CommandMenuItemButtonRenderer = ({
     label,
     shortLabel,
     Icon,
-    hotKeys: item.hotKeys,
   };
-
-  const buttonHotKey = getCommandMenuItemButtonHotKey(item);
 
   if (isInPreviewMode) {
     return (
       <StyledPreviewWrapper>
         <CommandMenuButton
           command={command}
-          hotKey={shouldShowHotKey ? buttonHotKey : undefined}
           isPrimaryAction={isPrimaryAction}
           shouldHideLabel={shouldHideLabel}
         />
@@ -77,16 +70,8 @@ const CommandMenuItemButtonRenderer = ({
 
   return (
     <>
-      {isDefined(buttonHotKey) && (
-        <CommandMenuItemButtonHotkeyEffect
-          hotKey={buttonHotKey}
-          disabled={disabled}
-          onHotkeyTriggered={handleClick}
-        />
-      )}
       <CommandMenuButton
         command={command}
-        hotKey={shouldShowHotKey ? buttonHotKey : undefined}
         onClick={disabled ? undefined : handleClick}
         disabled={disabled}
         progress={progress}
@@ -154,7 +139,6 @@ const CommandMenuItemSelectableRenderer = ({
         Icon={Icon}
         label={label}
         onClick={disabled ? undefined : handleClick}
-        hotKeys={item.hotKeys}
         disabled={disabled}
         RightComponent={loaderComponent}
       />

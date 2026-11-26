@@ -1,3 +1,4 @@
+import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { PAGE_LAYOUT_WIDGET_DND_TYPE } from '@/page-layout/constants/PageLayoutWidgetDndType';
 import { type PageLayoutWidget } from '@/page-layout/types/PageLayoutWidget';
 import { type PageLayoutWidgetDragData } from '@/page-layout/types/PageLayoutWidgetDragData';
@@ -103,7 +104,9 @@ export const PageLayoutVerticalListWidgetSlot = ({
         orientation="horizontal"
         fill={fillsViewport}
       >
-        <WidgetRenderer widget={widget} />
+        <ItemErrorBoundary itemKind="dashboard widget">
+          <WidgetRenderer widget={widget} />
+        </ItemErrorBoundary>
       </DragDropItemSortableCell>
     </StyledWidgetSlot>
   );
