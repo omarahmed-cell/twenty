@@ -95,13 +95,24 @@ export const usePropertyLogicFieldChange = (
         ),
       ),
     ].join(', ');
-    const missingFieldNames = [
-      ...new Set(
-        violations.flatMap(({ missingFields }) =>
-          missingFields.map(({ name }) => name),
-        ),
-      ),
-    ];
+    // Every dependent of the rules shows in the box, required ones starred
+    const dependentProperties = violations
+      .flatMap(({ rule }) => rule.properties)
+      .reduce<{ fieldName: string; isRequired: boolean }[]>(
+        (properties, property) => {
+          const existing = properties.find(
+            ({ fieldName }) => fieldName === property.fieldName,
+          );
+
+          if (isDefined(existing)) {
+            existing.isRequired = existing.isRequired || property.isRequired;
+            return properties;
+          }
+
+          return [...properties, { ...property }];
+        },
+        [],
+      );
 
     const values = await askForConditionalLogicValues({
       objectNameSingular: objectMetadataItem.nameSingular,
@@ -109,10 +120,8 @@ export const usePropertyLogicFieldChange = (
       trigger: triggers.replaceAll(' -> ', ' → '),
       confirmLabel: t`Save`,
       hint: t`Fill the required fields to save this change.`,
-      properties: missingFieldNames.map((fieldName) => ({
-        fieldName,
-        isRequired: true,
-      })),
+      properties: dependentProperties,
+      isDependentProperties: true,
       rules: violations.map(({ rule }) => rule),
       record,
       recordOverrides: changes,

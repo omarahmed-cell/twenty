@@ -16,6 +16,7 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
+import { RoboostDependentPropertiesBox } from '@/roboost-app/record/components/RoboostDependentPropertiesBox';
 import { Button } from '@/roboost-ui/components/Button';
 import { Modal } from '@/roboost-ui/components/Modal';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -79,6 +80,49 @@ const ConditionalLogicFieldsDialogContent = ({
       : [];
   });
 
+  const fieldRows = rows.map(({ fieldMetadataItem, isRequired }) => {
+    const inputKey = getRoboostFieldInputKey(fieldMetadataItem);
+    const value = Object.hasOwn(draftValues, inputKey)
+      ? draftValues[inputKey]
+      : getCurrentValue(record, fieldMetadataItem);
+
+    return (
+      <label key={fieldMetadataItem.id} className="rb-reqpop-field">
+        <span className="rb-reqpop-label">
+          {fieldMetadataItem.label}
+          {isRequired && <span className="rb-req"> *</span>}
+        </span>
+        <RoboostFieldInput
+          field={fieldMetadataItem}
+          value={value}
+          relatedRecord={
+            Object.hasOwn(relatedRecords, inputKey)
+              ? relatedRecords[inputKey]
+              : (record[fieldMetadataItem.name] as Record<
+                  string,
+                  unknown
+                > | null)
+          }
+          onChange={(nextValue, related) => {
+            setDraftValues((previous) => ({
+              ...previous,
+              [inputKey]: nextValue,
+            }));
+            if (related !== undefined) {
+              setRelatedRecords((previous) => ({
+                ...previous,
+                [inputKey]:
+                  related === null
+                    ? null
+                    : { id: related.id, name: related.label },
+              }));
+            }
+          }}
+        />
+      </label>
+    );
+  });
+
   return (
     <Modal
       title={request.title}
@@ -118,48 +162,13 @@ const ConditionalLogicFieldsDialogContent = ({
           }
         }}
       >
-        {rows.map(({ fieldMetadataItem, isRequired }) => {
-          const inputKey = getRoboostFieldInputKey(fieldMetadataItem);
-          const value = Object.hasOwn(draftValues, inputKey)
-            ? draftValues[inputKey]
-            : getCurrentValue(record, fieldMetadataItem);
-
-          return (
-            <label key={fieldMetadataItem.id} className="rb-reqpop-field">
-              <span className="rb-reqpop-label">
-                {fieldMetadataItem.label}
-                {isRequired && <span className="rb-req"> *</span>}
-              </span>
-              <RoboostFieldInput
-                field={fieldMetadataItem}
-                value={value}
-                relatedRecord={
-                  Object.hasOwn(relatedRecords, inputKey)
-                    ? relatedRecords[inputKey]
-                    : (record[fieldMetadataItem.name] as Record<
-                        string,
-                        unknown
-                      > | null)
-                }
-                onChange={(nextValue, related) => {
-                  setDraftValues((previous) => ({
-                    ...previous,
-                    [inputKey]: nextValue,
-                  }));
-                  if (related !== undefined) {
-                    setRelatedRecords((previous) => ({
-                      ...previous,
-                      [inputKey]:
-                        related === null
-                          ? null
-                          : { id: related.id, name: related.label },
-                    }));
-                  }
-                }}
-              />
-            </label>
-          );
-        })}
+        {request.isDependentProperties === true ? (
+          <RoboostDependentPropertiesBox>
+            {fieldRows}
+          </RoboostDependentPropertiesBox>
+        ) : (
+          fieldRows
+        )}
         {missingRequiredFields.length > 0 && (
           <div className="rb-reqpop-hint">{request.hint}</div>
         )}

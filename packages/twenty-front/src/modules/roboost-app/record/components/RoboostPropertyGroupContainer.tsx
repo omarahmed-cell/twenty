@@ -1,10 +1,15 @@
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { usePropertyLogicRules } from '@/properties/hooks/usePropertyLogicRules';
+import { RoboostDependentPropertiesBox } from '@/roboost-app/record/components/RoboostDependentPropertiesBox';
 import { RoboostPropertyRow } from '@/roboost-app/record/components/RoboostPropertyRow';
+import { getRoboostDependentPropertyLayout } from '@/roboost-app/record/utils/getRoboostDependentPropertyLayout';
 import { RoboostRecordContainer } from '@/roboost-app/record/components/RoboostRecordContainer';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
 import { useLingui } from '@lingui/react/macro';
+import { Fragment, type ReactNode } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 
 type RoboostPropertyGroupContainerProps = {
   id: string;
@@ -42,6 +47,51 @@ export const RoboostPropertyGroupContainer = ({
   onSaved,
 }: RoboostPropertyGroupContainerProps) => {
   const { t } = useLingui();
+  const { rules, fields: logicFields } =
+    usePropertyLogicRules(objectMetadataItem);
+  const dependentLayout = getRoboostDependentPropertyLayout({
+    fieldNames: fields.map((field) => field.name),
+    rules,
+    record,
+    fields: logicFields,
+  });
+  const fieldByName = new Map(
+    objectMetadataItem.fields
+      .filter((field) => field.isActive)
+      .map((field) => [field.name, field]),
+  );
+
+  const renderProperty = (
+    field: FieldMetadataItem,
+    isRequired = false,
+  ): ReactNode => {
+    const dependents =
+      dependentLayout.dependentsByTriggerFieldName.get(field.name) ?? [];
+
+    return (
+      <Fragment key={field.id}>
+        <RoboostPropertyRow
+          field={field}
+          record={record}
+          objectMetadataItem={objectMetadataItem}
+          objectMetadataItems={objectMetadataItems}
+          onSaved={onSaved}
+          isRequired={isRequired}
+        />
+        {dependents.length > 0 && (
+          <RoboostDependentPropertiesBox>
+            {dependents.map((dependent) => {
+              const dependentField = fieldByName.get(dependent.fieldName);
+
+              return isDefined(dependentField)
+                ? renderProperty(dependentField, dependent.isRequired)
+                : null;
+            })}
+          </RoboostDependentPropertiesBox>
+        )}
+      </Fragment>
+    );
+  };
 
   return (
     <RoboostRecordContainer
@@ -88,16 +138,10 @@ export const RoboostPropertyGroupContainer = ({
       }
     >
       <div className="rb-prop1">
-        {fields.map((field) => (
-          <RoboostPropertyRow
-            key={field.id}
-            field={field}
-            record={record}
-            objectMetadataItem={objectMetadataItem}
-            objectMetadataItems={objectMetadataItems}
-            onSaved={onSaved}
-          />
-        ))}
+        {dependentLayout.fieldNames
+          .map((fieldName) => fieldByName.get(fieldName))
+          .filter(isDefined)
+          .map((field) => renderProperty(field))}
       </div>
     </RoboostRecordContainer>
   );

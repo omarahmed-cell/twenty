@@ -26,6 +26,7 @@ type RoboostPropertyRowProps = {
   objectMetadataItem: EnrichedObjectMetadataItem;
   objectMetadataItems: EnrichedObjectMetadataItem[];
   onSaved: () => void;
+  isRequired?: boolean;
 };
 
 // Label above value; the whole row opens the editor, history and copy sit on the label line
@@ -35,6 +36,7 @@ export const RoboostPropertyRow = ({
   objectMetadataItem,
   objectMetadataItems,
   onSaved,
+  isRequired = false,
 }: RoboostPropertyRowProps) => {
   const { t } = useLingui();
   const editor = useRoboostCellEditor(
@@ -73,6 +75,7 @@ export const RoboostPropertyRow = ({
       <div className="rb-prop-head">
         <div className="rb-prop-label" title={field.label}>
           {field.label}
+          {isRequired && <span className="rb-req"> *</span>}
         </div>
         <div className="rb-prop-tools" onClick={stopRowClick}>
           {isScoreProperty && (

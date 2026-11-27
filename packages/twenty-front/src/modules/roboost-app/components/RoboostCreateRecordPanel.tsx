@@ -9,6 +9,7 @@ import { isRoboostFieldValueFilled } from '@/roboost-app/fields/isRoboostFieldVa
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
 import { useRoboostFormFields } from '@/roboost-app/hooks/useRoboostFormFields';
 import { getRoboostRuleRequiredFormFields } from '@/roboost-app/fields/utils/getRoboostRuleRequiredFormFields';
+import { RoboostDependentPropertiesBox } from '@/roboost-app/record/components/RoboostDependentPropertiesBox';
 import { usePropertyLogicRules } from '@/properties/hooks/usePropertyLogicRules';
 import { roboostCreatePanelState } from '@/roboost-app/states/roboostCreatePanelState';
 import { Button } from '@/roboost-ui/components/Button';
@@ -78,6 +79,32 @@ const RoboostCreateRecordForm = ({
     rules: propertyLogicRules,
     fields: propertyLogicFields,
   });
+  // Consecutive dependents of one trigger share a box
+  const formFieldRuns = formFields.reduce<
+    {
+      dependentOfFieldName?: string;
+      entries: ((typeof formFields)[number] & { index: number })[];
+    }[]
+  >((runs, formField, index) => {
+    const lastRun = runs[runs.length - 1];
+
+    if (
+      isDefined(lastRun) &&
+      isDefined(formField.dependentOfFieldName) &&
+      lastRun.dependentOfFieldName === formField.dependentOfFieldName
+    ) {
+      lastRun.entries.push({ ...formField, index });
+      return runs;
+    }
+
+    return [
+      ...runs,
+      {
+        dependentOfFieldName: formField.dependentOfFieldName,
+        entries: [{ ...formField, index }],
+      },
+    ];
+  }, []);
   const isCompany = objectMetadataItem.nameSingular === 'company';
   const hasStarted = formFields
     .slice(0, 2)
@@ -180,53 +207,67 @@ const RoboostCreateRecordForm = ({
             </span>
           </div>
         )}
-        {formFields.map(({ field, isRequired, isAddedByRule }, index) => (
-          <div
-            key={field.id}
-            className={isAddedByRule === true ? 'rb-cfield-byrule' : undefined}
-          >
-            <div
-              className={`rb-cfield ${isCompany && !hasStarted && index >= 2 ? 'is-greyed' : ''}`}
-            >
-              <label className="rb-cflabel">
-                {field.label}
-                {isRequired && <span className="rb-req"> *</span>}
-              </label>
-              <RoboostFieldInput
-                field={field}
-                value={values[field.name]}
-                relatedRecord={
-                  isDefined(relatedRecords[field.name])
-                    ? {
-                        id: relatedRecords[field.name]?.id,
-                        name: relatedRecords[field.name]?.label,
+        {formFieldRuns.map((run) => {
+          const renderedFields = run.entries.map(
+            ({ field, isRequired, index }) => (
+              <div key={field.id}>
+                <div
+                  className={`rb-cfield ${isCompany && !hasStarted && index >= 2 ? 'is-greyed' : ''}`}
+                >
+                  <label className="rb-cflabel">
+                    {field.label}
+                    {isRequired && <span className="rb-req"> *</span>}
+                  </label>
+                  <RoboostFieldInput
+                    field={field}
+                    value={values[field.name]}
+                    relatedRecord={
+                      isDefined(relatedRecords[field.name])
+                        ? {
+                            id: relatedRecords[field.name]?.id,
+                            name: relatedRecords[field.name]?.label,
+                          }
+                        : null
+                    }
+                    onChange={(value, relatedRecord) => {
+                      setValues({ ...values, [field.name]: value });
+                      if (relatedRecord !== undefined) {
+                        setRelatedRecords({
+                          ...relatedRecords,
+                          [field.name]: relatedRecord,
+                        });
                       }
-                    : null
-                }
-                onChange={(value, relatedRecord) => {
-                  setValues({ ...values, [field.name]: value });
-                  if (relatedRecord !== undefined) {
-                    setRelatedRecords({
-                      ...relatedRecords,
-                      [field.name]: relatedRecord,
-                    });
-                  }
-                }}
-              />
-              <RoboostDuplicateWarning
-                objectMetadataItem={objectMetadataItem}
-                field={field}
-                value={values[field.name]}
-                onOpen={onClose}
-              />
-            </div>
-            {isCompany && !hasStarted && index === 1 && (
-              <div className="rb-cpanel-hint">
-                {t`Start by entering a domain name, an account name, or both.`}
+                    }}
+                  />
+                  <RoboostDuplicateWarning
+                    objectMetadataItem={objectMetadataItem}
+                    field={field}
+                    value={values[field.name]}
+                    onOpen={onClose}
+                  />
+                </div>
+                {isCompany && !hasStarted && index === 1 && (
+                  <div className="rb-cpanel-hint">
+                    {t`Start by entering a domain name, an account name, or both.`}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        ))}
+            ),
+          );
+
+          return isDefined(run.dependentOfFieldName) ? (
+            <div
+              key={`${run.dependentOfFieldName}-dependents`}
+              className="rb-cfield-dep-box"
+            >
+              <RoboostDependentPropertiesBox>
+                {renderedFields}
+              </RoboostDependentPropertiesBox>
+            </div>
+          ) : (
+            renderedFields
+          );
+        })}
         {error !== null && <div className="rb-field-error">{error}</div>}
       </div>
       <div className="rb-cpanel-foot">

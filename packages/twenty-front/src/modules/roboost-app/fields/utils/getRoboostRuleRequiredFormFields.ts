@@ -2,19 +2,19 @@ import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/Enriche
 import { getRoboostFieldEditKind } from '@/roboost-app/fields/getRoboostFieldEditKind';
 import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
 import { type RoboostFormField } from '@/roboost-app/hooks/useRoboostFormFields';
+import { getRoboostDependentPropertyLayout } from '@/roboost-app/record/utils/getRoboostDependentPropertyLayout';
 import {
   type ConditionalLogicField,
   type ConditionalLogicRule,
-  evaluateConditionalLogicGroups,
-  getPropertyLogicConditionFieldNames,
   isDefined,
 } from 'twenty-shared/utils';
 
 export type RoboostRuleFormField = RoboostFormField & {
-  isAddedByRule?: boolean;
+  // Set on a rule's dependent, which the form shows in a box under this trigger field
+  dependentOfFieldName?: string;
 };
 
-// Create forms: a true rule marks its required properties required, adding the ones the form does not show
+// Create forms: a true rule shows its dependents, required ones starred, right under the field that triggered it
 export const getRoboostRuleRequiredFormFields = ({
   formFields,
   objectMetadataItem,
@@ -40,64 +40,46 @@ export const getRoboostRuleRequiredFormFields = ({
     }
   }
 
-  const fieldByName = new Map(fields.map((field) => [field.name, field]));
-  const trueRules = rules.filter((rule) =>
-    evaluateConditionalLogicGroups({
-      conditionGroups: rule.conditionGroups,
-      record,
-      fieldByName,
-    }),
+  const layout = getRoboostDependentPropertyLayout({
+    fieldNames: formFields.map(({ field }) => field.name),
+    rules,
+    record,
+    fields,
+  });
+  const formFieldByName = new Map(
+    formFields.map((formField) => [formField.field.name, formField]),
   );
+  const result: RoboostRuleFormField[] = [];
 
-  if (trueRules.length === 0) {
-    return formFields;
-  }
+  const addWithDependents = (formField: RoboostRuleFormField) => {
+    result.push(formField);
 
-  const requiredNames = new Set(
-    trueRules.flatMap((rule) =>
-      rule.properties
-        .filter(({ isRequired }) => isRequired)
-        .map(({ fieldName }) => fieldName),
-    ),
-  );
+    for (const dependent of layout.dependentsByTriggerFieldName.get(
+      formField.field.name,
+    ) ?? []) {
+      const field = objectMetadataItem.fields.find(
+        ({ name }) => name === dependent.fieldName,
+      );
 
-  const result: RoboostRuleFormField[] = formFields.map((formField) => ({
-    ...formField,
-    isRequired: formField.isRequired || requiredNames.has(formField.field.name),
-  }));
-  const shownNames = new Set(formFields.map(({ field }) => field.name));
-
-  for (const rule of trueRules) {
-    const addedFields = rule.properties
-      .filter(
-        ({ fieldName, isRequired }) => isRequired && !shownNames.has(fieldName),
-      )
-      .map(({ fieldName }) =>
-        objectMetadataItem.fields.find((field) => field.name === fieldName),
-      )
-      .filter(isDefined)
-      .filter((field) => getRoboostFieldEditKind(field) !== null);
-
-    if (addedFields.length === 0) {
-      continue;
-    }
-
-    const conditionNames = getPropertyLogicConditionFieldNames(rule);
-    const triggerIndex = result.findLastIndex(({ field }) =>
-      conditionNames.has(field.name),
-    );
-    const insertAt = triggerIndex === -1 ? result.length : triggerIndex + 1;
-
-    result.splice(
-      insertAt,
-      0,
-      ...addedFields.map((field) => ({
+      if (!isDefined(field) || getRoboostFieldEditKind(field) === null) {
+        continue;
+      }
+      addWithDependents({
         field,
-        isRequired: true,
-        isAddedByRule: true,
-      })),
-    );
-    addedFields.forEach((field) => shownNames.add(field.name));
+        isRequired:
+          dependent.isRequired ||
+          (formFieldByName.get(field.name)?.isRequired ?? false),
+        dependentOfFieldName: formField.field.name,
+      });
+    }
+  };
+
+  for (const fieldName of layout.fieldNames) {
+    const formField = formFieldByName.get(fieldName);
+
+    if (isDefined(formField)) {
+      addWithDependents(formField);
+    }
   }
 
   return result;

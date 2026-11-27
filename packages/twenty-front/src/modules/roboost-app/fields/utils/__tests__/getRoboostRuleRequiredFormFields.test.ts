@@ -62,7 +62,7 @@ const formFields = [
 ];
 
 describe('getRoboostRuleRequiredFormFields', () => {
-  it('keeps the form as configured while no rule is true', () => {
+  it('keeps the form as configured, without dependents, while no rule is true', () => {
     const result = getRoboostRuleRequiredFormFields({
       formFields,
       objectMetadataItem,
@@ -88,19 +88,29 @@ describe('getRoboostRuleRequiredFormFields', () => {
       'noOfBranches',
       'name',
     ]);
-    expect(result[1]).toMatchObject({ isRequired: true, isAddedByRule: true });
+    expect(result[1]).toMatchObject({
+      isRequired: true,
+      dependentOfFieldName: 'products',
+    });
   });
 
-  it('marks a field already on the form as required', () => {
+  it('moves a dependent already on the form under its trigger', () => {
     const result = getRoboostRuleRequiredFormFields({
-      formFields: [...formFields, { field: branchesField, isRequired: false }],
+      formFields: [{ field: branchesField, isRequired: false }, ...formFields],
       objectMetadataItem,
       values: { products: ['SIRA'] },
       rules,
       fields,
     });
 
-    expect(result).toHaveLength(3);
-    expect(result[2]).toMatchObject({ isRequired: true });
+    expect(result.map(({ field }) => field.name)).toEqual([
+      'name',
+      'products',
+      'noOfBranches',
+    ]);
+    expect(result[2]).toMatchObject({
+      isRequired: true,
+      dependentOfFieldName: 'products',
+    });
   });
 });

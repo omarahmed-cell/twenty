@@ -15,6 +15,8 @@ export type ConditionalLogicFieldsDialogRequest = {
   confirmLabel: string;
   hint: string;
   properties: ConditionalLogicProperty[];
+  // Property rules list their dependents in a "Dependent properties" box
+  isDependentProperties?: boolean;
   // Missing required fields are rechecked against these rules as the user fills the form
   rules: ConditionalLogicRule[];
   record: Record<string, unknown>;
