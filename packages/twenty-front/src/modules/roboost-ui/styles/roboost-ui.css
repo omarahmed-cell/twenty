@@ -922,8 +922,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: 320px;
-  max-width: 42%;
+  /* The search panel opens at exactly this width */
+  width: min(460px, 36vw);
+  flex: none;
 }
 .rb-topbar-search .rb-icon {
   position: absolute;
@@ -2545,11 +2546,66 @@
   border-color: var(--accent-soft);
   color: var(--accent-fill);
 }
+
+/* ---------- Dark modes: near-black frame, accent for primary actions ---------- */
+[data-scheme='dark'] .rb-nav-item[aria-current='page'] {
+  box-shadow: none;
+}
+[data-scheme='dark'] .rb-nav-item[aria-current='page']::before {
+  display: block;
+  background: var(--accent);
+}
+[data-scheme='dark'] .rb-nav-item[aria-current='page'] .rb-icon {
+  color: var(--accent-text);
+}
+[data-theme='sira'][data-scheme='dark'] .rb-topbar .rb-btn-primary,
+[data-theme='roboost'][data-scheme='dark'] .rb-btn-primary,
+[data-theme='roboost'][data-scheme='dark'] .rb-hbtn-accent {
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
+  color: var(--text-on-accent);
+  filter: none;
+}
 [data-theme='sira'][data-scheme='dark']
   .rb-topbar
-  .rb-btn-primary:hover:not([disabled]) {
-  background: #e8efff;
-  border-color: #e8efff;
+  .rb-btn-primary:hover:not([disabled]),
+[data-theme='roboost'][data-scheme='dark'] .rb-btn-primary:hover,
+[data-theme='roboost'][data-scheme='dark']
+  .rb-hbtn-accent:hover:not([disabled]) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--text-on-accent);
+  filter: none;
+}
+[data-theme='roboost'][data-scheme='dark']
+  .rb-check[data-checked='true']
+  .rb-check-box,
+[data-theme='roboost'][data-scheme='dark']
+  .rb-check[data-indeterminate='true']
+  .rb-check-box {
+  color: var(--text-on-accent);
+}
+[data-theme='roboost'][data-scheme='dark']
+  .rb-check[data-indeterminate='true']
+  .rb-check-box::after {
+  background: var(--text-on-accent);
+}
+[data-scheme='dark'] .rb-toggle.is-on .rb-toggle-knob {
+  background: var(--text-on-accent);
+}
+
+/* ---------- Light mode: black and white ---------- */
+[data-theme='light'] .rb-link,
+[data-theme='light'] a.rb-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+[data-theme='light'] .rb-nav-item[aria-current='page']::before {
+  background: #111111;
+}
+[data-theme='light'] .rb-btn-danger.rb-btn-primary {
+  background: #111111;
+  border-color: #111111;
 }
 
 /* Right panel toggle: a round button on the boundary between the middle and right columns, taking no space */

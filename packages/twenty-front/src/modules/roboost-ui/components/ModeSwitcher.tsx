@@ -25,15 +25,19 @@ export const ModeSwitcher = ({
     {
       id: 'roboost-dark',
       name: t`Roboost Dark`,
-      description: t`Deep navy · orange accent`,
+      description: t`Near-black frame · orange accent`,
     },
     { id: 'sira', name: t`Sira`, description: t`Blue frame · blue accent` },
     {
       id: 'sira-dark',
       name: t`Sira Dark`,
-      description: t`Deep blue · blue accent`,
+      description: t`Near-black frame · blue accent`,
     },
-    { id: 'light', name: t`Light`, description: t`White frame · red accent` },
+    {
+      id: 'light',
+      name: t`Light`,
+      description: t`White frame · black and white`,
+    },
   ];
 
   return (

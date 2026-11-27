@@ -155,91 +155,177 @@
   --accent-fill: var(--accent-text);
 }
 
-/* Roboost Dark / Sira Dark: values from ROBOOST_DARK_TOKENS in twenty-ui design-tokens/roboost.ts */
+/* Roboost Dark / Sira Dark: neutral greys measured from the dark-mode reference (page #191919, cards and
+   inputs #303030, borders #404040) inside a near-black frame. Mirrored in twenty-ui design-tokens/roboost.ts. */
 [data-scheme='dark'] {
   color-scheme: dark;
-  --canvas: #0b1424;
-  --surface: #111c2e;
-  --surface-sunken: #0d1727;
-  --surface-hover: #18253a;
-  --surface-active: #203049;
-  --overlay: rgba(2, 6, 14, 0.66);
-  --border: #26354c;
-  --border-strong: #60749a;
-  --border-subtle: #1c2a3f;
-  --control-hover-border: #8496b4;
-  --text: #e9eef5;
-  --text-secondary: #b1bccc;
-  --text-muted: #94a2b6;
-  --text-disabled: #66748a;
+  --canvas: #191919;
+  --surface: #303030;
+  --surface-sunken: #262626;
+  --surface-hover: #3a3a3a;
+  --surface-active: #444444;
+  --overlay: rgba(0, 0, 0, 0.66);
+  --border: #404040;
+  --border-strong: #7a7a7a;
+  --border-subtle: #383838;
+  --control-hover-border: #8f8f8f;
+  --text: #f0f0f0;
+  --text-secondary: #cfcfcf;
+  --text-muted: #b5b5b5;
+  --text-disabled: #7c7c7c;
   --text-on-accent: #ffffff;
-  --text-on-dark: #e9eef5;
-  --tooltip-bg: #2a3a52;
+  --text-on-dark: #f0f0f0;
+  --tooltip-bg: #474747;
 
   --success: #34c48b;
   --success-text: #6fdcae;
-  --success-soft: #0f3328;
-  --success-border: #1f6149;
+  --success-soft: #173326;
+  --success-border: #2b6148;
   --warning: #f0a63a;
   --warning-text: #f6c272;
-  --warning-soft: #3a2a10;
+  --warning-soft: #3a2c16;
   --warning-border: #6e4f1c;
   --danger: #f26b61;
   --danger-text: #ff9b93;
-  --danger-soft: #3f1b1d;
+  --danger-soft: #401f1f;
   --danger-border: #7a3332;
   --info: #4d94ff;
   --info-text: #93bcff;
-  --info-soft: #132a4d;
+  --info-soft: #1a2b45;
   --info-border: #2a5290;
-  --avatar-bg: #223149;
-  --avatar-fg: #c8d2e0;
-  --card-border: #33445f;
+  --avatar-bg: #474747;
+  --avatar-fg: #e6e6e6;
+  --card-border: #404040;
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+
+  --frame: #0d0d0d;
+  --frame-border: rgba(255, 255, 255, 0.09);
+  --frame-text: #d0d0d0;
+  --frame-text-strong: #ffffff;
+  --frame-text-muted: #a3a3a3;
+  --frame-active: rgba(255, 255, 255, 0.12);
+  --frame-field: rgba(255, 255, 255, 0.09);
 }
 
+/* Orange is too light for white text, so filled orange carries near-black text */
 [data-theme='roboost'][data-scheme='dark'] {
   --accent: #ff8300;
   --accent-hover: #ff962e;
   --accent-active: #e67600;
   --accent-text: #ffa149;
-  --accent-soft: #3b2614;
-  --accent-soft-hover: #4a2f16;
-  --accent-border: #7a4a18;
-  --accent-fill: #c2410c;
+  --accent-soft: #3d2a17;
+  --accent-soft-hover: #4b331a;
+  --accent-border: #8a5418;
+  --accent-fill: #ff8300;
+  --text-on-accent: #141414;
   --focus-ring: #ff962e;
-  --frame: #00122a;
-  --frame-border: rgba(255, 255, 255, 0.08);
-  --frame-text: #c2cfe3;
-  --frame-text-strong: #ffffff;
-  --frame-text-muted: #8da0bd;
-  --frame-active: rgba(255, 255, 255, 0.1);
   --frame-accent: #ff8300;
-  --frame-field: rgba(255, 255, 255, 0.1);
   --check-fill: var(--accent-fill);
 }
 
 [data-theme='sira'][data-scheme='dark'] {
-  --accent: #2f6fe8;
-  --accent-hover: #4a83f2;
-  --accent-active: #2560d6;
-  --accent-text: #94b8ff;
-  --accent-soft: #16295a;
-  --accent-soft-hover: #1c3370;
+  --accent: #1c67f9;
+  --accent-hover: #3b7cfa;
+  --accent-active: #1657d6;
+  --accent-text: #8cb3ff;
+  --accent-soft: #1b2a48;
+  --accent-soft-hover: #22355c;
   --accent-border: #2f4f9a;
-  --accent-fill: #2f6fe8;
+  --accent-fill: #1c67f9;
+  --text-on-accent: #ffffff;
   --focus-ring: #6a9dff;
-  --frame: var(--accent-fill);
-  --frame-border: rgba(255, 255, 255, 0.28);
-  --frame-text: #ffffff;
-  --frame-text-strong: #ffffff;
-  --frame-text-muted: #ffffff;
-  --frame-active: rgba(0, 12, 48, 0.36);
-  --frame-accent: #ffffff;
-  --frame-field: rgba(0, 12, 48, 0.2);
+  --frame-accent: #8cb3ff;
   --check-fill: var(--accent-fill);
+}
+
+/* Light mode is black and white: no coloured accent */
+[data-theme='light'][data-scheme='light'] {
+  --canvas: #ffffff;
+  --surface: #ffffff;
+  --surface-sunken: #f7f7f7;
+  --surface-hover: #f2f2f2;
+  --surface-active: #e6e6e6;
+  --border: #e2e2e2;
+  --border-strong: #a8a8a8;
+  --border-subtle: #ededed;
+  --control-hover-border: #8a8a8a;
+  --card-border: #d6d6d6;
+  --text: #111111;
+  --text-secondary: #4d4d4d;
+  --text-muted: #636363;
+  --text-disabled: #9a9a9a;
+  --tooltip-bg: #111111;
+  --avatar-bg: #efefef;
+  --avatar-fg: #333333;
+  --accent: #111111;
+  --accent-hover: #333333;
+  --accent-active: #000000;
+  --accent-text: #111111;
+  --accent-soft: #efefef;
+  --accent-soft-hover: #e4e4e4;
+  --accent-border: #bdbdbd;
+  --accent-fill: #111111;
+  --focus-ring: #111111;
+  --check-fill: #111111;
+  --frame: #ffffff;
+  --frame-border: #e2e2e2;
+  --frame-text: #4d4d4d;
+  --frame-text-strong: #111111;
+  --frame-text-muted: #6b6b6b;
+  --frame-active: #e6e6e6;
+  --frame-accent: #111111;
+  --frame-field: #f2f2f2;
+  --brand-gradient: linear-gradient(#111111, #111111);
+}
+
+/* Twenty's own screens follow the mode accent where the mode asks for one */
+[data-theme='light'][data-scheme='light'],
+[data-scheme='dark'] {
+  --t-accent-accent1: var(--accent-soft);
+  --t-accent-accent2: var(--accent-soft);
+  --t-accent-accent3: var(--accent-soft-hover);
+  --t-accent-accent4: var(--accent-soft-hover);
+  --t-accent-accent5: var(--accent-border);
+  --t-accent-accent6: var(--accent-border);
+  --t-accent-accent7: var(--accent-border);
+  --t-accent-accent8: var(--accent-hover);
+  --t-accent-accent9: var(--accent-fill);
+  --t-accent-accent10: var(--accent-hover);
+  --t-accent-accent11: var(--accent-text);
+  --t-accent-accent12: var(--accent-active);
+  --t-accent-accent3570: var(--accent-hover);
+  --t-accent-accent4060: var(--accent-hover);
+  --t-accent-primary: var(--accent-border);
+  --t-accent-secondary: var(--accent-border);
+  --t-accent-tertiary: var(--accent-soft-hover);
+  --t-accent-quaternary: var(--accent-soft);
+  --t-rb-accent: var(--accent);
+  --t-rb-accent-hover: var(--accent-hover);
+  --t-rb-accent-active: var(--accent-active);
+  --t-rb-accent-text: var(--accent-text);
+  --t-rb-accent-soft: var(--accent-soft);
+  --t-rb-accent-soft-hover: var(--accent-soft-hover);
+  --t-rb-accent-border: var(--accent-border);
+  --t-rb-surface-nav-active: var(--frame-active);
+  --t-rb-text-on-accent: var(--text-on-accent);
+  --t-rb-shadow-focus: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus-ring);
+}
+[data-scheme='dark'] {
+  --t-rb-canvas: var(--canvas);
+  --t-rb-surface: var(--surface);
+  --t-rb-surface-sunken: var(--surface-sunken);
+  --t-rb-surface-hover: var(--surface-hover);
+  --t-rb-surface-active: var(--surface-active);
+  --t-rb-border: var(--border);
+  --t-rb-border-strong: var(--border-strong);
+  --t-rb-border-subtle: var(--border-subtle);
+  --t-rb-text: var(--text);
+  --t-rb-text-secondary: var(--text-secondary);
+  --t-rb-text-muted: var(--text-muted);
+  --t-rb-text-disabled: var(--text-disabled);
+  --t-background-canvas: var(--canvas);
 }
