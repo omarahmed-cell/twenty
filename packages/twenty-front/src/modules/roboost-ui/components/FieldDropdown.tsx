@@ -9,19 +9,35 @@ import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { Fragment, type RefObject, useEffect, useRef, useState } from 'react';
 
+const BLANK_DISPLAY = '—';
+
+// Swallows the click that follows a pointerdown, so a trigger's own onClick doesn't run
+const swallowNextClick = () => {
+  const swallow = (event: MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+  };
+
+  document.addEventListener('click', swallow, { capture: true, once: true });
+  window.setTimeout(
+    () => document.removeEventListener('click', swallow, { capture: true }),
+    400,
+  );
+};
+
 export type FieldDropdownProps = {
   anchorRef: RefObject<HTMLElement | null>;
   options: SelectOption[];
   mode: 'single' | 'multi';
   selectedValues: string[];
-  // Single: the picked value, or null when the selected option is clicked again
+  // Single: the picked value, or null for Blank or when the selected option is clicked again
   onChoose?: (value: string | null) => void;
   // Multi: the ticked values in option order, on Save or Enter-confirm
   onSave?: (values: string[]) => void;
   // Escape, Cancel or a click outside; nothing is saved
   onDismiss: () => void;
   minWidth?: number;
-  // Field editors clear a single select when its selected option is clicked again
+  // Adds a Blank option on top; field editors also clear when the selected option is clicked again
   isClearable?: boolean;
   isSearchable?: boolean;
   'aria-label'?: string;
@@ -66,6 +82,8 @@ export const FieldDropdown = ({
         : [...current, value],
     );
 
+  const isBlankShown = !isMulti && isClearable && searchTerm === '';
+
   const pick = (option: SelectOption) => {
     if (isMulti) {
       toggle(option.value);
@@ -95,12 +113,18 @@ export const FieldDropdown = ({
     const dismissOnOutsidePointer = (event: PointerEvent) => {
       const target = event.target;
 
-      if (
-        target instanceof Node &&
-        (panelRef.current?.contains(target) === true ||
-          anchorRef.current?.contains(target) === true)
-      ) {
+      if (!(target instanceof Node)) {
+        onDismiss();
         return;
+      }
+      if (panelRef.current?.contains(target) === true) {
+        return;
+      }
+      // A press on the field itself closes the list like Cancel; its click must not reopen it
+      if (anchorRef.current?.contains(target) === true) {
+        event.stopPropagation();
+        event.preventDefault();
+        swallowNextClick();
       }
       onDismiss();
     };
@@ -179,6 +203,30 @@ export const FieldDropdown = ({
         />
       )}
       <div ref={listRef} className="rb-menu-list rb-fdd-list">
+        {isBlankShown && (
+          <div
+            role="option"
+            aria-selected={selectedValues.length === 0}
+            aria-label={t`Blank`}
+            title={t`Blank`}
+            className="rb-menu-item rb-fdd-item rb-fdd-blank"
+            onClick={() => onChoose?.(null)}
+          >
+            <span className="rb-menu-label">{BLANK_DISPLAY}</span>
+            {selectedValues.length === 0 && <Icon name="check" size={16} />}
+          </div>
+        )}
+        {isMulti && searchTerm === '' && (
+          <button
+            type="button"
+            className="rb-menu-item rb-fdd-item rb-fdd-clear"
+            disabled={draft.length === 0}
+            onClick={() => setDraft([])}
+          >
+            <Icon name="x" size={14} />
+            <span className="rb-menu-label">{t`Clear all`}</span>
+          </button>
+        )}
         {visibleOptions.map((option, index) => {
           const isSelected = isMulti
             ? draft.includes(option.value)

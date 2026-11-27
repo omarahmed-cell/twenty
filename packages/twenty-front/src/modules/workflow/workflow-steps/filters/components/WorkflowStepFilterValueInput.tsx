@@ -205,7 +205,17 @@ export const WorkflowStepFilterValueInput = ({
         onChange={handleValueChange}
         readonly={readonly}
         VariablePicker={WorkflowVariablePicker}
-        options={selectedFieldMetadataItem?.options ?? []}
+        options={[
+          // The filter evaluator matches an empty option against records with no value
+          {
+            id: 'roboost-blank-option',
+            value: '',
+            label: t`Blank`,
+            color: 'gray',
+            position: -1,
+          },
+          ...(selectedFieldMetadataItem?.options ?? []),
+        ]}
       />
     );
   }

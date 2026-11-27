@@ -26,7 +26,7 @@ import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
 import { type ReactNode } from 'react';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, ROBOOST_FILTER_BLANK_VALUE } from 'twenty-shared/utils';
 import { FieldMetadataType } from '~/generated-metadata/graphql';
 
 type MemberRecord = { id: string; name?: RoboostFullName; __typename: string };
@@ -149,13 +149,18 @@ export const RoboostListToolbar = ({
           selected.length === 0
             ? undefined
             : selected.length === 1
-              ? (options.find((option) => option.value === selected[0])
-                  ?.label ?? selected[0])
+              ? selected[0] === ROBOOST_FILTER_BLANK_VALUE
+                ? t`Blank`
+                : (options.find((option) => option.value === selected[0])
+                    ?.label ?? selected[0])
               : t`${selected.length} selected`
         }
         isActive={selected.length > 0}
         keepOpenOnSelect
-        entries={options.map((option) => ({
+        entries={[
+          { value: ROBOOST_FILTER_BLANK_VALUE, label: t`Blank` },
+          ...options,
+        ].map((option) => ({
           id: option.value,
           label: option.label,
           isSelected: selected.includes(option.value),

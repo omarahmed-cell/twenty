@@ -14,7 +14,7 @@ import { MultiSelect } from '@/roboost-ui/components/MultiSelect';
 import { Select } from '@/roboost-ui/components/Select';
 import { useLingui } from '@lingui/react/macro';
 import { isString } from '@sniptt/guards';
-import { isDefined } from 'twenty-shared/utils';
+import { isDefined, ROBOOST_FILTER_BLANK_VALUE } from 'twenty-shared/utils';
 
 type RoboostFilterRuleValueInputProps = {
   field: FieldMetadataItem | undefined;
@@ -64,10 +64,13 @@ export const RoboostFilterRuleValueInput = ({
           className="rb-frule-values"
           value={values}
           placeholder={t`Choose values`}
-          options={options.map((option) => ({
-            value: option.value,
-            label: option.label,
-          }))}
+          options={[
+            { value: ROBOOST_FILTER_BLANK_VALUE, label: t`Blank` },
+            ...options.map((option) => ({
+              value: option.value,
+              label: option.label,
+            })),
+          ]}
           onChange={setValues}
         />
       );
@@ -90,7 +93,9 @@ export const RoboostFilterRuleValueInput = ({
         <div className="rb-frule-relation">
           {values.map((id) => (
             <span key={id} className="rb-tag">
-              {rule.labels?.[id] ?? id.slice(0, 8)}
+              {id === ROBOOST_FILTER_BLANK_VALUE
+                ? t`Blank`
+                : (rule.labels?.[id] ?? id.slice(0, 8))}
               <button
                 type="button"
                 className="rb-rve-tag-x"
@@ -110,8 +115,11 @@ export const RoboostFilterRuleValueInput = ({
             selectedLabel=""
             placeholder={t`Add a value`}
             isClearable={false}
-            leadingOptions={
-              canPickTeams && isMemberRelation
+            leadingOptions={[
+              ...(values.includes(ROBOOST_FILTER_BLANK_VALUE)
+                ? []
+                : [{ id: ROBOOST_FILTER_BLANK_VALUE, label: t`Blank` }]),
+              ...(canPickTeams && isMemberRelation
                 ? teams
                     .filter(
                       (team) =>
@@ -121,8 +129,8 @@ export const RoboostFilterRuleValueInput = ({
                       id: toRoboostTeamFilterValue(team.id),
                       label: t`Team: ${team.name}`,
                     }))
-                : []
-            }
+                : []),
+            ]}
             onSelect={(record) => {
               if (isDefined(record) && !values.includes(record.id)) {
                 onChange({

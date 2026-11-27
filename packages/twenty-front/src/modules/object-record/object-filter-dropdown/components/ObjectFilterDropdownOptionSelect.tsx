@@ -34,6 +34,8 @@ export const EMPTY_FILTER_VALUE = '';
 
 const EMPTY_SELECT_OPTIONS: FieldMetadataItemOption[] = [];
 
+const BLANK_OPTION_ID = 'roboost-blank-option';
+
 type SelectOptionForFilter = FieldMetadataItemOption & {
   isSelected: boolean;
 };
@@ -119,9 +121,24 @@ export const ObjectFilterDropdownOptionSelect = ({
     SelectOptionForFilter[]
   >([]);
 
+  // An empty value is how the filter builder matches records with no option
+  const isBlankOffered =
+    !isDefined(relationTargetFieldMetadataItem) &&
+    fieldMetadataItemUsedInDropdown?.type === 'SELECT';
+
   useEffect(() => {
     if (isDefined(selectOptions)) {
-      const options = selectOptions.map((option) => {
+      const blankOption: FieldMetadataItemOption = {
+        id: BLANK_OPTION_ID,
+        value: '',
+        label: t`Blank`,
+        color: 'gray',
+        position: -1,
+      };
+      const options = [
+        ...(isBlankOffered ? [blankOption] : []),
+        ...selectOptions,
+      ].map((option) => {
         const isSelected = selectedOptions?.includes(option.value) ?? false;
 
         return {
@@ -132,7 +149,7 @@ export const ObjectFilterDropdownOptionSelect = ({
 
       setSelectableOptions(options);
     }
-  }, [selectedOptions, selectOptions]);
+  }, [selectedOptions, selectOptions, isBlankOffered]);
 
   useHotkeysOnFocusedElement({
     keys: [Key.Escape],

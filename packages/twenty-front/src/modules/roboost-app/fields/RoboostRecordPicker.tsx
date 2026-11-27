@@ -18,6 +18,7 @@ import { useDebounce } from 'use-debounce';
 const PICKER_MIN_WIDTH = 240;
 // Inside a record field or table cell the list hangs under the whole field, never over its label
 const FIELD_CONTAINER_SELECTOR = '.rb-prop, td';
+const BLANK_DISPLAY = '—';
 
 type RoboostRecordPickerProps = {
   objectNameSingular: string;
@@ -27,6 +28,8 @@ type RoboostRecordPickerProps = {
   isClearable?: boolean;
   isDisabled?: boolean;
   autoOpen?: boolean;
+  // The list closed without a pick: trigger clicked again or Escape
+  onCancel?: () => void;
   // Extra choices listed above the records, such as teams in a people picker
   leadingOptions?: { id: string; label: string }[];
 };
@@ -51,6 +54,7 @@ export const RoboostRecordPicker = ({
   isClearable = true,
   isDisabled = false,
   autoOpen = false,
+  onCancel,
   leadingOptions = [],
 }: RoboostRecordPickerProps) => {
   const { t } = useLingui();
@@ -62,6 +66,11 @@ export const RoboostRecordPicker = ({
   const open = () => {
     setSearch('');
     setIsOpen(true);
+  };
+
+  const cancel = () => {
+    setIsOpen(false);
+    onCancel?.();
   };
 
   // Positioning needs the trigger's rendered rect, so the first open waits for mount
@@ -116,8 +125,8 @@ export const RoboostRecordPicker = ({
         }
       }}
       onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          setIsOpen(false);
+        if (event.key === 'Escape' && isOpen) {
+          cancel();
         }
       }}
     >
@@ -127,7 +136,7 @@ export const RoboostRecordPicker = ({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         disabled={isDisabled}
-        onClick={() => (isOpen ? setIsOpen(false) : open())}
+        onClick={() => (isOpen ? cancel() : open())}
       >
         <span className="rb-truncate">
           {isNonEmptyString(selectedLabel)
@@ -165,17 +174,23 @@ export const RoboostRecordPicker = ({
         >
           <MenuSearch value={search} onChange={setSearch} />
           <div className="rb-menu-list">
-            {isClearable && isNonEmptyString(selectedLabel) && (
+            {isClearable && search.trim() === '' && (
               <button
                 type="button"
-                className="rb-menu-item"
+                className="rb-menu-item rb-fdd-blank"
+                role="option"
+                aria-selected={!isNonEmptyString(selectedLabel)}
+                aria-label={t`Blank`}
+                title={t`Blank`}
                 onClick={() => {
                   onSelect(null);
                   setIsOpen(false);
                 }}
               >
-                <Icon name="x" size={16} />
-                <span className="rb-menu-label">{t`Clear`}</span>
+                <span className="rb-menu-label">{BLANK_DISPLAY}</span>
+                {!isNonEmptyString(selectedLabel) && (
+                  <Icon name="check" size={16} />
+                )}
               </button>
             )}
             {leadingOptions

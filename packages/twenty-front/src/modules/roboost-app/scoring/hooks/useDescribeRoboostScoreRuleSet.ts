@@ -3,6 +3,7 @@ import { ROBOOST_FILTER_OPERATOR_LABELS } from '@/roboost-app/filters/constants/
 import { useLingui } from '@lingui/react/macro';
 import {
   isDefined,
+  ROBOOST_FILTER_BLANK_VALUE,
   type RoboostScoreCondition,
   type RoboostScoreRuleSet,
 } from 'twenty-shared/utils';
@@ -24,6 +25,9 @@ export const useDescribeRoboostScoreRuleSet = (
   ) => {
     if (field?.type === 'BOOLEAN') {
       return value === 'true' ? t`Yes` : t`No`;
+    }
+    if (value === ROBOOST_FILTER_BLANK_VALUE) {
+      return t`Blank`;
     }
 
     return (

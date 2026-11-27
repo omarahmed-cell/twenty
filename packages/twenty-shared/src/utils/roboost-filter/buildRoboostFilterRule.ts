@@ -10,6 +10,9 @@ import { isDefined } from '@/utils/validation/isDefined';
 
 export const ROBOOST_TEAM_FILTER_VALUE_PREFIX = 'team:';
 
+// A filter value meaning "no value", listed next to the options: "is any of [Blank, New]" = empty or New
+export const ROBOOST_FILTER_BLANK_VALUE = '__blank__';
+
 export type RoboostFilterRuleValue = string | string[] | null;
 
 const DAY_IN_MS = 24 * 3600 * 1000;
@@ -131,6 +134,24 @@ const knownCondition = (
   }
 
   return { [field.name]: { is: isKnown ? 'NOT_NULL' : 'NULL' } };
+};
+
+const splitBlank = (values: string[]) => ({
+  optionValues: values.filter((value) => value !== ROBOOST_FILTER_BLANK_VALUE),
+  hasBlank: values.includes(ROBOOST_FILTER_BLANK_VALUE),
+});
+
+const withBlank = (
+  field: RoboostFilterField,
+  hasBlank: boolean,
+  match: RecordGqlOperationFilter | undefined,
+): RecordGqlOperationFilter | undefined => {
+  if (!hasBlank) {
+    return match;
+  }
+  const blank = knownCondition(field, false);
+
+  return isDefined(match) ? anyOf([blank, match]) : blank;
 };
 
 // The API takes one operator per field filter, so a range becomes an "and" of single bounds
@@ -411,15 +432,52 @@ export const buildRoboostFilterRule = ({
       if (values.length === 0) {
         return undefined;
       }
-      const match = { [field.name]: { in: values } };
+      const { optionValues, hasBlank } = splitBlank(values);
+      const match = { [field.name]: { in: optionValues } };
 
-      return operator === 'isNoneOf'
-        ? { or: [{ not: match }, { [field.name]: { is: 'NULL' } }] }
-        : match;
+      if (operator === 'isNoneOf') {
+        const notMatch =
+          optionValues.length === 0
+            ? undefined
+            : { or: [{ not: match }, { [field.name]: { is: 'NULL' } }] };
+
+        return hasBlank
+          ? allOf([
+              knownCondition(field, true),
+              ...(notMatch ? [notMatch] : []),
+            ])
+          : notMatch;
+      }
+
+      return withBlank(
+        field,
+        hasBlank,
+        optionValues.length === 0 ? undefined : match,
+      );
     }
     case 'multiSelect': {
       if (values.length === 0) {
         return undefined;
+      }
+      const { optionValues, hasBlank } = splitBlank(values);
+
+      if (hasBlank) {
+        const rest =
+          optionValues.length === 0
+            ? undefined
+            : buildRoboostFilterRule({
+                field,
+                operator,
+                value: optionValues,
+                now,
+                selectOptionValues,
+              });
+
+        return operator === 'isNoneOf'
+          ? allOf([knownCondition(field, true), ...(rest ? [rest] : [])])
+          : operator === 'isAnyOf'
+            ? withBlank(field, true, rest)
+            : allOf([knownCondition(field, false), ...(rest ? [rest] : [])]);
       }
       const containsAll = allOf(
         values.map((item) => ({ [field.name]: { containsAny: [item] } })),
@@ -470,10 +528,11 @@ export const buildRoboostFilterRule = ({
         return undefined;
       }
       const key = `${field.name}Id`;
+      const { optionValues, hasBlank } = splitBlank(values);
       // "team:<id>" picks a team; the server matches whoever is in it when the query runs
       const ids = [
         ...new Set(
-          values.map((value) =>
+          optionValues.map((value) =>
             value.startsWith(ROBOOST_TEAM_FILTER_VALUE_PREFIX)
               ? value.slice(ROBOOST_TEAM_FILTER_VALUE_PREFIX.length)
               : value,
@@ -481,11 +540,30 @@ export const buildRoboostFilterRule = ({
         ),
       ];
 
-      return operator === 'isNoneOf'
-        ? {
-            or: [{ not: { [key]: { in: ids } } }, { [key]: { is: 'NULL' } }],
-          }
-        : { [key]: { in: ids } };
+      if (operator === 'isNoneOf') {
+        const notMatch =
+          ids.length === 0
+            ? undefined
+            : {
+                or: [
+                  { not: { [key]: { in: ids } } },
+                  { [key]: { is: 'NULL' } },
+                ],
+              };
+
+        return hasBlank
+          ? allOf([
+              knownCondition(field, true),
+              ...(notMatch ? [notMatch] : []),
+            ])
+          : notMatch;
+      }
+
+      return withBlank(
+        field,
+        hasBlank,
+        ids.length === 0 ? undefined : { [key]: { in: ids } },
+      );
     }
     default:
       return undefined;

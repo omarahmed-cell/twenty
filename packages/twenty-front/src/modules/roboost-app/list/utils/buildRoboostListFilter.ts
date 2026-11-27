@@ -152,8 +152,13 @@ export const buildRoboostListFilter = ({
   for (const [fieldName, values] of Object.entries(
     filters.selectValuesByFieldName,
   )) {
-    if (values.length > 0 && fieldsByName.has(fieldName)) {
-      conditions.push({ [fieldName]: { in: values } });
+    const field = fieldsByName.get(fieldName);
+    const selectFilter = isDefined(field)
+      ? buildRoboostFilterRule({ field, operator: 'isAnyOf', value: values })
+      : undefined;
+
+    if (isDefined(selectFilter)) {
+      conditions.push(selectFilter);
     }
   }
 

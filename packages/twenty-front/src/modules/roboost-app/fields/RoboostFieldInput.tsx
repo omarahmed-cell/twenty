@@ -384,6 +384,7 @@ export const RoboostFieldInput = ({
       return (
         <RoboostRecordPicker
           autoOpen={autoOpen}
+          onCancel={onCancel}
           objectNameSingular={targetObjectNameSingular}
           selectedLabel={
             isDefined(relatedRecord)
