@@ -186,7 +186,10 @@ const RoboostListCellEditor = ({
       }
     };
 
-    document.addEventListener('pointerdown', closeWhenUntouched, true);
+    // An inline dropdown closes itself on any press outside its list, the field included
+    if (!isInlineDropdown) {
+      document.addEventListener('pointerdown', closeWhenUntouched, true);
+    }
     document.addEventListener('keydown', cancelOnEscape);
 
     return () => {

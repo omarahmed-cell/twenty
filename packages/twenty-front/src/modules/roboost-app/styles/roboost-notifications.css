@@ -1,10 +1,10 @@
 /* Notifications: bell badge, slide-in panel, rows, hover preview, settings */
 .rb-notif-badge {
-  background: var(--accent);
+  background: var(--accent-fill);
   border: 2px solid var(--frame-bg, var(--surface));
   border-radius: 999px;
   box-sizing: border-box;
-  color: #fff;
+  color: var(--text-on-accent);
   font: 600 10px/14px var(--font-sans);
   min-width: 18px;
   padding: 0 4px;

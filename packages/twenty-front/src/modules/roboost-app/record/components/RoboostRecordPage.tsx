@@ -36,6 +36,7 @@ import { RoboostAttachmentsContainer } from '@/roboost-app/record/components/Rob
 import { RoboostRecordActionsMenu } from '@/roboost-app/record/components/RoboostRecordActionsMenu';
 import { RoboostRecordPager } from '@/roboost-app/record/components/RoboostRecordPager';
 import { RoboostRecentRecordEffect } from '@/roboost-app/search/components/RoboostRecentRecordEffect';
+import { usePropertyLogicRules } from '@/properties/hooks/usePropertyLogicRules';
 import { RoboostEmailContextRecordContext } from '@/roboost-app/fields/contexts/RoboostEmailContextRecordContext';
 import { RoboostHeaderPropertyLine } from '@/roboost-app/record/components/RoboostHeaderPropertyLine';
 import { RoboostPropertyGroupContainer } from '@/roboost-app/record/components/RoboostPropertyGroupContainer';
@@ -63,7 +64,11 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppPath, CoreObjectNameSingular } from 'twenty-shared/types';
-import { getAppPath, isDefined } from 'twenty-shared/utils';
+import {
+  getAppPath,
+  getPropertyLogicConditionFieldNames,
+  isDefined,
+} from 'twenty-shared/utils';
 import { RelationType } from '~/generated-metadata/graphql';
 
 const OWNER_FIELD_NAMES = ['accountOwner', 'owner', 'assignee', 'sdrOwner'];
@@ -130,6 +135,8 @@ const RoboostRecordPageContent = ({
     isReady: isLayoutReady,
   } = useRoboostRecordLayoutConfig(objectMetadataItem, objectMetadataItems);
 
+  const { rules: propertyLogicRules } =
+    usePropertyLogicRules(objectMetadataItem);
   const activeFields = objectMetadataItem.fields.filter(
     (field) => field.isActive,
   );
@@ -148,7 +155,12 @@ const RoboostRecordPageContent = ({
       field,
     ]),
   );
+  // Conditional logic dependents show under their trigger even when no card lists them
   const logicFields = [
+    ...propertyLogicRules.flatMap((rule) => [
+      ...rule.properties.map(({ fieldName }) => fieldName),
+      ...getPropertyLogicConditionFieldNames(rule),
+    ]),
     ...recordLayout.left.flatMap((card) =>
       getRoboostCardLogicFieldNames(card.logic),
     ),

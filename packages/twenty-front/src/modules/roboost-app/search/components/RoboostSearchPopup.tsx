@@ -10,7 +10,7 @@ import { cx } from '@/roboost-ui/utils/cx';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AppPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -72,13 +72,17 @@ export const RoboostSearchPopup = ({
   const [results, setResults] = useState<RoboostSearchResult[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(
+    () => anchor?.getBoundingClientRect() ?? null,
+  );
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useLayoutEffect(() => {
     const measure = () =>
       setAnchorRect(anchor?.getBoundingClientRect() ?? null);
 
     measure();
+    inputRef.current?.focus();
     window.addEventListener('resize', measure);
 
     return () => window.removeEventListener('resize', measure);
@@ -215,8 +219,7 @@ export const RoboostSearchPopup = ({
               <Icon name="search" size={16} />
               <input
                 className="rb-input"
-                // oxlint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus
+                ref={inputRef}
                 value={query}
                 placeholder={t`Search Roboost CRM`}
                 aria-label={t`Search Roboost CRM`}

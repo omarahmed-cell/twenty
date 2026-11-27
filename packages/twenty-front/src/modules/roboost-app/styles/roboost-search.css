@@ -8,9 +8,12 @@
 /* Placed over the top bar box with the box's own rect, so its input row is where the box was */
 .rb-searchbox {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 17px 17px var(--radius-lg) var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  /* The outline is a shadow, so the input row starts exactly at the box's top-left */
+  box-shadow:
+    0 0 0 1px var(--border),
+    var(--shadow-md);
   box-sizing: border-box;
   color: var(--text);
   overflow: hidden;
@@ -18,8 +21,8 @@
   z-index: 80;
 }
 .rb-sb-top {
-  border-bottom: 1px solid var(--border-subtle);
-  height: 32px;
+  box-shadow: inset 0 -1px 0 var(--border-subtle);
+  height: 34px;
 }
 .rb-sb-top .rb-input-wrap {
   height: 100%;

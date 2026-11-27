@@ -18,7 +18,7 @@ export const ROBOOST_TOKENS = {
     borderSubtle: '#edeff3',
     surfaceActive: '#e8ebf0',
     textDisabled: '#9aa2b1',
-    textMuted: '#6b7483',
+    textMuted: '#5f6878',
     textSecondary: '#596273',
     text: '#1a2230',
   },
