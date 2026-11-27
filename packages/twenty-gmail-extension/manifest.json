@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Roboost CRM for Gmail",
   "description": "Log and track Gmail emails in Roboost CRM, and see the CRM record of everyone in an email.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "permissions": ["storage"],
   "host_permissions": ["https://mail.google.com/*", "https://*.roboost.app/*"],
   "background": {
@@ -19,11 +19,24 @@
   "options_page": "src/options.html",
   "action": {
     "default_title": "Roboost CRM",
-    "default_popup": "src/options.html"
+    "default_popup": "src/options.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "icons": {
     "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/roboost-mark.svg"],
+      "matches": ["https://mail.google.com/*"]
+    }
+  ]
 }

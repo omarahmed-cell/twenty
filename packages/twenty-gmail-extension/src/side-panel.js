@@ -118,10 +118,15 @@ window.RoboostSidePanel = (() => {
     if (panel) return;
 
     body = U.el('div', { class: 'rcrm-panel-body' });
-    panel = U.el('div', { class: 'rcrm-panel' }, [U.el('div', { class: 'rcrm-panel-header', text: 'Roboost CRM' }), body]);
+    const mark = () => U.el('img', { class: 'rcrm-mark', src: chrome.runtime.getURL('icons/roboost-mark.svg'), alt: '' });
+
+    panel = U.el('div', { class: 'rcrm-panel' }, [
+      U.el('div', { class: 'rcrm-panel-header' }, [mark(), U.el('span', { text: 'Roboost CRM' })]),
+      body,
+    ]);
     panel.hidden = true;
 
-    const toggle = U.el('button', { type: 'button', class: 'rcrm-panel-toggle', text: 'CRM', title: 'Roboost CRM' });
+    const toggle = U.el('button', { type: 'button', class: 'rcrm-panel-toggle', title: 'Roboost CRM', 'aria-label': 'Roboost CRM' }, [mark()]);
 
     toggle.addEventListener('click', () => {
       panel.hidden = !panel.hidden;
