@@ -1155,3 +1155,35 @@ td .rb-cell-editor.is-in-cell .rb-select-trigger:focus-visible {
   min-width: 0;
   padding: 0;
 }
+
+/* Websites open a new tab (↗); emails open the composer */
+.rb-ldomain {
+  align-items: center;
+  display: inline-flex;
+  gap: 3px;
+  max-width: 100%;
+  min-width: 0;
+}
+.rb-ldomain-icon {
+  flex: none;
+  opacity: 0.75;
+}
+.rb-email-link {
+  background: none;
+  border: none;
+  color: var(--accent-text);
+  cursor: pointer;
+  font: inherit;
+  max-width: 100%;
+  padding: 0;
+  text-align: left;
+}
+.rb-email-link:hover,
+.rb-ldomain:hover {
+  text-decoration: underline;
+}
+[data-theme='light'] .rb-email-link,
+[data-theme='light'] .rb-ldomain {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

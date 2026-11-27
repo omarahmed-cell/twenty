@@ -21,6 +21,18 @@ export type RoboostAssociation =
       targetObjectMetadataItem: EnrichedObjectMetadataItem;
     }
   | {
+      id: string;
+      kind: 'junction';
+      field: FieldMetadataItem;
+      title: string;
+      targetObjectMetadataItem: EnrichedObjectMetadataItem;
+      junctionObjectMetadataItem: EnrichedObjectMetadataItem;
+      // Junction column pointing back at the record whose page shows the card
+      sourceJoinColumnName: string;
+      targetFieldName: string;
+      targetJoinColumnName: string;
+    }
+  | {
       id: 'attachments';
       kind: 'attachments';
       title: string;
@@ -38,6 +50,19 @@ const EXCLUDED_TARGET_OBJECTS = new Set<string>([
   CoreObjectNameSingular.WorkflowRun,
   CoreObjectNameSingular.WorkflowVersion,
 ]);
+
+// Hidden junctions shown as a card of the records on their far side: a deal's contacts
+const ROBOOST_JUNCTION_ASSOCIATIONS: {
+  sourceObjectNameSingular: string;
+  junctionObjectNameSingular: string;
+  targetFieldName: string;
+}[] = [
+  {
+    sourceObjectNameSingular: 'opportunity',
+    junctionObjectNameSingular: 'opportunityContact',
+    targetFieldName: 'person',
+  },
+];
 
 export const getRoboostAssociations = (
   objectMetadataItem: EnrichedObjectMetadataItem,
@@ -58,6 +83,43 @@ export const getRoboostAssociations = (
       continue;
     }
     const target = findObject(relation.targetObjectMetadata.nameSingular);
+
+    const junction = ROBOOST_JUNCTION_ASSOCIATIONS.find(
+      (candidate) =>
+        candidate.sourceObjectNameSingular ===
+          objectMetadataItem.nameSingular &&
+        candidate.junctionObjectNameSingular === target?.nameSingular,
+    );
+
+    if (isDefined(junction) && isDefined(target)) {
+      const targetField = target.fields.find(
+        (junctionField) =>
+          junctionField.name === junction.targetFieldName &&
+          junctionField.isActive,
+      );
+      const farTarget = findObject(
+        targetField?.relation?.targetObjectMetadata.nameSingular,
+      );
+
+      if (
+        relation.type === RelationType.ONE_TO_MANY &&
+        isDefined(targetField) &&
+        isDefined(farTarget)
+      ) {
+        associations.push({
+          id: field.name,
+          kind: 'junction',
+          field,
+          title: field.label,
+          targetObjectMetadataItem: farTarget,
+          junctionObjectMetadataItem: target,
+          sourceJoinColumnName: `${relation.targetFieldMetadata.name}Id`,
+          targetFieldName: targetField.name,
+          targetJoinColumnName: `${targetField.name}Id`,
+        });
+      }
+      continue;
+    }
 
     if (
       !isDefined(target) ||

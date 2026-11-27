@@ -36,6 +36,8 @@ import { RoboostAttachmentsContainer } from '@/roboost-app/record/components/Rob
 import { RoboostRecordActionsMenu } from '@/roboost-app/record/components/RoboostRecordActionsMenu';
 import { RoboostRecordPager } from '@/roboost-app/record/components/RoboostRecordPager';
 import { RoboostRecentRecordEffect } from '@/roboost-app/search/components/RoboostRecentRecordEffect';
+import { RoboostEmailContextRecordContext } from '@/roboost-app/fields/contexts/RoboostEmailContextRecordContext';
+import { RoboostHeaderPropertyLine } from '@/roboost-app/record/components/RoboostHeaderPropertyLine';
 import { RoboostPropertyGroupContainer } from '@/roboost-app/record/components/RoboostPropertyGroupContainer';
 import {
   type RoboostRecordPanelSide,
@@ -133,6 +135,9 @@ const RoboostRecordPageContent = ({
   );
   const findActiveField = (name: string) =>
     activeFields.find((field) => field.name === name);
+  const headerPropertyFields = recordLayout.header.fieldNames
+    .map(findActiveField)
+    .filter(isDefined);
   const cards = recordLayout.left.map((card) => ({
     ...card,
     fields: card.fieldNames.map(findActiveField).filter(isDefined),
@@ -178,6 +183,7 @@ const RoboostRecordPageContent = ({
   );
   const loadedFields: FieldMetadataItem[] = [
     ...headerFields,
+    ...headerPropertyFields,
     ...(isDefined(ownerField) ? [ownerField] : []),
     ...manyToOneFields,
     ...cards.flatMap((card) => card.fields),
@@ -340,6 +346,8 @@ const RoboostRecordPageContent = ({
   );
   const rightHandlers = dragHandlers('right', rightIds);
 
+  const emailContextRecord = { objectNameSingular, recordId };
+
   const left = (
     <>
       <section className="rb-rc rb-tb" aria-label={t`Record summary`}>
@@ -384,6 +392,20 @@ const RoboostRecordPageContent = ({
             </div>
           </div>
         </div>
+        {headerPropertyFields.length > 0 && (
+          <div className="rb-tb-props">
+            {headerPropertyFields.map((field) => (
+              <RoboostHeaderPropertyLine
+                key={field.id}
+                field={field}
+                record={loadedRecord}
+                objectMetadataItem={objectMetadataItem}
+                objectMetadataItems={objectMetadataItems}
+                onSaved={() => refetch()}
+              />
+            ))}
+          </div>
+        )}
         <RoboostRecordQuickActions
           targetRecord={{
             id: recordId,
@@ -535,64 +557,66 @@ const RoboostRecordPageContent = ({
   );
 
   const page = (
-    <div className="rb-recpage">
-      <RoboostMergedRecordNotice />
-      <RoboostRecentRecordEffect
-        objectNameSingular={objectNameSingular}
-        recordId={recordId}
-        label={recordName}
-      />
-      <RecordLayout
-        isBare
-        leftCollapsed={roboostRecordLeftPanelCollapsed}
-        rightCollapsed={isRightCollapsed}
-        onLeftToggle={setRoboostRecordLeftPanelCollapsed}
-        onRightToggle={(collapsed) => {
-          setIsRightOpenedOnNarrow(!collapsed);
-          setRoboostRecordRightPanelCollapsed(collapsed);
-        }}
-        left={left}
-        middle={
-          <ItemErrorBoundary itemKind="record page activity column">
-            <RoboostActivityColumn
-              items={feedItems}
-              loading={feedLoading}
-              mainTab={mainTab}
-              onMainTabChange={setMainTab}
-              subTab={subTab}
-              onSubTabChange={(tab) => {
-                setMainTab('activities');
-                setSubTab(tab);
-              }}
-              customizePath={recordViewSettingsPath}
-              overviewSections={recordLayout.overview}
-              isPinned={(item) =>
-                isDefined(item.objectNameSingular) &&
-                isDefined(item.recordId) &&
-                isPinned(item.objectNameSingular, item.recordId)
-              }
-              onTogglePin={(item) => {
-                if (
+    <RoboostEmailContextRecordContext.Provider value={emailContextRecord}>
+      <div className="rb-recpage">
+        <RoboostMergedRecordNotice />
+        <RoboostRecentRecordEffect
+          objectNameSingular={objectNameSingular}
+          recordId={recordId}
+          label={recordName}
+        />
+        <RecordLayout
+          isBare
+          leftCollapsed={roboostRecordLeftPanelCollapsed}
+          rightCollapsed={isRightCollapsed}
+          onLeftToggle={setRoboostRecordLeftPanelCollapsed}
+          onRightToggle={(collapsed) => {
+            setIsRightOpenedOnNarrow(!collapsed);
+            setRoboostRecordRightPanelCollapsed(collapsed);
+          }}
+          left={left}
+          middle={
+            <ItemErrorBoundary itemKind="record page activity column">
+              <RoboostActivityColumn
+                items={feedItems}
+                loading={feedLoading}
+                mainTab={mainTab}
+                onMainTabChange={setMainTab}
+                subTab={subTab}
+                onSubTabChange={(tab) => {
+                  setMainTab('activities');
+                  setSubTab(tab);
+                }}
+                customizePath={recordViewSettingsPath}
+                overviewSections={recordLayout.overview}
+                isPinned={(item) =>
                   isDefined(item.objectNameSingular) &&
-                  isDefined(item.recordId)
-                ) {
-                  togglePin(item.objectNameSingular, item.recordId);
+                  isDefined(item.recordId) &&
+                  isPinned(item.objectNameSingular, item.recordId)
                 }
-              }}
-              onChanged={() => {
-                refetchFeed();
-                refetch();
-              }}
-              members={members.map((member) => ({
-                id: member.id,
-                name: getRoboostPersonName(member.name),
-              }))}
-            />
-          </ItemErrorBoundary>
-        }
-        right={right}
-      />
-    </div>
+                onTogglePin={(item) => {
+                  if (
+                    isDefined(item.objectNameSingular) &&
+                    isDefined(item.recordId)
+                  ) {
+                    togglePin(item.objectNameSingular, item.recordId);
+                  }
+                }}
+                onChanged={() => {
+                  refetchFeed();
+                  refetch();
+                }}
+                members={members.map((member) => ({
+                  id: member.id,
+                  name: getRoboostPersonName(member.name),
+                }))}
+              />
+            </ItemErrorBoundary>
+          }
+          right={right}
+        />
+      </div>
+    </RoboostEmailContextRecordContext.Provider>
   );
 
   // The record page also loads trashed records, so a merged one is redirected here too

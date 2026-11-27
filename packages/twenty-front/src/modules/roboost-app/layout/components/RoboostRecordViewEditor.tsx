@@ -42,6 +42,7 @@ type RoboostLayoutPanel = 'left' | 'right' | 'overview';
 type RoboostLayoutModalState =
   | { kind: 'add-card'; index: number }
   | { kind: 'edit-card'; cardId: string }
+  | { kind: 'edit-header' }
   | { kind: 'edit-association'; cardId: string }
   | { kind: 'rename-section'; sectionId: string }
   | { kind: 'logic'; panel: 'left' | 'right'; cardId: string; anchor: DOMRect }
@@ -284,6 +285,21 @@ export const RoboostRecordViewEditor = ({
             }}
           />
         );
+      case 'edit-header':
+        return (
+          <RoboostCardFieldsModal
+            heading={t`Header card properties`}
+            submitLabel={t`Apply`}
+            fields={pickableFields}
+            initialFieldNames={layout.header.fieldNames}
+            fieldsHint={t`Shown under the record name as "Label: value" lines. Drag to order.`}
+            onClose={close}
+            onApply={({ fieldNames }) => {
+              commit({ ...layout, header: { fieldNames } });
+              close();
+            }}
+          />
+        );
       case 'edit-card': {
         const card = layout.left.find(({ id }) => id === modal.cardId);
 
@@ -424,10 +440,7 @@ export const RoboostRecordViewEditor = ({
 
   const left = (
     <div className="rb-rve-col rb-rve-left" aria-label={t`Left panel cards`}>
-      <div
-        className="rb-rve-identity"
-        title={t`Always shown; not editable here`}
-      >
+      <div className="rb-rve-identity">
         <div className="rb-rve-identity-top">
           <Avatar name={objectMetadataItem.labelSingular} size="lg" />
           <div className="rb-rve-identity-name">
@@ -435,6 +448,37 @@ export const RoboostRecordViewEditor = ({
           </div>
           <span className="rb-sp" />
           <Icon name="pin" size={14} />
+        </div>
+        <div className="rb-rve-header-props">
+          <div className="rb-rve-header-props-head">
+            <span className="rb-rve-header-props-title">
+              {t`Header card properties`}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              icon="pencil"
+              onClick={() => setModal({ kind: 'edit-header' })}
+            >
+              {t`Edit`}
+            </Button>
+          </div>
+          {layout.header.fieldNames.length > 0 ? (
+            <ul className="rb-rve-header-props-list">
+              {layout.header.fieldNames.map((fieldName) => (
+                <li key={fieldName}>
+                  {objectMetadataItem.fields.find(
+                    (field) => field.name === fieldName,
+                  )?.label ?? fieldName}
+                  {': …'}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="rb-rve-header-props-empty">
+              {t`No header properties`}
+            </div>
+          )}
         </div>
         <div className="rb-rve-identity-actions">
           {Array.from({ length: QUICK_ACTION_PLACEHOLDER_COUNT }).map(

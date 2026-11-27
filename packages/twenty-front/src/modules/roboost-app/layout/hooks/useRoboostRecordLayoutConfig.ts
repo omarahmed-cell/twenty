@@ -18,6 +18,7 @@ import {
 } from '@/roboost-app/layout/utils/roboostRecordViews';
 import {
   buildRoboostDefaultRecordLayout,
+  getRoboostDefaultHeaderFieldNames,
   resolveRoboostRecordLayout,
   type RoboostOverviewSectionTitles,
 } from '@/roboost-app/layout/utils/resolveRoboostRecordLayout';
@@ -72,6 +73,7 @@ export const useRoboostRecordLayoutConfig = (
     sections,
     associations,
     overviewTitles,
+    headerFieldNames: getRoboostDefaultHeaderFieldNames(objectMetadataItem),
   });
 
   const loadLayouts = useCallback(

@@ -625,3 +625,63 @@
 .rb-prop:hover .rb-prop-caret {
   opacity: 1;
 }
+
+/* Dependent properties: a bordered box under the property whose conditional logic rule is met */
+.rb-dep-box {
+  border: 1px solid var(--card-border, var(--border));
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 8px;
+}
+.rb-dep-box .rb-prop {
+  margin: 0 -8px;
+}
+.rb-dep-title {
+  align-items: center;
+  color: var(--text);
+  display: flex;
+  font: 600 13px/18px var(--font-sans);
+  gap: 6px;
+}
+.rb-dep-info {
+  color: var(--text-muted);
+  display: inline-flex;
+}
+.rb-cfield-dep-box {
+  margin-top: 12px;
+}
+.rb-cfield-dep-box .rb-cfield {
+  margin-top: 6px;
+}
+.rb-reqpop .rb-dep-box {
+  margin-top: 12px;
+}
+
+/* Header card properties: "Label: value" lines under the record name */
+.rb-tb-props {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 10px 0 4px;
+}
+.rb-tb-prop {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 8px;
+}
+.rb-tb-prop-label {
+  color: var(--text-secondary);
+  flex: none;
+  font: 400 13px/18px var(--font-sans);
+}
+.rb-tb-prop-value {
+  color: var(--text);
+  flex: 1;
+  font: 600 13px/18px var(--font-sans);
+  min-width: 0;
+}

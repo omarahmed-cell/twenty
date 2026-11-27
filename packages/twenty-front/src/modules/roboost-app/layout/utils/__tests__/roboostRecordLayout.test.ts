@@ -3,6 +3,7 @@ import { type RoboostRecordLayoutConfig } from '@/roboost-app/layout/types/Roboo
 import { moveRoboostLayoutItem } from '@/roboost-app/layout/utils/moveRoboostLayoutItem';
 import {
   buildRoboostDefaultRecordLayout,
+  getRoboostDefaultHeaderFieldNames,
   resolveRoboostRecordLayout,
 } from '@/roboost-app/layout/utils/resolveRoboostRecordLayout';
 import {
@@ -94,6 +95,7 @@ describe('resolveRoboostRecordLayout', () => {
   it('keeps the saved cards, drops inactive properties and appends a new relation', () => {
     const stored: RoboostRecordLayoutConfig = {
       version: 1,
+      header: { fieldNames: ['leadStatus', 'oldField'] },
       left: [
         { id: 'card', title: 'Test card', fieldNames: ['oldField', 'name'] },
       ],
@@ -110,9 +112,44 @@ describe('resolveRoboostRecordLayout', () => {
       overviewTitles,
     });
 
+    expect(layout.header.fieldNames).toEqual(['leadStatus']);
     expect(layout.left[0].fieldNames).toEqual(['name']);
     expect(layout.right.map(({ id }) => id)).toEqual(['attachments', 'people']);
     expect(layout.overview).toHaveLength(3);
+  });
+
+  it('gives a layout saved before header lines the default lines', () => {
+    const { header: _header, ...storedWithoutHeader } = {
+      ...fallback,
+      header: { fieldNames: ['ignored'] },
+    };
+    const layout = resolveRoboostRecordLayout({
+      stored: storedWithoutHeader,
+      fallback: { ...fallback, header: { fieldNames: ['leadStatus'] } },
+      objectMetadataItem: company,
+      associations,
+      overviewTitles,
+    });
+
+    expect(layout.header.fieldNames).toEqual(['leadStatus']);
+  });
+
+  it('starts deals on amount, close date, pipeline and stage', () => {
+    const deal = {
+      nameSingular: 'opportunity',
+      fields: ['dealAmount', 'closeDate', 'pipeline', 'stage'].map((name) => ({
+        name,
+        isActive: true,
+      })),
+    } as unknown as EnrichedObjectMetadataItem;
+
+    expect(getRoboostDefaultHeaderFieldNames(deal)).toEqual([
+      'dealAmount',
+      'closeDate',
+      'pipeline',
+      'stage',
+    ]);
+    expect(getRoboostDefaultHeaderFieldNames(company)).toEqual([]);
   });
 
   it('does not bring back a removed association', () => {

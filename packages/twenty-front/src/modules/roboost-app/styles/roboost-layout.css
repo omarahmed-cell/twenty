@@ -449,3 +449,34 @@
   gap: 8px;
   padding: 12px 18px;
 }
+
+.rb-rve-header-props {
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+}
+.rb-rve-header-props-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.rb-rve-header-props-title {
+  color: var(--text);
+  font: 600 13px/18px var(--font-sans);
+}
+.rb-rve-header-props-list {
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  font: 400 13px/18px var(--font-sans);
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rb-rve-header-props-empty {
+  color: var(--text-muted);
+  font: 400 13px/18px var(--font-sans);
+}

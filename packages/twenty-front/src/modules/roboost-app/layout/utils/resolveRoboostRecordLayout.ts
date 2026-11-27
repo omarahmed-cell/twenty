@@ -10,6 +10,25 @@ import { getRoboostAssociationCardFields } from '@/roboost-app/record/components
 import { type RoboostAssociation } from '@/roboost-app/record/utils/getRoboostAssociations';
 import { isPlainObject } from 'twenty-shared/utils';
 
+// Deals open on their money and stage, like HubSpot; other objects start with no header lines
+const ROBOOST_DEFAULT_HEADER_FIELD_NAMES: Record<string, string[]> = {
+  opportunity: ['dealAmount', 'closeDate', 'pipeline', 'stage'],
+};
+
+export const getRoboostDefaultHeaderFieldNames = (
+  objectMetadataItem: Pick<
+    EnrichedObjectMetadataItem,
+    'nameSingular' | 'fields'
+  >,
+): string[] =>
+  (
+    ROBOOST_DEFAULT_HEADER_FIELD_NAMES[objectMetadataItem.nameSingular] ?? []
+  ).filter((fieldName) =>
+    objectMetadataItem.fields.some(
+      (field) => field.name === fieldName && field.isActive,
+    ),
+  );
+
 export const ROBOOST_OVERVIEW_SECTION_IDS: RoboostOverviewSectionId[] = [
   'openTasks',
   'pinnedActivities',
@@ -51,12 +70,15 @@ export const buildRoboostDefaultRecordLayout = ({
   sections,
   associations,
   overviewTitles,
+  headerFieldNames = [],
 }: {
   sections: { id: string; title: string; fields: { name: string }[] }[];
   associations: RoboostAssociation[];
   overviewTitles: RoboostOverviewSectionTitles;
+  headerFieldNames?: string[];
 }): RoboostRecordLayoutConfig => ({
   version: 1,
+  header: { fieldNames: headerFieldNames },
   left: sections.map((section) => ({
     id: section.id,
     title: section.title,
@@ -152,8 +174,20 @@ export const resolveRoboostRecordLayout = ({
     ),
   ];
 
+  // Layouts saved before header lines existed get the object's default lines
+  const header =
+    isPlainObject(stored.header) && Array.isArray(stored.header.fieldNames)
+      ? {
+          fieldNames: stored.header.fieldNames.filter(
+            (name): name is string =>
+              typeof name === 'string' && activeFieldNames.has(name),
+          ),
+        }
+      : fallback.header;
+
   return {
     version: 1,
+    header,
     left,
     right: [...listedRight, ...unlistedRight],
     removedRightIds,

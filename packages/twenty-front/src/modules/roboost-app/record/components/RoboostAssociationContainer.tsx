@@ -1,5 +1,7 @@
 import { ItemErrorBoundary } from '@/roboost-ui/components/ItemErrorBoundary';
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
+import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
+import { useDeleteOneRecord } from '@/object-record/hooks/useDeleteOneRecord';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
@@ -24,6 +26,7 @@ import { Input } from '@/roboost-ui/components/Input';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
 import { cx } from '@/roboost-ui/utils/cx';
 import { useLingui } from '@lingui/react/macro';
+import { isString } from '@sniptt/guards';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { AppPath, type RecordGqlFields } from 'twenty-shared/types';
@@ -34,7 +37,10 @@ const ASSOCIATION_LIMIT = 100;
 type RoboostAssociationSort = 'newest' | 'oldest' | 'name';
 
 type RoboostAssociationContainerProps = {
-  association: Extract<RoboostAssociation, { kind: 'many' | 'one' }>;
+  association: Extract<
+    RoboostAssociation,
+    { kind: 'many' | 'one' | 'junction' }
+  >;
   recordId: string;
   sourceObjectNameSingular: string;
   relatedRecordId: string | null;
@@ -101,21 +107,57 @@ export const RoboostAssociationContainer = ({
     ...(isDefined(avatarField) ? { avatarUrl: true } : {}),
   };
 
-  const isMany = association.kind === 'many';
-  const filter = isMany
-    ? { [association.joinColumnName]: { eq: recordId } }
-    : { id: { eq: relatedRecordId ?? '' } };
+  const isJunction = association.kind === 'junction';
+  const isMany = association.kind === 'many' || isJunction;
+  const queriedObjectNameSingular = isJunction
+    ? association.junctionObjectMetadataItem.nameSingular
+    : target.nameSingular;
+  const filter =
+    association.kind === 'junction'
+      ? { [association.sourceJoinColumnName]: { eq: recordId } }
+      : association.kind === 'many'
+        ? { [association.joinColumnName]: { eq: recordId } }
+        : { id: { eq: relatedRecordId ?? '' } };
 
   const { records, totalCount, refetch } = useFindManyRecords<ObjectRecord>({
-    objectNameSingular: target.nameSingular,
+    objectNameSingular: queriedObjectNameSingular,
     filter,
     skip: !isMany && !isDefined(relatedRecordId),
-    recordGqlFields,
+    recordGqlFields:
+      association.kind === 'junction'
+        ? {
+            id: true,
+            createdAt: true,
+            [association.targetFieldName]: recordGqlFields,
+          }
+        : recordGqlFields,
     orderBy: [{ createdAt: 'DescNullsLast' }],
     limit: ASSOCIATION_LIMIT,
   });
+  const { createOneRecord: createJunctionRecord } = useCreateOneRecord({
+    objectNameSingular: queriedObjectNameSingular,
+  });
+  const { deleteOneRecord: deleteJunctionRecord } = useDeleteOneRecord({
+    objectNameSingular: queriedObjectNameSingular,
+  });
 
-  const shownRecords = !isMany && !isDefined(relatedRecordId) ? [] : records;
+  // A junction row stands for the record on its far side; removing it unlinks that record
+  const associatedRecords =
+    association.kind === 'junction'
+      ? records.flatMap((row) => {
+          const linked = row[association.targetFieldName] as
+            | ObjectRecord
+            | null
+            | undefined;
+
+          return isDefined(linked)
+            ? [{ ...linked, junctionRecordId: row.id }]
+            : [];
+        })
+      : records;
+
+  const shownRecords =
+    !isMany && !isDefined(relatedRecordId) ? [] : associatedRecords;
   const count = isMany
     ? (totalCount ?? shownRecords.length)
     : shownRecords.length;
@@ -150,7 +192,15 @@ export const RoboostAssociationContainer = ({
 
   const linkExisting = async (pickedId: string) => {
     setIsPicking(false);
-    if (association.kind === 'many') {
+    if (association.kind === 'junction') {
+      if (!shownRecords.some((record) => record.id === pickedId)) {
+        await createJunctionRecord({
+          [association.sourceJoinColumnName]: recordId,
+          [association.targetJoinColumnName]: pickedId,
+        });
+      }
+      refetch();
+    } else if (association.kind === 'many') {
       await updateOneRecord({
         objectNameSingular: target.nameSingular,
         idToUpdate: pickedId,
@@ -167,11 +217,16 @@ export const RoboostAssociationContainer = ({
     }
   };
 
-  const removeAssociation = async (associatedId: string) => {
-    if (association.kind === 'many') {
+  const removeAssociation = async (associated: ObjectRecord) => {
+    if (association.kind === 'junction') {
+      if (isString(associated.junctionRecordId)) {
+        await deleteJunctionRecord(associated.junctionRecordId);
+      }
+      refetch();
+    } else if (association.kind === 'many') {
       await updateOneRecord({
         objectNameSingular: target.nameSingular,
-        idToUpdate: associatedId,
+        idToUpdate: associated.id,
         updateOneRecordInput: { [association.joinColumnName]: null },
       });
       refetch();
@@ -186,7 +241,9 @@ export const RoboostAssociationContainer = ({
   };
 
   const openCreate = () => {
-    if (association.kind === 'many') {
+    if (association.kind === 'junction') {
+      setIsPicking(true);
+    } else if (association.kind === 'many') {
       openCreatePanel({
         objectNameSingular: target.nameSingular,
         presetValues: { [association.joinColumnName]: recordId },
@@ -204,13 +261,18 @@ export const RoboostAssociationContainer = ({
       isNoPermission: !canEditAssociations,
       onSelect: () => setIsPicking(true),
     },
-    {
-      id: 'create',
-      label: t`Create a new ${targetLabel}`,
-      icon: 'plus',
-      isNoPermission: !canCreateTarget,
-      onSelect: openCreate,
-    },
+    // A new record can't be linked through the junction from the create panel, so only existing ones are offered
+    ...(isJunction
+      ? []
+      : [
+          {
+            id: 'create',
+            label: t`Create a new ${targetLabel}`,
+            icon: 'plus' as const,
+            isNoPermission: !canCreateTarget,
+            onSelect: openCreate,
+          },
+        ]),
   ];
 
   const tagOptions = [...(tagField?.options ?? [])].sort(
@@ -280,7 +342,9 @@ export const RoboostAssociationContainer = ({
             variant="secondary"
             size="sm"
             icon="plus"
-            isNoPermission={!canCreateTarget}
+            isNoPermission={
+              isJunction ? !canEditAssociations : !canCreateTarget
+            }
             onClick={openCreate}
           >
             {t`Add ${targetLabel}`}
@@ -366,7 +430,7 @@ export const RoboostAssociationContainer = ({
                   objectMetadataItem={target}
                   tagField={tagField}
                   lineFields={lineFields}
-                  onRemove={() => removeAssociation(record.id)}
+                  onRemove={() => removeAssociation(record)}
                   canRemove={canEditAssociations}
                 />
               </ItemErrorBoundary>
@@ -375,7 +439,7 @@ export const RoboostAssociationContainer = ({
               <div className="rb-rc-nomatch">{t`Nothing matches.`}</div>
             )}
           </div>
-          {isMany && (
+          {association.kind === 'many' && (
             <div className="rb-rc-foot">
               <Link className="rb-view-all" to={viewAllPath}>
                 {t`View all associated ${association.title}`}

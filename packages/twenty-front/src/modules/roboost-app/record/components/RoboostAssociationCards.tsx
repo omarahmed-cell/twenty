@@ -2,6 +2,8 @@ import { getRoboostNoPermissionAttribute } from '@/roboost-ui/utils/getRoboostNo
 import { type EnrichedObjectMetadataItem } from '@/object-metadata/types/EnrichedObjectMetadataItem';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
 import { getRoboostRecordLabel } from '@/roboost-app/fields/getRoboostRecordLabel';
+import { RoboostDomainLink } from '@/roboost-app/fields/RoboostDomainLink';
+import { RoboostEmailLink } from '@/roboost-app/fields/RoboostEmailLink';
 import { formatRoboostFieldValue } from '@/roboost-app/utils/formatRoboostFieldValue';
 import { getRoboostAvatarTone } from '@/roboost-app/utils/getRoboostAvatarTone';
 import { getRoboostOptionTone } from '@/roboost-app/utils/getRoboostOptionTone';
@@ -64,6 +66,27 @@ export const getRoboostAssociationCardFields = (
   return { tagField, lineFields };
 };
 
+// Emails open the composer and websites a new tab, wherever a card line shows them
+const getRoboostLineLink = (
+  field: FieldMetadataItem,
+  value: unknown,
+): { kind: 'email' | 'domain'; value: string } | undefined => {
+  if (field.type === FieldMetadataType.EMAILS) {
+    const email = (value as { primaryEmail?: string } | null)?.primaryEmail;
+
+    return isNonEmptyString(email)
+      ? { kind: 'email', value: email }
+      : undefined;
+  }
+  if (field.type === FieldMetadataType.LINKS) {
+    const url = (value as { primaryLinkUrl?: string } | null)?.primaryLinkUrl;
+
+    return isNonEmptyString(url) ? { kind: 'domain', value: url } : undefined;
+  }
+
+  return undefined;
+};
+
 type RoboostAssociationCardProps = {
   record: RoboostAssociationRecord;
   objectMetadataItem: EnrichedObjectMetadataItem;
@@ -93,6 +116,7 @@ export const RoboostAssociationCard = ({
     .map((field) => ({
       label: field.label,
       value: formatRoboostFieldValue(field, record[field.name], record),
+      link: getRoboostLineLink(field, record[field.name]),
     }))
     .filter((line) => isNonEmptyString(line.value) && line.value !== '—');
 
@@ -146,7 +170,19 @@ export const RoboostAssociationCard = ({
           {lines.map((line) => (
             <div key={line.label} className="rb-mini-line" title={line.value}>
               <span className="rb-mini-key">{line.label} · </span>
-              {line.value}
+              {line.link?.kind === 'email' ? (
+                <RoboostEmailLink
+                  email={line.link.value}
+                  record={{
+                    objectNameSingular: objectMetadataItem.nameSingular,
+                    recordId: record.id,
+                  }}
+                />
+              ) : line.link?.kind === 'domain' ? (
+                <RoboostDomainLink url={line.link.value} label={line.value} />
+              ) : (
+                line.value
+              )}
             </div>
           ))}
         </div>

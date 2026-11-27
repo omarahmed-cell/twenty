@@ -50,6 +50,9 @@ type RoboostListEditableCellProps = {
   objectMetadataItems: EnrichedObjectMetadataItem[];
   onSaved?: () => void;
   hideEditButton?: boolean;
+  // Set when the same field shows twice on a page, so each place opens its own editor
+  editorKey?: string;
+  selectAsTag?: boolean;
 };
 
 export const getRoboostCellEditorKey = (recordId: string, fieldId: string) =>
@@ -290,7 +293,7 @@ const RoboostListCellEditor = ({
 
 type RoboostListCellEditorProps = Omit<
   RoboostListEditableCellProps,
-  'hideEditButton'
+  'hideEditButton' | 'editorKey' | 'selectAsTag'
 > & {
   editor: ReturnType<typeof useRoboostCellEditor>;
 };
@@ -304,10 +307,12 @@ export const RoboostListEditableCell = memo(
     objectMetadataItems,
     onSaved,
     hideEditButton = false,
+    editorKey,
+    selectAsTag = false,
   }: RoboostListEditableCellProps) => {
     const { t } = useLingui();
     const editor = useRoboostCellEditor(
-      getRoboostCellEditorKey(record.id, field.id),
+      editorKey ?? getRoboostCellEditorKey(record.id, field.id),
     );
     const { isAdmin } = useRoboostAccess();
     const isEditable = getRoboostFieldEditKind(field, { isAdmin }) !== null;
@@ -360,6 +365,8 @@ export const RoboostListEditableCell = memo(
           field={field}
           record={record}
           objectMetadataItems={objectMetadataItems}
+          selectAsTag={selectAsTag}
+          objectNameSingular={objectMetadataItem.nameSingular}
         />
         {isEditable && !hideEditButton && (
           <button
