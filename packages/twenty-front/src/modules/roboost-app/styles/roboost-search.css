@@ -5,25 +5,31 @@
   position: fixed;
   z-index: 70;
 }
+/* Placed over the top bar box with the box's own rect, so its input row is where the box was */
 .rb-searchbox {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 17px 17px var(--radius-lg) var(--radius-lg);
   box-shadow: var(--shadow-md);
+  box-sizing: border-box;
   color: var(--text);
-  max-width: 52vw;
-  min-width: 360px;
   overflow: hidden;
   position: fixed;
-  width: 460px;
   z-index: 80;
 }
 .rb-sb-top {
   border-bottom: 1px solid var(--border-subtle);
-  padding: 12px 14px;
+  height: 32px;
 }
 .rb-sb-top .rb-input-wrap {
+  height: 100%;
   width: 100%;
+}
+.rb-sb-top .rb-input {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  height: 100%;
 }
 .rb-sb-top .rb-input:focus {
   box-shadow: none;

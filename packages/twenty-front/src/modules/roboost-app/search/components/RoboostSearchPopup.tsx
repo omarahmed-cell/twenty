@@ -1,4 +1,3 @@
-import { FloatingPanel } from '@/roboost-ui/components/FloatingPanel';
 import { SEARCH_QUERY } from '@/command-menu/graphql/queries/search';
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
@@ -11,7 +10,7 @@ import { cx } from '@/roboost-ui/utils/cx';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useLingui } from '@lingui/react/macro';
 import { isNonEmptyString } from '@sniptt/guards';
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AppPath } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
@@ -58,7 +57,7 @@ type RoboostSearchPopupProps = {
   onClose: () => void;
 };
 
-// Opens under the top bar search box, never on top of it
+// Opens exactly over the top bar search box, its own input where the box was, so one click is enough to type
 export const RoboostSearchPopup = ({
   anchor,
   onClose,
@@ -73,6 +72,17 @@ export const RoboostSearchPopup = ({
   const [results, setResults] = useState<RoboostSearchResult[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+
+  useLayoutEffect(() => {
+    const measure = () =>
+      setAnchorRect(anchor?.getBoundingClientRect() ?? null);
+
+    measure();
+    window.addEventListener('resize', measure);
+
+    return () => window.removeEventListener('resize', measure);
+  }, [anchor]);
 
   const { objectPermissionsByObjectMetadataId } = useObjectPermissions();
   const searchableObjects = filterReadableActiveObjectMetadataItems(
@@ -170,126 +180,138 @@ export const RoboostSearchPopup = ({
         </div>,
         document.body,
       )}
-      <FloatingPanel
-        anchor={anchor}
-        side="bottom"
-        align="start"
-        maxHeight={null}
-        minWidth={460}
-        className="rb-popover-panel rb-searchbox"
-        role="dialog"
-        aria-label={t`Search Roboost CRM`}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') {
-            event.preventDefault();
-            onClose();
-          } else if (event.key === 'ArrowDown') {
-            event.preventDefault();
-            setActiveIndex(Math.min(activeIndex + 1, shownItems.length - 1));
-          } else if (event.key === 'ArrowUp') {
-            event.preventDefault();
-            setActiveIndex(Math.max(activeIndex - 1, 0));
-          } else if (event.key === 'Enter') {
-            event.preventDefault();
-            openResult(shownItems[activeIndex]);
+      {createPortal(
+        <div
+          className="rb-ui rb-popover-panel rb-searchbox"
+          style={
+            isDefined(anchorRect)
+              ? {
+                  left: anchorRect.left,
+                  top: anchorRect.top,
+                  width: anchorRect.width,
+                }
+              : { visibility: 'hidden' }
           }
-        }}
-      >
-        <div className="rb-sb-top">
-          <span className="rb-input-wrap has-icon rb-input-search">
-            <Icon name="search" size={16} />
-            <input
-              className="rb-input"
-              // oxlint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              value={query}
-              placeholder={t`Search Roboost CRM`}
-              aria-label={t`Search Roboost CRM`}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                updateSearch(event.target.value, selectedObjects);
-              }}
-            />
-          </span>
-        </div>
-        <div className="rb-sb-chips">
-          {chipObjects.map((item) => {
-            const isOn = selectedObjects.includes(item.nameSingular);
-
-            return (
-              <button
-                key={item.nameSingular}
-                type="button"
-                className={cx('rb-sbchip', isOn && 'is-on')}
-                aria-pressed={isOn}
-                onClick={() => {
-                  const nextObjects = isOn
-                    ? selectedObjects.filter(
-                        (name) => name !== item.nameSingular,
-                      )
-                    : [...selectedObjects, item.nameSingular];
-
-                  setSelectedObjects(nextObjects);
-                  updateSearch(query, nextObjects);
+          role="dialog"
+          aria-label={t`Search Roboost CRM`}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              onClose();
+            } else if (event.key === 'ArrowDown') {
+              event.preventDefault();
+              setActiveIndex(Math.min(activeIndex + 1, shownItems.length - 1));
+            } else if (event.key === 'ArrowUp') {
+              event.preventDefault();
+              setActiveIndex(Math.max(activeIndex - 1, 0));
+            } else if (event.key === 'Enter') {
+              event.preventDefault();
+              openResult(shownItems[activeIndex]);
+            }
+          }}
+        >
+          <div className="rb-sb-top">
+            <span className="rb-input-wrap has-icon rb-input-search">
+              <Icon name="search" size={16} />
+              <input
+                className="rb-input"
+                // oxlint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                value={query}
+                placeholder={t`Search Roboost CRM`}
+                aria-label={t`Search Roboost CRM`}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  updateSearch(event.target.value, selectedObjects);
                 }}
-              >
-                <Icon
-                  name={ICON_BY_OBJECT[item.nameSingular] ?? 'search'}
-                  size={13}
-                />
-                {item.labelPlural}
-              </button>
-            );
-          })}
-        </div>
-        {results === null && <div className="rb-sb-reclabel">{t`Recent`}</div>}
-        <div className="rb-sb-recent">
-          {shownItems.map((item, index) => (
-            <button
-              key={`${item.objectNameSingular}-${item.recordId}`}
-              type="button"
-              className={cx('rb-sritem', index === activeIndex && 'is-active')}
-              onMouseEnter={() => setActiveIndex(index)}
-              onClick={() => openResult(item)}
-            >
-              <span className="rb-sr-ic">
-                <Icon
-                  name={ICON_BY_OBJECT[item.objectNameSingular] ?? 'search'}
-                  size={15}
-                />
-              </span>
-              <span className="rb-sr-main">
-                <span className="rb-sr-name">{item.label}</span>
-                <span className="rb-sr-sub">{item.objectLabel}</span>
-              </span>
-            </button>
-          ))}
-          {shownItems.length === 0 && (
-            <div className="rb-sb-empty">
-              {isSearching
-                ? t`Searching…`
-                : results === null
-                  ? t`Records you open will show up here.`
-                  : t`No records match "${query}".`}
-            </div>
+              />
+            </span>
+          </div>
+          <div className="rb-sb-chips">
+            {chipObjects.map((item) => {
+              const isOn = selectedObjects.includes(item.nameSingular);
+
+              return (
+                <button
+                  key={item.nameSingular}
+                  type="button"
+                  className={cx('rb-sbchip', isOn && 'is-on')}
+                  aria-pressed={isOn}
+                  onClick={() => {
+                    const nextObjects = isOn
+                      ? selectedObjects.filter(
+                          (name) => name !== item.nameSingular,
+                        )
+                      : [...selectedObjects, item.nameSingular];
+
+                    setSelectedObjects(nextObjects);
+                    updateSearch(query, nextObjects);
+                  }}
+                >
+                  <Icon
+                    name={ICON_BY_OBJECT[item.nameSingular] ?? 'search'}
+                    size={13}
+                  />
+                  {item.labelPlural}
+                </button>
+              );
+            })}
+          </div>
+          {results === null && (
+            <div className="rb-sb-reclabel">{t`Recent`}</div>
           )}
-        </div>
-        <div className="rb-sb-foot">
-          <span className="rb-kbd">
-            <b>↑</b>
-            <b>↓</b>
-            {t`Select`}
-          </span>
-          <span className="rb-kbd">
-            <b>↵</b>
-            {t`Open`}
-          </span>
-          <span className="rb-kbd">
-            <b>esc</b>
-            {t`Close`}
-          </span>
-        </div>
-      </FloatingPanel>
+          <div className="rb-sb-recent">
+            {shownItems.map((item, index) => (
+              <button
+                key={`${item.objectNameSingular}-${item.recordId}`}
+                type="button"
+                className={cx(
+                  'rb-sritem',
+                  index === activeIndex && 'is-active',
+                )}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => openResult(item)}
+              >
+                <span className="rb-sr-ic">
+                  <Icon
+                    name={ICON_BY_OBJECT[item.objectNameSingular] ?? 'search'}
+                    size={15}
+                  />
+                </span>
+                <span className="rb-sr-main">
+                  <span className="rb-sr-name">{item.label}</span>
+                  <span className="rb-sr-sub">{item.objectLabel}</span>
+                </span>
+              </button>
+            ))}
+            {shownItems.length === 0 && (
+              <div className="rb-sb-empty">
+                {isSearching
+                  ? t`Searching…`
+                  : results === null
+                    ? t`Records you open will show up here.`
+                    : t`No records match "${query}".`}
+              </div>
+            )}
+          </div>
+          <div className="rb-sb-foot">
+            <span className="rb-kbd">
+              <b>↑</b>
+              <b>↓</b>
+              {t`Select`}
+            </span>
+            <span className="rb-kbd">
+              <b>↵</b>
+              {t`Open`}
+            </span>
+            <span className="rb-kbd">
+              <b>esc</b>
+              {t`Close`}
+            </span>
+          </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 };
