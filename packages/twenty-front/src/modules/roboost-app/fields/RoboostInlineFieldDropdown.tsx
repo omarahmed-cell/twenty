@@ -27,6 +27,8 @@ export const RoboostInlineFieldDropdown = ({
 }: RoboostInlineFieldDropdownProps) => {
   const valueRef = useRef<HTMLDivElement>(null);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  // The list closes on the pick itself, not when the save comes back
+  const [isPicked, setIsPicked] = useState(false);
   const anchorRef = useMemo(() => ({ current: anchor }), [anchor]);
   const labels = options
     .filter((option) => selectedValues.includes(option.value))
@@ -46,7 +48,7 @@ export const RoboostInlineFieldDropdown = ({
         {labels.length > 0 ? labels.join(', ') : EMPTY_DISPLAY}
       </span>
       <Icon name="caret" size={14} className="rb-fdd-caret" />
-      {anchor !== null && (
+      {anchor !== null && !isPicked && (
         <FieldDropdown
           anchorRef={anchorRef}
           options={options}
@@ -55,8 +57,14 @@ export const RoboostInlineFieldDropdown = ({
           minWidth={anchor.tagName === 'TD' ? TABLE_MIN_WIDTH : 0}
           isClearable
           aria-label={ariaLabel}
-          onChoose={(value) => onChange(value)}
-          onSave={(values) => onChange(values)}
+          onChoose={(value) => {
+            setIsPicked(true);
+            onChange(value);
+          }}
+          onSave={(values) => {
+            setIsPicked(true);
+            onChange(values);
+          }}
           onDismiss={() => onCancel?.()}
         />
       )}
