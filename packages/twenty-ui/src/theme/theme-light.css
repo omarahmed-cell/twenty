@@ -161,7 +161,7 @@
     --t-box-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.06);
     --t-font-color-primary: #1a2230;
     --t-font-color-secondary: #596273;
-    --t-font-color-tertiary: #6b7483;
+    --t-font-color-tertiary: #5f6878;
     --t-font-color-light: #9aa2b1;
     --t-font-color-extra-light: #b4bcc8;
     --t-font-color-inverted: #ffffff;
@@ -271,7 +271,7 @@
     --t-gray-scale-gray6: #c3cad4;
     --t-gray-scale-gray7: #b4bcc8;
     --t-gray-scale-gray8: #9aa2b1;
-    --t-gray-scale-gray9: #6b7483;
+    --t-gray-scale-gray9: #5f6878;
     --t-gray-scale-gray10: #636c7c;
     --t-gray-scale-gray11: #596273;
     --t-gray-scale-gray12: #1a2230;
@@ -299,7 +299,7 @@
     --t-color-bronze: color(display-p3 0.611 0.507 0.455);
     --t-color-gold: color(display-p3 0.579 0.517 0.41);
     --t-color-brown: color(display-p3 0.651 0.505 0.368);
-    --t-color-gray: #6b7483;
+    --t-color-gray: #5f6878;
     --t-color-yellow1: color(display-p3 0.992 0.992 0.978);
     --t-color-yellow2: color(display-p3 0.995 0.99 0.922);
     --t-color-yellow3: color(display-p3 0.997 0.982 0.749);
@@ -416,7 +416,7 @@
     --t-color-gray6: #c3cad4;
     --t-color-gray7: #b4bcc8;
     --t-color-gray8: #9aa2b1;
-    --t-color-gray9: #6b7483;
+    --t-color-gray9: #5f6878;
     --t-color-gray10: #636c7c;
     --t-color-gray11: #596273;
     --t-color-gray12: #1a2230;
@@ -1036,7 +1036,7 @@
     --t-rb-control-hover-border: #aab2bf;
     --t-rb-text: #1a2230;
     --t-rb-text-secondary: #596273;
-    --t-rb-text-muted: #6b7483;
+    --t-rb-text-muted: #5f6878;
     --t-rb-text-disabled: #9aa2b1;
     --t-rb-text-on-accent: #ffffff;
     --t-rb-accent: #ea0029;

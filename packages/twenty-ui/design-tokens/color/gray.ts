@@ -5,17 +5,18 @@ const { neutrals: darkNeutrals } = ROBOOST_DARK_TOKENS;
 
 export const GRAY_COLOR_TOKENS = {
   scale: {
+    // Dark: the page is gray1 and cards gray2, matching Roboost's #191919 page and #303030 cards
     gray1: token({
       light: ROBOOST_TOKENS.neutrals.surface,
-      dark: darkNeutrals.surface,
+      dark: darkNeutrals.canvas,
     }),
     gray2: token({
       light: ROBOOST_TOKENS.neutrals.surfaceSunken,
-      dark: darkNeutrals.surfaceSunken,
+      dark: darkNeutrals.surface,
     }),
     gray3: token({
       light: ROBOOST_TOKENS.neutrals.canvas,
-      dark: darkNeutrals.canvas,
+      dark: darkNeutrals.surfaceSunken,
     }),
     gray4: token({
       light: ROBOOST_TOKENS.neutrals.surfaceHover,
@@ -27,11 +28,11 @@ export const GRAY_COLOR_TOKENS = {
     }),
     gray6: token({
       light: ROBOOST_TOKENS.neutrals.borderStrong,
-      dark: '#33445e',
+      dark: '#5a5a5a',
     }),
     gray7: token({
       light: '#b4bcc8',
-      dark: '#425573',
+      dark: '#6a6a6a',
     }),
     gray8: token({
       light: ROBOOST_TOKENS.neutrals.textDisabled,
@@ -43,7 +44,7 @@ export const GRAY_COLOR_TOKENS = {
     }),
     gray10: token({
       light: '#636c7c',
-      dark: '#a3afc1',
+      dark: '#c2c2c2',
     }),
     gray11: token({
       light: ROBOOST_TOKENS.neutrals.textSecondary,

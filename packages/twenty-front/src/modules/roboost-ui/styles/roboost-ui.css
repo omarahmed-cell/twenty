@@ -2516,18 +2516,12 @@
   display: none;
 }
 
-/* ---------- Sira frame (bar and panel in the primary button blue) ---------- */
+/* ---------- Sira frame (deep blue from the design hand-off; names, icons and New stay white) ---------- */
 [data-theme='sira'] .rb-nav-item .rb-icon,
 [data-theme='sira'] .rb-nav-toggle,
 [data-theme='sira'] .rb-topbar-iconbtn {
   color: #ffffff;
   opacity: 1;
-}
-[data-theme='sira'] .rb-nav-item[aria-current='page'] {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
-}
-[data-theme='sira'] .rb-nav-item[aria-current='page']::before {
-  display: none;
 }
 [data-theme='sira'] .rb-topbar .rb-avatar {
   border-color: #ffffff;

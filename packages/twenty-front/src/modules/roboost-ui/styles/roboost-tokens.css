@@ -133,15 +133,14 @@
   --accent-soft-hover: #d8e6fe;
   --accent-border: #b6cdfb;
   --focus-ring: #1c67f9;
-  /* The frame is the primary button blue; states darken it so white text stays above 4.5:1 */
-  --frame: var(--accent);
-  --frame-border: rgba(255, 255, 255, 0.28);
+  --frame: #0c3097;
+  --frame-border: rgba(255, 255, 255, 0.12);
   --frame-text: #ffffff;
   --frame-text-strong: #ffffff;
   --frame-text-muted: #ffffff;
-  --frame-active: rgba(0, 18, 64, 0.32);
-  --frame-accent: #ffffff;
-  --frame-field: rgba(0, 18, 64, 0.18);
+  --frame-active: rgba(255, 255, 255, 0.14);
+  --frame-accent: #59bdf7;
+  --frame-field: rgba(255, 255, 255, 0.1);
   --check-fill: var(--accent);
 }
 
@@ -242,21 +241,22 @@
   --check-fill: var(--accent-fill);
 }
 
-/* Light mode is black and white: no coloured accent */
+/* Light mode is black and white with three levels: white frame, grey page, lighter grey containers */
 [data-theme='light'][data-scheme='light'] {
-  --canvas: #ffffff;
-  --surface: #ffffff;
-  --surface-sunken: #f7f7f7;
-  --surface-hover: #f2f2f2;
-  --surface-active: #e6e6e6;
-  --border: #e2e2e2;
+  --canvas: #e4e4e4;
+  --surface: #f7f7f7;
+  --surface-sunken: #efefef;
+  --surface-hover: #ededed;
+  --surface-active: #e0e0e0;
+  --border: #d6d6d6;
+  --t-background-canvas: var(--canvas);
   --border-strong: #a8a8a8;
   --border-subtle: #ededed;
   --control-hover-border: #8a8a8a;
-  --card-border: #d6d6d6;
+  --card-border: #cfcfcf;
   --text: #111111;
-  --text-secondary: #4d4d4d;
-  --text-muted: #636363;
+  --text-secondary: #4a4a4a;
+  --text-muted: #5c5c5c;
   --text-disabled: #9a9a9a;
   --tooltip-bg: #111111;
   --avatar-bg: #efefef;
@@ -328,4 +328,19 @@
   --t-rb-text-muted: var(--text-muted);
   --t-rb-text-disabled: var(--text-disabled);
   --t-background-canvas: var(--canvas);
+}
+
+/* Dark-mode scrollbars on every scroll area: a mid-grey thumb (3.3:1 on #303030, 4.5:1 on #191919) on no track,
+   lighter while the area is hovered. Hidden scrollbars stay hidden: only the colour is set. */
+[data-scheme='dark'] {
+  --scrollbar-thumb: #808080;
+  --scrollbar-thumb-hover: #a6a6a6;
+  --t-rb-tooltip-background: var(--tooltip-bg);
+}
+[data-scheme='dark'],
+[data-scheme='dark'] * {
+  scrollbar-color: var(--scrollbar-thumb) transparent !important;
+}
+[data-scheme='dark'] *:hover {
+  scrollbar-color: var(--scrollbar-thumb-hover) transparent !important;
 }
