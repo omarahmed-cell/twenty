@@ -31,6 +31,8 @@ const FORM_OBJECTS: { nameSingular: string; icon: RoboostIconName }[] = [
   { nameSingular: 'person', icon: 'contacts' },
   { nameSingular: 'opportunity', icon: 'deals' },
   { nameSingular: 'service', icon: 'services' },
+  { nameSingular: 'product', icon: 'archive' },
+  { nameSingular: 'lineItem', icon: 'list' },
   { nameSingular: 'task', icon: 'tasks' },
   { nameSingular: 'note', icon: 'note' },
 ];

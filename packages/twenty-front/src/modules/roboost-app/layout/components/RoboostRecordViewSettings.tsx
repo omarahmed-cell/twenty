@@ -28,6 +28,8 @@ export const ROBOOST_RECORD_VIEW_OBJECTS = [
   'person',
   'opportunity',
   'service',
+  'product',
+  'lineItem',
 ];
 
 const DEFAULT_VIEW_ID = 'default';

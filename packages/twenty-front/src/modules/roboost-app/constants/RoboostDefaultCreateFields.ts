@@ -16,4 +16,13 @@ export const ROBOOST_DEFAULT_CREATE_FIELDS: Record<string, string[]> = {
   call: ['title', 'direction', 'outcome'],
   communication: ['title'],
   service: ['name', 'company', 'opportunity', 'pointOfContact'],
+  lineItem: ['name', 'quantity', 'unitPrice', 'discountType', 'unitDiscount'],
+  product: [
+    'name',
+    'sku',
+    'productDescription',
+    'productType',
+    'billingFrequency',
+    'term',
+  ],
 };
