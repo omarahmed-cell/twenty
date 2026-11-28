@@ -159,7 +159,18 @@ export class CommonCreateManyQueryRunnerService extends CommonBaseQueryRunnerSer
       queryRunnerContext,
     });
 
-    const upsertedRecords = await this.fetchUpsertedRecords({
+    const getBypassRepository = () =>
+      isDefined(queryRunnerContext.transactionScope)
+        ? queryRunnerContext.transactionScope.getRepository(
+            flatObjectMetadata.nameSingular,
+            { shouldBypassPermissionChecks: true },
+          )
+        : this.workspaceOrmManager.getRepository(
+            flatObjectMetadata.nameSingular,
+            { shouldBypassPermissionChecks: true },
+          );
+
+    const readableRecords = await this.fetchUpsertedRecords({
       objectRecords,
       flatObjectMetadata,
       flatObjectMetadataMaps,
@@ -167,13 +178,24 @@ export class CommonCreateManyQueryRunnerService extends CommonBaseQueryRunnerSer
       repository:
         isGatedThroughRecordShares &&
         isDefined(queryRunnerContext.transactionScope)
-          ? queryRunnerContext.transactionScope.getRepository(
-              flatObjectMetadata.nameSingular,
-              { shouldBypassPermissionChecks: true },
-            )
+          ? getBypassRepository()
           : repository,
       selectedFieldsResult: args.selectedFieldsResult,
     });
+
+    // A creator whose record view rule leaves out what they just made (owned by someone else) still gets it
+    // back once, so the app can say who owns it instead of failing
+    const upsertedRecords =
+      readableRecords.length < objectRecords.generatedMaps.length
+        ? await this.fetchUpsertedRecords({
+            objectRecords,
+            flatObjectMetadata,
+            flatObjectMetadataMaps,
+            flatFieldMetadataMaps,
+            repository: getBypassRepository(),
+            selectedFieldsResult: args.selectedFieldsResult,
+          })
+        : readableRecords;
 
     await this.processNestedRelationsIfNeeded({
       args,

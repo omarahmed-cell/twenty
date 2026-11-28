@@ -124,7 +124,6 @@ import {
   type RoboostRecordAccessCondition,
 } from 'src/engine/twenty-orm/utils/build-roboost-record-access-condition.util';
 import { findRoboostAssociationViolation } from 'src/engine/twenty-orm/utils/find-roboost-association-violation.util';
-import { defaultRoboostRecordOwner } from 'src/engine/twenty-orm/utils/default-roboost-record-owner.util';
 import { serializeJsonbWriteValue } from 'src/engine/twenty-orm/sql/utils/serialize-jsonb-write-value.util';
 import {
   type WorkspaceRelationShape,
@@ -1064,16 +1063,6 @@ export class WorkspaceRepository<TEntity extends ObjectLiteral = ObjectRecord> {
 
       filesFieldFileIds = enriched.fileIds;
       recordsToInsert = enriched.entities as Partial<ObjectRecord>[];
-    }
-
-    const roboostSubject = this.resolveRoboostRecordAccessSubject();
-
-    if (isDefined(roboostSubject)) {
-      recordsToInsert = defaultRoboostRecordOwner({
-        records: recordsToInsert,
-        objectNameSingular: this.options.flatObjectMetadata.nameSingular,
-        workspaceMemberId: roboostSubject.workspaceMemberId,
-      });
     }
 
     const { columnNames, rows, parameters, insertedColumns, formattedRecords } =

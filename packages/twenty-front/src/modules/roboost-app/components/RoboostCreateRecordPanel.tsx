@@ -15,7 +15,13 @@ import { roboostCreatePanelState } from '@/roboost-app/states/roboostCreatePanel
 import { Button } from '@/roboost-ui/components/Button';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
+import { gql } from '@apollo/client';
+import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
+import { getRoboostPersonName } from '@/roboost-app/utils/getRoboostPersonName';
 import { useLingui } from '@lingui/react/macro';
+import { isNonEmptyString } from '@sniptt/guards';
+import { ROBOOST_OWNERSHIP_FIELDS } from 'twenty-shared/constants';
+import { useToast } from 'twenty-ui/components/feedback';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
@@ -42,6 +48,8 @@ const RoboostCreateRecordForm = ({
 }: RoboostCreateRecordFormProps) => {
   const { t } = useLingui();
   const navigateApp = useNavigateApp();
+  const apolloCoreClient = useApolloCoreClient();
+  const { enqueueToast } = useToast();
   const configuredFormFields = useRoboostFormFields(objectMetadataItem);
   const { rules: propertyLogicRules, fields: propertyLogicFields } =
     usePropertyLogicRules(objectMetadataItem);
@@ -115,6 +123,47 @@ const RoboostCreateRecordForm = ({
   );
   const objectLabel = objectMetadataItem.labelSingular;
 
+  const canViewRecord = async (recordId: string) => {
+    try {
+      const { data } = await apolloCoreClient.query<
+        Record<string, { totalCount?: number }>
+      >({
+        query: gql`
+          query RoboostCanViewCreatedRecord($id: UUID!) {
+            records: ${objectMetadataItem.namePlural}(filter: { id: { eq: $id } }) {
+              totalCount
+            }
+          }
+        `,
+        variables: { id: recordId },
+        fetchPolicy: 'network-only',
+      });
+
+      return (data?.records?.totalCount ?? 0) > 0;
+    } catch {
+      return false;
+    }
+  };
+
+  const getCreatedRecordOwnerName = (record: Record<string, unknown>) => {
+    const ownerFieldName =
+      ROBOOST_OWNERSHIP_FIELDS[objectMetadataItem.nameSingular]?.[0]?.fieldName;
+
+    if (!isDefined(ownerFieldName)) {
+      return undefined;
+    }
+    const picked = relatedRecords[ownerFieldName]?.label;
+
+    if (isNonEmptyString(picked)) {
+      return picked;
+    }
+    const owner = record[ownerFieldName] as {
+      name?: Parameters<typeof getRoboostPersonName>[0];
+    } | null;
+
+    return isDefined(owner) ? getRoboostPersonName(owner.name) : undefined;
+  };
+
   const create = async (addAnother: boolean) => {
     setIsSaving(true);
     setError(null);
@@ -139,7 +188,21 @@ const RoboostCreateRecordForm = ({
         });
       }
 
-      if (addAnother) {
+      // The owner is never forced, so a rep can create a record their view rule leaves out
+      const canOpen = await canViewRecord(record.id);
+
+      if (!canOpen) {
+        const ownerName = getCreatedRecordOwnerName(record);
+
+        enqueueToast({
+          status: 'info',
+          children: isNonEmptyString(ownerName)
+            ? t`${objectLabel} created. It's owned by ${ownerName}, so you can't open it.`
+            : t`${objectLabel} created. It's unassigned, so you can't open it.`,
+        });
+      }
+
+      if (addAnother || !canOpen) {
         const labelValue = values[formFields[0]?.field.name ?? ''];
 
         setLastCreated({
@@ -148,6 +211,9 @@ const RoboostCreateRecordForm = ({
         });
         setValues({});
         setRelatedRecords({});
+        if (!addAnother) {
+          onClose();
+        }
       } else {
         onClose();
         navigateApp(AppPath.RecordShowPage, {
