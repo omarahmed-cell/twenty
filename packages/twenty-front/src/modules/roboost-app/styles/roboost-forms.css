@@ -145,7 +145,7 @@
   gap: 16px;
 }
 .rb-forms-star {
-  color: var(--danger);
+  color: var(--danger-text);
 }
 .rb-forms-status {
   color: var(--success-text);
