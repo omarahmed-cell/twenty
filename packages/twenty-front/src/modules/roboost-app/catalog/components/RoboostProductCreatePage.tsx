@@ -80,6 +80,7 @@ export const RoboostProductCreatePage = ({
   const informationFields = formFields.filter(
     ({ field: candidate }) =>
       !PAGE_MANAGED_FIELD_NAMES.has(candidate.name) &&
+      candidate.name !== 'productDescription' &&
       !candidate.name.startsWith('price'),
   );
   const companyPrice = Number(prices[companyCode]);
@@ -94,13 +95,11 @@ export const RoboostProductCreatePage = ({
   const isValid =
     isNonEmptyString(values.name) &&
     (values.name as string).trim() !== '' &&
-    formFields.every(({ field: candidate, isRequired }) =>
-      !isRequired
-        ? true
-        : candidate.name === 'productDescription'
-          ? description.trim() !== ''
-          : PAGE_MANAGED_FIELD_NAMES.has(candidate.name) ||
-            isRoboostFieldValueFilled(values[candidate.name]),
+    formFields.every(
+      ({ field: candidate, isRequired }) =>
+        !isRequired ||
+        PAGE_MANAGED_FIELD_NAMES.has(candidate.name) ||
+        isRoboostFieldValueFilled(values[candidate.name]),
     ) &&
     Number.isFinite(companyPrice) &&
     prices[companyCode] !== undefined &&
@@ -255,24 +254,22 @@ export const RoboostProductCreatePage = ({
           <h2 className="rb-pcreate-heading">{t`Product information`}</h2>
           <div className="rb-pcreate-info">
             <div className="rb-pcreate-grid">
-              {informationFields.map(({ field: candidate, isRequired }) =>
-                candidate.name === 'productDescription' ? (
-                  <Field
-                    key={candidate.id}
-                    label={candidate.label}
-                    required={isRequired}
-                    className="rb-pcreate-wide"
-                  >
-                    <textarea
-                      className="rb-input rb-pcreate-textarea"
-                      value={description}
-                      onChange={(event) => setDescription(event.target.value)}
-                    />
-                  </Field>
-                ) : (
-                  <div key={candidate.id}>{renderInput(candidate.name)}</div>
-                ),
-              )}
+              {informationFields.map(({ field: candidate }) => (
+                <div key={candidate.id}>{renderInput(candidate.name)}</div>
+              ))}
+              {/* Rich text isn't offered by the form editor, so the description is always on the page */}
+              <Field
+                label={
+                  field('productDescription')?.label ?? t`Product description`
+                }
+                className="rb-pcreate-wide"
+              >
+                <textarea
+                  className="rb-input rb-pcreate-textarea"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                />
+              </Field>
             </div>
             <div className="rb-pcreate-image">
               {isDefined(image) ? (
