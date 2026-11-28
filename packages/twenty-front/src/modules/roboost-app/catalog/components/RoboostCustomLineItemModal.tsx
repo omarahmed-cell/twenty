@@ -1,13 +1,19 @@
 import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { isDefined } from 'twenty-shared/utils';
 import { useToast } from 'twenty-ui/components/feedback';
 
+import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
+import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
+import { isRoboostFieldValueFilled } from '@/roboost-app/fields/isRoboostFieldValueFilled';
+import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
+import { useRoboostFormFields } from '@/roboost-app/hooks/useRoboostFormFields';
+import { getRoboostFormsSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import { Button } from '@/roboost-ui/components/Button';
 import { Field } from '@/roboost-ui/components/Field';
-import { Input } from '@/roboost-ui/components/Input';
 import { Modal } from '@/roboost-ui/components/Modal';
-import { Select } from '@/roboost-ui/components/Select';
 
 type RoboostCustomLineItemModalProps = {
   dealId: string;
@@ -16,7 +22,7 @@ type RoboostCustomLineItemModalProps = {
   onCreated: () => void;
 };
 
-// A line that isn't in the product library
+// A line that isn't in the product library; its fields, order and required flags come from Layout > Forms
 export const RoboostCustomLineItemModal = ({
   dealId,
   dealCurrency,
@@ -25,36 +31,40 @@ export const RoboostCustomLineItemModal = ({
 }: RoboostCustomLineItemModalProps) => {
   const { t } = useLingui();
   const { enqueueToast } = useToast();
+  const { objectMetadataItems } = useObjectMetadataItems();
+  const lineItemObject = objectMetadataItems.find(
+    ({ nameSingular }) => nameSingular === 'lineItem',
+  );
+  const formFields = useRoboostFormFields(lineItemObject);
   const { createOneRecord } = useCreateOneRecord({
     objectNameSingular: 'lineItem',
   });
-  const [name, setName] = useState('');
-  const [quantity, setQuantity] = useState('1');
-  const [price, setPrice] = useState('');
-  const [discountType, setDiscountType] = useState('PERCENTAGE');
-  const [discount, setDiscount] = useState('0');
+  const [values, setValues] = useState<Record<string, unknown>>({
+    quantity: 1,
+    unitPrice: { amountMicros: null, currencyCode: dealCurrency },
+    discountType: 'PERCENTAGE',
+    unitDiscount: 0,
+  });
+  const [relatedRecords, setRelatedRecords] = useState<
+    Record<string, { id: string; label: string } | null>
+  >({});
   const [isSaving, setIsSaving] = useState(false);
-  const isValid =
-    name.trim() !== '' &&
-    Number.isFinite(Number(quantity)) &&
-    price !== '' &&
-    Number.isFinite(Number(price));
+  const isValid = formFields.every(
+    ({ field, isRequired }) =>
+      !isRequired || isRoboostFieldValueFilled(values[field.name]),
+  );
 
   const handleCreate = async () => {
     setIsSaving(true);
     try {
-      await createOneRecord({
-        dealId,
-        name: name.trim(),
-        quantity: Number(quantity),
-        unitPrice: {
-          amountMicros: Math.round(Number(price) * 1_000_000),
-          currencyCode: dealCurrency,
-        },
-        discountType,
-        unitDiscount: Number(discount) || 0,
-        source: 'DEAL',
-      });
+      const input: Record<string, unknown> = { dealId, source: 'DEAL' };
+
+      for (const { field } of formFields) {
+        if (isRoboostFieldValueFilled(values[field.name])) {
+          input[getRoboostFieldInputKey(field)] = values[field.name];
+        }
+      }
+      await createOneRecord(input);
       onCreated();
     } catch (error) {
       enqueueToast({
@@ -73,6 +83,13 @@ export const RoboostCustomLineItemModal = ({
       width={480}
       footer={
         <>
+          <Link
+            className="rb-link rb-li-form-edit"
+            to={getRoboostFormsSettingsPath('lineItem')}
+            onClick={onClose}
+          >
+            {t`Edit this form`}
+          </Link>
           <Button variant="secondary" onClick={onClose}>
             {t`Cancel`}
           </Button>
@@ -87,47 +104,31 @@ export const RoboostCustomLineItemModal = ({
       }
     >
       <div className="rb-cur-form">
-        <Field label={t`Name`} required>
-          <Input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </Field>
-        <div className="rb-li-form-row">
-          <Field label={t`Quantity`} required>
-            <Input
-              type="number"
-              value={quantity}
-              onChange={(event) => setQuantity(event.target.value)}
+        {formFields.map(({ field, isRequired }) => (
+          <Field key={field.id} label={field.label} required={isRequired}>
+            <RoboostFieldInput
+              field={field}
+              value={values[field.name]}
+              relatedRecord={
+                isDefined(relatedRecords[field.name])
+                  ? {
+                      id: relatedRecords[field.name]?.id,
+                      name: relatedRecords[field.name]?.label,
+                    }
+                  : null
+              }
+              onChange={(value, related) => {
+                setValues((current) => ({ ...current, [field.name]: value }));
+                if (related !== undefined) {
+                  setRelatedRecords((current) => ({
+                    ...current,
+                    [field.name]: related,
+                  }));
+                }
+              }}
             />
           </Field>
-          <Field label={t`Unit price (${dealCurrency})`} required>
-            <Input
-              type="number"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-            />
-          </Field>
-        </div>
-        <div className="rb-li-form-row">
-          <Field label={t`Discount type`}>
-            <Select
-              options={[
-                { value: 'PERCENTAGE', label: t`Percentage` },
-                { value: 'AMOUNT', label: t`Amount` },
-              ]}
-              value={discountType}
-              onChange={setDiscountType}
-            />
-          </Field>
-          <Field label={t`Discount`}>
-            <Input
-              type="number"
-              value={discount}
-              onChange={(event) => setDiscount(event.target.value)}
-            />
-          </Field>
-        </div>
+        ))}
       </div>
     </Modal>
   );

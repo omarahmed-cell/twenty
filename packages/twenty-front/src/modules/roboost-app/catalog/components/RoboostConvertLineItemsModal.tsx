@@ -8,6 +8,7 @@ import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
 import { type RoboostLineItem } from '@/roboost-app/catalog/components/RoboostLineItemsContainer';
+import { convertRoboostAmount } from '@/roboost-app/catalog/utils/getRoboostProductPrice';
 import { getRoboostPriceFieldName } from '@/roboost-app/catalog/utils/getRoboostPriceFieldName';
 import { useRoboostCurrencies } from '@/roboost-app/currencies/hooks/useRoboostCurrencies';
 import { Button } from '@/roboost-ui/components/Button';
@@ -33,7 +34,7 @@ export const RoboostConvertLineItemsModal = ({
 }: RoboostConvertLineItemsModalProps) => {
   const { t } = useLingui();
   const { enqueueToast } = useToast();
-  const { byCode } = useRoboostCurrencies();
+  const { byCode, companyCurrency } = useRoboostCurrencies();
   const { updateOneRecord } = useUpdateOneRecord();
   const [choice, setChoice] = useState<Choice>('productPrice');
   const [isSaving, setIsSaving] = useState(false);
@@ -47,13 +48,17 @@ export const RoboostConvertLineItemsModal = ({
     recordGqlFields: { id: true, [toPriceField]: true },
     skip: productIds.length === 0,
   });
-  const fromRate = byCode.get(fromCurrency)?.rate;
-  const toRate = byCode.get(toCurrency)?.rate;
+  const convert = (micros: number) => {
+    const converted = convertRoboostAmount({
+      amount: micros,
+      fromCode: fromCurrency,
+      toCode: toCurrency,
+      companyCode: companyCurrency?.code ?? 'USD',
+      byCode,
+    });
 
-  const convert = (micros: number) =>
-    isDefined(fromRate) && isDefined(toRate) && toRate > 0
-      ? Math.round((micros * fromRate) / toRate)
-      : micros;
+    return isDefined(converted) ? Math.round(converted) : micros;
+  };
 
   const apply = async () => {
     if (choice === 'keep') {
@@ -101,7 +106,10 @@ export const RoboostConvertLineItemsModal = ({
       label: t`Use each product's ${toCurrency} price (convert the rest at today's rate)`,
     },
     { value: 'convert', label: t`Convert every price at today's rate` },
-    { value: 'keep', label: t`Keep the numbers as they are` },
+    {
+      value: 'keep',
+      label: t`Keep them in ${fromCurrency} (the total converts them)`,
+    },
   ];
 
   return (

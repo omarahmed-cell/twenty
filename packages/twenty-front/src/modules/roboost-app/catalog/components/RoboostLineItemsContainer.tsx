@@ -17,12 +17,17 @@ import {
 } from '@/roboost-app/catalog/components/RoboostProductLibraryModal';
 import { computeRoboostLineItemTotal } from '@/roboost-app/catalog/utils/computeRoboostLineItemTotal';
 import { getRoboostPriceFieldName } from '@/roboost-app/catalog/utils/getRoboostPriceFieldName';
+import {
+  convertRoboostAmount,
+  getRoboostProductPrice,
+} from '@/roboost-app/catalog/utils/getRoboostProductPrice';
 import { useRoboostCurrencies } from '@/roboost-app/currencies/hooks/useRoboostCurrencies';
 import { RoboostRecordContainer } from '@/roboost-app/record/components/RoboostRecordContainer';
 import { useRoboostAccess } from '@/roboost-app/users-and-teams/hooks/useRoboostAccess';
 import { canRoboostWriteObject } from '@/roboost-app/users-and-teams/utils/canRoboostWriteObject';
 import { Icon } from '@/roboost-ui/components/Icon';
 import { Menu, type MenuEntry } from '@/roboost-ui/components/Menu';
+import { Select } from '@/roboost-ui/components/Select';
 
 export type RoboostLineItem = ObjectRecord & {
   name?: string | null;
@@ -34,7 +39,10 @@ export type RoboostLineItem = ObjectRecord & {
   unitDiscount?: number | null;
   discountType?: string | null;
   isPriceConverted?: boolean | null;
-  product?: { id: string; name?: string | null } | null;
+  totalInCompanyCurrency?: { amountMicros?: number | null } | null;
+  product?:
+    | ({ id: string; name?: string | null } & Record<string, unknown>)
+    | null;
 };
 
 type RoboostLineItemsContainerProps = {
@@ -49,7 +57,10 @@ type RoboostLineItemsContainerProps = {
   onDragEnd: () => void;
 };
 
-type EditingCell = { id: string; field: 'quantity' | 'price' | 'discount' };
+type EditingCell = {
+  id: string;
+  field: 'quantity' | 'price' | 'discount' | 'currency';
+};
 
 // What was sold on the deal; the total stays on this card and never overwrites the deal Amount
 export const RoboostLineItemsContainer = ({
@@ -67,13 +78,26 @@ export const RoboostLineItemsContainer = ({
   const { enqueueToast } = useToast();
   const roboostAccess = useRoboostAccess();
   const canEdit = canRoboostWriteObject(roboostAccess, 'opportunity', 'edit');
-  const { companyCurrency, byCode } = useRoboostCurrencies();
+  const { companyCurrency, byCode, activeCurrencies } = useRoboostCurrencies();
+  const companyCode = companyCurrency?.code ?? 'USD';
+  const priceFields = Object.fromEntries(
+    activeCurrencies.map(({ code }) => [getRoboostPriceFieldName(code), true]),
+  );
   const { record: deal } = useFindOneRecord<
-    ObjectRecord & { currency?: string | null; dealAmount?: number | null }
+    ObjectRecord & {
+      currency?: string | null;
+      dealAmount?: number | null;
+      exchangeRate?: number | null;
+    }
   >({
     objectNameSingular: 'opportunity',
     objectRecordId: dealId,
-    recordGqlFields: { id: true, currency: true, dealAmount: true },
+    recordGqlFields: {
+      id: true,
+      currency: true,
+      dealAmount: true,
+      exchangeRate: true,
+    },
   });
   const { records, refetch } = useFindManyRecords<RoboostLineItem>({
     objectNameSingular: 'lineItem',
@@ -86,7 +110,8 @@ export const RoboostLineItemsContainer = ({
       unitDiscount: true,
       discountType: true,
       isPriceConverted: true,
-      product: { id: true, name: true },
+      totalInCompanyCurrency: true,
+      product: { id: true, name: true, ...priceFields },
     },
     orderBy: [{ createdAt: 'AscNullsLast' }],
     limit: 200,
@@ -103,9 +128,42 @@ export const RoboostLineItemsContainer = ({
   const [draft, setDraft] = useState('');
   const [seenCurrency, setSeenCurrency] = useState<string | null>(null);
   const [convertFrom, setConvertFrom] = useState<string | null>(null);
-  const dealCurrency = deal?.currency ?? companyCurrency?.code ?? 'USD';
+  const dealCurrency = deal?.currency ?? companyCode;
+  const lineCurrency = (lineItem: RoboostLineItem) =>
+    lineItem.unitPrice?.currencyCode || dealCurrency;
+  // Lines in another currency go through the company currency: the server's company total (the deal's frozen
+  // close-date rates on a closed deal, else the latest), then the deal's own rate
+  const dealRate =
+    dealCurrency === companyCode
+      ? 1
+      : (deal?.exchangeRate ?? byCode.get(dealCurrency)?.rate);
+  const toDealCurrency = (lineItem: RoboostLineItem) => {
+    const lineTotal = computeRoboostLineItemTotal(lineItem) ?? 0;
+
+    if (lineCurrency(lineItem) === dealCurrency) {
+      return lineTotal;
+    }
+    const companyMicros = lineItem.totalInCompanyCurrency?.amountMicros;
+
+    if (isDefined(companyMicros) && isDefined(dealRate) && dealRate > 0) {
+      return companyMicros / 1_000_000 / dealRate;
+    }
+
+    return (
+      convertRoboostAmount({
+        amount: lineTotal,
+        fromCode: lineCurrency(lineItem),
+        toCode: dealCurrency,
+        companyCode,
+        byCode,
+      }) ?? 0
+    );
+  };
+  const hasConvertedLines = records.some(
+    (lineItem) => lineCurrency(lineItem) !== dealCurrency,
+  );
   const total = records.reduce(
-    (sum, lineItem) => sum + (computeRoboostLineItemTotal(lineItem) ?? 0),
+    (sum, lineItem) => sum + toDealCurrency(lineItem),
     0,
   );
   const dealAmount = deal?.dealAmount;
@@ -125,11 +183,12 @@ export const RoboostLineItemsContainer = ({
       return;
     }
     if (seenCurrency !== deal.currency) {
-      if (records.length > 0) {
+      if (records.some((lineItem) => lineCurrency(lineItem) === seenCurrency)) {
         setConvertFrom(seenCurrency);
       }
       setSeenCurrency(deal.currency);
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [deal?.currency, seenCurrency, records.length]);
 
   const showError = (error: unknown) =>
@@ -138,25 +197,17 @@ export const RoboostLineItemsContainer = ({
       children: error instanceof Error ? error.message : String(error),
     });
 
-  const addFromProduct = async (product: RoboostLibraryProduct) => {
+  const addFromProduct = async (
+    product: RoboostLibraryProduct,
+    currencyCode: string,
+  ) => {
     setModal(null);
-    const ownPrice = product[getRoboostPriceFieldName(dealCurrency)];
-    const companyCode = companyCurrency?.code ?? 'USD';
-    const companyPrice = product[getRoboostPriceFieldName(companyCode)];
-    const rate = byCode.get(dealCurrency)?.rate;
-    let price: number | null = null;
-    let isPriceConverted = false;
-
-    if (typeof ownPrice === 'number') {
-      price = ownPrice;
-    } else if (
-      typeof companyPrice === 'number' &&
-      isDefined(rate) &&
-      rate > 0
-    ) {
-      price = companyPrice / rate;
-      isPriceConverted = true;
-    }
+    const { price, isConverted: isPriceConverted } = getRoboostProductPrice({
+      product,
+      currencyCode,
+      companyCode,
+      byCode,
+    });
     try {
       await createOneRecord({
         dealId,
@@ -172,7 +223,7 @@ export const RoboostLineItemsContainer = ({
           : null,
         unitPrice: {
           amountMicros: isDefined(price) ? Math.round(price * 1_000_000) : null,
-          currencyCode: dealCurrency,
+          currencyCode,
         },
         discountType: 'PERCENTAGE',
         unitDiscount: 0,
@@ -182,7 +233,7 @@ export const RoboostLineItemsContainer = ({
       if (isPriceConverted) {
         enqueueToast({
           status: 'warning',
-          children: t`${product.name ?? ''} has no ${dealCurrency} price: its ${companyCode} price was converted at today's rate`,
+          children: t`${product.name ?? ''} has no ${currencyCode} price: its ${companyCode} price was converted at today's rate`,
         });
       }
       await refetch();
@@ -228,7 +279,7 @@ export const RoboostLineItemsContainer = ({
           ? {
               unitPrice: {
                 amountMicros: Math.round(value * 1_000_000),
-                currencyCode: dealCurrency,
+                currencyCode: lineCurrency(lineItem),
               },
               isPriceConverted: false,
             }
@@ -239,6 +290,72 @@ export const RoboostLineItemsContainer = ({
         objectNameSingular: 'lineItem',
         idToUpdate: lineItem.id,
         updateOneRecordInput: input,
+      });
+      await refetch();
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  // A product line takes the product's price in the new currency; any other price converts at today's rate
+  const changeCurrency = async (
+    lineItem: RoboostLineItem,
+    currencyCode: string,
+  ) => {
+    setEditing(null);
+    const fromCode = lineCurrency(lineItem);
+
+    if (currencyCode === fromCode) {
+      return;
+    }
+    const current = (lineItem.unitPrice?.amountMicros ?? 0) / 1_000_000;
+    const productPrice = isDefined(lineItem.product)
+      ? getRoboostProductPrice({
+          product: lineItem.product,
+          currencyCode,
+          companyCode,
+          byCode,
+        })
+      : null;
+    const converted = convertRoboostAmount({
+      amount: current,
+      fromCode,
+      toCode: currencyCode,
+      companyCode,
+      byCode,
+    });
+    const price = isDefined(productPrice?.price)
+      ? productPrice.price
+      : converted;
+    const discount = lineItem.unitDiscount ?? 0;
+
+    try {
+      await updateOneRecord({
+        objectNameSingular: 'lineItem',
+        idToUpdate: lineItem.id,
+        updateOneRecordInput: {
+          unitPrice: {
+            amountMicros: isDefined(price)
+              ? Math.round(price * 1_000_000)
+              : null,
+            currencyCode,
+          },
+          isPriceConverted: isDefined(productPrice?.price)
+            ? productPrice.isConverted
+            : true,
+          ...(lineItem.discountType === 'AMOUNT'
+            ? {
+                unitDiscount:
+                  convertRoboostAmount({
+                    amount: discount,
+                    fromCode,
+                    toCode: currencyCode,
+                    companyCode,
+                    byCode,
+                  }) ?? discount,
+              }
+            : {}),
+        },
       });
       await refetch();
     } catch (error) {
@@ -345,6 +462,7 @@ export const RoboostLineItemsContainer = ({
             const unitPrice =
               (lineItem.unitPrice?.amountMicros ?? 0) / 1_000_000;
             const discount = lineItem.unitDiscount ?? 0;
+            const currency = lineCurrency(lineItem);
 
             return (
               <div key={lineItem.id} className="rb-li-row">
@@ -362,7 +480,33 @@ export const RoboostLineItemsContainer = ({
                     {renderCell(
                       lineItem,
                       'price',
-                      formatRoboostCurrencyValue(unitPrice, dealCurrency),
+                      formatRoboostCurrencyValue(unitPrice, currency),
+                    )}
+                    {editing?.id === lineItem.id &&
+                    editing.field === 'currency' ? (
+                      <Select
+                        aria-label={t`Currency`}
+                        className="rb-li-currency-select"
+                        value={currency}
+                        autoOpen
+                        options={activeCurrencies.map(({ code }) => ({
+                          value: code,
+                          label: code,
+                        }))}
+                        onChange={(code) => changeCurrency(lineItem, code)}
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        className="rb-li-currency"
+                        disabled={!canEdit}
+                        aria-label={t`Line currency ${currency}`}
+                        onClick={() =>
+                          setEditing({ id: lineItem.id, field: 'currency' })
+                        }
+                      >
+                        {currency}
+                      </button>
                     )}
                     {lineItem.isPriceConverted === true && (
                       <span
@@ -379,14 +523,14 @@ export const RoboostLineItemsContainer = ({
                       lineItem,
                       'discount',
                       lineItem.discountType === 'AMOUNT'
-                        ? formatRoboostCurrencyValue(discount, dealCurrency)
+                        ? formatRoboostCurrencyValue(discount, currency)
                         : `${discount}%`,
                     )}
                   </span>
                 </div>
                 <div className="rb-li-side">
                   <strong>
-                    {formatRoboostCurrencyValue(lineTotal, dealCurrency)}
+                    {formatRoboostCurrencyValue(lineTotal, currency)}
                   </strong>
                   {canEdit && (
                     <button
@@ -406,6 +550,14 @@ export const RoboostLineItemsContainer = ({
           <div className="rb-li-foot">
             <span>{t`Total:`}</span>
             <strong>{formatRoboostCurrencyValue(total, dealCurrency)}</strong>
+            {hasConvertedLines && (
+              <span
+                className="rb-li-converted"
+                data-tooltip={t`Lines in another currency are converted with the deal's exchange rate`}
+              >
+                {t`converted`}
+              </span>
+            )}
           </div>
           {differs && (
             <div className="rb-li-hint">
@@ -436,7 +588,9 @@ export const RoboostLineItemsContainer = ({
         <RoboostConvertLineItemsModal
           fromCurrency={convertFrom}
           toCurrency={dealCurrency}
-          lineItems={records}
+          lineItems={records.filter(
+            (lineItem) => lineCurrency(lineItem) === convertFrom,
+          )}
           onClose={() => setConvertFrom(null)}
           onDone={async () => {
             setConvertFrom(null);

@@ -1,6 +1,7 @@
-// Total = quantity x unit price, less the discount (a percentage, or an amount off the line), in the line's currency:
-// the deal's currency when the line belongs to a deal. The company total uses the deal's exchange rate, else the
-// latest rate of the line's currency. $1 holds the line item ids or deal ids, as the scope says.
+// Total = quantity x unit price, less the discount (a percentage, or an amount off the line), in the line's own
+// currency (a line without one takes its deal's). The company total uses the deal's exchange rate when the line is in
+// the deal's currency, else the line currency's rate on the deal's close date for a frozen (closed) deal, or the latest
+// rate. $1 holds the line item ids or deal ids, as the scope says.
 export const buildLineItemTotalsQuery = (
   schemaName: string,
   scope: 'lineItems' | 'deals' | 'all',
@@ -19,8 +20,11 @@ export const buildLineItemTotalsQuery = (
     ),
     base AS (
       SELECT li.id,
-        coalesce(o."currency"::text, nullif(li."unitPriceCurrencyCode", ''), company.code) AS currency,
+        coalesce(nullif(li."unitPriceCurrencyCode", ''), o."currency"::text, company.code) AS currency,
+        o."currency"::text AS "dealCurrency",
         o."exchangeRate" AS "dealRate",
+        CASE WHEN o."exchangeRateMode"::text = 'FROZEN' AND o."closeDate" IS NOT NULL
+          THEN o."closeDate"::date ELSE current_date END AS "rateDate",
         company.code AS "companyCurrency",
         CASE WHEN li."unitPriceAmountMicros" IS NULL THEN NULL
           WHEN li."discountType"::text = 'AMOUNT'
@@ -35,9 +39,9 @@ export const buildLineItemTotalsQuery = (
     rated AS (
       SELECT base.*,
         CASE WHEN base.currency = base."companyCurrency" THEN 1
-          WHEN base."dealRate" IS NOT NULL THEN base."dealRate"
+          WHEN base.currency = base."dealCurrency" AND base."dealRate" IS NOT NULL THEN base."dealRate"
           ELSE (SELECT r.rate FROM ${schema}."roboostExchangeRate" r
-            WHERE r."currencyCode" = base.currency AND r."effectiveDate" <= current_date
+            WHERE r."currencyCode" = base.currency AND r."effectiveDate" <= base."rateDate"
             ORDER BY r."effectiveDate" DESC, (r.source = 'MANUAL') DESC, r."createdAt" DESC LIMIT 1)
         END AS rate
       FROM base

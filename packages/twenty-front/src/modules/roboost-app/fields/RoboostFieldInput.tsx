@@ -66,7 +66,17 @@ export const RoboostFieldInput = ({
   const { t } = useLingui();
   const { objectMetadataItems } = useObjectMetadataItems();
   const { isAdmin } = useRoboostAccess();
-  const { byCode } = useRoboostCurrencies();
+  const { byCode, activeCurrencies } = useRoboostCurrencies();
+  // Currencies from Settings > Currencies; an archived one stays listed only where it is already set
+  const currencyOptions = (current: string) => [
+    ...activeCurrencies.map(({ code, name }) => ({
+      value: code,
+      label: `${code} · ${name}`,
+    })),
+    ...(current !== '' && !activeCurrencies.some(({ code }) => code === current)
+      ? [{ value: current, label: current }]
+      : []),
+  ];
   const kind = getRoboostFieldEditKind(field, { isAdmin });
   const composite = value as CompositeValue;
 
@@ -311,17 +321,20 @@ export const RoboostFieldInput = ({
 
       return (
         <div className="rb-inline-fields">
-          <Input
+          <Select
+            aria-label={t`Currency`}
+            className="rb-input-narrow"
             value={
               isString(composite?.currencyCode) ? composite.currencyCode : ''
             }
-            placeholder="SAR"
-            aria-label={t`Currency`}
-            className="rb-input-narrow"
-            onChange={(event) =>
+            placeholder={t`Currency`}
+            options={currencyOptions(
+              isString(composite?.currencyCode) ? composite.currencyCode : '',
+            )}
+            onChange={(currencyCode) =>
               onChange({
                 amountMicros: composite?.amountMicros ?? null,
-                currencyCode: event.target.value.toUpperCase(),
+                currencyCode,
               })
             }
           />

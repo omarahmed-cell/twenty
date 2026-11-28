@@ -17,7 +17,10 @@ import { useCreateOneRecord } from '@/object-record/hooks/useCreateOneRecord';
 import { useUploadFilesFieldFile } from '@/object-record/record-field/ui/meta-types/hooks/useUploadFilesFieldFile';
 import { getRoboostPriceFieldName } from '@/roboost-app/catalog/utils/getRoboostPriceFieldName';
 import { useRoboostCurrencies } from '@/roboost-app/currencies/hooks/useRoboostCurrencies';
+import { getRoboostFieldInputKey } from '@/roboost-app/fields/getRoboostFieldInputKey';
+import { isRoboostFieldValueFilled } from '@/roboost-app/fields/isRoboostFieldValueFilled';
 import { RoboostFieldInput } from '@/roboost-app/fields/RoboostFieldInput';
+import { useRoboostFormFields } from '@/roboost-app/hooks/useRoboostFormFields';
 import { getRoboostFormsSettingsPath } from '@/roboost-app/layout/utils/getRoboostLayoutSettingsPath';
 import { Button } from '@/roboost-ui/components/Button';
 import { Field } from '@/roboost-ui/components/Field';
@@ -33,6 +36,15 @@ type RoboostProductCreatePageProps = {
 type ImageValue = { fileId: string; label: string };
 
 // Full-page product form like HubSpot's: information, billing, then one price per active currency
+const PAGE_MANAGED_FIELD_NAMES = new Set([
+  'billingFrequency',
+  'term',
+  'unitCost',
+  'image',
+  'isActive',
+  'margin',
+]);
+
 export const RoboostProductCreatePage = ({
   objectMetadataItem,
   onClose,
@@ -61,6 +73,15 @@ export const RoboostProductCreatePage = ({
       (candidate) => candidate.name === name && candidate.isActive,
     );
   const imageField = field('image');
+  const formFields = useRoboostFormFields(objectMetadataItem);
+  const formField = (name: string) =>
+    formFields.find((candidate) => candidate.field.name === name);
+  // Prices, unit cost, image and Active have their own controls on this page
+  const informationFields = formFields.filter(
+    ({ field: candidate }) =>
+      !PAGE_MANAGED_FIELD_NAMES.has(candidate.name) &&
+      !candidate.name.startsWith('price'),
+  );
   const companyPrice = Number(prices[companyCode]);
   const cost = Number(unitCost);
   const margin =
@@ -73,6 +94,14 @@ export const RoboostProductCreatePage = ({
   const isValid =
     isNonEmptyString(values.name) &&
     (values.name as string).trim() !== '' &&
+    formFields.every(({ field: candidate, isRequired }) =>
+      !isRequired
+        ? true
+        : candidate.name === 'productDescription'
+          ? description.trim() !== ''
+          : PAGE_MANAGED_FIELD_NAMES.has(candidate.name) ||
+            isRoboostFieldValueFilled(values[candidate.name]),
+    ) &&
     Number.isFinite(companyPrice) &&
     prices[companyCode] !== undefined &&
     prices[companyCode] !== '';
@@ -106,9 +135,14 @@ export const RoboostProductCreatePage = ({
         billingFrequency: values.billingFrequency,
       };
 
-      for (const name of ['sku', 'productType', 'term']) {
-        if (isDefined(values[name]) && values[name] !== '') {
-          input[name] = values[name];
+      for (const { field: candidate } of formFields) {
+        if (
+          !PAGE_MANAGED_FIELD_NAMES.has(candidate.name) &&
+          candidate.name !== 'productDescription' &&
+          candidate.name !== 'name' &&
+          isRoboostFieldValueFilled(values[candidate.name])
+        ) {
+          input[getRoboostFieldInputKey(candidate)] = values[candidate.name];
         }
       }
       if (!isRecurring) {
@@ -158,11 +192,15 @@ export const RoboostProductCreatePage = ({
     }
   };
 
-  const renderInput = (name: string, required = false) => {
+  const renderInput = (name: string) => {
     const metadata = field(name);
+    const configured = formField(name);
 
-    return isDefined(metadata) ? (
-      <Field label={metadata.label} required={required}>
+    return isDefined(metadata) && isDefined(configured) ? (
+      <Field
+        label={metadata.label}
+        required={name === 'name' || configured.isRequired}
+      >
         <RoboostFieldInput
           field={metadata}
           value={values[name]}
@@ -217,23 +255,24 @@ export const RoboostProductCreatePage = ({
           <h2 className="rb-pcreate-heading">{t`Product information`}</h2>
           <div className="rb-pcreate-info">
             <div className="rb-pcreate-grid">
-              {renderInput('name', true)}
-              {renderInput('sku')}
-              <Field
-                label={
-                  field('productDescription')?.label ?? t`Product description`
-                }
-                className="rb-pcreate-wide"
-              >
-                <textarea
-                  className="rb-input rb-pcreate-textarea"
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                />
-              </Field>
-              <div className="rb-pcreate-wide">
-                {renderInput('productType')}
-              </div>
+              {informationFields.map(({ field: candidate, isRequired }) =>
+                candidate.name === 'productDescription' ? (
+                  <Field
+                    key={candidate.id}
+                    label={candidate.label}
+                    required={isRequired}
+                    className="rb-pcreate-wide"
+                  >
+                    <textarea
+                      className="rb-input rb-pcreate-textarea"
+                      value={description}
+                      onChange={(event) => setDescription(event.target.value)}
+                    />
+                  </Field>
+                ) : (
+                  <div key={candidate.id}>{renderInput(candidate.name)}</div>
+                ),
+              )}
             </div>
             <div className="rb-pcreate-image">
               {isDefined(image) ? (

@@ -459,3 +459,42 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
+
+/* Each line shows and can change its own currency */
+.rb-li-currency {
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: 600 11px/16px var(--font-sans);
+  padding: 0 7px;
+}
+.rb-li-currency:hover:not([disabled]) {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.rb-li-currency[disabled] {
+  cursor: default;
+}
+.rb-li-currency-select {
+  width: 96px;
+}
+.rb-li-converted {
+  color: var(--text-muted);
+  font: 400 12px/16px var(--font-sans);
+  margin-left: 6px;
+}
+.rb-li-library-tools {
+  display: flex;
+  gap: 8px;
+}
+.rb-li-library-tools > :first-child {
+  flex: 1;
+}
+.rb-li-library-currency {
+  width: 110px;
+}
+.rb-li-form-edit {
+  margin-right: auto;
+}
